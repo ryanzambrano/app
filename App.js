@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TextInput, View, Image } from 'react-native';
 import { Button } from 'react-native';
 
 export default function App() {
@@ -11,8 +11,12 @@ export default function App() {
       <View style = {styles.box}></View>
       <View style = {styles.box}></View>
       <View style = {styles.balls}>
-        <View style = {styles.box}></View>
-        <View style = {styles.box}></View>
+        <View style = {styles.none}>
+          <TextInput style = { styles.bar }></TextInput>
+          </View>
+          <Image style = { styles.box } source = { 'assets/icon.png'}></Image>
+        <View style = {styles.none}></View>
+        <Text style = { styles.none }>search</Text>
       </View>
 
       <StatusBar style="auto" />
@@ -26,11 +30,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
-
   },
 
   mid: {
     fontSize: 50,
+    marginTop: 50,
   },
 
   box: {
@@ -40,6 +44,16 @@ const styles = StyleSheet.create({
   balls: {
     flex: 1,
     flexDirection: 'row',
+    justifyContent:'center',
+    alignContent: 'center',
+  },
+
+  bar: {
+    width: 100, borderBottomColor:'red', borderBottomWidth: 5,
+  },
+
+  none: {
+    
   }
 
 
