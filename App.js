@@ -1,3 +1,4 @@
+import React from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, TextInput, View, Image } from 'react-native';
 import { Button } from 'react-native';
@@ -5,26 +6,32 @@ import { Button } from 'react-native';
 export default function App() {
   return (
     <View style={styles.container}>
-      <Text style = { styles.mid }>Start matching with roomates!!</Text>
-      <Button title="Sign Up Bitch"> Details </Button>
-      <View style = {styles.box}></View>
-      <View style = {styles.box}></View>
-      <View style = {styles.box}></View>
-      <View style = {styles.balls}>
-        <View style = {styles.none}>
-          <TextInput style = { styles.bar }></TextInput>
-          </View>
-          <Image style = { styles.box } source = { 'assets/icon.png'}></Image>
-        <View style = {styles.none}></View>
-        <Text style = { styles.none }>search</Text>
-      </View>
-
+      <Text style = { styles.welcomeText }>Roomba</Text>
+      <Text style = { styles.sloganText }>Find and meet your new roomates</Text>
+      <Button title="Sign Up"> Details </Button>
       <StatusBar style="auto" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  welcomeText: {
+    flex: 1,
+    fontFamily: 'Verdana-Bold',
+    fontSize: 45,
+    textAlign: "center",
+    marginBottom: 10,
+    marginTop: "40%",
+  },
+
+  sloganText: {
+    flex: 1,
+    fontFamily: 'Verdana',
+    fontSize: 20,
+    textAlign: "center",
+    marginBottom: 10,
+  },
+
   container: {
     flex: 1,
     backgroundColor: 'white',
