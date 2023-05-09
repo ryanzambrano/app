@@ -6,7 +6,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style = { styles.mid }>Start matching with roomates!!</Text>
-      <Button title="Sign Up"> Details </Button>
+      <Button title="Sign Up Bitch"> Details </Button>
       <View style = {styles.box}></View>
       <View style = {styles.box}></View>
       <View style = {styles.box}></View>
