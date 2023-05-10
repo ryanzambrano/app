@@ -7,9 +7,8 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style = { styles.welcomeText }>Roomba</Text>
-      <Text style = { styles.sloganText }>Find and meet your new roomates</Text>
-      <Button title="Sign Up"> Details </Button>
-      <StatusBar style="auto" />
+      <Text style = { styles.sloganText }>Find and meet new roomates, for any situation!</Text>
+      <Button title="Sign Up Bitch"> Details </Button>
     </View>
   );
 }
@@ -20,7 +19,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Verdana-Bold',
     fontSize: 45,
     textAlign: "center",
-    marginBottom: 10,
+    marginBottom: -475,
     marginTop: "40%",
   },
 
