@@ -14,11 +14,11 @@ export default function App() {
       <View style={styles.container}>
         <View style={styles.header}>
           <Image
-            source={{ uri: "https://th.bing.com/th/id/R.2e5759904001f6bfb51514cfe25d9fae?rik=mjp6tYknw47rEA&riu=http%3a%2f%2fwww.newdesignfile.com%2fpostpic%2f2009%2f07%2fhome-button-icon_6176.png&ehk=Lun4Q0YhJO1adNrK72JB3%2brQm5p6s2ug3vWUBSJnthA%3d&risl=&pid=ImgRaw&r=0"}}
+            source={{ uri: "https://cdn3.iconfinder.com/data/icons/furniture-volume-1-2/48/12-512.png"}}
             style={styles.headerImage}
             alt="Logo "
           />
-          <Text style = { styles.titleText }>Sign into RoomBa</Text>
+          <Text style = { styles.titleText }>Sign into RoomSurf</Text>
           <Text style = { styles.sloganText }>Find and meet new roomates, for any situation!</Text>
         </View>
 
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     width: 90,
     height: 90,
     alignSelf: 'center',
-    marginBottom: 33,
+    marginBottom: 25,
   },
 
   titleText: {
