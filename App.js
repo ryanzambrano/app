@@ -68,9 +68,10 @@ export default function App() {
             }}
             style={{ marginTop: 'auto' }}>
             <Text style={styles.formFooter}>
-              Don't have an account?{' '} <Text style={{ textDecorationLine: 'underline' }}>Sign up</Text>
+              Don't have an account?{' '} <Text style={{ textDecorationLine: 'underline' }}>Sign up Bitch</Text>
             </Text>
           </TouchableOpacity>
+
         </View>
       </View>
     </SafeAreaView>
@@ -80,6 +81,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  
   container: {
     padding: 24,
     flex: 1,
@@ -176,6 +178,7 @@ const styles = StyleSheet.create({
   none: {
     
   },
+
 
 
 });
