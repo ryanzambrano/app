@@ -26,13 +26,13 @@ export default function App() {
 
           <View style={styles.input}>
             <Text style={styles.inputHeader}>Email Address:</Text>
-            <TextInput style={styles.inputControl} 
+            <TextInput style={styles.inputControl}hi
               autoCapitalize='none'
               autoCorrect={false}
               keyboardType='email-address'
-              placeholder='deeznuts@bruh.com'S
+              placeholder='deeznuts@bruh.com'
               placeholderTextColor="#6b7280"
-              value={form.email} 
+              value={form.email}
               onChangeText={email => setForm({ ...form, email })} 
             />
           </View>
