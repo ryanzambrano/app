@@ -16,7 +16,6 @@ mongoose.connect('mongodb://localhost/mydatabase', {
 const userSchema = new mongoose.Schema({
   name: String,
   email: String,
-  age: Number
 });
 
 // Create a mongoose model for a User using the userSchema
