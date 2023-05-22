@@ -1,8 +1,39 @@
+import 'react-native-url-polyfill/auto';
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, TextInput, View, Image, SafeAreaView, TouchableOpacity, Button } from 'react-native';
+import { supabase } from './supabase.js';
+//import { insertUser} from './server.js';
 
 export default function App() {
+
+  async function signupUser(email, password) {
+    try {
+      // Sign up a user with email and password
+      const { user, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+  
+      if (error) {
+        console.error('Error signing up user:', error.message);
+        return;
+      }
+  
+      console.log('User signed up successfully:', user);
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+  }
+
+  async function insertUser(user) {
+    const { data, error } = await supabase.from('users').insert([user]);
+    if (error) {
+      console.error('Error inserting user:', error);
+    } else {
+      console.log('User inserted successfully:', data);
+    }
+  }
 
   const [form, setForm] = useState({
     email: '',
@@ -54,6 +85,8 @@ export default function App() {
             <TouchableOpacity
               onPress={() => {
                 // handle onPress
+                signupUser( form.email, form.password );
+                
               }}>
               <View style={styles.continue}>
                 <Text style={styles.continueText}>Sign in</Text>
@@ -65,6 +98,8 @@ export default function App() {
           <TouchableOpacity
             onPress={() => {
               // handle link
+            
+            
             }}
             style={{ marginTop: 'auto' }}>
             <Text style={styles.formFooter}>
