@@ -2,7 +2,7 @@ import 'react-native-url-polyfill/auto';
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, TextInput, View, Image, SafeAreaView, TouchableOpacity, Button } from 'react-native';
-import { supabase } from './supabase.js';
+import { supabase } from './auth/supabase.js';
 import SignUp from './signUp.js';
 //import { insertUser} from './server.js';
 
