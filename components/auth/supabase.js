@@ -8,7 +8,7 @@ export const supabase = createClient(
 
 // Example: Querying data from a table
 async function getUsers() {
-  const { data, error } = await supabase.from('users').select('*');
+  const { data, error } = await supabase.from('profiles').select('*');
   if (error) {
     console.error('Error fetching users:', error);
   } else {
@@ -18,7 +18,7 @@ async function getUsers() {
 
 // Example: Inserting data into a table
 async function insertUser(user) {
-  const { data, error } = await supabase.from('users').insert([user]);
+  const { data, error } = await supabase.from('profiles').insert([user]);
   if (error) {
     console.error('Error inserting user:', error);
   } else {
@@ -44,6 +44,18 @@ async function signupUser(email, password) {
     console.error('Error:', error.message);
   }
 }
+
+async function signInWithEmail(email, password) {
+  setLoading(true)
+  const { error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password,
+  })
+
+  if (error) Alert.alert(error.message)
+  setLoading(false)
+}
+
 
 
 // Call the function to signup a user
