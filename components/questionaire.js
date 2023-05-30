@@ -5,7 +5,6 @@ import { StyleSheet, Text, TextInput, View, Image, SafeAreaView, TouchableOpacit
 import { Picker } from '@react-native-picker/picker';
 import { supabase } from './auth/supabase.js';
 import SignUp from './signUp.js';
-import BirthdayPicker from './smaller-components/birthday-picker.js';
 //import { insertUser} from './server.js';
 
 export const Questionaire = ({navigation}) => {
@@ -28,40 +27,88 @@ export const Questionaire = ({navigation}) => {
     password: '',
   });
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isBirthdayModalVisible, setIsBirthdayModalVisible] = useState(false);
+  const [isGenderModalVisible, setIsGenderModalVisible] = useState(false);
+  const [isRaceModalVisible, setIsRaceModalVisible] = useState(false);
+
     const [selectedDay, setSelectedDay] = useState('');
     const [selectedMonth, setSelectedMonth] = useState('');
     const [selectedYear, setSelectedYear] = useState('');
-  
+
+    const [selectedGender, setSelectedGender] = useState('');
+
+    const [selectedRace, setSelectedRace] = useState('');
+
     const days = Array.from(Array(31).keys()).map((day) => String(day + 1));
     const months = [
       'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'
     ];
     const years = Array.from(Array(100).keys()).map((year) => String(2023 - year));
-  
-    const openModal = () => {
-      setIsModalVisible(true);
+
+    const gender = [
+        'Male', 'Female', 'Other',
+      ];
+
+    const race = [
+        'White', 'Black', 'Brown', 'Yellow',
+    ]
+
+    const openBirthdayModal = () => {
+      setIsBirthdayModalVisible(true);
+      
     };
-  
-    const closeModal = () => {
-      setIsModalVisible(false);
+
+    const closeBirthdayModal = () => {
+      setIsBirthdayModalVisible(false);
     };
+
+    const openGenderModal = () => {
+        setIsGenderModalVisible(true);
+        
+      };
   
+      const closeGenderModal = () => {
+        setIsGenderModalVisible(false);
+      };
 
-    const handleSave = () => {
+      const openRaceModal = () => {
+        setIsRaceModalVisible(true);
+        
+      };
+  
+      const closeRaceModal = () => {
+        setIsRaceModalVisible(false);
+      };
 
-        closeModal();
 
+    const handleSaveBirthday = () => {
+
+        
         const birthday = {
           day: selectedDay,
           month: selectedMonth,
           year: selectedYear
         };
 
+        closeBirthdayModal();
       };
-      
-  
+
+      const handleSaveGender = () => {
+        const gender = {
+            gender: selectedGender,
+        }
+
+        closeGenderModal();
+      };
+
+      const handleSaveRace = () => {
+        const race = {
+            race: selectedRace,
+        }
+
+        closeRaceModal();
+      };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#eBecf4' }}>
@@ -79,10 +126,10 @@ export const Questionaire = ({navigation}) => {
             placeholder="Select your birthday"
             placeholderTextColor="#6b7280"
             value={`${selectedDay} ${selectedMonth} ${selectedYear}`}
-            onFocus={openModal}>
-    </TextInput>
+            onFocus={openBirthdayModal}>
+            </TextInput>
   
-        <Modal visible={isModalVisible} animationType="slide">
+        <Modal visible={isBirthdayModalVisible} animationType="slide">
           <View>
             <Picker
               selectedValue={selectedDay}
@@ -111,54 +158,79 @@ export const Questionaire = ({navigation}) => {
               ))}
             </Picker>
   
-            <Button title="Save" onPress={handleSave} />
-            <Button title="Cancel" onPress={closeModal} />
+            <Button title="Save" onPress={handleSaveBirthday} />
+            <Button title="Cancel" onPress={closeBirthdayModal} />
+          </View>
+        </Modal>
+          </View>
+
+          
+
+          <View style={styles.input}>
+            <Text style={styles.inputHeader}>Gender</Text>
+            
+            <TextInput style={styles.inputControl}
+            placeholder="Select your Gender"
+            placeholderTextColor="#6b7280"
+            value={`${selectedGender}`}
+            onFocus={openGenderModal}>
+            </TextInput>
+  
+        <Modal visible={isGenderModalVisible} animationType="slide">
+          <View>
+            <Picker style={styles.center}
+              selectedValue={selectedGender}
+              onValueChange={(itemValue) => setSelectedGender(itemValue)}
+            >
+              {gender.map((Gender) => (
+                <Picker.Item key={Gender} label={Gender} value={Gender} />
+              ))}
+            </Picker>
+
+            <Button title="Save" onPress={handleSaveGender} />
+            <Button title="Cancel" onPress={closeGenderModal} />
           </View>
         </Modal>
           </View>
 
           <View style={styles.input}>
-            <Text style={styles.inputHeader}>Gender</Text>
-            <TextInput style={styles.inputControl}hi
-              autoCapitalize='none'
-              autoCorrect={false}
-              value={form.email}
-              onChangeText={email => setForm({ ...form, email })} 
-            />
-          </View>
-
-          <View style={styles.input}>
             <Text style={styles.inputHeader}>Race</Text>
-            <TextInput style={styles.inputControl} 
-              styles={styles.inputControl}
-              autoCorrect={false}
-              value={form.password}
-              onChangeText={password => setForm({ ...form, password })}
-              secureTextEntry={true}
-            />
+            
+            <TextInput style={styles.inputControl}
+            placeholder="Select your Race"
+            placeholderTextColor="#6b7280"
+            value={`${selectedRace}`}
+            onFocus={openRaceModal}>
+            </TextInput>
+  
+        <Modal visible={isRaceModalVisible} animationType="slide">
+          <View>
+            <Picker style={styles.center}
+              selectedValue={selectedRace}
+              onValueChange={(itemValue) => setSelectedRace(itemValue)}
+            >
+              {race.map((race) => (
+                <Picker.Item key={race} label={race} value={race} />
+              ))}
+            </Picker>
+
+            <Button title="Save" onPress={handleSaveRace} />
+            <Button title="Cancel" onPress={closeRaceModal} />
+          </View>
+        </Modal>
           </View>
 
           <View style={styles.formAction}>
             <TouchableOpacity
               onPress={() => {
                 // handle onPress
-                
-                
+
               }}>
               <View style={styles.continue}>
                 <Text style={styles.continueText}>Next</Text>
-              
               </View>
             </TouchableOpacity>
           </View>
-
-          <TouchableOpacity
-            onPress={() => {
-              // handle link
-            navigation.navigate('SignUp')
-            }}
-            style={{ marginTop: 'auto' }}>
-          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
@@ -233,14 +305,6 @@ const styles = StyleSheet.create({
     marginVertical: 24,
   },
 
-  formFooter: {
-     fontSize: 17,
-     fontWeight: '600',
-     color: '#222',
-     textAlign: 'center',
-     letterSpacing: 0.15,
-  },
-
   continue: {
     marginTop: 5,
     marginBottom: 20,
@@ -262,10 +326,10 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
 
-  none: {
-    
-  },
-
+  center: {
+    marginTop: '60%',
+    marginBottom: '20%',
+  }
 
 });
 
