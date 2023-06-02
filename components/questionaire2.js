@@ -18,7 +18,7 @@ import { supabase, insertUser } from "./auth/supabase.js";
 import SignUp from "./signUp.js";
 //import { insertUser} from './server.js';
 
-export const Questionaire = ({ navigation }) => {
+export const Questionaire2 = ({ navigation }) => {
   const windowHeight = Dimensions.get("window").height;
   const [isBirthdayModalVisible, setIsBirthdayModalVisible] = useState(false);
   const [isGenderModalVisible, setIsGenderModalVisible] = useState(false);
@@ -34,6 +34,8 @@ export const Questionaire = ({ navigation }) => {
   const [selectedGender, setSelectedGender] = useState("Select your Gender");
 
   const [selectedRace, setSelectedRace] = useState("Select your Race");
+
+  const [formattedBirthday, setFormattedBirthday] = useState("");
 
   const days = Array.from(Array(31).keys()).map((day) => String(day + 1));
   const months = [
@@ -289,14 +291,7 @@ export const Questionaire = ({ navigation }) => {
           </View>
 
           <View style={styles.formAction}>
-            <TouchableOpacity
-              onPress={() => {
-                {
-                  /*insertUser(userData);*/
-                  navigation.navigate("Questionaire2");
-                }
-              }}
-            >
+            <TouchableOpacity onPress={() => {}}>
               <View style={styles.continue}>
                 <Text style={styles.continueText}>Next</Text>
               </View>
@@ -318,6 +313,13 @@ const styles = StyleSheet.create({
     marginVertical: 36,
   },
 
+  headerImage: {
+    width: 90,
+    height: 90,
+    alignSelf: "center",
+    marginBottom: 25,
+  },
+
   titleText: {
     fontFamily: "Verdana-Bold",
     fontSize: 27,
@@ -325,6 +327,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 12,
     color: "#1e1e1e",
+  },
+
+  sloganText: {
+    fontFamily: "Verdana",
+    fontSize: 15,
+    fontWeight: "500",
+    color: "#929292",
+    textAlign: "center",
   },
 
   input: {
@@ -355,7 +365,6 @@ const styles = StyleSheet.create({
 
   inputText: {
     color: "#6b7280",
-    fontWeight: "500",
   },
 
   form: {
@@ -440,4 +449,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Questionaire;
+export default Questionaire2;
