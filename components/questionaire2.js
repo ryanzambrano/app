@@ -21,224 +21,165 @@ import SignUp from "./signUp.js";
 export const Questionaire2 = ({ navigation }) => {
   const windowHeight = Dimensions.get("window").height;
   const [isBirthdayModalVisible, setIsBirthdayModalVisible] = useState(false);
-  const [isGenderModalVisible, setIsGenderModalVisible] = useState(false);
-  const [isRaceModalVisible, setIsRaceModalVisible] = useState(false);
+  const [isForFunModalVisible, setIsForFunModalVisible] = useState(false);
+  const [isLivingPreferencesModalVisible, setIsLivingPreferencesModalVisible] =
+    useState(false);
 
-  const [selectedDay, setSelectedDay] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
-  const [selectedBirthday, setSelectedBirthday] = useState(
-    "Select your Birthday"
+  const [selectedStudies, setSelectedStudies] = useState("");
+
+  const [selectedForFun, setSelectedForFun] = useState("Stay in or Go out?");
+
+  const [selectedLivingPreferences, setSelectedLivingPreferences] = useState(
+    "Select your Living Preferences"
   );
 
-  const [selectedGender, setSelectedGender] = useState("Select your Gender");
+  const livingPreferences = ["Apartment", "Dorm", "No Preferences", "Other"];
 
-  const [selectedRace, setSelectedRace] = useState("Select your Race");
+  const forFun = ["Stay in", "Go out"];
 
-  const [formattedBirthday, setFormattedBirthday] = useState("");
-
-  const days = Array.from(Array(31).keys()).map((day) => String(day + 1));
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const monthIndex = months.indexOf(selectedMonth);
-  const numericalMonth = monthIndex + 1;
-  const years = Array.from(Array(100).keys()).map((year) =>
-    String(2023 - year)
-  );
-
-  const gender = ["Male", "Female", "Other"];
-
-  const race = ["White", "Black", "Brown", "Yellow"];
-
-  const openBirthdayModal = () => {
-    setIsBirthdayModalVisible(true);
+  const openStudiesModal = () => {
+    setIsStudiesModalVisible(true);
   };
 
-  const closeBirthdayModal = () => {
-    setIsBirthdayModalVisible(false);
+  const closeStudiesModal = () => {
+    setIsStudiesModalVisible(false);
   };
 
-  const openGenderModal = () => {
-    setIsGenderModalVisible(true);
+  const openForFunModal = () => {
+    setIsForFunModalVisible(true);
   };
 
-  const closeGenderModal = () => {
-    setIsGenderModalVisible(false);
+  const closeForFunModal = () => {
+    setIsForFunModalVisible(false);
   };
 
-  const openRaceModal = () => {
-    setIsRaceModalVisible(true);
+  const openLivingPreferencesModal = () => {
+    setIsLivingPreferencesModalVisible(true);
   };
 
-  const closeRaceModal = () => {
-    setIsRaceModalVisible(false);
-  };
-
-  const handleSaveBirthday = () => {
-    const formattedBirthday = `${selectedYear}-${numericalMonth
-      .toString()
-      .padStart(2, "0")}-${selectedDay.toString().padStart(2, "0")}`;
-
-    setSelectedBirthday(selectedMonth + " " + selectedDay + " " + selectedYear);
-
-    closeBirthdayModal();
+  const closeLivingPreferencesModal = () => {
+    setIsLivingPreferencesModalVisible(false);
   };
 
   const userData = {
-    name: "royce",
-    age: 19,
-    birthday: `${selectedYear}-${numericalMonth
-      .toString()
-      .padStart(2, "0")}-${selectedDay.toString().padStart(2, "0")}`,
-    race: selectedRace,
-    gender: selectedGender,
+    living_preferences: selectedLivingPreferences,
+    for_fun: selectedForFun,
+    studies: selectedStudies,
   };
 
-  async function insertUser(userData) {
-    const { data, error } = await supabase.from("profiles").insert([
-      {
-        name: userData.name,
-        age: userData.age,
-        birthday: userData.birthday,
-        race: userData.race,
-        gender: userData.gender,
-      },
-    ]);
+  const updateProfile = async () => {
+    // Update the user profile in the 'profiles' table
+    const { data, error } = await supabase
+      .from("profiles")
+      .update([
+        {
+          living_preferences: "dorm",
+        },
+      ])
+      .eq("id", 1);
+
     if (error) {
-      console.error("Error inserting user:", error);
+      console.error("Error updating profile:", error.message);
     } else {
-      console.log("User inserted successfully:", data);
+      console.log("Profile updated successfully:", data);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.titleText}>
-            Answer some questions about yourself!
-          </Text>
+          <Text style={styles.titleText}>Answer some lifestyle questions!</Text>
         </View>
 
         <View style={styles.form}>
           <View style={styles.input}>
-            <Text style={styles.inputHeader}>Birthday</Text>
+            <Text style={styles.inputHeader}>
+              Do you have living preferences?
+            </Text>
 
             <TouchableOpacity
               onPress={() => {
-                openBirthdayModal();
+                openLivingPreferencesModal();
               }}
             >
               <View style={styles.inputControl}>
-                <Text
-                  style={styles.inputText}
-                  placeholder="Select your Gender"
-                  placeholderTextColor="#6b7280"
-                  value={`${selectedGender}`}
-                >
-                  {selectedBirthday}
+                <Text style={styles.inputText}>
+                  {selectedLivingPreferences}
                 </Text>
               </View>
             </TouchableOpacity>
 
             <Modal
-              visible={isBirthdayModalVisible}
+              visible={isLivingPreferencesModalVisible}
               animationType="slide"
               transparent
             >
               <View style={styles.modalContainer}>
                 <View style={styles.pickerContainer}>
                   <Picker
-                    style={styles.pickerDate}
-                    selectedValue={selectedDay}
-                    onValueChange={(itemValue) => setSelectedDay(itemValue)}
-                  >
-                    {days.map((day) => (
-                      <Picker.Item key={day} label={day} value={day} />
-                    ))}
-                  </Picker>
-
-                  <Picker
                     style={styles.picker}
-                    selectedValue={selectedMonth}
-                    onValueChange={(itemValue) => setSelectedMonth(itemValue)}
+                    selectedValue={selectedLivingPreferences}
+                    onValueChange={(itemValue) =>
+                      setSelectedLivingPreferences(itemValue)
+                    }
                   >
-                    {months.map((month) => (
-                      <Picker.Item key={month} label={month} value={month} />
-                    ))}
-                  </Picker>
-
-                  <Picker
-                    style={styles.pickerYear}
-                    selectedValue={selectedYear}
-                    onValueChange={(itemValue) => setSelectedYear(itemValue)}
-                  >
-                    {years.map((year) => (
-                      <Picker.Item key={year} label={year} value={year} />
+                    {livingPreferences.map((livingPreferences) => (
+                      <Picker.Item
+                        key={livingPreferences}
+                        label={livingPreferences}
+                        value={livingPreferences}
+                      />
                     ))}
                   </Picker>
                 </View>
+
                 <View style={styles.bbuttons}>
-                  <Button title="Save" onPress={handleSaveBirthday} />
-                  <Button title="Cancel" onPress={closeBirthdayModal} />
+                  <Button title="Save" onPress={closeLivingPreferencesModal} />
+                  <Button
+                    title="Cancel"
+                    onPress={closeLivingPreferencesModal}
+                  />
                 </View>
               </View>
             </Modal>
           </View>
 
           <View style={styles.input}>
-            <Text style={styles.inputHeader}>Gender</Text>
+            <Text style={styles.inputHeader}>
+              For fun, would you rather stay in or go out?
+            </Text>
 
             <TouchableOpacity
               onPress={() => {
-                openGenderModal();
+                openForFunModal();
               }}
             >
               <View style={styles.inputControl}>
-                <Text
-                  style={styles.inputText}
-                  placeholder="Select your Gender"
-                  placeholderTextColor="#6b7280"
-                  value={`${selectedGender}`}
-                >
-                  {selectedGender}
-                </Text>
+                <Text style={styles.inputText}>{selectedForFun}</Text>
               </View>
             </TouchableOpacity>
 
             <Modal
-              visible={isGenderModalVisible}
+              visible={isForFunModalVisible}
               animationType="slide"
               transparent
             >
-              <View style={styles.modalContainerGender}>
-                <View style={styles.pickerContainerGender}>
+              <View style={styles.modalContainer}>
+                <View style={styles.pickerContainer}>
                   <Picker
                     style={styles.picker}
-                    selectedValue={selectedGender}
-                    onValueChange={(itemValue) => setSelectedGender(itemValue)}
+                    selectedValue={selectedForFun}
+                    onValueChange={(itemValue) => setSelectedForFun(itemValue)}
                   >
-                    {gender.map((Gender) => (
+                    {forFun.map((Gender) => (
                       <Picker.Item key={Gender} label={Gender} value={Gender} />
                     ))}
                   </Picker>
                 </View>
                 <View style={styles.bbuttons}>
-                  <Button title="Save" onPress={closeGenderModal} />
-                  <Button title="Cancel" onPress={closeGenderModal} />
+                  <Button title="Save" onPress={closeForFunModal} />
+                  <Button title="Cancel" onPress={closeForFunModal} />
                 </View>
               </View>
             </Modal>
@@ -249,49 +190,57 @@ export const Questionaire2 = ({ navigation }) => {
 
             <TouchableOpacity
               onPress={() => {
-                openRaceModal();
+                openLivingPreferencesModal();
               }}
             >
               <View style={styles.inputControl}>
-                <Text
-                  style={styles.inputText}
-                  placeholder="Select your Gender"
-                  placeholderTextColor="#6b7280"
-                  value={`${selectedGender}`}
-                >
-                  {selectedRace}
+                <Text style={styles.inputText}>
+                  {selectedLivingPreferences}
                 </Text>
               </View>
             </TouchableOpacity>
 
             <Modal
-              visible={isRaceModalVisible}
+              visible={isLivingPreferencesModalVisible}
               animationType="slide"
               transparent
             >
-              <View style={styles.modalContainerGender}>
-                <View style={styles.pickerContainerGender}>
+              <View style={styles.modalContainer}>
+                <View style={styles.pickerContainer}>
                   <Picker
                     style={styles.picker}
-                    selectedValue={selectedRace}
-                    onValueChange={(itemValue) => setSelectedRace(itemValue)}
+                    selectedValue={selectedLivingPreferences}
+                    onValueChange={(itemValue) =>
+                      setSelectedLivingPreferences(itemValue)
+                    }
                   >
-                    {race.map((race) => (
-                      <Picker.Item key={race} label={race} value={race} />
+                    {livingPreferences.map((livingPreferences) => (
+                      <Picker.Item
+                        key={livingPreferences}
+                        label={livingPreferences}
+                        value={livingPreferences}
+                      />
                     ))}
                   </Picker>
                 </View>
 
                 <View style={styles.bbuttons}>
-                  <Button title="Save" onPress={closeRaceModal} />
-                  <Button title="Cancel" onPress={closeRaceModal} />
+                  <Button title="Save" onPress={closeLivingPreferencesModal} />
+                  <Button
+                    title="Cancel"
+                    onPress={closeLivingPreferencesModal}
+                  />
                 </View>
               </View>
             </Modal>
           </View>
 
           <View style={styles.formAction}>
-            <TouchableOpacity onPress={() => {}}>
+            <TouchableOpacity
+              onPress={() => {
+                updateProfile(selectedLivingPreferences);
+              }}
+            >
               <View style={styles.continue}>
                 <Text style={styles.continueText}>Next</Text>
               </View>
@@ -403,14 +352,6 @@ const styles = StyleSheet.create({
 
   modalContainer: {
     flex: 1,
-    marginTop: "100%",
-    backgroundColor: "#fff",
-    justifyContent: "space-around",
-    gap: "50%",
-  },
-
-  modalContainerGender: {
-    flex: 1,
     marginTop: "130%",
     backgroundColor: "#fff",
     justifyContent: "space-around",
@@ -420,14 +361,9 @@ const styles = StyleSheet.create({
   pickerContainer: {
     flex: 1,
     flexDirection: "row",
-    marginTop: "7%",
-  },
-
-  pickerContainerGender: {
-    flex: 1,
-    flexDirection: "row",
     marginTop: "1%",
   },
+
   picker: {
     flex: 1,
   },
