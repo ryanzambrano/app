@@ -14,7 +14,7 @@
     "@react-navigation/stack": "^6.3.16",
     "@supabase/supabase-js": "^2.22.0",
     "body-parser": "^1.20.2",
-    "expo": "~48.0.15",
+    "expo": "^48.0.17",
     "expo-cli": "^6.3.7",
     "expo-secure-store": "~12.1.1",
     "expo-status-bar": "~1.4.4",
@@ -28,6 +28,9 @@
     "react": "18.2.0",
     "react-native": "0.71.7",
     "react-native-elements": "^3.4.3",
+    "react-native-gesture-handler": "^2.10.2",
+    "react-native-reanimated": "^3.2.0",
+    "react-native-sound": "^0.11.2",
     "react-native-url-polyfill": "^1.3.0"
   },
   "devDependencies": {
