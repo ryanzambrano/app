@@ -2,16 +2,17 @@ import 'react-native-url-polyfill/auto';
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, TextInput, View, Image, SafeAreaView, TouchableOpacity, Button } from 'react-native';
-import { supabase } from './supabase.js';
+import { supabase } from './auth/supabase.js';
+import SignUp from './signUp.js';
 //import { insertUser} from './server.js';
 
-export const SignUp = () => {
+export const SignIn = ({navigation}) => {
 
   const [loading, setLoading] = useState(false)
 
-  async function signUpUser(email, password) {
+  async function signInUser(email, password) {
     setLoading(true)
-    const { error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     })
@@ -35,7 +36,7 @@ export const SignUp = () => {
             style={styles.headerImage}
             alt="Logo "
           />
-          <Text style = { styles.titleText }>Sign up for RoomSurf</Text>
+          <Text style = { styles.titleText }>Sign into Casa</Text>
           <Text style = { styles.sloganText }>Find and meet new roomates, for any situation!</Text>
         </View>
 
@@ -71,11 +72,11 @@ export const SignUp = () => {
             <TouchableOpacity
               onPress={() => {
                 // handle onPress
-                signUpUser( form.email, form.password );
+                signInUser( form.email, form.password );
                 
               }}>
               <View style={styles.continue}>
-                <Text style={styles.continueText}>Sign up</Text>
+                <Text style={styles.continueText}>Sign in</Text>
               
               </View>
             </TouchableOpacity>
@@ -84,7 +85,7 @@ export const SignUp = () => {
           <TouchableOpacity
             onPress={() => {
               // handle link
-            
+            navigation.navigate('SignUp')
             
             }}
             style={{ marginTop: 'auto' }}>
@@ -201,5 +202,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default SignUp;
-
+export default SignIn;

@@ -2,17 +2,16 @@ import 'react-native-url-polyfill/auto';
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, TextInput, View, Image, SafeAreaView, TouchableOpacity, Button } from 'react-native';
-import { supabase } from './supabase.js';
-import SignUp from './signUp.js';
+import { supabase } from './auth/supabase.js';
 //import { insertUser} from './server.js';
 
-export const SignIn = ({navigation}) => {
+export const SignUp = () => {
 
   const [loading, setLoading] = useState(false)
 
-  async function signInUser(email, password) {
+  async function signUpUser(email, password) {
     setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signUp({
       email: email,
       password: password,
     })
@@ -36,7 +35,7 @@ export const SignIn = ({navigation}) => {
             style={styles.headerImage}
             alt="Logo "
           />
-          <Text style = { styles.titleText }>Sign into RoomSurf</Text>
+          <Text style = { styles.titleText }>Sign up for RoomSurf</Text>
           <Text style = { styles.sloganText }>Find and meet new roomates, for any situation!</Text>
         </View>
 
@@ -72,11 +71,11 @@ export const SignIn = ({navigation}) => {
             <TouchableOpacity
               onPress={() => {
                 // handle onPress
-                signInUser( form.email, form.password );
+                signUpUser( form.email, form.password );
                 
               }}>
               <View style={styles.continue}>
-                <Text style={styles.continueText}>Sign in</Text>
+                <Text style={styles.continueText}>Sign up</Text>
               
               </View>
             </TouchableOpacity>
@@ -85,7 +84,7 @@ export const SignIn = ({navigation}) => {
           <TouchableOpacity
             onPress={() => {
               // handle link
-            navigation.navigate('SignUp')
+            
             
             }}
             style={{ marginTop: 'auto' }}>
@@ -202,4 +201,5 @@ const styles = StyleSheet.create({
 
 });
 
-export default SignIn;
+export default SignUp;
+
