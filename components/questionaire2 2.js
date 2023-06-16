@@ -14,17 +14,18 @@ import {
   Dimensions,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { supabase } from "./auth/supabase.js";
+import { supabase, insertUser } from "./auth/supabase.js";
 import SignUp from "./signUp.js";
+//import { insertUser} from './server.js';
 
 export const Questionaire2 = ({ navigation }) => {
   const windowHeight = Dimensions.get("window").height;
-  const [isStudiesModalVisible, setIsStudiesModalVisible] = useState(false);
+  const [isBirthdayModalVisible, setIsBirthdayModalVisible] = useState(false);
   const [isForFunModalVisible, setIsForFunModalVisible] = useState(false);
   const [isLivingPreferencesModalVisible, setIsLivingPreferencesModalVisible] =
     useState(false);
 
-  const [selectedStudies, setSelectedStudies] = useState("Select your Major");
+  const [selectedStudies, setSelectedStudies] = useState("");
 
   const [selectedForFun, setSelectedForFun] = useState("Stay in or Go out?");
 
@@ -35,15 +36,6 @@ export const Questionaire2 = ({ navigation }) => {
   const livingPreferences = ["Apartment", "Dorm", "No Preferences", "Other"];
 
   const forFun = ["Stay in", "Go out"];
-
-  const studies = [
-    "Science",
-    "Business",
-    "Engineering",
-    "Art",
-    "Exploratory",
-    "Other",
-  ];
 
   const openStudiesModal = () => {
     setIsStudiesModalVisible(true);
@@ -75,42 +67,23 @@ export const Questionaire2 = ({ navigation }) => {
     studies: selectedStudies,
   };
 
-  const updateProfile = async (userData) => {
+  const updateProfile = async () => {
     // Update the user profile in the 'profiles' table
     const { data, error } = await supabase
       .from("profiles")
       .update([
         {
-          living_preferences: userData.living_preferences,
-          for_fun: userData.for_fun,
-          studies: userData.studies,
+          living_preferences: "dorm",
         },
       ])
-      .eq("id", "32");
+      .eq("id", 1);
 
     if (error) {
-      alert("Error updating profile:", error.message);
+      console.error("Error updating profile:", error.message);
     } else {
-      alert("Profile updated successfully:", data);
+      console.log("Profile updated successfully:", data);
     }
   };
-  const checkProfile = async () => {
-    const { data, error } = await supabase.from("profiles").select("*");
-    if (error) {
-      alert("Error checking profile:", error.message);
-    } else {
-      alert("Profile found:", data);
-    }
-  };
-
-  async function getUsers() {
-    const { data, error } = await supabase.from("profiles").select("*");
-    if (error) {
-      console.error("Error fetching users:", error);
-    } else {
-      console.log("Users:", data);
-    }
-  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
@@ -213,20 +186,22 @@ export const Questionaire2 = ({ navigation }) => {
           </View>
 
           <View style={styles.input}>
-            <Text style={styles.inputHeader}>What are you studying?</Text>
+            <Text style={styles.inputHeader}>Race</Text>
 
             <TouchableOpacity
               onPress={() => {
-                openStudiesModal();
+                openLivingPreferencesModal();
               }}
             >
               <View style={styles.inputControl}>
-                <Text style={styles.inputText}>{selectedStudies}</Text>
+                <Text style={styles.inputText}>
+                  {selectedLivingPreferences}
+                </Text>
               </View>
             </TouchableOpacity>
 
             <Modal
-              visible={isStudiesModalVisible}
+              visible={isLivingPreferencesModalVisible}
               animationType="slide"
               transparent
             >
@@ -234,22 +209,27 @@ export const Questionaire2 = ({ navigation }) => {
                 <View style={styles.pickerContainer}>
                   <Picker
                     style={styles.picker}
-                    selectedValue={selectedStudies}
-                    onValueChange={(itemValue) => setSelectedStudies(itemValue)}
+                    selectedValue={selectedLivingPreferences}
+                    onValueChange={(itemValue) =>
+                      setSelectedLivingPreferences(itemValue)
+                    }
                   >
-                    {studies.map((studies) => (
+                    {livingPreferences.map((livingPreferences) => (
                       <Picker.Item
-                        key={studies}
-                        label={studies}
-                        value={studies}
+                        key={livingPreferences}
+                        label={livingPreferences}
+                        value={livingPreferences}
                       />
                     ))}
                   </Picker>
                 </View>
 
                 <View style={styles.bbuttons}>
-                  <Button title="Save" onPress={closeStudiesModal} />
-                  <Button title="Cancel" onPress={closeStudiesModal} />
+                  <Button title="Save" onPress={closeLivingPreferencesModal} />
+                  <Button
+                    title="Cancel"
+                    onPress={closeLivingPreferencesModal}
+                  />
                 </View>
               </View>
             </Modal>
@@ -258,7 +238,7 @@ export const Questionaire2 = ({ navigation }) => {
           <View style={styles.formAction}>
             <TouchableOpacity
               onPress={() => {
-                updateProfile(userData);
+                updateProfile(selectedLivingPreferences);
               }}
             >
               <View style={styles.continue}>

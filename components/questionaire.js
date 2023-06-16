@@ -14,7 +14,7 @@ import {
   Dimensions,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { supabase, insertUser } from "./auth/supabase.js";
+import { supabase } from "./auth/supabase.js";
 import SignUp from "./signUp.js";
 //import { insertUser} from './server.js';
 
@@ -108,8 +108,6 @@ export const Questionaire = ({ navigation }) => {
   async function insertUser(userData) {
     const { data, error } = await supabase.from("profiles").insert([
       {
-        name: userData.name,
-        age: userData.age,
         birthday: userData.birthday,
         race: userData.race,
         gender: userData.gender,
@@ -292,7 +290,7 @@ export const Questionaire = ({ navigation }) => {
             <TouchableOpacity
               onPress={() => {
                 {
-                  /*insertUser(userData);*/
+                  insertUser(userData);
                   navigation.navigate("Questionaire2");
                 }
               }}

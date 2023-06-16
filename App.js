@@ -16,6 +16,9 @@ import SignIn from "./components/signIn.js";
 import SignUp from "./components/signUp.js";
 import Questionaire from "./components/questionaire.js";
 import Questionaire2 from "./components/questionaire2.js";
+import MessagingUI from "./components/messages.js";
+import TagSelectionScreen from "./components/tagSelectionScreen.js";
+import Email from "./components/emailValidation.js";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -26,10 +29,12 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator>
         {/* Define a Stack.Screen component for each screen */}
-        {/*<Stack.Screen name="SignIn" component={SignIn} />*/}
-        {/*<Stack.Screen name="SignUp" component={SignUp} />*/}
+        {/*<Stack.Screen name="SignIn" component={SignIn} />
+        <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="Questionaire" component={Questionaire} />
-        <Stack.Screen name="Questionaire2" component={Questionaire2} />
+  <Stack.Screen name="Questionaire2" component={Questionaire2} />*/}
+        {/*<Stack.Screen name="messages" component={MessagingUI} />*/}
+        <Stack.Screen name="Email" component={Email} />
       </Stack.Navigator>
     </NavigationContainer>
   );

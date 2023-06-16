@@ -66,5 +66,5 @@ async function signInWithEmail(email, password) {
 // Call the function to signup a user
 //signupUser('example@example.com', 'password');
 // Call the functions or other Supabase methods as needed
-//getUsers();
+getUsers();
 //insertUser({ name: 'John', age: 25 });
