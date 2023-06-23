@@ -14,7 +14,7 @@ import {
 import { supabase } from "./auth/supabase.js";
 import SignIn from "./signIn.js";
 import SignUp from "./signUp.js";
-import Questionaire1 from "./questionaire1.js";
+import Questionaire from "./questionaire1.js";
 import Questionaire2 from "./questionaire2.js";
 import MessagingUI from "./messages.js";
 import TagSelectionScreen from "./tagSelectionScreen.js";
@@ -24,26 +24,14 @@ import { Session } from "@supabase/supabase-js";
 
 const Stack = createStackNavigator();
 
-const Questionaire = ({ navigation, route }) => {
-  const { session } = route.params;
-  useEffect(() => {
-    if (!session) alert("session not found");
-  }, [session]);
+const Authentication = ({ navigation }) => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen
-        name="Questionaire1"
-        component={Questionaire1}
-        initialParams={{ session }}
-      />
-      <Stack.Screen
-        name="Questionaire2"
-        component={Questionaire2}
-        initialParams={{ session }}
-      />
+      <Stack.Screen name="SignIn" component={SignIn} />
+      <Stack.Screen name="SignUp" component={SignUp} />
       {/*<Stack.Screen name="messages" component={MessagingUI} />*/}
     </Stack.Navigator>
   );
 };
 
-export default Questionaire;
+export default Authentication;

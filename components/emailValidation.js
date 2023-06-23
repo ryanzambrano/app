@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { View, TextInput, Button, Alert } from "react-native";
-const sgMail = require("@sendgrid/mail");
-
-sgMail.setApiKey("YOUR_SENDGRID_API_KEY");
+import { supabase } from "./auth/supabase";
 
 const Email = () => {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [confirmationCode, setConfirmationCode] = useState("");
-  const [isCodeSent, setIsCodeSent] = useState(false);
+  const [isEmailSent, setIsEmailSent] = useState(false);
   const [generatedCode, setGeneratedCode] = useState(null);
 
   const generateConfirmationCode = () => {
@@ -15,27 +14,18 @@ const Email = () => {
     return Math.floor(100000 + Math.random() * 900000);
   };
 
-  const sendConfirmationCode = async () => {
-    const code = generateConfirmationCode();
-    setGeneratedCode(code);
+  const sendEmail = async (email, password) => {
+    async function signUpUser() {
+      setLoading(true);
+      const { error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+      });
+      setIsEmailSent(true);
 
-    const sendEmail = async (toEmail, subject, content) => {
-      const msg = {
-        to: toEmail,
-        from: "YOUR_SENDER_EMAIL_ADDRESS", // Replace with your sender email address
-        subject,
-        text: content,
-      };
-
-      try {
-        await sgMail.send(msg);
-        console.log("Email sent successfully");
-      } catch (error) {
-        console.error("Error sending email:", error);
-      }
-    };
-
-    module.exports = sendEmail;
+      if (error) Alert.alert(error.message);
+      setLoading(false);
+    }
   };
 
   const verifyCode = () => {
@@ -55,17 +45,18 @@ const Email = () => {
         onChangeText={setEmail}
         value={email}
       />
-
-      <Button
-        title="Send Confirmation Code"
-        onPress={sendConfirmationCode}
-        disabled={!email}
+      <TextInput
+        placeholder="Enter password"
+        onChangeText={setPassword}
+        value={password}
       />
 
-      {isCodeSent && (
+      <Button title="Sign up" onPress={sendEmail} disabled={!email} />
+
+      {isEmailSent && (
         <>
           <TextInput
-            placeholder="Enter confirmation code"
+            placeholder="go to your email and verify your account"
             onChangeText={setConfirmationCode}
             value={confirmationCode}
           />

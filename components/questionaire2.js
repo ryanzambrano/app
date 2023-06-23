@@ -1,6 +1,7 @@
 import "react-native-url-polyfill/auto";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
+
 import {
   StyleSheet,
   Text,
@@ -15,9 +16,17 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "./auth/supabase.js";
+import { Session } from "@supabase/supabase-js";
 import SignUp from "./signUp.js";
+import { NavigationHelpersContext } from "@react-navigation/native";
 
-export const Questionaire2 = ({ navigation }) => {
+export default function Questionaire2({ navigation, route }) {
+  const { session } = route.params;
+  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState("");
+  const [website, setWebsite] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
+
   const windowHeight = Dimensions.get("window").height;
   const [isStudiesModalVisible, setIsStudiesModalVisible] = useState(false);
   const [isForFunModalVisible, setIsForFunModalVisible] = useState(false);
@@ -75,41 +84,28 @@ export const Questionaire2 = ({ navigation }) => {
     studies: selectedStudies,
   };
 
-  const updateProfile = async (userData) => {
-    // Update the user profile in the 'profiles' table
+  const updateUser = async (userData, session) => {
+    if (!session?.user) {
+      alert("no user found");
+    }
     const { data, error } = await supabase
-      .from("profiles")
-      .update([
-        {
-          living_preferences: userData.living_preferences,
-          for_fun: userData.for_fun,
-          studies: userData.studies,
-        },
-      ])
-      .eq("id", "32");
+      .from("profile")
+      .update({
+        living_preferences: userData.living_preferences,
+        for_fun: userData.for_fun,
+        studies: userData.studies,
+        profile_complete: true,
+      }) // Update the profile_complete value to false
+      .eq("user_id", session.user.id);
 
     if (error) {
-      alert("Error updating profile:", error.message);
-    } else {
-      alert("Profile updated successfully:", data);
-    }
-  };
-  const checkProfile = async () => {
-    const { data, error } = await supabase.from("profiles").select("*");
-    if (error) {
-      alert("Error checking profile:", error.message);
-    } else {
-      alert("Profile found:", data);
+      throw new Error(error.message);
     }
   };
 
-  async function getUsers() {
-    const { data, error } = await supabase.from("profiles").select("*");
-    if (error) {
-      console.error("Error fetching users:", error);
-    } else {
-      console.log("Users:", data);
-    }
+  async function refreshSession() {
+    const { data, error } = await supabase.auth.refreshSession();
+    const { session, user } = data;
   }
 
   return (
@@ -258,7 +254,9 @@ export const Questionaire2 = ({ navigation }) => {
           <View style={styles.formAction}>
             <TouchableOpacity
               onPress={() => {
-                updateProfile(userData);
+                updateUser(userData, session);
+                refreshSession();
+                //navigation.navigate("TagSelectionScreen");
               }}
             >
               <View style={styles.continue}>
@@ -270,7 +268,7 @@ export const Questionaire2 = ({ navigation }) => {
       </View>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -354,8 +352,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderWidth: 1,
-    backgroundColor: "#075eec",
-    borderColor: "#075eec",
+    backgroundColor: "#14999999",
+    borderColor: "#14999999",
   },
 
   continueText: {
@@ -404,5 +402,3 @@ const styles = StyleSheet.create({
     gap: "20%",
   },
 });
-
-export default Questionaire2;

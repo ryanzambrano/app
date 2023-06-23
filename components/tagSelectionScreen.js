@@ -7,8 +7,9 @@ import {
   ScrollView,
 } from "react-native";
 import { supabase } from "./auth/supabase.js";
+import { Session } from "@supabase/supabase-js";
 
-const TagSelectionScreen = () => {
+const TagSelectionScreen = ({ session }) => {
   const [selectedTags, setSelectedTags] = useState([]);
 
   const availableTags = [
@@ -84,6 +85,42 @@ const TagSelectionScreen = () => {
     }
   };
 
+  async function signOut() {
+    const { error } = await supabase.auth.signOut();
+  }
+
+  const [isProfileCreated, setIsProfileCreated] = useState(false);
+  async function checkProfile() {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("email", form.email);
+    if (error) {
+      console.error("Error fetching users:", error);
+    }
+
+    if (data.length === 0) {
+      insertUser(form.email);
+      navigation.navigate("Questionaire");
+    } else if (data) {
+      alert(data);
+    } else {
+    }
+  }
+
+  async function validateUserSession() {
+    const {
+      data: { user, error },
+    } = await supabase.auth.getUser();
+    if (error) {
+      alert(error.message);
+    } else if (user == null) {
+      alert("invalid authentication");
+    } else {
+      alert("User is authenticated");
+    }
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Select Your Interests</Text>
@@ -101,7 +138,8 @@ const TagSelectionScreen = () => {
         <TouchableOpacity
           onPress={() => {
             {
-              updateProfile();
+              //updateProfile();
+              signOut();
             }
           }}
         >
@@ -124,14 +162,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
-    marginTop: 20,
+    marginBottom: "10%",
+    marginTop: "20%",
   },
   tagContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    marginBottom: 20,
   },
   tag: {
     backgroundColor: "#ECECEC",
@@ -159,7 +196,7 @@ const styles = StyleSheet.create({
   },
   formAction: {
     flex: 1,
-    marginBottom: "25%",
+    marginBottom: "20%",
   },
 
   continue: {
@@ -171,8 +208,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderWidth: 1,
-    backgroundColor: "#075eec",
-    borderColor: "#075eec",
+    backgroundColor: "#14999999",
+    borderColor: "#14999999",
   },
   continueText: {
     fontSize: 18,

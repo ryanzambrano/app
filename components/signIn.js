@@ -13,25 +13,51 @@ import {
 } from "react-native";
 import { supabase } from "./auth/supabase.js";
 import SignUp from "./signUp.js";
-import Questionaire from "./questionaire.js";
+import Questionaire from "./questionaire1.js";
 
 export const SignIn = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
-
-  /*useEffect(() => {
-    checkAuthentication();
-  }, []);*/
-
-  /*const checkAuthentication = async () => {
-    const user = supabase.auth.user();
-    if (user) {
-      alert("User is authenticated:", user.email);
-      // Perform actions when the user is authenticated
-      // Example navigation after authentication
+  async function insertUser(email) {
+    const { data, error } = await supabase.from("profiles").insert([
+      {
+        email: email,
+      },
+    ]);
+    if (error) {
+      console.error("Error inserting user:", error);
     } else {
-      alert("User is not authenticated");
+      console.log("User inserted successfully:", data);
     }
-  };*/
+  }
+  const [isProfileCreated, setIsProfileCreated] = useState(false);
+  async function checkProfile() {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("email", form.email);
+    if (error) {
+      console.error("Error fetching users:", error);
+    }
+
+    if (data.length === 0) {
+      insertUser(form.email);
+      navigation.navigate("Questionaire");
+    } else if (data) {
+      alert(data);
+    } else {
+    }
+  }
+
+  async function validateUserSession() {
+    const {
+      data: { user, error },
+    } = await supabase.auth.getUser();
+    if (error) {
+      console.error(error.message);
+    } else if (user == null) {
+      console.error("invalid authentication");
+    }
+  }
 
   async function signInUser(email, password) {
     setLoading(true);
@@ -40,16 +66,33 @@ export const SignIn = ({ navigation }) => {
       password: password,
     });
 
-    if (error) Alert.alert(error.message);
-    setLoading(false);
-
-    //checkAuthentication();
+    if (error) {
+      alert("no works");
+      setLoading(false);
+    } else {
+      validateUserSession();
+    }
   }
 
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
+
+  async function getsesh() {
+    const { data, error } = await supabase.auth.getSession();
+    //alert(user);
+    if (data) {
+      // User is authenticated
+      //alert();
+    } else {
+      // User is not authenticated
+      alert("User is not authenticated");
+    }
+    if (error) {
+      alert(error.message);
+    }
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
@@ -104,9 +147,6 @@ export const SignIn = ({ navigation }) => {
                 // handle onPress
 
                 signInUser(form.email, form.password);
-                checkUser();
-
-                //navigation.navigate("Questionaire");
               }}
             >
               <View style={styles.continue}>
@@ -118,7 +158,7 @@ export const SignIn = ({ navigation }) => {
           <TouchableOpacity
             onPress={() => {
               // handle link
-              //navigation.navigate("SignUp");
+              navigation.navigate("SignUp");
             }}
             style={{ marginTop: "auto" }}
           >
@@ -216,8 +256,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderWidth: 1,
-    backgroundColor: "#075eec",
-    borderColor: "#075eec",
+    backgroundColor: "#14999999",
+    borderColor: "#14999999",
   },
 
   continueText: {

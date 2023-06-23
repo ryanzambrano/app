@@ -85,6 +85,11 @@ export const Questionaire2 = ({ navigation }) => {
     }
   };
 
+  async function refreshSession() {
+    const { data, error } = await supabase.auth.refreshSession();
+    const { session, user } = data;
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
       <View style={styles.container}>
@@ -238,7 +243,8 @@ export const Questionaire2 = ({ navigation }) => {
           <View style={styles.formAction}>
             <TouchableOpacity
               onPress={() => {
-                updateProfile(selectedLivingPreferences);
+                updateProfile();
+                refreshSession();
               }}
             >
               <View style={styles.continue}>

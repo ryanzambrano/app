@@ -1,5 +1,5 @@
 import "react-native-url-polyfill/auto";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
@@ -18,26 +18,120 @@ import Questionaire from "./components/questionaire.js";
 import Questionaire2 from "./components/questionaire2.js";
 import MessagingUI from "./components/messages.js";
 import TagSelectionScreen from "./components/tagSelectionScreen.js";
+import Username from "./components/username.js";
 import Email from "./components/emailValidation.js";
+import Authentication from "./components/authentication.js";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { Session } from "@supabase/supabase-js";
 
 const Stack = createStackNavigator();
 
 const App = () => {
+  const [session, setSession] = useState(null);
+  const [hasProfile, setHasProfile] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      checkUserProfile(session);
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      checkUserProfile(session);
+    });
+  }, []);
+
+  const checkUserProfile = async (session) => {
+    if (session?.user) {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from("profile")
+        .select("profile_complete")
+        .eq("user_id", session.user.id)
+        .single();
+
+      if (data == null) {
+        // User does not have a profile, insert a new profile
+        const { data, error } = await supabase
+          .from("profile")
+          .insert([{ user_id: session.user.id, profile_complete: false }]);
+        alert("Profile inserted successfully");
+
+        if (data == true) {
+          setHasProfile(hasProfile);
+        }
+
+        if (error) {
+          throw new Error("error.message");
+        }
+      } else {
+        const hasProfile = !!data.profile_complete;
+        setHasProfile(hasProfile);
+      }
+    }
+    setIsLoading(false);
+  };
+
+  if (isLoading) {
+    // Render a loading state or splash screen
+    return (
+      <View style={styles.container}>
+        <Image
+          source={{
+            uri: "https://cdn3.iconfinder.com/data/icons/furniture-volume-1-2/48/12-512.png",
+          }}
+          style={styles.headerImage}
+          alt="Logo "
+        />
+      </View>
+    );
+  }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        {/* Define a Stack.Screen component for each screen */}
-        {/*<Stack.Screen name="SignIn" component={SignIn} />
-        <Stack.Screen name="SignUp" component={SignUp} />
-        <Stack.Screen name="Questionaire" component={Questionaire} />
-  <Stack.Screen name="Questionaire2" component={Questionaire2} />*/}
-        {/*<Stack.Screen name="messages" component={MessagingUI} />*/}
-        <Stack.Screen name="Email" component={Email} />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {session && session.user ? (
+          hasProfile ? (
+            <Stack.Screen
+              key={session?.user?.id ?? "TagSelectionScreen"}
+              name="TagSelectionScreen"
+              component={TagSelectionScreen}
+              initialParams={{ session }}
+            />
+          ) : (
+            <Stack.Screen
+              key={session?.user?.id ?? "TagSelectionScreen"}
+              name="questionaire"
+              component={Questionaire}
+              initialParams={{ session }}
+            />
+          )
+        ) : (
+          <>
+            <Stack.Screen name="Authentication" component={Authentication} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignSelf: "center",
+    justifyContent: "center",
+    justifySelf: "center",
+  },
+  headerImage: {
+    width: 90,
+    height: 90,
+    alignSelf: "center",
+    marginBottom: 25,
+  },
+});
 
 export default App;
