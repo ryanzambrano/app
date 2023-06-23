@@ -1,5 +1,5 @@
 import "react-native-url-polyfill/auto";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
@@ -12,8 +12,10 @@ import {
   Button,
 } from "react-native";
 import { supabase } from "./components/auth/supabase.js";
-import SignIn from "./components/auth/signIn.js";
-import SignUp from "./components/auth/signUp.js";
+import Authentication from "./components/authentication.js";
+import Questionaire from "./components/questionaire.js";
+import TagSelectionScreen from "./components/tagSelectionScreen.js";
+
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
