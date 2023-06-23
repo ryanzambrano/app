@@ -103,7 +103,7 @@ const App = () => {
             />
           ) : (
             <Stack.Screen
-              key={session?.user?.id ?? "TagSelectionScreen"}
+              key={session?.user?.id ?? "questionaire"}
               name="questionaire"
               component={Questionaire}
               initialParams={{ session }}
