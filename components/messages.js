@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, FlatList, StyleSheet, Text, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+//import ContactUI from "./components/contact.js"
 
 const MessagingUI = () => {
+  const navigation = useNavigation();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
 
@@ -20,14 +23,17 @@ const MessagingUI = () => {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
       <View style={styles.header}>
-        <View style={styles.profileContainer}>
-          {/* Replace the placeholder with your circular profile picture component */}
-          <View style={styles.profilePicture} />
-        </View>
-        <TouchableOpacity style={styles.button}>
-          <AntDesign name="arrowright" size={24} color="#007AFF" />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+  style={styles.button}
+  onPress={() => navigation.navigate('Contacts')} // Replace 'OtherPage' with the name of the desired page component to navigate to
+>
+  <AntDesign name="arrowleft" size={24} color="#007AFF" />
+</TouchableOpacity>
+  <View style={styles.profileContainer}>
+    {/* Replace the placeholder with your circular profile picture component */}
+    <View style={styles.profilePicture} />
+  </View>
+</View>
       <View style={styles.messagesContainer}>
         <FlatList
           data={messages}
@@ -65,12 +71,14 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
+    alignItems: 'flex-end', // Align items vertically to the bottom
+    marginBottom: 20, // Increase the margin bottom for lower positioning
     paddingHorizontal: 10,
-  },
+    paddingVertical: 20,
+  },  
   button: {
     padding: 10,
+    marginBottom: 0,
   },
   profileContainer: {
     width: 40,
