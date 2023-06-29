@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, FlatList, StyleSheet, Text, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import { View, TextInput, Button, FlatList, StyleSheet, Text, KeyboardAvoidingView, Platform, TouchableOpacity, Image } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
@@ -9,6 +9,7 @@ const MessagingUI = () => {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const [contactName, setContactName] = useState('');
+  const [contactImage, setContactImage] = useState('');
 
   const sendMessage = () => {
     if (message.trim() !== '') {
@@ -20,6 +21,9 @@ const MessagingUI = () => {
   useEffect(() => {
     if (route.params && route.params.contactName) {
       setContactName(route.params.contactName);
+    }
+    if (route.params && route.params.contactImage) {
+      setContactImage(route.params.contactImage);
     }
   }, [route.params]);
 
@@ -46,7 +50,9 @@ const MessagingUI = () => {
           <AntDesign name="arrowleft" size={24} color="#007AFF" />
         </TouchableOpacity>
         <Text style={styles.contactName}>{contactName}</Text>
-        <View style={styles.profileContainer} />
+        <View style={styles.profileContainer}>
+          {contactImage && <Image source={{ uri: contactImage }} style={styles.profilePicture} />}
+        </View>
       </View>
       <View style={styles.messagesContainer}>
         <FlatList
@@ -110,6 +116,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#dedede',
     overflow: 'hidden',
     marginRight: 10,
+  },
+  profilePicture: {
+    width: '100%',
+    height: '100%',
   },
   messagesContainer: {
     flex: 1,
