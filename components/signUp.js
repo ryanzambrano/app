@@ -1,5 +1,5 @@
 import "react-native-url-polyfill/auto";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
@@ -10,159 +10,205 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Button,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Animated,
+  Easing,
 } from "react-native";
 import { supabase } from "./auth/supabase.js";
 import { NavigationContainerRefContext } from "@react-navigation/native";
+import { startShakeAnimation } from "./profileUtils.js";
 //import { insertUser} from './server.js';
 
 export const SignUp = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [isSignedUp, setIsSignedUp] = useState(false);
+  const [passwordsMatch, setPasswordsMatch] = useState(null);
+  const [isError, setIsError] = useState("");
+  const shakeAnimationValue = useRef(new Animated.Value(0)).current;
 
-  async function validateUserSession() {
-    const {
-      data: { user, error },
-    } = await supabase.auth.getUser();
-    if (error) {
-      alert(error.message);
-    } else {
-      alert(user);
-      //navigation.navigate("Questionaire");
-    }
-  }
-
-  async function signUpUser(email, password) {
-    setLoading(true);
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
-
-    if (data) {
-      setIsSignedUp(true);
-    }
-
-    if (error) Alert.alert(error.message);
-    setLoading(false);
-  }
-
-  async function insertUser(email) {
-    const { data, error } = await supabase.from("profiles").insert([
-      {
-        email: email,
-      },
-    ]);
-    if (error) {
-      console.error("Error inserting user:", error);
-    } else {
-      console.log("User inserted successfully:", data);
-    }
-  }
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
 
   const [form, setForm] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
   });
+
+  const handleSignUp = async () => {
+    setPasswordsMatch(true);
+    setIsError(null);
+
+    if (form.password === form.confirmPassword) {
+      const { data, error } = await supabase.auth.signUp({
+        email: form.email,
+        password: form.password,
+      });
+
+      if (error) {
+        startShakeAnimation(shakeAnimationValue);
+        setIsError(error.message);
+        setIsSignedUp(false);
+      } else {
+        setIsSignedUp(true);
+      }
+    } else {
+      startShakeAnimation(shakeAnimationValue);
+      setPasswordsMatch(false);
+    }
+  };
+
+  const shakeAnimationStyle = {
+    transform: [
+      {
+        translateX: shakeAnimationValue.interpolate({
+          inputRange: [-1, 0, 1],
+          outputRange: [-5, 0, 5],
+        }),
+      },
+    ],
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
-      {isSignedUp ? (
-        <>
-          <View style={styles.header}>
-            <Image
-              source={{
-                uri: "https://cdn3.iconfinder.com/data/icons/furniture-volume-1-2/48/12-512.png",
-              }}
-              style={styles.headerImage}
-              alt="Logo "
-            />
-            <Text style={styles.titleText}>Congratulations!</Text>
-            <Text style={styles.titleText}>
-              Verify your email address then sign in!
-            </Text>
-          </View>
-          <Button
-            title="Sign In"
-            onPress={() => {
-              navigation.navigate("SignIn");
-            }}
-            // disabled={!confirmationCode}
-          />
-        </>
-      ) : (
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Image
-              source={{
-                uri: "https://cdn3.iconfinder.com/data/icons/furniture-volume-1-2/48/12-512.png",
-              }}
-              style={styles.headerImage}
-              alt="Logo "
-            />
-            <Text style={styles.titleText}>Sign up for RoomSurf</Text>
-            <Text style={styles.sloganText}>
-              Find and meet new roomates, for any situation!
-            </Text>
-          </View>
-
-          <View style={styles.form}>
-            <View style={styles.input}>
-              <Text style={styles.inputHeader}>Enter an Email Address:</Text>
-              <TextInput
-                style={styles.inputControl}
-                hi
-                autoCapitalize="none"
-                autoCorrect={false}
-                keyboardType="email-address"
-                placeholder="deeznuts@bruh.com"
-                placeholderTextColor="#6b7280"
-                value={form.email}
-                onChangeText={(email) => setForm({ ...form, email })}
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        {isSignedUp ? (
+          <>
+            <View style={styles.container}>
+              <View style={styles.verifyHeader}>
+                <Image
+                  source={{
+                    uri: "https://cdn3.iconfinder.com/data/icons/furniture-volume-1-2/48/12-512.png",
+                  }}
+                  style={styles.headerImage}
+                  alt="Logo "
+                />
+                <Text style={styles.titleText}>Verify your email!</Text>
+              </View>
+              <Text style={styles.sloganText}>
+                Check your email for an account verification email, and then
+                sign in!
+              </Text>
+              <View style={styles.verifyFormAction}>
+                <TouchableOpacity
+                  onPress={() => {
+                    // handle onPress
+                    navigation.navigate("SignIn");
+                  }}
+                >
+                  <View style={styles.continue}>
+                    <Text style={styles.continueText}>Sign in</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        ) : (
+          <View style={styles.container}>
+            <View style={styles.header}>
+              <Image
+                source={{
+                  uri: "https://cdn3.iconfinder.com/data/icons/furniture-volume-1-2/48/12-512.png",
+                }}
+                style={styles.headerImage}
+                alt="Logo "
               />
+              <Text style={styles.titleText}>Create an Account!</Text>
             </View>
 
-            <View style={styles.input}>
-              <Text style={styles.inputHeader}>Create a password:</Text>
-              <TextInput
-                style={styles.inputControl}
-                styles={styles.inputControl}
-                autoCorrect={false}
-                placeholder="*********"
-                placeholderTextColor="#6b7280"
-                value={form.password}
-                onChangeText={(password) => setForm({ ...form, password })}
-                secureTextEntry={true}
-              />
-            </View>
+            <View style={styles.form}>
+              <View style={styles.input}>
+                <Text style={styles.inputHeader}>
+                  Enter your College Email Address:
+                </Text>
+                <TextInput
+                  style={styles.inputControl}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  keyboardType="email-address"
+                  placeholderTextColor="#6b7280"
+                  value={form.email}
+                  onChangeText={(email) => setForm({ ...form, email })}
+                />
+              </View>
 
-            <View style={styles.formAction}>
+              <View style={styles.input}>
+                <Text style={styles.inputHeader}>Create a password:</Text>
+                <TextInput
+                  style={styles.inputControl}
+                  styles={styles.inputControl}
+                  autoCorrect={false}
+                  placeholderTextColor="#6b7280"
+                  value={form.password}
+                  onChangeText={(password) => setForm({ ...form, password })}
+                  secureTextEntry={true}
+                />
+              </View>
+
+              <View style={styles.input}>
+                <Text style={styles.inputHeader}>Confirm your password:</Text>
+                <TextInput
+                  style={styles.inputControl}
+                  styles={styles.inputControl}
+                  autoCorrect={false}
+                  placeholderTextColor="#6b7280"
+                  value={form.confirmPassword}
+                  onChangeText={(confirmPassword) =>
+                    setForm({ ...form, confirmPassword })
+                  }
+                  secureTextEntry={true}
+                />
+              </View>
+
+              {passwordsMatch == false && (
+                <Animated.Text style={[styles.errorText, shakeAnimationStyle]}>
+                  Passwords Do Not Match
+                </Animated.Text>
+              )}
+
+              {isError && (
+                <Animated.Text
+                  style={[styles.errorText, shakeAnimationStyle]}
+                  value={isError}
+                >
+                  {isError}
+                </Animated.Text>
+              )}
+
+              <View style={styles.formAction}>
+                <TouchableOpacity
+                  onPress={() => {
+                    handleSignUp();
+                    //signUpUser(form.email, form.password);
+                  }}
+                >
+                  <View style={styles.continue}>
+                    <Text style={styles.continueText}>Sign up</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+
               <TouchableOpacity
                 onPress={() => {
-                  // handle onPress
-                  signUpUser(form.email, form.password);
+                  // handle link
+                  navigation.navigate("SignIn");
                 }}
+                style={{ marginTop: "auto" }}
               >
-                <View style={styles.continue}>
-                  <Text style={styles.continueText}>Sign up</Text>
-                </View>
+                <Text style={styles.formFooter}>
+                  Have an account already?{" "}
+                  <Text style={{ textDecorationLine: "underline" }}>
+                    Sign in
+                  </Text>
+                </Text>
               </TouchableOpacity>
             </View>
-
-            <TouchableOpacity
-              onPress={() => {
-                // handle link
-                navigation.navigate("SignIn");
-              }}
-              style={{ marginTop: "auto" }}
-            >
-              <Text style={styles.formFooter}>
-                Have an account already?{" "}
-                <Text style={{ textDecorationLine: "underline" }}>Sign in</Text>
-              </Text>
-            </TouchableOpacity>
           </View>
-        </View>
-      )}
+        )}
+      </TouchableWithoutFeedback>
+      <StatusBar style="dark" />
     </SafeAreaView>
   );
 };
@@ -174,14 +220,28 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    marginVertical: 36,
+    flex: 0,
+    flexDirection: "row",
+    justifyContent: "left",
+    gap: "10%",
+    marginBottom: "20%",
+    //padding: "0%",
+  },
+
+  verifyHeader: {
+    flex: 0,
+    flexDirection: "row",
+    justifyContent: "left",
+    gap: "10%",
+    marginBottom: "10%",
+    //padding: "0%",
   },
 
   headerImage: {
-    width: 90,
-    height: 90,
-    alignSelf: "center",
-    marginBottom: 25,
+    width: 40,
+    height: 40,
+    //alignSelf: "center",
+    marginBottom: 0,
   },
 
   titleText: {
@@ -189,20 +249,23 @@ const styles = StyleSheet.create({
     fontSize: 27,
     fontWeight: "700",
     textAlign: "center",
-    marginBottom: 12,
+    //AlignSelf: "center",
     color: "#1e1e1e",
+    paddingTop: 5,
   },
 
   sloganText: {
+    //flex: 1,
     fontFamily: "Verdana",
     fontSize: 15,
     fontWeight: "500",
     color: "#929292",
     textAlign: "center",
+    marginBottom: "10%",
   },
 
   input: {
-    marginBottom: 16,
+    marginBottom: "10%",
   },
 
   inputHeader: {
@@ -229,7 +292,11 @@ const styles = StyleSheet.create({
   },
 
   formAction: {
-    marginVertical: 24,
+    flex: 1,
+  },
+
+  verifyFormAction: {
+    marginTop: 20,
   },
 
   formFooter: {
@@ -243,6 +310,7 @@ const styles = StyleSheet.create({
   continue: {
     marginTop: 5,
     marginBottom: 20,
+
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -261,7 +329,13 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
 
-  none: {},
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 10,
+  },
 });
 
 export default SignUp;

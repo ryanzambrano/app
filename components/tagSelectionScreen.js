@@ -1,16 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import { StatusBar } from "expo-status-bar";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  SafeAreaView,
+  Animated,
+  Easing,
 } from "react-native";
 import { supabase } from "./auth/supabase.js";
-import { Session } from "@supabase/supabase-js";
 
-const TagSelectionScreen = ({ session }) => {
+import { Session } from "@supabase/supabase-js";
+import { startShakeAnimation } from "./profileUtils.js";
+
+const TagSelectionScreen = ({ navigatio, route }) => {
+  const { session } = route.params;
   const [selectedTags, setSelectedTags] = useState([]);
+
+  const shakeAnimationValue = useRef(new Animated.Value(0)).current;
+  const [isError, setIsError] = useState("");
 
   const availableTags = [
     "Technology",
@@ -67,88 +77,132 @@ const TagSelectionScreen = ({ session }) => {
     );
   };
 
-  const updateProfile = async (userData) => {
-    // Update the user profile in the 'profiles' table
-    const { data, error } = await supabase
-      .from("profiles")
-      .update([
-        {
-          tags: selectedTags,
-        },
-      ])
-      .eq("id", "31");
-
-    if (error) {
-      alert("Error updating profile:", error.message);
-    } else {
-      alert("Profile updated successfully:", data);
-    }
-  };
-
   async function signOut() {
     const { error } = await supabase.auth.signOut();
   }
 
-  const [isProfileCreated, setIsProfileCreated] = useState(false);
-  async function checkProfile() {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("email", form.email);
-    if (error) {
-      console.error("Error fetching users:", error);
-    }
+  const userData = {
+    tags: selectedTags,
+  };
 
-    if (data.length === 0) {
-      insertUser(form.email);
-      navigation.navigate("Questionaire");
-    } else if (data) {
-      alert(data);
-    } else {
-    }
-  }
+  const updateProfile = async (userData, session) => {
+    if (session?.user) {
+      const { data, error } = await supabase
+        .from("profile")
+        .update({
+          tags: userData.tags,
+        })
+        .eq("user_id", session.user.id);
 
-  async function validateUserSession() {
-    const {
-      data: { user, error },
-    } = await supabase.auth.getUser();
-    if (error) {
-      alert(error.message);
-    } else if (user == null) {
-      alert("invalid authentication");
-    } else {
-      alert("User is authenticated");
+      if (error) {
+        alert("Error updating profile:", error.message);
+      }
     }
-  }
+  };
 
+  const handleUpdate = async (userData, session) => {
+    setIsError(null);
+
+    if (session?.user) {
+      if (userData.tags.length >= 3 && userData.tags.length <= 7) {
+        const { data, error } = await supabase
+          .from("profile")
+          .update({
+            tags: userData.tags,
+          })
+          .eq("user_id", session.user.id);
+
+        if (error) {
+          startShakeAnimation();
+          setIsError(error.message);
+        } else {
+          //refreshSession();
+
+          signOut();
+        }
+      } else if (userData.tags.length > 7) {
+        setIsError("Less than 7 interests");
+        startShakeAnimation(shakeAnimationValue);
+      } else if (userData.tags.length < 3) {
+        setIsError("At least 3 interests are required");
+        startShakeAnimation(shakeAnimationValue);
+      }
+    }
+  };
+
+  /*const startShakeAnimation = () => {
+    shakeAnimationValue.setValue(0);
+    Animated.sequence([
+      Animated.timing(shakeAnimationValue, {
+        toValue: 1,
+        duration: 100,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnimationValue, {
+        toValue: -1,
+        duration: 100,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnimationValue, {
+        toValue: 0,
+        duration: 100,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };*/
+
+  const shakeAnimationStyle = {
+    transform: [
+      {
+        translateX: shakeAnimationValue.interpolate({
+          inputRange: [-1, 0, 1],
+          outputRange: [-5, 0, 5],
+        }),
+      },
+    ],
+  };
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Select Your Interests</Text>
-      <ScrollView
-        contentContainerStyle={styles.tagContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {availableTags.map((tag) => renderTag(tag))}
-      </ScrollView>
-      <Text style={styles.selectedTagsText}>
-        Your Interests: {selectedTags.join(", ")}
-      </Text>
-
-      <View style={styles.formAction}>
-        <TouchableOpacity
-          onPress={() => {
-            {
-              //updateProfile();
-              signOut();
-            }
-          }}
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Select Your Interests</Text>
+        <ScrollView
+          contentContainerStyle={styles.tagContainer}
+          showsVerticalScrollIndicator={false}
         >
-          <View style={styles.continue}>
-            <Text style={styles.continueText}>Next</Text>
-          </View>
-        </TouchableOpacity>
+          {availableTags.map((tag) => renderTag(tag))}
+        </ScrollView>
+        <Text style={styles.selectedTagsText}>
+          Your Interests: {selectedTags.join(", ")}
+        </Text>
+
+        {isError && (
+          <Animated.Text
+            style={[styles.errorText, shakeAnimationStyle]}
+            value={isError}
+          >
+            {isError}
+          </Animated.Text>
+        )}
+
+        <View style={styles.formAction}>
+          <TouchableOpacity
+            onPress={() => {
+              {
+                handleUpdate(userData, session);
+              }
+            }}
+          >
+            <View style={styles.continue}>
+              <Text style={styles.continueText}>Next</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+        <StatusBar style="dark" />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -163,15 +217,17 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: "10%",
-    marginTop: "20%",
+    marginTop: "5%",
   },
   tagContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
+    //color: "#fff",
   },
   tag: {
-    backgroundColor: "#ECECEC",
+    backgroundColor: "#fff",
+
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 16,
@@ -216,6 +272,13 @@ const styles = StyleSheet.create({
     lineHeight: 26,
     fontWeight: "600",
     color: "#fff",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 10,
   },
 });
 

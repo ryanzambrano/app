@@ -1,6 +1,7 @@
 import "react-native-url-polyfill/auto";
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
+
 import {
   StyleSheet,
   Text,
@@ -52,7 +53,6 @@ const App = () => {
         const { data, error } = await supabase
           .from("profile")
           .insert([{ user_id: session.user.id, profile_complete: false }]);
-        alert("Profile inserted successfully");
 
         if (data == true) {
           setHasProfile(hasProfile);
