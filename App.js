@@ -27,6 +27,8 @@ import Home from "./components/home.js";
 
 // npm install @react-navigation/native @react-navigation/material-bottom-tabs react-native-paper react-native-vector-icons
 
+// npm install @react-navigation/native react-native-tab-view react-native-gesture-handler react-native-reanimated
+// npm install react-native-vector-icons
 
 
 
