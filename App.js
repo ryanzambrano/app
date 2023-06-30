@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import MessagingUI from './components/messages.js';
 import ContactUI from './components/contacts.js';
+import ProfileUI from './components/profile.js';
 
 const Stack = createStackNavigator();
 
@@ -32,6 +33,13 @@ const App = () => {
           component={MessagingUI}
           options={{
             headerShown: false, // Hides the header for the "Message" screen
+          }}
+        />
+                <Stack.Screen
+          name="Profile"
+          component={ProfileUI}
+          options={{
+            //headerShown: false, // Hides the header for the "Message" screen
           }}
         />
       </Stack.Navigator>

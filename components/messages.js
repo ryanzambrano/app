@@ -36,6 +36,10 @@ const MessagingUI = () => {
 
   const flatListRef = React.useRef();
 
+  const navigateToProfile = () => {
+    navigation.navigate('Profile', { contactName, contactImage });
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -50,9 +54,9 @@ const MessagingUI = () => {
           <AntDesign name="arrowleft" size={24} color="#007AFF" />
         </TouchableOpacity>
         <Text style={styles.contactName}>{contactName}</Text>
-        <View style={styles.profileContainer}>
+        <TouchableOpacity style={styles.profileContainer} onPress={navigateToProfile}>
           {contactImage && <Image source={{ uri: contactImage }} style={styles.profilePicture} />}
-        </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.messagesContainer}>
         <FlatList
