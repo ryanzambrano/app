@@ -81,6 +81,11 @@ const TagSelectionScreen = ({ navigatio, route }) => {
     const { error } = await supabase.auth.signOut();
   }
 
+  async function refreshSession() {
+    const { data, error } = await supabase.auth.refreshSession();
+    const { session, user } = data;
+  }
+
   const userData = {
     tags: selectedTags,
   };
@@ -109,6 +114,7 @@ const TagSelectionScreen = ({ navigatio, route }) => {
           .from("profile")
           .update({
             tags: userData.tags,
+            profile_complete: true,
           })
           .eq("user_id", session.user.id);
 
@@ -116,9 +122,9 @@ const TagSelectionScreen = ({ navigatio, route }) => {
           startShakeAnimation();
           setIsError(error.message);
         } else {
-          //refreshSession();
+          refreshSession();
 
-          signOut();
+          //signOut();
         }
       } else if (userData.tags.length > 7) {
         setIsError("Less than 7 interests");

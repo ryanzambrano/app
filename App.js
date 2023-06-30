@@ -16,7 +16,7 @@ import { supabase } from "./components/auth/supabase.js";
 import Authentication from "./components/authentication.js";
 import Questionaire from "./components/questionaire.js";
 import TagSelectionScreen from "./components/tagSelectionScreen.js";
-
+import ProfileScreen from "./components/profile.js";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -90,9 +90,9 @@ const App = () => {
         {session && session.user ? (
           hasProfile ? (
             <Stack.Screen
-              key={session?.user?.id ?? "TagSelectionScreen"}
-              name="TagSelectionScreen"
-              component={TagSelectionScreen}
+              key={session?.user?.id ?? "ProfileScreen"}
+              name="ProfileScreen"
+              component={ProfileScreen}
               initialParams={{ session }}
             />
           ) : (

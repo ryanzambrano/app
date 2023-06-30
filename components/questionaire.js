@@ -49,6 +49,11 @@ const Questionaire = ({ navigation, route }) => {
         component={Questionaire2}
         initialParams={{ session }}
       />
+      <Stack.Screen
+        name="TagSelectionScreen"
+        component={TagSelectionScreen}
+        initialParams={{ session }}
+      />
       {/*<Stack.Screen name="messages" component={MessagingUI} />*/}
     </Stack.Navigator>
   );
