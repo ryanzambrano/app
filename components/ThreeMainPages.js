@@ -4,9 +4,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import TabNavigator from './TabNavigator';
 
 const ThreeMainPages = () => {
+  
   return (
     <NavigationContainer independent={true}>
-      <TabNavigator />
+      <TabNavigator/>
     </NavigationContainer>
   );
 };

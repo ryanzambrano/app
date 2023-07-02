@@ -10,6 +10,7 @@ import Profile from './profile';
 const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => {
+  
   return (
     <Tab.Navigator
     screenOptions={({ route }) => ({
@@ -37,7 +38,7 @@ const TabNavigator = () => {
     
     <Tab.Screen name="Messages" component={MessagingUI} />
     <Tab.Screen name="Home" component={Home} />
-    <Tab.Screen name="Profile" component={Profile} /> 
+    <Tab.Screen name="Profile" component={Profile}/> 
 
   </Tab.Navigator>
   );

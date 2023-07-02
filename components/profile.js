@@ -13,12 +13,12 @@ import {
 } from "react-native";
 import { fetchUsername } from "./profileUtils.js";
 import { supabase } from "./auth/supabase.js";
-import ImagePicker from "react-native-image-picker";
+// import ImagePicker from "react-native-image-picker";
 
-export const MyProfile = ({ navigation, route }) => {
-  const { session } = route.params;
+export const Profile = ({ navigation}) => {
+ // const { session } = route.params;
   const [editing, setEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState(session.user);
+  //const [editedUser, setEditedUser] = useState(session.user);
   const [isName, setIsName] = useState("");
   const [isBio, setIsBio] = useState("");
   const [profilePicture, setProfilePicture] = useState(null);
@@ -29,16 +29,16 @@ export const MyProfile = ({ navigation, route }) => {
     Keyboard.dismiss();
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
     fetchProfile();
     fetchData();
-  }, []);
+  }, []);*/
 
-  const fetchData = async () => {
+  /*const fetchData = async () => {
     await fetchProfile();
     const username = await fetchUsername(session);
     setUsername(username);
-  };
+  };*/
 
   const fetchProfile = async () => {
     const { data, error } = await supabase
@@ -102,7 +102,7 @@ export const MyProfile = ({ navigation, route }) => {
     setEditing(true);
   };
 
-  const handleImageUpload = () => {
+ /* const handleImageUpload = () => {
     ImagePicker.launchImageLibrary({ mediaType: "photo" }, (response) => {
       if (response.didCancel) {
         console.log("User cancelled image picker");
@@ -139,7 +139,7 @@ export const MyProfile = ({ navigation, route }) => {
     } catch (error) {
       console.error(error.message);
     }
-  };
+  };*/
 
   return (
     <SafeAreaView style={styles.container}>
@@ -172,7 +172,7 @@ export const MyProfile = ({ navigation, route }) => {
             {profilePicture ? (
               <TouchableOpacity
                 style={styles.profilePictureContainer}
-                onPress={handleImageRemove}
+                //onPress={handleImageRemove}
                 disabled={uploading}
               >
                 <Image
@@ -188,7 +188,7 @@ export const MyProfile = ({ navigation, route }) => {
             ) : (
               <TouchableOpacity
                 style={styles.profilePictureContainer}
-                onPress={handleImageUpload}
+                //onPress={handleImageUpload}
                 disabled={uploading}
               >
                 <Text style={styles.profilePictureText}>Add Photo</Text>
@@ -206,18 +206,18 @@ export const MyProfile = ({ navigation, route }) => {
                   <TextInput
                     style={styles.input}
                     value={editedUser.name}
-                    onChangeText={(name) =>
-                      setEditedUser({ ...editedUser, name })
-                    }
+                    //onChangeText={(name) =>
+                    //  setEditedUser({ ...editedUser, name })}
+                    
                   />
 
                   <Text style={styles.label}>Bio:</Text>
                   <TextInput
                     style={styles.input}
                     value={editedUser.bio}
-                    onChangeText={(bio) =>
-                      setEditedUser({ ...editedUser, bio })
-                    }
+                    //onChangeText={(bio) =>
+                    //  setEditedUser({ ...editedUser, bio })}
+                    
                     multiline
                   />
                 </View>
@@ -225,10 +225,10 @@ export const MyProfile = ({ navigation, route }) => {
               {!editing && (
                 <View>
                   <Text style={styles.label}></Text>
-                  <Text style={styles.name}>{editedUser.name}</Text>
+                  {/*<Text style={styles.name}>{editedUser.name}</Text>*/}
 
                   <Text style={styles.label}></Text>
-                  <Text style={styles.text}>{editedUser.bio}</Text>
+                  {/*<Text style={styles.text}>{editedUser.bio}</Text>*/}
                 </View>
               )}
             </View>
@@ -339,4 +339,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MyProfile;
+export default Profile;
