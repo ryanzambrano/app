@@ -25,3 +25,28 @@ export async function startShakeAnimation(shakeAnimationValue) {
     }),
   ]).start();
 }
+
+export const fetchUsername = async (session) => {
+  if (session?.user) {
+    const { data, error } = await supabase
+      .from("profile")
+      .select("username")
+      .eq("user_id", session.user.id)
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    if (data) {
+      // User does not have a profile, insert a new profile
+      //alert("we in");
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data.username;
+    }
+    // Set hasProfile based on the presence of username
+  }
+};
