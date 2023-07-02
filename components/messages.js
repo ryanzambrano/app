@@ -1,35 +1,66 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, FlatList, StyleSheet, Text, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, Button, FlatList, StyleSheet, Text, KeyboardAvoidingView, Platform, TouchableOpacity, Image } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const MessagingUI = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
+  const [contactName, setContactName] = useState('');
+  const [contactImage, setContactImage] = useState('');
 
   const sendMessage = () => {
     if (message.trim() !== '') {
-      setMessages(prevMessages => [message, ...prevMessages]); // Prepend the new message to the messages array
+      setMessages(prevMessages => [message, ...prevMessages]);
       setMessage('');
     }
+  };
+
+  useEffect(() => {
+    if (route.params && route.params.contactName) {
+      setContactName(route.params.contactName);
+    }
+    if (route.params && route.params.contactImage) {
+      setContactImage(route.params.contactImage);
+    }
+  }, [route.params]);
+
+  useEffect(() => {
+    // Scroll to the bottom of the messages when a new message is added
+    setTimeout(() => {
+      flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
+    }, 100);
+  }, [messages]);
+
+  const flatListRef = React.useRef();
+
+  const navigateToProfile = () => {
+    navigation.navigate('Profile', { contactName, contactImage });
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : null}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 2 : 0}
     >
       <View style={styles.header}>
-        <View style={styles.profileContainer}>
-          {/* Replace the placeholder with your circular profile picture component */}
-          <View style={styles.profilePicture} />
-        </View>
-        <TouchableOpacity style={styles.button}>
-          <AntDesign name="arrowright" size={24} color="#007AFF" />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.goBack()}
+        >
+          <AntDesign name="arrowleft" size={24} color="#007AFF" />
+        </TouchableOpacity>
+        <Text style={styles.contactName}>{contactName}</Text>
+        <TouchableOpacity style={styles.profileContainer} onPress={navigateToProfile}>
+          {contactImage && <Image source={{ uri: contactImage }} style={styles.profilePicture} />}
         </TouchableOpacity>
       </View>
       <View style={styles.messagesContainer}>
         <FlatList
+          ref={flatListRef}
           data={messages}
           renderItem={({ item }) => (
             <View style={styles.messageContainer}>
@@ -38,7 +69,7 @@ const MessagingUI = () => {
           )}
           keyExtractor={(_, index) => index.toString()}
           contentContainerStyle={styles.messagesContent}
-          inverted // Reverse the order of messages to display the most recent at the bottom
+          inverted
         />
       </View>
       <View style={styles.inputContainer}>
@@ -48,6 +79,8 @@ const MessagingUI = () => {
           onChangeText={text => setMessage(text)}
           placeholder="Type a message..."
           placeholderTextColor="#888"
+          autoCorrect={false}
+          multiline
         />
         <Button title="Send" onPress={sendMessage} color="#007AFF" />
       </View>
@@ -66,11 +99,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
     paddingHorizontal: 10,
+    paddingVertical: 20,
   },
   button: {
     padding: 10,
+    marginBottom: 0,
+  },
+  contactName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 10,
+    paddingVertical: 20,
   },
   profileContainer: {
     width: 40,
@@ -81,8 +122,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   profilePicture: {
-    flex: 1,
-    backgroundColor: 'lightgray',
+    width: '100%',
+    height: '100%',
   },
   messagesContainer: {
     flex: 1,
@@ -94,7 +135,7 @@ const styles = StyleSheet.create({
   messageContainer: {
     borderRadius: 20,
     marginBottom: 10,
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-end',
     backgroundColor: '#dedede',
   },
   message: {
@@ -111,6 +152,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     marginBottom: 10,
+    paddingTop: 0,
   },
   input: {
     flex: 1,
@@ -120,6 +162,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 10,
     backgroundColor: '#FFF',
+    fontSize: 20,
+    paddingTop: 10,
   },
 });
 
