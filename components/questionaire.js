@@ -10,12 +10,15 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Button,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { supabase } from "./auth/supabase.js";
 import SignIn from "./signIn.js";
 import SignUp from "./signUp.js";
 import Questionaire1 from "./questionaire1.js";
 import Questionaire2 from "./questionaire2.js";
+import Username from "./username.js";
 import MessagingUI from "./messages.js";
 import TagSelectionScreen from "./tagSelectionScreen.js";
 import { NavigationContainer } from "@react-navigation/native";
@@ -32,6 +35,11 @@ const Questionaire = ({ navigation, route }) => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen
+        name="Username"
+        component={Username}
+        initialParams={{ session }}
+      />
+      <Stack.Screen
         name="Questionaire1"
         component={Questionaire1}
         initialParams={{ session }}
@@ -39,6 +47,11 @@ const Questionaire = ({ navigation, route }) => {
       <Stack.Screen
         name="Questionaire2"
         component={Questionaire2}
+        initialParams={{ session }}
+      />
+      <Stack.Screen
+        name="TagSelectionScreen"
+        component={TagSelectionScreen}
         initialParams={{ session }}
       />
       {/*<Stack.Screen name="messages" component={MessagingUI} />*/}

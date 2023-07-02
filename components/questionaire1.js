@@ -1,10 +1,9 @@
 import "react-native-url-polyfill/auto";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
-  TextInput,
   View,
   Image,
   SafeAreaView,
@@ -12,19 +11,24 @@ import {
   Button,
   Modal,
   Dimensions,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Animated,
+  Easing,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "./auth/supabase.js";
 import { Session } from "@supabase/supabase-js";
-import SignUp from "./signUp.js";
-//import { insertUser} from './server.js';
+import { startShakeAnimation } from "./profileUtils.js";
 
 export const Questionaire1 = ({ navigation, route }) => {
   const { session } = route.params;
-  useEffect(() => {
-    if (!session) alert("session not found");
-  }, [session]);
-  const windowHeight = Dimensions.get("window").height;
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+  const shakeAnimationValue = useRef(new Animated.Value(0)).current;
+  const [isError, setIsError] = useState("");
+
   const [isBirthdayModalVisible, setIsBirthdayModalVisible] = useState(false);
   const [isGenderModalVisible, setIsGenderModalVisible] = useState(false);
   const [isRaceModalVisible, setIsRaceModalVisible] = useState(false);
@@ -32,13 +36,12 @@ export const Questionaire1 = ({ navigation, route }) => {
   const [selectedDay, setSelectedDay] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
-  const [selectedBirthday, setSelectedBirthday] = useState(
-    "Select your Birthday"
-  );
+  const [selectedBirthday, setSelectedBirthday] = useState("");
+  const [formattedBirthday, setFormattedBirthday] = useState("");
 
-  const [selectedGender, setSelectedGender] = useState("Select your Gender");
+  const [selectedGender, setSelectedGender] = useState("");
 
-  const [selectedRace, setSelectedRace] = useState("Select your Race");
+  const [selectedRace, setSelectedRace] = useState("");
 
   const days = Array.from(Array(31).keys()).map((day) => String(day + 1));
   const months = [
@@ -91,246 +94,285 @@ export const Questionaire1 = ({ navigation, route }) => {
   };
 
   const handleSaveBirthday = () => {
-    const formattedBirthday = `${selectedYear}-${numericalMonth
-      .toString()
-      .padStart(2, "0")}-${selectedDay.toString().padStart(2, "0")}`;
+    let tempMonth = selectedMonth;
+    let tempYear = selectedYear;
+    let tempDay = selectedDay;
+    let tempNumericalMonth = numericalMonth;
 
-    setSelectedBirthday(selectedMonth + " " + selectedDay + " " + selectedYear);
+    if (!selectedMonth) {
+      tempMonth = "January";
+      tempNumericalMonth = "1";
+    }
+
+    if (!selectedYear) {
+      tempYear = "2023";
+    }
+
+    if (!selectedDay) {
+      tempDay = "1";
+    }
+
+    setFormattedBirthday(tempMonth + " " + tempDay + " " + tempYear);
+
+    setSelectedBirthday(
+      `${tempYear}-${tempNumericalMonth.toString().padStart(2, "0")}-${tempDay
+        .toString()
+        .padStart(2, "0")}`
+    );
 
     closeBirthdayModal();
   };
 
+  handleSaveGender = () => {
+    if (!selectedGender) {
+      setSelectedGender("Male");
+    }
+    closeGenderModal();
+  };
+
+  handleSaveRace = () => {
+    if (!selectedRace) {
+      setSelectedRace("White");
+    }
+    closeRaceModal();
+  };
+
   const userData = {
-    birthday: `${selectedYear}-${numericalMonth
-      .toString()
-      .padStart(2, "0")}-${selectedDay.toString().padStart(2, "0")}`,
+    birthday: selectedBirthday,
     race: selectedRace,
     gender: selectedGender,
   };
 
-  const updateProfile = async (userData, session) => {
-    if (session?.user) {
-      const { data, error } = await supabase
-        .from("profile")
-        .update({
-          birthday: userData.birthday,
-          race: userData.race,
-          gender: userData.gender,
-        })
-        .eq("user_id", session.user.id);
+  const handleUpdate = async (userData, session) => {
+    setIsError(null);
 
-      if (error) {
-        alert("Error updating profile:", error.message);
+    if (session?.user) {
+      if (!!userData.birthday && !!userData.gender) {
+        const { data, error } = await supabase
+          .from("profile")
+          .update({
+            birthday: userData.birthday,
+            race: userData.race,
+            gender: userData.gender,
+          })
+          .eq("user_id", session.user.id);
+
+        if (error) {
+          startShakeAnimation(shakeAnimationValue);
+          setIsError(error.message);
+        } else {
+          navigation.navigate("Questionaire2");
+        }
       } else {
-        alert("Profile updated successfully: " + session.user.email);
+        startShakeAnimation(shakeAnimationValue);
+        setIsError("Enter all required fields");
       }
     }
   };
 
-  const updateUser = async (userData, session) => {
-    if (!session?.user) {
-      alert("no user found");
-    }
-    const { data, error } = await supabase
-      .from("profile")
-      .update({
-        birthday: userData.birthday,
-        race: userData.race,
-        gender: selectedGender,
-      }) // Update the profile_complete value to false
-      .eq("user_id", session.user.id);
-
-    if (error) {
-      throw new Error(error.message);
-    }
+  const shakeAnimationStyle = {
+    transform: [
+      {
+        translateX: shakeAnimationValue.interpolate({
+          inputRange: [-1, 0, 1],
+          outputRange: [-5, 0, 5],
+        }),
+      },
+    ],
   };
-
-  async function signOut() {
-    const { error } = await supabase.auth.signOut();
-  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.titleText}>
-            Answer some questions about yourself!
-          </Text>
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.titleText}>
+              Answer some questions about yourself!
+            </Text>
+          </View>
+
+          <View style={styles.form}>
+            <View style={styles.input}>
+              <Text style={styles.inputHeader}>Select your Birthday</Text>
+
+              <TouchableOpacity
+                onPress={() => {
+                  openBirthdayModal();
+                }}
+              >
+                <View style={styles.inputControl}>
+                  <Text style={styles.inputText}>{formattedBirthday}</Text>
+                </View>
+              </TouchableOpacity>
+
+              <Modal
+                visible={isBirthdayModalVisible}
+                animationType="slide"
+                transparent
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      style={styles.pickerDate}
+                      selectedValue={selectedDay}
+                      onValueChange={(itemValue) => setSelectedDay(itemValue)}
+                    >
+                      {days.map((day) => (
+                        <Picker.Item key={day} label={day} value={day} />
+                      ))}
+                    </Picker>
+
+                    <Picker
+                      style={styles.picker}
+                      selectedValue={selectedMonth}
+                      onValueChange={(itemValue) => setSelectedMonth(itemValue)}
+                    >
+                      {months.map((month) => (
+                        <Picker.Item key={month} label={month} value={month} />
+                      ))}
+                    </Picker>
+
+                    <Picker
+                      style={styles.pickerYear}
+                      selectedValue={selectedYear}
+                      onValueChange={(itemValue) => setSelectedYear(itemValue)}
+                    >
+                      {years.map((year) => (
+                        <Picker.Item key={year} label={year} value={year} />
+                      ))}
+                    </Picker>
+                  </View>
+                  <View style={styles.bbuttons}>
+                    <Button title="Save" onPress={handleSaveBirthday} />
+                    <Button title="Cancel" onPress={closeBirthdayModal} />
+                  </View>
+                </View>
+              </Modal>
+            </View>
+
+            <View style={styles.input}>
+              <Text style={styles.inputHeader}>Select your Gender</Text>
+
+              <TouchableOpacity
+                onPress={() => {
+                  openGenderModal();
+                }}
+              >
+                <View style={styles.inputControl}>
+                  <Text
+                    style={styles.inputText}
+                    placeholder="Select your Gender"
+                    placeholderTextColor="#6b7280"
+                    value={`${selectedGender}`}
+                  >
+                    {selectedGender}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <Modal
+                visible={isGenderModalVisible}
+                animationType="slide"
+                transparent
+              >
+                <View style={styles.modalContainerGender}>
+                  <View style={styles.pickerContainerGender}>
+                    <Picker
+                      style={styles.picker}
+                      selectedValue={selectedGender}
+                      onValueChange={(itemValue) =>
+                        setSelectedGender(itemValue)
+                      }
+                    >
+                      {gender.map((Gender) => (
+                        <Picker.Item
+                          key={Gender}
+                          label={Gender}
+                          value={Gender}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+                  <View style={styles.bbuttons}>
+                    <Button title="Save" onPress={handleSaveGender} />
+                    <Button title="Cancel" onPress={closeGenderModal} />
+                  </View>
+                </View>
+              </Modal>
+            </View>
+
+            <View style={styles.input}>
+              <Text style={styles.inputHeader}>Select your race</Text>
+
+              <TouchableOpacity
+                onPress={() => {
+                  openRaceModal();
+                }}
+              >
+                <View style={styles.inputControl}>
+                  <Text
+                    style={styles.inputText}
+                    placeholder="Select your Gender"
+                    placeholderTextColor="#6b7280"
+                    value={`${selectedGender}`}
+                  >
+                    {selectedRace}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+
+              <Modal
+                visible={isRaceModalVisible}
+                animationType="slide"
+                transparent
+              >
+                <View style={styles.modalContainerGender}>
+                  <View style={styles.pickerContainerGender}>
+                    <Picker
+                      style={styles.picker}
+                      selectedValue={selectedRace}
+                      onValueChange={(itemValue) => setSelectedRace(itemValue)}
+                    >
+                      {race.map((race) => (
+                        <Picker.Item key={race} label={race} value={race} />
+                      ))}
+                    </Picker>
+                  </View>
+
+                  <View style={styles.bbuttons}>
+                    <Button title="Save" onPress={handleSaveRace} />
+                    <Button title="Cancel" onPress={closeRaceModal} />
+                  </View>
+                </View>
+              </Modal>
+            </View>
+
+            {isError && (
+              <Animated.Text
+                style={[styles.errorText, shakeAnimationStyle]}
+                value={isError}
+              >
+                {isError}
+              </Animated.Text>
+            )}
+
+            <View style={styles.formAction}>
+              <TouchableOpacity
+                onPress={() => {
+                  {
+                    handleUpdate(userData, session);
+                  }
+                }}
+              >
+                <View style={styles.continue}>
+                  <Text style={styles.continueText}>Next</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-
-        <View style={styles.form}>
-          <View style={styles.input}>
-            <Text style={styles.inputHeader}>Birthday</Text>
-
-            <TouchableOpacity
-              onPress={() => {
-                openBirthdayModal();
-              }}
-            >
-              <View style={styles.inputControl}>
-                <Text
-                  style={styles.inputText}
-                  placeholder="Select your Gender"
-                  placeholderTextColor="#6b7280"
-                  value={`${selectedGender}`}
-                >
-                  {selectedBirthday}
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <Modal
-              visible={isBirthdayModalVisible}
-              animationType="slide"
-              transparent
-            >
-              <View style={styles.modalContainer}>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    style={styles.pickerDate}
-                    selectedValue={selectedDay}
-                    onValueChange={(itemValue) => setSelectedDay(itemValue)}
-                  >
-                    {days.map((day) => (
-                      <Picker.Item key={day} label={day} value={day} />
-                    ))}
-                  </Picker>
-
-                  <Picker
-                    style={styles.picker}
-                    selectedValue={selectedMonth}
-                    onValueChange={(itemValue) => setSelectedMonth(itemValue)}
-                  >
-                    {months.map((month) => (
-                      <Picker.Item key={month} label={month} value={month} />
-                    ))}
-                  </Picker>
-
-                  <Picker
-                    style={styles.pickerYear}
-                    selectedValue={selectedYear}
-                    onValueChange={(itemValue) => setSelectedYear(itemValue)}
-                  >
-                    {years.map((year) => (
-                      <Picker.Item key={year} label={year} value={year} />
-                    ))}
-                  </Picker>
-                </View>
-                <View style={styles.bbuttons}>
-                  <Button title="Save" onPress={handleSaveBirthday} />
-                  <Button title="Cancel" onPress={closeBirthdayModal} />
-                </View>
-              </View>
-            </Modal>
-          </View>
-
-          <View style={styles.input}>
-            <Text style={styles.inputHeader}>Gender</Text>
-
-            <TouchableOpacity
-              onPress={() => {
-                openGenderModal();
-              }}
-            >
-              <View style={styles.inputControl}>
-                <Text
-                  style={styles.inputText}
-                  placeholder="Select your Gender"
-                  placeholderTextColor="#6b7280"
-                  value={`${selectedGender}`}
-                >
-                  {selectedGender}
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <Modal
-              visible={isGenderModalVisible}
-              animationType="slide"
-              transparent
-            >
-              <View style={styles.modalContainerGender}>
-                <View style={styles.pickerContainerGender}>
-                  <Picker
-                    style={styles.picker}
-                    selectedValue={selectedGender}
-                    onValueChange={(itemValue) => setSelectedGender(itemValue)}
-                  >
-                    {gender.map((Gender) => (
-                      <Picker.Item key={Gender} label={Gender} value={Gender} />
-                    ))}
-                  </Picker>
-                </View>
-                <View style={styles.bbuttons}>
-                  <Button title="Save" onPress={closeGenderModal} />
-                  <Button title="Cancel" onPress={closeGenderModal} />
-                </View>
-              </View>
-            </Modal>
-          </View>
-
-          <View style={styles.input}>
-            <Text style={styles.inputHeader}>Race</Text>
-
-            <TouchableOpacity
-              onPress={() => {
-                openRaceModal();
-              }}
-            >
-              <View style={styles.inputControl}>
-                <Text
-                  style={styles.inputText}
-                  placeholder="Select your Gender"
-                  placeholderTextColor="#6b7280"
-                  value={`${selectedGender}`}
-                >
-                  {selectedRace}
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <Modal
-              visible={isRaceModalVisible}
-              animationType="slide"
-              transparent
-            >
-              <View style={styles.modalContainerGender}>
-                <View style={styles.pickerContainerGender}>
-                  <Picker
-                    style={styles.picker}
-                    selectedValue={selectedRace}
-                    onValueChange={(itemValue) => setSelectedRace(itemValue)}
-                  >
-                    {race.map((race) => (
-                      <Picker.Item key={race} label={race} value={race} />
-                    ))}
-                  </Picker>
-                </View>
-
-                <View style={styles.bbuttons}>
-                  <Button title="Save" onPress={closeRaceModal} />
-                  <Button title="Cancel" onPress={closeRaceModal} />
-                </View>
-              </View>
-            </Modal>
-          </View>
-
-          <View style={styles.formAction}>
-            <TouchableOpacity
-              onPress={() => {
-                {
-                  updateUser(userData, session);
-                  navigation.navigate("Questionaire2");
-                }
-              }}
-            >
-              <View style={styles.continue}>
-                <Text style={styles.continueText}>Next</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
+      </TouchableWithoutFeedback>
+      <StatusBar style="dark" />
     </SafeAreaView>
   );
 };
@@ -395,7 +437,6 @@ const styles = StyleSheet.create({
   },
 
   continue: {
-    marginBottom: "100%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -464,6 +505,14 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     gap: "20%",
+  },
+
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 10,
   },
 });
 

@@ -1,6 +1,7 @@
 import "react-native-url-polyfill/auto";
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
+
 import {
   StyleSheet,
   Text,
@@ -15,7 +16,7 @@ import { supabase } from "./components/auth/supabase.js";
 import Authentication from "./components/authentication.js";
 import Questionaire from "./components/questionaire.js";
 import TagSelectionScreen from "./components/tagSelectionScreen.js";
-
+import ProfileScreen from "./components/profile.js";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -66,7 +67,6 @@ const App = () => {
         const { data, error } = await supabase
           .from("profile")
           .insert([{ user_id: session.user.id, profile_complete: false }]);
-        alert("Profile inserted successfully");
 
         if (data == true) {
           setHasProfile(hasProfile);
@@ -108,6 +108,7 @@ const App = () => {
               name="ThreeMainPages"
             
               component={ThreeMainPages}
+             
               initialParams={{ session }}
             />
           ) : (

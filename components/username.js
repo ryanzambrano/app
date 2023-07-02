@@ -1,5 +1,5 @@
 import "react-native-url-polyfill/auto";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
@@ -12,161 +12,161 @@ import {
   Button,
   Modal,
   Dimensions,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Animated,
+  Easing,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "./auth/supabase.js";
 import SignUp from "./signUp.js";
 //import { insertUser} from './server.js';
 
-export const Username = ({ navigation }) => {
-  const windowHeight = Dimensions.get("window").height;
-  const [isBirthdayModalVisible, setIsBirthdayModalVisible] = useState(false);
-  const [isGenderModalVisible, setIsGenderModalVisible] = useState(false);
-  const [isRaceModalVisible, setIsRaceModalVisible] = useState(false);
-
-  const [selectedDay, setSelectedDay] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
-  const [selectedBirthday, setSelectedBirthday] = useState(
-    "Select your Birthday"
-  );
-
-  const [selectedGender, setSelectedGender] = useState("Select your Gender");
-
+export const Username = ({ navigation, route }) => {
+  const { session } = route.params;
   const [selectedUsername, setSelectedUsername] = useState("");
+  const [isError, setIsError] = useState("");
 
-  const days = Array.from(Array(31).keys()).map((day) => String(day + 1));
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const monthIndex = months.indexOf(selectedMonth);
-  const numericalMonth = monthIndex + 1;
-
-  const gender = ["Male", "Female", "Other"];
-
-  const race = ["White", "Black", "Brown", "Yellow"];
-
-  const openBirthdayModal = () => {
-    setIsBirthdayModalVisible(true);
-  };
-
-  const closeBirthdayModal = () => {
-    setIsBirthdayModalVisible(false);
-  };
-
-  const openGenderModal = () => {
-    setIsGenderModalVisible(true);
-  };
-
-  const closeGenderModal = () => {
-    setIsGenderModalVisible(false);
-  };
-
-  const openRaceModal = () => {
-    setIsRaceModalVisible(true);
-  };
-
-  const closeRaceModal = () => {
-    setIsRaceModalVisible(false);
-  };
-
-  const handleSaveBirthday = () => {
-    const formattedBirthday = `${selectedYear}-${numericalMonth
-      .toString()
-      .padStart(2, "0")}-${selectedDay.toString().padStart(2, "0")}`;
-
-    setSelectedBirthday(selectedMonth + " " + selectedDay + " " + selectedYear);
-
-    closeBirthdayModal();
-  };
+  const shakeAnimationValue = useRef(new Animated.Value(0)).current;
 
   const userData = {
     username: selectedUsername,
   };
 
-  async function insertUser(userData) {
-    const { data, error } = await supabase.from("profiles").insert([
-      {
-        username: userData.username,
-      },
-    ]);
-    if (error) {
-      console.error("Error inserting user:", error);
-    } else {
-      console.log("User inserted successfully:", data);
+  const handleUpdate = async (userData, session) => {
+    setIsError(null);
+
+    if (session?.user) {
+      //alert("session.user");
+      if (!!userData.username) {
+        const { data, error } = await supabase
+          .from("profile")
+          .update({
+            username: selectedUsername,
+            email: session.user.email,
+          })
+          .eq("user_id", session.user.id);
+
+        if (error) {
+          if (
+            error.message.includes(
+              "duplicate key value violates unique constraint"
+            )
+          ) {
+            setIsError("Username is already taken");
+          } else {
+            startShakeAnimation();
+            setIsError(error.message);
+          }
+        } else {
+          navigation.navigate("Questionaire1");
+        }
+      } else setIsError("Enter a Username");
     }
-  }
+  };
+
+  const updateProfile = async (userData, session) => {
+    if (session?.user) {
+      const { data, error } = await supabase
+        .from("profile")
+        .update({
+          username: userData.username,
+          email: session.user.email,
+        })
+        .eq("user_id", session.user.id);
+
+      if (error) {
+        alert("Error updating profile:", error.message);
+      }
+    }
+  };
+
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
+  const startShakeAnimation = () => {
+    shakeAnimationValue.setValue(0);
+    Animated.sequence([
+      Animated.timing(shakeAnimationValue, {
+        toValue: 1,
+        duration: 100,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnimationValue, {
+        toValue: -1,
+        duration: 100,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnimationValue, {
+        toValue: 0,
+        duration: 100,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const shakeAnimationStyle = {
+    transform: [
+      {
+        translateX: shakeAnimationValue.interpolate({
+          inputRange: [-1, 0, 1],
+          outputRange: [-5, 0, 5],
+        }),
+      },
+    ],
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.titleText}>Pick a Username!</Text>
-        </View>
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.titleText}>Create a Username!</Text>
+          </View>
 
-        <View style={styles.input}>
-          <Text style={styles.inputHeader}>Username</Text>
+          <View style={styles.input}>
+            <Text style={styles.inputHeader}>Username</Text>
 
-          <TextInput
-            style={styles.inputControl}
-            placeholder="Select your birthday"
-            placeholderTextColor="#6b7280"
-            //value={selectedUsername}
-            onChangeText={(username) => setSelectedUsername(selectedUsername)}
-          ></TextInput>
-
-          <Modal
-            visible={isGenderModalVisible}
-            animationType="slide"
-            transparent
-          >
-            <View style={styles.modalContainerGender}>
-              <View style={styles.pickerContainerGender}>
-                <Picker
-                  style={styles.picker}
-                  selectedValue={selectedGender}
-                  onValueChange={(itemValue) => setSelectedGender(itemValue)}
-                >
-                  {gender.map((Gender) => (
-                    <Picker.Item key={Gender} label={Gender} value={Gender} />
-                  ))}
-                </Picker>
-              </View>
-              <View style={styles.bbuttons}>
-                <Button title="Save" onPress={closeGenderModal} />
-                <Button title="Cancel" onPress={closeGenderModal} />
-              </View>
-            </View>
-          </Modal>
-        </View>
-
-        <View style={styles.formAction}>
-          <TouchableOpacity
-            onPress={() => {
-              {
-                insertUser(userData);
-                navigation.navigate("Questionaire2");
+            <TextInput
+              style={styles.inputControl}
+              //placeholder=""
+              placeholderTextColor="#6b7280"
+              value={selectedUsername}
+              onChangeText={(selectedUsername) =>
+                setSelectedUsername(selectedUsername)
               }
-            }}
-          >
-            <View style={styles.continue}>
-              <Text style={styles.continueText}>Next</Text>
-            </View>
-          </TouchableOpacity>
+            ></TextInput>
+          </View>
+
+          {isError && (
+            <Animated.Text
+              style={[styles.errorText, shakeAnimationStyle]}
+              value={isError}
+            >
+              {isError}
+            </Animated.Text>
+          )}
+
+          <View style={styles.formAction}>
+            <TouchableOpacity
+              onPress={() => {
+                {
+                  handleUpdate(userData, session);
+                  //navigation.navigate("Questionaire1");
+                }
+              }}
+            >
+              <View style={styles.continue}>
+                <Text style={styles.continueText}>Next</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 };
@@ -231,7 +231,6 @@ const styles = StyleSheet.create({
   },
 
   continue: {
-    marginBottom: "100%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -239,8 +238,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderWidth: 1,
-    backgroundColor: "#075eec",
-    borderColor: "#075eec",
+    backgroundColor: "#14999999",
+    borderColor: "#14999999",
   },
 
   continueText: {
@@ -300,6 +299,14 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     gap: "20%",
+  },
+
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 10,
   },
 });
 
