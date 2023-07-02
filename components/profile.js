@@ -15,7 +15,7 @@ import { fetchUsername } from "./profileUtils.js";
 import { supabase } from "./auth/supabase.js";
 import ImagePicker from "react-native-image-picker";
 
-export const ProfileScreen = ({ navigation, route }) => {
+export const MyProfile = ({ navigation, route }) => {
   const { session } = route.params;
   const [editing, setEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(session.user);
@@ -339,4 +339,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen;
+export default MyProfile;
