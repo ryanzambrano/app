@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import MessagingUI from './messages';
+import ContactsUI from './contacts';
 import Home from './home';
 import Profile from './profile';
 
@@ -16,7 +17,7 @@ const TabNavigator = () => {
     screenOptions={({ route }) => ({
       tabBarIcon: ({ focused, color, size }) => {
         let iconName;
-        if (route.name === 'Messages') {
+        if (route.name === 'Contacts') {
           iconName = focused ? 'comment' : 'comment-o'; // Set the icons for the 'Messages
         }
         else if (route.name === 'Home') {
@@ -36,9 +37,10 @@ const TabNavigator = () => {
     }}
   >
     
-    <Tab.Screen name="Messages" component={MessagingUI} />
+    <Tab.Screen name="Contacts"  component={ContactsUI} />
     <Tab.Screen name="Home" component={Home} />
     <Tab.Screen name="Profile" component={Profile}/> 
+    <Tab.Screen name="Messages" options={{ headerShown: false }} component={MessagingUI} />
 
   </Tab.Navigator>
   );
