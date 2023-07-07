@@ -40,7 +40,6 @@ const TabNavigator = () => {
     <Tab.Screen name="Contacts"  component={ContactsUI} />
     <Tab.Screen name="Home" component={Home} />
     <Tab.Screen name="Profile" component={Profile}/> 
-    <Tab.Screen name="Messages" options={{ headerShown: false }} component={MessagingUI} />
 
   </Tab.Navigator>
   );
