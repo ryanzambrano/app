@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import MessagingUI from "./messages";
 import TabNavigator from "./TabNavigator";
+import ProfileUI from "./otherprofile";
 
 const Stack = createStackNavigator();
 
@@ -11,10 +12,7 @@ const ThreeMainPages = ({ route }) => {
   const { session } = route.params;
   return (
     <NavigationContainer independent={true}>
-      <Stack.Navigator
-        screenOptions={{ headerShown: false }}
-        initialParams={{ session }}
-      >
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen
           name="Tabs"
           component={TabNavigator}
@@ -23,6 +21,11 @@ const ThreeMainPages = ({ route }) => {
         <Stack.Screen
           name="Message"
           component={MessagingUI}
+          initialParams={{ session }}
+        />
+        <Stack.Screen
+          name="OtherProfile"
+          component={ProfileUI}
           initialParams={{ session }}
         />
       </Stack.Navigator>

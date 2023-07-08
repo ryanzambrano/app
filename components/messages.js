@@ -37,7 +37,7 @@ const MessagingUI = () => {
   const flatListRef = React.useRef();
 
   const navigateToProfile = () => {
-    navigation.navigate('Profile', { contactName, contactImage });
+    navigation.navigate('OtherProfile', { contactName, contactImage });
   };
 
   return (
