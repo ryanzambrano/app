@@ -13,12 +13,12 @@ import {
 } from "react-native";
 import { fetchUsername } from "./profileUtils.js";
 import { supabase } from "./auth/supabase.js";
-// import ImagePicker from "react-native-image-picker";
+import * as ImagePicker from "expo-image-picker";
 
-export const Profile = ({ navigation}) => {
- // const { session } = route.params;
+export const Profile = ({ navigation, route }) => {
+  const { session } = route.params;
   const [editing, setEditing] = useState(false);
-  //const [editedUser, setEditedUser] = useState(session.user);
+  const [editedUser, setEditedUser] = useState(session.user);
   const [isName, setIsName] = useState("");
   const [isBio, setIsBio] = useState("");
   const [profilePicture, setProfilePicture] = useState(null);
@@ -29,16 +29,16 @@ export const Profile = ({ navigation}) => {
     Keyboard.dismiss();
   };
 
-  /*useEffect(() => {
+  useEffect(() => {
     fetchProfile();
     fetchData();
-  }, []);*/
+  }, []);
 
-  /*const fetchData = async () => {
+  const fetchData = async () => {
     await fetchProfile();
     const username = await fetchUsername(session);
     setUsername(username);
-  };*/
+  };
 
   const fetchProfile = async () => {
     const { data, error } = await supabase
@@ -91,6 +91,60 @@ export const Profile = ({ navigation}) => {
     }
     setEditing(false);
   };
+  const handleImageUpload = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    // try {
+    const imagePickerResult = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 10],
+      quality: 1,
+    });
+
+    if (!imagePickerResult.canceled) {
+      //setUploading(true);
+      const response = await fetch(imagePickerResult.assets[0].uri);
+      //const blob = await response.blob();
+      setProfilePicture(imagePickerResult.assets[0].uri);
+
+      /*const { data, error } = await supabase.storage
+          .from("profile-pictures")
+          .upload(`profile_${session.user.id}`, blob);*/
+
+      /*if (error) {
+        alert("Failed to upload image. Please try again.");
+      } else {
+        //setProfilePicture(data.Key);
+      }*/
+
+      //setUploading(false);
+    }
+    /*} catch (error) {
+      alert("An error occurred while uploading the image. Please try again.");
+    }  */
+  };
+
+  const handleImageRemove = async () => {
+    if (profilePicture) {
+      /*try {
+        await supabase.storage
+          .from("profile-pictures")
+          .remove([profilePicture]);
+  
+        setProfilePicture(null);
+      } catch (error) {
+        alert("An error occurred while removing the image. Please try again.");
+      }*/
+
+      setProfilePicture(null);
+    }
+  };
 
   const handleCancel = () => {
     // Revert the editedUser back to the original user object
@@ -101,45 +155,6 @@ export const Profile = ({ navigation}) => {
   const handleEdit = () => {
     setEditing(true);
   };
-
- /* const handleImageUpload = () => {
-    ImagePicker.launchImageLibrary({ mediaType: "photo" }, (response) => {
-      if (response.didCancel) {
-        console.log("User cancelled image picker");
-      } else if (response.error) {
-        console.log("ImagePicker Error: ", response.error);
-      } else {
-        // Image selected, upload it to the server
-        const imageData = response.data;
-
-        setUploading(true);
-        try {
-          // Upload the image using supabase storage or any other API
-          // ...
-        } catch (error) {
-          console.error(error.message);
-        } finally {
-          setUploading(false);
-        }
-      }
-    });
-  };
-
-  const handleImageRemove = async () => {
-    try {
-      await supabase.storage
-        .from("profile-pictures")
-        .remove([`profile-picture-${session.user.id}`]);
-
-      setProfilePicture(null);
-      await supabase
-        .from("UGC")
-        .update({ profile_picture: null })
-        .eq("user_id", session.user.id);
-    } catch (error) {
-      console.error(error.message);
-    }
-  };*/
 
   return (
     <SafeAreaView style={styles.container}>
@@ -172,7 +187,7 @@ export const Profile = ({ navigation}) => {
             {profilePicture ? (
               <TouchableOpacity
                 style={styles.profilePictureContainer}
-                //onPress={handleImageRemove}
+                onPress={handleImageRemove}
                 disabled={uploading}
               >
                 <Image
@@ -188,7 +203,7 @@ export const Profile = ({ navigation}) => {
             ) : (
               <TouchableOpacity
                 style={styles.profilePictureContainer}
-                //onPress={handleImageUpload}
+                onPress={handleImageUpload}
                 disabled={uploading}
               >
                 <Text style={styles.profilePictureText}>Add Photo</Text>
@@ -206,18 +221,18 @@ export const Profile = ({ navigation}) => {
                   <TextInput
                     style={styles.input}
                     value={editedUser.name}
-                    //onChangeText={(name) =>
-                    //  setEditedUser({ ...editedUser, name })}
-                    
+                    onChangeText={(name) =>
+                      setEditedUser({ ...editedUser, name })
+                    }
                   />
 
                   <Text style={styles.label}>Bio:</Text>
                   <TextInput
                     style={styles.input}
                     value={editedUser.bio}
-                    //onChangeText={(bio) =>
-                    //  setEditedUser({ ...editedUser, bio })}
-                    
+                    onChangeText={(bio) =>
+                      setEditedUser({ ...editedUser, bio })
+                    }
                     multiline
                   />
                 </View>
@@ -225,10 +240,10 @@ export const Profile = ({ navigation}) => {
               {!editing && (
                 <View>
                   <Text style={styles.label}></Text>
-                  {/*<Text style={styles.name}>{editedUser.name}</Text>*/}
+                  <Text style={styles.name}>{editedUser.name}</Text>
 
                   <Text style={styles.label}></Text>
-                  {/*<Text style={styles.text}>{editedUser.bio}</Text>*/}
+                  <Text style={styles.text}>{editedUser.bio}</Text>
                 </View>
               )}
             </View>
@@ -299,8 +314,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   profilePicture: {
-    width: 80,
-    height: 80,
+    width: 175,
+    height: 300,
   },
   profilePictureText: {
     fontSize: 16,
