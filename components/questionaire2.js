@@ -1,6 +1,7 @@
 import "react-native-url-polyfill/auto";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
+
 import {
   StyleSheet,
   Text,
@@ -12,30 +13,51 @@ import {
   Button,
   Modal,
   Dimensions,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Animated,
+  Easing,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { supabase, insertUser } from "./auth/supabase.js";
+import { supabase } from "./auth/supabase.js";
+import { Session } from "@supabase/supabase-js";
 import SignUp from "./signUp.js";
-//import { insertUser} from './server.js';
+import { NavigationHelpersContext } from "@react-navigation/native";
+import { startShakeAnimation } from "./profileUtils.js";
 
-export const Questionaire2 = ({ navigation }) => {
-  const windowHeight = Dimensions.get("window").height;
-  const [isBirthdayModalVisible, setIsBirthdayModalVisible] = useState(false);
+export default function Questionaire2({ navigation, route }) {
+  const { session } = route.params;
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
+
+  const shakeAnimationValue = useRef(new Animated.Value(0)).current;
+  const [isError, setIsError] = useState("");
+
+  const [isStudiesModalVisible, setIsStudiesModalVisible] = useState(false);
   const [isForFunModalVisible, setIsForFunModalVisible] = useState(false);
   const [isLivingPreferencesModalVisible, setIsLivingPreferencesModalVisible] =
     useState(false);
 
   const [selectedStudies, setSelectedStudies] = useState("");
 
-  const [selectedForFun, setSelectedForFun] = useState("Stay in or Go out?");
+  const [selectedForFun, setSelectedForFun] = useState("");
 
-  const [selectedLivingPreferences, setSelectedLivingPreferences] = useState(
-    "Select your Living Preferences"
-  );
+  const [selectedLivingPreferences, setSelectedLivingPreferences] =
+    useState("");
 
   const livingPreferences = ["Apartment", "Dorm", "No Preferences", "Other"];
 
   const forFun = ["Stay in", "Go out"];
+
+  const studies = [
+    "Science",
+    "Business",
+    "Engineering",
+    "Art",
+    "Exploratory",
+    "Other",
+  ];
 
   const openStudiesModal = () => {
     setIsStudiesModalVisible(true);
@@ -62,195 +84,262 @@ export const Questionaire2 = ({ navigation }) => {
   };
 
   const userData = {
-    living_preferences: selectedLivingPreferences,
-    for_fun: selectedForFun,
+    livingPreferences: selectedLivingPreferences,
+    forFun: selectedForFun,
     studies: selectedStudies,
   };
 
-  const updateProfile = async () => {
-    // Update the user profile in the 'profiles' table
-    const { data, error } = await supabase
-      .from("profiles")
-      .update([
-        {
-          living_preferences: "dorm",
-        },
-      ])
-      .eq("id", 1);
+  const handleUpdate = async (userData, session) => {
+    setIsError(null);
 
-    if (error) {
-      console.error("Error updating profile:", error.message);
-    } else {
-      console.log("Profile updated successfully:", data);
+    if (session?.user) {
+      if (
+        !!userData.livingPreferences &&
+        !!userData.forFun &&
+        !!userData.studies
+      ) {
+        const { data, error } = await supabase
+          .from("profile")
+          .update({
+            living_preferences: userData.livingPreferences,
+            for_fun: userData.forFun,
+            studies: userData.studies,
+          })
+          .eq("user_id", session.user.id);
+
+        if (error) {
+          startShakeAnimation(shakeAnimationValue);
+          setIsError(error.message);
+        } else {
+          navigation.navigate("TagSelectionScreen");
+        }
+      } else {
+        startShakeAnimation(shakeAnimationValue);
+        setIsError("All fields are required");
+      }
     }
+  };
+
+  handleLivingPreferences = () => {
+    if (!selectedLivingPreferences) {
+      setSelectedLivingPreferences("Apartment");
+    }
+    closeLivingPreferencesModal();
+  };
+
+  handleForFun = () => {
+    if (!selectedForFun) {
+      setSelectedForFun("Stay in");
+    }
+    closeForFunModal();
+  };
+
+  handleStudies = () => {
+    if (!selectedStudies) {
+      setSelectedStudies("Science");
+    }
+    closeStudiesModal();
+  };
+
+  async function refreshSession() {
+    const { data, error } = await supabase.auth.refreshSession();
+    const { session, user } = data;
+  }
+
+  const shakeAnimationStyle = {
+    transform: [
+      {
+        translateX: shakeAnimationValue.interpolate({
+          inputRange: [-1, 0, 1],
+          outputRange: [-5, 0, 5],
+        }),
+      },
+    ],
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.titleText}>Answer some lifestyle questions!</Text>
-        </View>
-
-        <View style={styles.form}>
-          <View style={styles.input}>
-            <Text style={styles.inputHeader}>
-              Do you have living preferences?
+      <TouchableWithoutFeedback onPress={dismissKeyboard}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.titleText}>
+              Answer some lifestyle questions!
             </Text>
-
-            <TouchableOpacity
-              onPress={() => {
-                openLivingPreferencesModal();
-              }}
-            >
-              <View style={styles.inputControl}>
-                <Text style={styles.inputText}>
-                  {selectedLivingPreferences}
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <Modal
-              visible={isLivingPreferencesModalVisible}
-              animationType="slide"
-              transparent
-            >
-              <View style={styles.modalContainer}>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    style={styles.picker}
-                    selectedValue={selectedLivingPreferences}
-                    onValueChange={(itemValue) =>
-                      setSelectedLivingPreferences(itemValue)
-                    }
-                  >
-                    {livingPreferences.map((livingPreferences) => (
-                      <Picker.Item
-                        key={livingPreferences}
-                        label={livingPreferences}
-                        value={livingPreferences}
-                      />
-                    ))}
-                  </Picker>
-                </View>
-
-                <View style={styles.bbuttons}>
-                  <Button title="Save" onPress={closeLivingPreferencesModal} />
-                  <Button
-                    title="Cancel"
-                    onPress={closeLivingPreferencesModal}
-                  />
-                </View>
-              </View>
-            </Modal>
           </View>
 
-          <View style={styles.input}>
-            <Text style={styles.inputHeader}>
-              For fun, would you rather stay in or go out?
-            </Text>
+          <View style={styles.form}>
+            <View style={styles.input}>
+              <Text style={styles.inputHeader}>
+                Do you have living preferences?
+              </Text>
 
-            <TouchableOpacity
-              onPress={() => {
-                openForFunModal();
-              }}
-            >
-              <View style={styles.inputControl}>
-                <Text style={styles.inputText}>{selectedForFun}</Text>
-              </View>
-            </TouchableOpacity>
-
-            <Modal
-              visible={isForFunModalVisible}
-              animationType="slide"
-              transparent
-            >
-              <View style={styles.modalContainer}>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    style={styles.picker}
-                    selectedValue={selectedForFun}
-                    onValueChange={(itemValue) => setSelectedForFun(itemValue)}
-                  >
-                    {forFun.map((Gender) => (
-                      <Picker.Item key={Gender} label={Gender} value={Gender} />
-                    ))}
-                  </Picker>
+              <TouchableOpacity
+                onPress={() => {
+                  openLivingPreferencesModal();
+                }}
+              >
+                <View style={styles.inputControl}>
+                  <Text style={styles.inputText}>
+                    {selectedLivingPreferences}
+                  </Text>
                 </View>
-                <View style={styles.bbuttons}>
-                  <Button title="Save" onPress={closeForFunModal} />
-                  <Button title="Cancel" onPress={closeForFunModal} />
+              </TouchableOpacity>
+
+              <Modal
+                visible={isLivingPreferencesModalVisible}
+                animationType="slide"
+                transparent
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      style={styles.picker}
+                      selectedValue={selectedLivingPreferences}
+                      onValueChange={(itemValue) =>
+                        setSelectedLivingPreferences(itemValue)
+                      }
+                    >
+                      {livingPreferences.map((livingPreferences) => (
+                        <Picker.Item
+                          key={livingPreferences}
+                          label={livingPreferences}
+                          value={livingPreferences}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+
+                  <View style={styles.bbuttons}>
+                    <Button title="Save" onPress={handleLivingPreferences} />
+
+                    <Button
+                      title="Cancel"
+                      onPress={closeLivingPreferencesModal}
+                    />
+                  </View>
                 </View>
-              </View>
-            </Modal>
-          </View>
+              </Modal>
+            </View>
 
-          <View style={styles.input}>
-            <Text style={styles.inputHeader}>Race</Text>
+            <View style={styles.input}>
+              <Text style={styles.inputHeader}>
+                For fun, would you rather stay in or go out?
+              </Text>
 
-            <TouchableOpacity
-              onPress={() => {
-                openLivingPreferencesModal();
-              }}
-            >
-              <View style={styles.inputControl}>
-                <Text style={styles.inputText}>
-                  {selectedLivingPreferences}
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <Modal
-              visible={isLivingPreferencesModalVisible}
-              animationType="slide"
-              transparent
-            >
-              <View style={styles.modalContainer}>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    style={styles.picker}
-                    selectedValue={selectedLivingPreferences}
-                    onValueChange={(itemValue) =>
-                      setSelectedLivingPreferences(itemValue)
-                    }
-                  >
-                    {livingPreferences.map((livingPreferences) => (
-                      <Picker.Item
-                        key={livingPreferences}
-                        label={livingPreferences}
-                        value={livingPreferences}
-                      />
-                    ))}
-                  </Picker>
+              <TouchableOpacity
+                onPress={() => {
+                  openForFunModal();
+                }}
+              >
+                <View style={styles.inputControl}>
+                  <Text style={styles.inputText}>{selectedForFun}</Text>
                 </View>
+              </TouchableOpacity>
 
-                <View style={styles.bbuttons}>
-                  <Button title="Save" onPress={closeLivingPreferencesModal} />
-                  <Button
-                    title="Cancel"
-                    onPress={closeLivingPreferencesModal}
-                  />
+              <Modal
+                visible={isForFunModalVisible}
+                animationType="slide"
+                transparent
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      style={styles.picker}
+                      selectedValue={selectedForFun}
+                      onValueChange={(itemValue) =>
+                        setSelectedForFun(itemValue)
+                      }
+                    >
+                      {forFun.map((Gender) => (
+                        <Picker.Item
+                          key={Gender}
+                          label={Gender}
+                          value={Gender}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+                  <View style={styles.bbuttons}>
+                    <Button title="Save" onPress={handleForFun} />
+                    <Button title="Cancel" onPress={closeForFunModal} />
+                  </View>
                 </View>
-              </View>
-            </Modal>
-          </View>
+              </Modal>
+            </View>
 
-          <View style={styles.formAction}>
-            <TouchableOpacity
-              onPress={() => {
-                updateProfile(selectedLivingPreferences);
-              }}
-            >
-              <View style={styles.continue}>
-                <Text style={styles.continueText}>Next</Text>
-              </View>
-            </TouchableOpacity>
+            <View style={styles.input}>
+              <Text style={styles.inputHeader}>What are you studying?</Text>
+
+              <TouchableOpacity
+                onPress={() => {
+                  openStudiesModal();
+                }}
+              >
+                <View style={styles.inputControl}>
+                  <Text style={styles.inputText}>{selectedStudies}</Text>
+                </View>
+              </TouchableOpacity>
+
+              <Modal
+                visible={isStudiesModalVisible}
+                animationType="slide"
+                transparent
+              >
+                <View style={styles.modalContainer}>
+                  <View style={styles.pickerContainer}>
+                    <Picker
+                      style={styles.picker}
+                      selectedValue={selectedStudies}
+                      onValueChange={(itemValue) =>
+                        setSelectedStudies(itemValue)
+                      }
+                    >
+                      {studies.map((studies) => (
+                        <Picker.Item
+                          key={studies}
+                          label={studies}
+                          value={studies}
+                        />
+                      ))}
+                    </Picker>
+                  </View>
+
+                  <View style={styles.bbuttons}>
+                    <Button title="Save" onPress={handleStudies} />
+                    <Button title="Cancel" onPress={closeStudiesModal} />
+                  </View>
+                </View>
+              </Modal>
+            </View>
+
+            {isError && (
+              <Animated.Text
+                style={[styles.errorText, shakeAnimationStyle]}
+                value={isError}
+              >
+                {isError}
+              </Animated.Text>
+            )}
+
+            <View style={styles.formAction}>
+              <TouchableOpacity
+                onPress={() => {
+                  handleUpdate(userData, session);
+                  //navigation.navigate("TagSelectionScreen");
+                }}
+              >
+                <View style={styles.continue}>
+                  <Text style={styles.continueText}>Next</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
+      <StatusBar style="dark" />
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -326,7 +415,6 @@ const styles = StyleSheet.create({
   },
 
   continue: {
-    marginBottom: "100%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -334,8 +422,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderWidth: 1,
-    backgroundColor: "#075eec",
-    borderColor: "#075eec",
+    backgroundColor: "#14999999",
+    borderColor: "#14999999",
   },
 
   continueText: {
@@ -383,6 +471,12 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     gap: "20%",
   },
-});
 
-export default Questionaire2;
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 10,
+  },
+});
