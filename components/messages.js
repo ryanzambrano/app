@@ -1,20 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, FlatList, StyleSheet, Text, KeyboardAvoidingView, Platform, TouchableOpacity, Image } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  TextInput,
+  Button,
+  FlatList,
+  StyleSheet,
+  Text,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  Image,
+} from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const MessagingUI = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [contactName, setContactName] = useState('');
-  const [contactImage, setContactImage] = useState('');
+  const [contactName, setContactName] = useState("");
+  const [contactImage, setContactImage] = useState("");
 
   const sendMessage = () => {
-    if (message.trim() !== '') {
-      setMessages(prevMessages => [message, ...prevMessages]);
-      setMessage('');
+    if (message.trim() !== "") {
+      setMessages((prevMessages) => [message, ...prevMessages]);
+      setMessage("");
     }
   };
 
@@ -37,14 +49,14 @@ const MessagingUI = () => {
   const flatListRef = React.useRef();
 
   const navigateToProfile = () => {
-    navigation.navigate('OtherProfile', { contactName, contactImage });
+    navigation.navigate("OtherProfile", { contactName, contactImage });
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : null}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 2 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : null}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 2 : 0}
     >
       <View style={styles.header}>
         <TouchableOpacity
@@ -54,8 +66,16 @@ const MessagingUI = () => {
           <AntDesign name="arrowleft" size={24} color="#007AFF" />
         </TouchableOpacity>
         <Text style={styles.contactName}>{contactName}</Text>
-        <TouchableOpacity style={styles.profileContainer} onPress={navigateToProfile}>
-          {contactImage && <Image source={{ uri: contactImage }} style={styles.profilePicture} />}
+        <TouchableOpacity
+          style={styles.profileContainer}
+          onPress={navigateToProfile}
+        >
+          {contactImage && (
+            <Image
+              source={{ uri: contactImage }}
+              style={styles.profilePicture}
+            />
+          )}
         </TouchableOpacity>
       </View>
       <View style={styles.messagesContainer}>
@@ -76,7 +96,7 @@ const MessagingUI = () => {
         <TextInput
           style={styles.input}
           value={message}
-          onChangeText={text => setMessage(text)}
+          onChangeText={(text) => setMessage(text)}
           placeholder="Type a message..."
           placeholderTextColor="#888"
           autoCorrect={false}
@@ -92,13 +112,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: '#F9F9F9',
+    backgroundColor: "#F9F9F9",
     marginBottom: 10,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
     paddingHorizontal: 10,
     paddingVertical: 20,
@@ -109,7 +129,7 @@ const styles = StyleSheet.create({
   },
   contactName: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: 10,
     paddingVertical: 20,
   },
@@ -117,13 +137,13 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#dedede',
-    overflow: 'hidden',
+    backgroundColor: "#dedede",
+    overflow: "hidden",
     marginRight: 10,
   },
   profilePicture: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   messagesContainer: {
     flex: 1,
@@ -135,19 +155,19 @@ const styles = StyleSheet.create({
   messageContainer: {
     borderRadius: 20,
     marginBottom: 10,
-    alignSelf: 'flex-end',
-    backgroundColor: '#dedede',
+    alignSelf: "flex-end",
+    backgroundColor: "#dedede",
   },
   message: {
     fontSize: 16,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    color: '#000',
+    color: "#000",
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFF",
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -158,10 +178,10 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 40,
     marginRight: 10,
-    color: '#333',
+    color: "#333",
     borderRadius: 20,
     paddingHorizontal: 10,
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     fontSize: 20,
     paddingTop: 10,
   },

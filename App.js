@@ -31,9 +31,6 @@ import Home from "./components/home.js";
 // npm install @react-navigation/native react-native-tab-view react-native-gesture-handler react-native-reanimated
 // npm install react-native-vector-icons
 
-
-
-
 const Stack = createStackNavigator();
 
 const App = () => {
@@ -106,9 +103,7 @@ const App = () => {
             <Stack.Screen
               key={session?.user?.id ?? "ThreeMainPages"}
               name="ThreeMainPages"
-            
               component={ThreeMainPages}
-             
               initialParams={{ session }}
             />
           ) : (
@@ -121,9 +116,7 @@ const App = () => {
           )
         ) : (
           <>
-
             <Stack.Screen name="Authentication" component={Authentication} />
-
           </>
         )}
       </Stack.Navigator>

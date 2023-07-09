@@ -14,6 +14,7 @@ import {
 import { fetchUsername } from "./profileUtils.js";
 import { supabase } from "./auth/supabase.js";
 import * as ImagePicker from "expo-image-picker";
+import { StatusBar } from "expo-status-bar";
 
 export const Profile = ({ navigation, route }) => {
   const { session } = route.params;
@@ -32,6 +33,7 @@ export const Profile = ({ navigation, route }) => {
   useEffect(() => {
     fetchProfile();
     fetchData();
+    getProfilePicture();
   }, []);
 
   const fetchData = async () => {
@@ -51,7 +53,24 @@ export const Profile = ({ navigation, route }) => {
       console.error(error.message);
     } else {
       setEditedUser(data);
-      setProfilePicture(data.profile_picture);
+      //setProfilePicture(data.profile_picture);
+    }
+  };
+
+  const getProfilePicture = async () => {
+    try {
+      const { data, error } = await supabase.storage
+        .from("user_pictures")
+        .download(`profile-pic.jpeg`);
+
+      if (error) {
+        alert(error.message);
+      } else {
+        const url = URL.createObjectURL(data);
+        setProfilePicture(url);
+      }
+    } catch (error) {
+      alert(error.message);
     }
   };
 
@@ -99,35 +118,64 @@ export const Profile = ({ navigation, route }) => {
       return;
     }
 
-    // try {
-    const imagePickerResult = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 10],
-      quality: 1,
-    });
+    try {
+      const imagePickerResult = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
 
-    if (!imagePickerResult.canceled) {
-      //setUploading(true);
-      const response = await fetch(imagePickerResult.assets[0].uri);
-      //const blob = await response.blob();
-      setProfilePicture(imagePickerResult.assets[0].uri);
+      if (!imagePickerResult.canceled) {
+        //setUploading(true);
+        const response = await fetch(imagePickerResult.assets[0].uri);
+        const blob = await response.blob();
 
-      /*const { data, error } = await supabase.storage
-          .from("profile-pictures")
-          .upload(`profile_${session.user.id}`, blob);*/
+        const file = new File([blob], `profile_${session.user.id}.jpeg`);
+        setProfilePicture(imagePickerResult.assets[0].uri);
 
-      /*if (error) {
-        alert("Failed to upload image. Please try again.");
-      } else {
-        //setProfilePicture(data.Key);
-      }*/
+        /*const { error: removeError } = await supabase.storage
+          .from("user_pictures")
+          .remove(`profile_pictures/profile_${session.user.id}.jpeg`);
 
-      //setUploading(false);
+        if (removeError) {
+          alert(removeError.message + `profile_${session.user.id}`);
+        }
+
+        const { data, error: uploadError } = await supabase.storage
+          .from("user_pictures")
+
+          .upload(`profile_pictures/profile_${session.user.id}.jpeg`, file, {
+            contentType: "image/jpeg", // Replace with the appropriate content type if necessary
+          });
+        if (uploadError) {
+          alert(uploadError.message + blob);
+        }*/
+        setUploading(false);
+      }
+    } catch (error) {
+      alert(error.message + `profile_${session.user.id}`);
     }
-    /*} catch (error) {
-      alert("An error occurred while uploading the image. Please try again.");
-    }  */
+  };
+
+  const convertBlobToImage = (blob) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const image = new Image();
+        image.src = reader.result;
+        image.onload = () => {
+          resolve(image);
+        };
+        image.onerror = (error) => {
+          reject(error);
+        };
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+      reader.readAsDataURL(blob);
+    });
   };
 
   const handleImageRemove = async () => {
@@ -159,7 +207,7 @@ export const Profile = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
-        <View style={styles.container}>
+        <View style={styles.viewContainer}>
           <View style={styles.topBar}>
             <Text style={styles.username}>{isUsername}</Text>
             {editing ? (
@@ -187,7 +235,7 @@ export const Profile = ({ navigation, route }) => {
             {profilePicture ? (
               <TouchableOpacity
                 style={styles.profilePictureContainer}
-                onPress={handleImageRemove}
+                onPress={handleImageUpload}
                 disabled={uploading}
               >
                 <Image
@@ -225,31 +273,39 @@ export const Profile = ({ navigation, route }) => {
                       setEditedUser({ ...editedUser, name })
                     }
                   />
-
-                  <Text style={styles.label}>Bio:</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={editedUser.bio}
-                    onChangeText={(bio) =>
-                      setEditedUser({ ...editedUser, bio })
-                    }
-                    multiline
-                  />
                 </View>
               )}
               {!editing && (
                 <View>
                   <Text style={styles.label}></Text>
                   <Text style={styles.name}>{editedUser.name}</Text>
-
-                  <Text style={styles.label}></Text>
-                  <Text style={styles.text}>{editedUser.bio}</Text>
                 </View>
               )}
             </View>
           </View>
+
+          <View style={styles.bio}>
+            {editing && (
+              <View>
+                <Text style={styles.label}>Bio:</Text>
+                <TextInput
+                  style={styles.input}
+                  value={editedUser.bio}
+                  onChangeText={(bio) => setEditedUser({ ...editedUser, bio })}
+                  multiline
+                />
+              </View>
+            )}
+            {!editing && (
+              <View>
+                <Text style={styles.label}></Text>
+                <Text style={styles.text}>{editedUser.bio}</Text>
+              </View>
+            )}
+          </View>
         </View>
       </TouchableWithoutFeedback>
+      <StatusBar style="dark" />
     </SafeAreaView>
   );
 };
@@ -257,17 +313,25 @@ export const Profile = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#eBecf4",
+    backgroundColor: "white",
+  },
+
+  viewContainer: {
+    flex: 1,
+    backgroundColor: "#F4F4F4",
+    margin: 0,
   },
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 15,
-    color: "black",
-    borderBottomWidth: 0.5,
-    borderColor: "#11",
-    backgroundColor: "#12222",
+    padding: 6,
+    paddingLeft: 15,
+    paddingRight: 15,
+    //color: "black",
+    //borderBottomWidth: 0.5,
+    //borderColor: "#11",
+    backgroundColor: "white",
   },
   username: {
     fontSize: 18,
@@ -276,7 +340,16 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: "600",
+    color: "black",
   },
+
+  bio: {
+    fontSize: 18,
+    fontWeight: "600",
+    paddingLeft: 16,
+    margin: 0,
+  },
+
   editButton: {
     padding: 8,
     borderRadius: 4,
@@ -301,21 +374,26 @@ const styles = StyleSheet.create({
     backgroundColor: "#aaa",
   },
   profileContainer: {
-    flex: 1,
+    flex: 0,
     padding: 16,
+    flexDirection: "row",
+    justifyContent: "center",
+    margin: 0,
   },
   profilePictureContainer: {
-    width: 175,
-    height: 300,
+    width: 171,
+    height: 311,
     backgroundColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
-    alignSelf: "center",
-    marginBottom: 16,
+    //alignSelf: "center",
+    //marginBottom: 16,
+    borderRadius: 20,
   },
   profilePicture: {
-    width: 175,
-    height: 300,
+    width: 171,
+    height: 311,
+    borderRadius: 20,
   },
   profilePictureText: {
     fontSize: 16,
@@ -327,8 +405,8 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    justifyContent: "center",
-    alignItems: "center",
+    //justifyContent: "center",
+    //alignItems: "center",
   },
   profileDetails: {
     flex: 1,
@@ -341,7 +419,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    marginBottom: 16,
+    //marginBottom: 16,
   },
   input: {
     fontSize: 16,

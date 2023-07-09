@@ -34,7 +34,6 @@ export default function Questionaire2({ navigation, route }) {
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
 
-  const windowHeight = Dimensions.get("window").height;
   const [isStudiesModalVisible, setIsStudiesModalVisible] = useState(false);
   const [isForFunModalVisible, setIsForFunModalVisible] = useState(false);
   const [isLivingPreferencesModalVisible, setIsLivingPreferencesModalVisible] =
