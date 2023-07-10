@@ -1,0 +1,2 @@
+# app
+  This is a personal project collaborated on by Matthew Brown (University of Florida), Ryan Zambrano (Florida State University), and Mason Hall (University of Central Florida). We are all first-year computer science students. This is a roommate-finding app that uses React native, Javascript, and Supabase as the authenticator and database. This was done from scratch, and will be found on the app store soon.
