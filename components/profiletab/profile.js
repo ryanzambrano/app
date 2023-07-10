@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import {
   View,
   Text,
@@ -11,8 +12,9 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { fetchUsername } from "./profileUtils.js";
-import { supabase } from "./auth/supabase.js";
+
+import { fetchUsername } from "../auth/profileUtils.js";
+import { supabase } from "../auth/supabase.js";
 import * as ImagePicker from "expo-image-picker";
 import { StatusBar } from "expo-status-bar";
 

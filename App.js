@@ -1,35 +1,25 @@
 import "react-native-url-polyfill/auto";
 import React, { useState, useEffect } from "react";
-import { StatusBar } from "expo-status-bar";
 
 import {
   StyleSheet,
-  Text,
-  TextInput,
   View,
   Image,
-  SafeAreaView,
-  TouchableOpacity,
-  Button,
 } from "react-native";
-import { supabase } from "./components/auth/supabase.js";
-import Authentication from "./components/authentication.js";
-import Questionaire from "./components/questionaire.js";
-import TagSelectionScreen from "./components/tagSelectionScreen.js";
-import ProfileScreen from "./components/profile.js";
+
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { supabase } from "./components/auth/supabase.js";
 
-import TabNavigator from "./components/TabNavigator.js";
-import ThreeMainPages from "./components/ThreeMainPages.js";
-import Home from "./components/home.js";
+import Authentication from "./components/auth/authentication.js";
+import Questionaire from "./components/questionairefiles/questionaire.js";
+import ThreeMainPages from "./components/miscellaneous/ThreeMainPages.js";
 
 // npm install @react-navigation/native @react-navigation/bottom-tabs react-native-reanimated react-native-gesture-handler react-native-screens react-native-safe-area-context @react-native-community/masked-view
-
 // npm install @react-navigation/native @react-navigation/material-bottom-tabs react-native-paper react-native-vector-icons
-
 // npm install @react-navigation/native react-native-tab-view react-native-gesture-handler react-native-reanimated
 // npm install react-native-vector-icons
+
 
 const Stack = createStackNavigator();
 
@@ -103,7 +93,9 @@ const App = () => {
             <Stack.Screen
               key={session?.user?.id ?? "ThreeMainPages"}
               name="ThreeMainPages"
+            
               component={ThreeMainPages}
+             
               initialParams={{ session }}
             />
           ) : (
@@ -116,7 +108,9 @@ const App = () => {
           )
         ) : (
           <>
+
             <Stack.Screen name="Authentication" component={Authentication} />
+
           </>
         )}
       </Stack.Navigator>
@@ -140,3 +134,5 @@ const styles = StyleSheet.create({
 });
 
 export default App;
+
+

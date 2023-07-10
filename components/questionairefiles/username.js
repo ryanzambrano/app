@@ -1,26 +1,20 @@
 import "react-native-url-polyfill/auto";
 import React, { useState, useRef } from "react";
-import { StatusBar } from "expo-status-bar";
+
 import {
   StyleSheet,
   Text,
   TextInput,
   View,
-  Image,
   SafeAreaView,
   TouchableOpacity,
-  Button,
-  Modal,
-  Dimensions,
   TouchableWithoutFeedback,
   Keyboard,
   Animated,
   Easing,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import { supabase } from "./auth/supabase.js";
-import SignUp from "./signUp.js";
-//import { insertUser} from './server.js';
+
+import { supabase } from "../auth/supabase.js";
 
 export const Username = ({ navigation, route }) => {
   const { session } = route.params;

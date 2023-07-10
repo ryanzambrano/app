@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, TextInput, Button, Alert } from "react-native";
-import { supabase } from "./auth/supabase";
+import { supabase } from "./supabase";
 
 const Email = () => {
   const [email, setEmail] = useState("");

@@ -1,25 +1,23 @@
 import "react-native-url-polyfill/auto";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
+
 import {
   StyleSheet,
   Text,
   View,
-  Image,
   SafeAreaView,
   TouchableOpacity,
   Button,
   Modal,
-  Dimensions,
   TouchableWithoutFeedback,
   Keyboard,
   Animated,
-  Easing,
 } from "react-native";
+
 import { Picker } from "@react-native-picker/picker";
-import { supabase } from "./auth/supabase.js";
-import { Session } from "@supabase/supabase-js";
-import { startShakeAnimation } from "./profileUtils.js";
+import { supabase } from "../auth/supabase.js";
+import { startShakeAnimation } from "../auth/profileUtils.js";
 
 export const Questionaire1 = ({ navigation, route }) => {
   const { session } = route.params;
