@@ -8,6 +8,7 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = 'https://jaupbyhwvfulpvkfxmgm.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM';
 const supabase = createClient(supabaseUrl, supabaseKey);
+import UserCard from './userCard.js';
 
 
 const Home = () => {
@@ -20,14 +21,19 @@ const Home = () => {
       const { data, error } = await supabase.from('UGC').select('*');
       if (error) {
         console.error(error);
-      } else { 
+      } else {
         setUsers(data);
       }
     };
-  
+
     fetchUsers();
   }, []);
-  
+
+  const handleUserCardPress = (user) => {
+    setSelectedUser(user);
+    navigation.navigate('userCard', { user }); // Navigate to UserProfile component with selected user data
+  };
+
   const renderUserCard = ({ item }) => {
     return (
       <TouchableOpacity onPress={() => handleUserCardPress(item)}>
@@ -37,11 +43,6 @@ const Home = () => {
         </View>
       </TouchableOpacity>
     );
-  };
-
-  const handleUserCardPress = (user) => {
-    setSelectedUser(user);
-    navigation.navigate('UserProfile', { user });
   };
 
   return (
@@ -66,7 +67,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 8,
     backgroundColor: "#F4F4F4",
-    borderRadius: 8,
+    borderRadius: 20,
   },
   topBar: {
     flexDirection: "row",

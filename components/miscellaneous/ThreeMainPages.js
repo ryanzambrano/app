@@ -5,7 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import MessagingUI from "../contactstab/messages";
 import TabNavigator from "./TabNavigator";
 import ProfileUI from "../contactstab/otherprofile";
-
+import UserCard from "../hometab/userCard.js";
 
 const Stack = createStackNavigator();
 
@@ -19,7 +19,10 @@ const ThreeMainPages = ({ route }) => {
           component={TabNavigator}
           initialParams={{ session }}
         />
-       
+        <Stack.Screen  
+          name="userCard" 
+          component={ UserCard } 
+          initialParams={{ session }} />
         <Stack.Screen
           name="Message"
           component={MessagingUI}

@@ -1,15 +1,24 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { StyleSheet, SafeAreaView, Text } from 'react-native';
 
 const UserCard = ({ route }) => {
-  const { userId } = route.params;
+  const { name, bio } = route.params.user;
 
   return (
-    <View>
-      <Text> User Profile </Text>
-      <Text> UserId: {userId} </Text>
-    </View>
+    <SafeAreaView style={styles.container}>
+      <Text> Name: {name} </Text>
+      <Text> Bio: {bio} </Text>
+    </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 30,
+    alignItems: 'center',
+    marginTop: 50,
+  },
+});
 
 export default UserCard;
