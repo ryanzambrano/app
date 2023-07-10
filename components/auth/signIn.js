@@ -15,9 +15,9 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import { supabase } from "./auth/supabase.js";
+import { supabase } from "./supabase.js";
 import SignUp from "./signUp.js";
-import Questionaire from "./questionaire1.js";
+import Questionaire from "../questionairefiles/questionaire1.js";
 import { startShakeAnimation } from "./profileUtils.js";
 
 export const SignIn = ({ navigation }) => {

@@ -15,7 +15,7 @@ import {
   Animated,
   Easing,
 } from "react-native";
-import { supabase } from "./auth/supabase.js";
+import { supabase } from "./supabase.js";
 import { NavigationContainerRefContext } from "@react-navigation/native";
 import { startShakeAnimation } from "./profileUtils.js";
 //import { insertUser} from './server.js';
