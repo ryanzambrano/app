@@ -1,5 +1,4 @@
 import { supabase } from "./supabase";
-import React, { useState, useEffect } from "react";
 import { Animated, Easing } from "react-native";
 
 export async function startShakeAnimation(shakeAnimationValue) {

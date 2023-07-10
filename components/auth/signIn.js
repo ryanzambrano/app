@@ -1,6 +1,7 @@
 import "react-native-url-polyfill/auto";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
+
 import {
   StyleSheet,
   Text,
@@ -9,15 +10,12 @@ import {
   Image,
   SafeAreaView,
   TouchableOpacity,
-  Button,
   Animated,
-  Easing,
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
+
 import { supabase } from "./supabase.js";
-import SignUp from "./signUp.js";
-import Questionaire from "../questionairefiles/questionaire1.js";
 import { startShakeAnimation } from "./profileUtils.js";
 
 export const SignIn = ({ navigation }) => {

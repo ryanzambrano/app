@@ -1,10 +1,12 @@
 import "react-native-url-polyfill/auto";
 import React, { useState, useEffect } from "react";
+
 import {
   StyleSheet,
   View,
   Image,
 } from "react-native";
+
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { supabase } from "./components/auth/supabase.js";

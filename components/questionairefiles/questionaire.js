@@ -1,10 +1,12 @@
 import "react-native-url-polyfill/auto";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+
 import Questionaire1 from "./questionaire1.js";
 import Questionaire2 from "./questionaire2.js";
 import Username from "./username.js";
 import TagSelectionScreen from "./tagSelectionScreen.js";
-import { createStackNavigator } from "@react-navigation/stack";
+
 
 const Stack = createStackNavigator();
 

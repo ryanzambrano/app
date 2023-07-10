@@ -5,24 +5,18 @@ import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
-  TextInput,
   View,
-  Image,
   SafeAreaView,
   TouchableOpacity,
   Button,
   Modal,
-  Dimensions,
   TouchableWithoutFeedback,
   Keyboard,
   Animated,
-  Easing,
 } from "react-native";
+
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../auth/supabase.js";
-import { Session } from "@supabase/supabase-js";
-import SignUp from "../auth/signUp.js";
-import { NavigationHelpersContext } from "@react-navigation/native";
 import { startShakeAnimation } from "../auth/profileUtils.js";
 
 export default function Questionaire2({ navigation, route }) {

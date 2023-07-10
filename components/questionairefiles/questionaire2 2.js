@@ -1,5 +1,6 @@
 import "react-native-url-polyfill/auto";
 import React, { useState } from "react";
+
 import {
   StyleSheet,
   Text,
@@ -10,6 +11,7 @@ import {
   Modal,
   Dimensions,
 } from "react-native";
+
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../authentication/supabase.js";
 //import { insertUser} from './server.js';

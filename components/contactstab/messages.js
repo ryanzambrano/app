@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import {
   View,
   TextInput,
@@ -11,9 +12,9 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
+
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const MessagingUI = () => {
   const navigation = useNavigation();

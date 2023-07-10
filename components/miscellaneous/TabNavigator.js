@@ -2,10 +2,9 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-import MessagingUI from "../contactstab/messages";
 import ContactsUI from "../contactstab/contacts";
 import Home from "../hometab/home";
-import Profile from "../selfprofilefiles/profile";
+import Profile from "../profiletab/profile";
 
 const Tab = createBottomTabNavigator();
 
