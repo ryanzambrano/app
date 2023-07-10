@@ -6,6 +6,7 @@ import MessagingUI from "../contactstab/messages";
 import TabNavigator from "./TabNavigator";
 import ProfileUI from "../contactstab/otherprofile";
 
+
 const Stack = createStackNavigator();
 
 const ThreeMainPages = ({ route }) => {
@@ -18,6 +19,7 @@ const ThreeMainPages = ({ route }) => {
           component={TabNavigator}
           initialParams={{ session }}
         />
+       
         <Stack.Screen
           name="Message"
           component={MessagingUI}
