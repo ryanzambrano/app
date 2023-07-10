@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 8,
     backgroundColor: "#F4F4F4",
-    borderRadius: 20,
+    borderRadius: 8,
   },
   topBar: {
     flexDirection: "row",
