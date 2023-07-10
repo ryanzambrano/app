@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
+
 import {
   View,
   Text,
@@ -8,12 +9,10 @@ import {
   ScrollView,
   SafeAreaView,
   Animated,
-  Easing,
 } from "react-native";
-import { supabase } from "./auth/supabase.js";
 
-import { Session } from "@supabase/supabase-js";
-import { startShakeAnimation } from "./profileUtils.js";
+import { supabase } from "../auth/supabase.js";
+import { startShakeAnimation } from "../auth/profileUtils.js";
 
 const TagSelectionScreen = ({ navigatio, route }) => {
   const { session } = route.params;

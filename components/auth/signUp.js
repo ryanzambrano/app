@@ -1,6 +1,7 @@
 import "react-native-url-polyfill/auto";
 import React, { useState, useRef } from "react";
 import { StatusBar } from "expo-status-bar";
+
 import {
   StyleSheet,
   Text,
@@ -9,16 +10,13 @@ import {
   Image,
   SafeAreaView,
   TouchableOpacity,
-  Button,
   TouchableWithoutFeedback,
   Keyboard,
   Animated,
-  Easing,
 } from "react-native";
-import { supabase } from "./auth/supabase.js";
-import { NavigationContainerRefContext } from "@react-navigation/native";
+
+import { supabase } from "./supabase.js";
 import { startShakeAnimation } from "./profileUtils.js";
-//import { insertUser} from './server.js';
 
 export const SignUp = ({ navigation }) => {
   const [loading, setLoading] = useState(false);

@@ -1,21 +1,19 @@
 import "react-native-url-polyfill/auto";
 import React, { useState } from "react";
-import { StatusBar } from "expo-status-bar";
+
 import {
   StyleSheet,
   Text,
-  TextInput,
   View,
-  Image,
   SafeAreaView,
   TouchableOpacity,
   Button,
   Modal,
   Dimensions,
 } from "react-native";
+
 import { Picker } from "@react-native-picker/picker";
-import { supabase, insertUser } from "./auth/supabase.js";
-import SignUp from "./signUp.js";
+import { supabase } from "../authentication/supabase.js";
 //import { insertUser} from './server.js';
 
 export const Questionaire2 = ({ navigation }) => {

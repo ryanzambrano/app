@@ -2,9 +2,9 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
-import MessagingUI from "./messages";
+import MessagingUI from "../contactstab/messages";
 import TabNavigator from "./TabNavigator";
-import ProfileUI from "./otherprofile";
+import ProfileUI from "../contactstab/otherprofile";
 
 const Stack = createStackNavigator();
 
