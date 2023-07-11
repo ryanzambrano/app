@@ -241,8 +241,11 @@ export const Profile = ({ navigation, route }) => {
             ) : (
               <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
                 <Text style={styles.buttonText}>Edit</Text>
-              </TouchableOpacity>
+              </TouchableOpacity>             
             )}
+            <TouchableOpacity style={styles.settingsButton}>
+              <Image style={styles.settingsIcon} source={{ uri: "https://th.bing.com/th/id/OIP.nEKx7qYL-7aettL7yMDiOgHaHv?pid=ImgDet&rs=1"}} />
+            </TouchableOpacity>
           </View>
           <View style={styles.profileContainer}>
             {profilePicture ? (
@@ -329,6 +332,13 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
 
+  settingsIcon: {
+    padding: 8,
+    width: 25,
+    height: 25,
+    borderRadius: 4,
+  },
+
   viewContainer: {
     flex: 1,
     backgroundColor: "#F4F4F4",
@@ -366,6 +376,7 @@ const styles = StyleSheet.create({
   editButton: {
     padding: 8,
     borderRadius: 4,
+    marginRight: -180,
     backgroundColor: "#4EB1A3",
   },
   buttonText: {

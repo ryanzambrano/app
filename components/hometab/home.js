@@ -8,7 +8,7 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = 'https://jaupbyhwvfulpvkfxmgm.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM';
 const supabase = createClient(supabaseUrl, supabaseKey);
-import UserCard from './userCard.js';
+// import UserCard from './userCard.js';
 
 
 const Home = () => {
@@ -18,14 +18,31 @@ const Home = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data, error } = await supabase.from('UGC').select('*');
-      if (error) {
-        console.error(error);
-      } else {
-        setUsers(data);
+      const { data: ugcData, error: ugcError } = await supabase.from('UGC').select('*');
+      const { data: profileData, error: profileError } = await supabase.from('profile').select('*');
+  
+      if (ugcError) {
+        console.error(ugcError);
+        return;
       }
+  
+      if (profileError) {
+        console.error(profileError);
+        return;
+      }
+  
+      // Merge the data for each user
+      const mergedData = ugcData.map((ugcUser) => {
+        const profileUser = profileData.find((profileUser) => profileUser.id === ugcUser.id);
+        return {
+          ...ugcUser,
+          ...(profileUser && { profile: profileUser }),
+        };
+      });
+  
+      setUsers(mergedData);
     };
-
+  
     fetchUsers();
   }, []);
 

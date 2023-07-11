@@ -14,7 +14,7 @@ import {
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
 
-const TagSelectionScreen = ({ navigatio, route }) => {
+const TagSelectionScreen = ({ navigation, route }) => {
   const { session } = route.params;
   const [selectedTags, setSelectedTags] = useState([]);
 
