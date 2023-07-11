@@ -1,11 +1,7 @@
 import "react-native-url-polyfill/auto";
 import React, { useState, useEffect } from "react";
 
-import {
-  StyleSheet,
-  View,
-  Image,
-} from "react-native";
+import { StyleSheet, View, Image } from "react-native";
 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -19,7 +15,6 @@ import ThreeMainPages from "./components/miscellaneous/ThreeMainPages.js";
 // npm install @react-navigation/native @react-navigation/material-bottom-tabs react-native-paper react-native-vector-icons
 // npm install @react-navigation/native react-native-tab-view react-native-gesture-handler react-native-reanimated
 // npm install react-native-vector-icons
-
 
 const Stack = createStackNavigator();
 
@@ -93,9 +88,7 @@ const App = () => {
             <Stack.Screen
               key={session?.user?.id ?? "ThreeMainPages"}
               name="ThreeMainPages"
-            
               component={ThreeMainPages}
-             
               initialParams={{ session }}
             />
           ) : (
@@ -108,9 +101,7 @@ const App = () => {
           )
         ) : (
           <>
-
             <Stack.Screen name="Authentication" component={Authentication} />
-
           </>
         )}
       </Stack.Navigator>
@@ -134,5 +125,3 @@ const styles = StyleSheet.create({
 });
 
 export default App;
-
-

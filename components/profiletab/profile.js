@@ -17,6 +17,7 @@ import { fetchUsername } from "../auth/profileUtils.js";
 import { supabase } from "../auth/supabase.js";
 import * as ImagePicker from "expo-image-picker";
 import { StatusBar } from "expo-status-bar";
+import { decode } from "base64-arraybuffer";
 
 export const Profile = ({ navigation, route }) => {
   const { session } = route.params;
@@ -63,13 +64,19 @@ export const Profile = ({ navigation, route }) => {
     try {
       const { data, error } = await supabase.storage
         .from("user_pictures")
-        .download(`profile-pic.jpeg`);
+        .download(`profile_pictures/profile_${session.user.id}`);
+
+      if (data) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const decodedData = reader.result;
+          setProfilePicture(decodedData);
+        };
+        reader.readAsDataURL(data);
+      }
 
       if (error) {
         alert(error.message);
-      } else {
-        const url = URL.createObjectURL(data);
-        setProfilePicture(url);
       }
     } catch (error) {
       alert(error.message);
@@ -124,39 +131,41 @@ export const Profile = ({ navigation, route }) => {
       const imagePickerResult = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
+        //forceJpg: true,
+        base64: true,
         aspect: [1, 1],
         quality: 1,
       });
 
       if (!imagePickerResult.canceled) {
-        //setUploading(true);
-        const response = await fetch(imagePickerResult.assets[0].uri);
-        const blob = await response.blob();
+        //const response = await fetch(imagePickerResult.assets[0].uri);
 
-        const file = new File([blob], `profile_${session.user.id}.jpeg`);
         setProfilePicture(imagePickerResult.assets[0].uri);
 
-        /*const { error: removeError } = await supabase.storage
+        const { error: removeError } = await supabase.storage
           .from("user_pictures")
-          .remove(`profile_pictures/profile_${session.user.id}.jpeg`);
+          .remove(`profile_pictures/profile_${session.user.id}`);
 
         if (removeError) {
           alert(removeError.message + `profile_${session.user.id}`);
         }
 
+        const base64Data = imagePickerResult.assets[0].base64;
+        //alert(base64Data);
+        const buffer = decode(base64Data);
+        //const buffer = Buffer.from(base64Data, "base64");
+
         const { data, error: uploadError } = await supabase.storage
           .from("user_pictures")
-
-          .upload(`profile_pictures/profile_${session.user.id}.jpeg`, file, {
+          .upload(`profile_pictures/profile_${session.user.id}`, buffer, {
             contentType: "image/jpeg", // Replace with the appropriate content type if necessary
           });
         if (uploadError) {
-          alert(uploadError.message + blob);
-        }*/
-        setUploading(false);
+          alert(uploadError.message);
+        }
       }
     } catch (error) {
-      alert(error.message + `profile_${session.user.id}`);
+      alert(error.message);
     }
   };
 
