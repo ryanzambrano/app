@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  View,
   FlatList,
   StyleSheet,
   Text,
@@ -53,6 +54,10 @@ const ContactsUI = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Image style={styles.logo} source = {{ uri: "https://cdn3.iconfinder.com/data/icons/user-interface-865/24/36_Home_App_House-256.png"}} />
+        <Text style={styles.headerText}> Cabana </Text>
+      </View>
       <FlatList
         data={contacts}
         renderItem={renderContact}
@@ -67,6 +72,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F9F9F9",
   },
+
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderColor: 'gray',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginBottom: 8,
+  },
+
+  headerText: {
+    fontSize: 25,
+    fontWeight: 'bold',
+    marginTop: -7,
+  },
+
+  logo: {
+    width: 27,
+    height: 27,
+    marginRight: 0,
+    marginTop: -10,
+  },
+
   contactItem: {
     flexDirection: "row",
     alignItems: "center",

@@ -17,7 +17,9 @@ import { fetchUsername } from "../auth/profileUtils.js";
 import { supabase } from "../auth/supabase.js";
 import * as ImagePicker from "expo-image-picker";
 import { StatusBar } from "expo-status-bar";
+
 import { decode } from "base64-arraybuffer";
+// npm install base64-arraybuffer
 
 export const Profile = ({ navigation, route }) => {
   const { session } = route.params;
