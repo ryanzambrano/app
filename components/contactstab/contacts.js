@@ -6,9 +6,9 @@ import {
   Text,
   TouchableOpacity,
   Image,
+  SafeAreaView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const ContactsUI = () => {
   const navigation = useNavigation();
@@ -55,9 +55,15 @@ const ContactsUI = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Image style={styles.logo} source = {{ uri: "https://cdn3.iconfinder.com/data/icons/user-interface-865/24/36_Home_App_House-256.png"}} />
+        <Image
+          style={styles.logo}
+          source={{
+            uri: "https://cdn3.iconfinder.com/data/icons/user-interface-865/24/36_Home_App_House-256.png",
+          }}
+        />
         <Text style={styles.headerText}> Cabana </Text>
       </View>
+
       <FlatList
         data={contacts}
         renderItem={renderContact}
@@ -70,22 +76,28 @@ const ContactsUI = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9F9F9",
+    backgroundColor: "white",
+  },
+
+  viewContainer: {
+    flex: 1,
+    backgroundColor: "#F4F4F4",
   },
 
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderColor: 'gray',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+
+    borderColor: "gray",
+    paddingTop: 13,
+    paddingBottom: 6,
+    paddingLeft: 15,
+    paddingRight: 15,
   },
 
   headerText: {
     fontSize: 25,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: -7,
   },
 

@@ -62,11 +62,11 @@ export const Profile = ({ navigation, route }) => {
     }
   };
 
-  const getProfilePicture = async () => {
+  const getProfilePicture = async (navigation) => {
     try {
       const { data, error } = await supabase.storage
         .from("user_pictures")
-        .download(`profile_pictures/profile_${session.user.id}`);
+        .download(`profile_pictures/profile_${session.user.id}-0`);
 
       if (data) {
         const reader = new FileReader();
@@ -78,10 +78,10 @@ export const Profile = ({ navigation, route }) => {
       }
 
       if (error) {
-        alert(error.message);
+        //alert(error.message);
       }
     } catch (error) {
-      alert(error.message);
+      //alert(error.message);
     }
   };
 
@@ -171,26 +171,6 @@ export const Profile = ({ navigation, route }) => {
     }
   };
 
-  const convertBlobToImage = (blob) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const image = new Image();
-        image.src = reader.result;
-        image.onload = () => {
-          resolve(image);
-        };
-        image.onerror = (error) => {
-          reject(error);
-        };
-      };
-      reader.onerror = (error) => {
-        reject(error);
-      };
-      reader.readAsDataURL(blob);
-    });
-  };
-
   const handleImageRemove = async () => {
     if (profilePicture) {
       /*try {
@@ -207,10 +187,16 @@ export const Profile = ({ navigation, route }) => {
     }
   };
 
+  handleEditPictures = async () => {
+    navigation.navigate("AddProfileImages");
+  };
+
   const handleCancel = () => {
     // Revert the editedUser back to the original user object
-    setEditedUser(session.user);
+    //setEditedUser(session.user);
+
     setEditing(false);
+    fetchProfile();
   };
 
   const handleEdit = () => {
@@ -237,21 +223,50 @@ export const Profile = ({ navigation, route }) => {
                 >
                   <Text style={styles.buttonText}>Save</Text>
                 </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.settingsButton}
+                  onPress={() => {
+                    navigation.navigate("SettingsScreen");
+                  }}
+                >
+                  <Image
+                    style={styles.settingsIcon}
+                    source={{
+                      uri: "https://th.bing.com/th/id/OIP.nEKx7qYL-7aettL7yMDiOgHaHv?pid=ImgDet&rs=1",
+                    }}
+                  />
+                </TouchableOpacity>
               </View>
             ) : (
-              <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
-                <Text style={styles.buttonText}>Edit</Text>
-              </TouchableOpacity>             
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={handleEdit}
+                >
+                  <Text style={styles.buttonText}>Edit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.settingsButton}
+                  onPress={() => {
+                    navigation.navigate("SettingsScreen");
+                  }}
+                >
+                  <Image
+                    style={styles.settingsIcon}
+                    source={{
+                      uri: "https://th.bing.com/th/id/OIP.nEKx7qYL-7aettL7yMDiOgHaHv?pid=ImgDet&rs=1",
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
             )}
-            <TouchableOpacity style={styles.settingsButton}>
-              <Image style={styles.settingsIcon} source={{ uri: "https://th.bing.com/th/id/OIP.nEKx7qYL-7aettL7yMDiOgHaHv?pid=ImgDet&rs=1"}} />
-            </TouchableOpacity>
           </View>
           <View style={styles.profileContainer}>
             {profilePicture ? (
               <TouchableOpacity
                 style={styles.profilePictureContainer}
-                onPress={handleImageUpload}
+                //onPress={handleImageUpload}
+                onPress={handleEditPictures}
                 disabled={uploading}
               >
                 <Image
@@ -267,7 +282,8 @@ export const Profile = ({ navigation, route }) => {
             ) : (
               <TouchableOpacity
                 style={styles.profilePictureContainer}
-                onPress={handleImageUpload}
+                //onPress={handleImageUpload}
+                onPress={handleEditPictures}
                 disabled={uploading}
               >
                 <Text style={styles.profilePictureText}>Add Photo</Text>
@@ -342,7 +358,7 @@ const styles = StyleSheet.create({
   viewContainer: {
     flex: 1,
     backgroundColor: "#F4F4F4",
-    margin: 0,
+    //margin: 0,
   },
   topBar: {
     flexDirection: "row",
@@ -376,7 +392,7 @@ const styles = StyleSheet.create({
   editButton: {
     padding: 8,
     borderRadius: 4,
-    marginRight: -180,
+    //marginRight: 20,
     backgroundColor: "#4EB1A3",
   },
   buttonText: {
@@ -385,6 +401,8 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
   saveButton: {
     marginLeft: 8,
@@ -410,8 +428,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
-    //alignSelf: "center",
-    //marginBottom: 16,
     borderRadius: 20,
   },
   profilePicture: {
