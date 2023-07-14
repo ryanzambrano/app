@@ -1,5 +1,6 @@
 import { supabase } from "./supabase";
 import { Animated, Easing } from "react-native";
+import { picURL } from "./supabase";
 
 export async function startShakeAnimation(shakeAnimationValue) {
   shakeAnimationValue.setValue(0);
@@ -47,5 +48,29 @@ export const fetchUsername = async (session) => {
       return data.username;
     }
     // Set hasProfile based on the presence of username
+  }
+};
+
+export const getProfilePicture = async (navigation) => {
+  try {
+    const profilePictureURL = `${picURL}/${session.user.id}/${session.user.id}-0`; // Replace '...' with the actual URL of the profile picture
+
+    const response = await fetch(profilePictureURL, {
+      cache: "no-store",
+    });
+    if (response.ok) {
+      const blob = await response.blob();
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const decodedData = reader.result;
+        return decodedData;
+      };
+      reader.readAsDataURL(blob);
+    } else {
+      // Handle response error
+    }
+  } catch (error) {
+    // Handle fetch or other errors
   }
 };

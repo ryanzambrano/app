@@ -125,7 +125,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
   };
 
   const handleBackPress = () => {
-    navigation.navigate("Tabs");
+    navigation.goBack();
   };
 
   const handleClear = (index) => {
