@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 10,
     alignSelf: "flex-start",
-    backgroundColor: "#dedede",
+    backgroundColor: "#c4c4c4",
   },
   message: {
     fontSize: 16,
