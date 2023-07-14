@@ -26,16 +26,18 @@ const ContactsUI = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const { data, error } = await supabase.from("UGC").select("*");
-      if (error) {
-        console.error(error);
-      } else {
-        setUsers(data);
-      }
-    };
+  const fetchUsers = async () => {
+    const { data, error } = await supabase.from("UGC").select("*");
+    if (error) {
+      console.error(error);
+    } else {
+      setUsers(data);
+    }
+  };
 
+
+
+  useEffect(() => {
     fetchUsers();
   }, []);
 
