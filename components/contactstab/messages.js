@@ -57,8 +57,9 @@ const MessagingUI = () => {
       const { data, error } = await supabase
         .from("Message")
         .select("Content")
+        .eq("Sent_From", route.params.myId)
         .eq("Contact_ID", route.params.contactId);
-
+    
       if (error) {
         console.error(error);
       } else {
