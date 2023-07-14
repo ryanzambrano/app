@@ -36,15 +36,18 @@ const ContactsUI = ({ route }) => {
     }
   };
 
-
-
   useEffect(() => {
     fetchUsers();
   }, []);
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
-    navigation.navigate("Message", { contactName: user.name, contactId: user.user_id, myId: session.user.id });
+
+    navigation.navigate("Message", {
+      contactName: user.name,
+      contactId: user.user_id,
+      myId: session.user.id,
+    });
   };
 
   const renderContact = ({ item }) => {

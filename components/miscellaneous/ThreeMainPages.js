@@ -9,6 +9,7 @@ import ProfileUI from "../contactstab/otherprofile";
 import UserCard from "../hometab/userCard.js";
 import SettingsScreen from "./settings";
 import AddProfileImages from "../profiletab/addProfileImages";
+import EditProfileScreen from "../profiletab/editProfile";
 
 const Stack = createStackNavigator();
 
@@ -45,6 +46,11 @@ const ThreeMainPages = ({ route }) => {
         <Stack.Screen
           name="SettingsScreen"
           component={SettingsScreen}
+          initialParams={{ session }}
+        />
+        <Stack.Screen
+          name="EditProfileScreen"
+          component={EditProfileScreen}
           initialParams={{ session }}
         />
       </Stack.Navigator>
