@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-
 import {
   View,
   TextInput,
@@ -12,9 +11,14 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
+
+import { createClient } from "@supabase/supabase-js";
+const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
+const supabaseKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM";
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const MessagingUI = () => {
   const navigation = useNavigation();
@@ -24,10 +28,18 @@ const MessagingUI = () => {
   const [contactName, setContactName] = useState("");
   const [contactImage, setContactImage] = useState("");
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (message.trim() !== "") {
-      setMessages((prevMessages) => [message, ...prevMessages]);
-      setMessage("");
+      const { data, error } = await supabase
+        .from("Message")
+        .insert([{ Content: message, Contact_ID: route.params.contactId }]);
+
+      if (error) {
+        console.error(error);
+      } else {
+        setMessages((prevMessages) => [message, ...prevMessages]);
+        setMessage("");
+      }
     }
   };
 
@@ -39,6 +51,23 @@ const MessagingUI = () => {
       setContactImage(route.params.contactImage);
     }
   }, [route.params]);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      const { data, error } = await supabase
+        .from("Message")
+        .select("Content")
+        .eq("Contact_ID", route.params.contactId);
+
+      if (error) {
+        console.error(error);
+      } else {
+        setMessages(data.map((message) => message.Content).reverse());
+      }
+    };
+
+    fetchMessages();
+  }, [route.params.contactId]);
 
   useEffect(() => {
     // Scroll to the bottom of the messages when a new message is added
@@ -82,7 +111,7 @@ const MessagingUI = () => {
       <View style={styles.messagesContainer}>
         <FlatList
           ref={flatListRef}
-          data={messages}
+          data={messages.slice().reverse()}
           renderItem={({ item }) => (
             <View style={styles.messageContainer}>
               <Text style={styles.message}>{item}</Text>
@@ -90,7 +119,6 @@ const MessagingUI = () => {
           )}
           keyExtractor={(_, index) => index.toString()}
           contentContainerStyle={styles.messagesContent}
-          inverted
         />
       </View>
       <View style={styles.inputContainer}>
