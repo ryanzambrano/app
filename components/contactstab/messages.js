@@ -51,24 +51,28 @@ const MessagingUI = () => {
       setContactImage(route.params.contactImage);
     }
   }, [route.params]);
+  const { myId, contactId } = route.params;
+  const fetchMessages = async () => {
+    const { data, error } = await supabase
+      .from("Message")
+      .select("*")
+      .or(`and(Sent_From.eq.${myId},Contact_ID.eq.${contactId}),and(Contact_ID.eq.${myId},Sent_From.eq.${contactId})`)
+      .order("createdat", { ascending: false })
+      .limit(250);
+  
+    if (error) {
+      console.error(error);
+    } else {
+      setMessages(data.reverse());
+    }
+  };
+
 
   useEffect(() => {
-    const fetchMessages = async () => {
-      const { data, error } = await supabase
-        .from("Message")
-        .select("Content")
-        .eq("Sent_From", route.params.myId)
-        .eq("Contact_ID", route.params.contactId);
-    
-      if (error) {
-        console.error(error);
-      } else {
-        setMessages(data.map((message) => message.Content).reverse());
-      }
-    };
-
     fetchMessages();
-  }, [route.params.contactId]);
+
+
+  }, [route.params.myId, route.params.contactId]);
 
   useEffect(() => {
     // Scroll to the bottom of the messages when a new message is added
@@ -112,10 +116,10 @@ const MessagingUI = () => {
       <View style={styles.messagesContainer}>
         <FlatList
           ref={flatListRef}
-          data={messages.slice().reverse()}
+          data={messages}
           renderItem={({ item }) => (
-            <View style={styles.messageContainer}>
-              <Text style={styles.message}>{item}</Text>
+            <View style={item.Sent_From===myId?styles.messageContainerRight:styles.messageContainerLeft}>
+              <Text style={styles.message}>{item.Content}</Text>
             </View>
           )}
           keyExtractor={(_, index) => index.toString()}
@@ -182,10 +186,16 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 20,
   },
-  messageContainer: {
+  messageContainerRight: {
     borderRadius: 20,
     marginBottom: 10,
     alignSelf: "flex-end",
+    backgroundColor: "#dedede",
+  },
+  messageContainerLeft: {
+    borderRadius: 20,
+    marginBottom: 10,
+    alignSelf: "flex-start",
     backgroundColor: "#dedede",
   },
   message: {
