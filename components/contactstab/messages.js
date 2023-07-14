@@ -32,7 +32,7 @@ const MessagingUI = () => {
     if (message.trim() !== "") {
       const { data, error } = await supabase
         .from("Message")
-        .insert([{ Content: message, Contact_ID: route.params.contactId }]);
+        .insert([{ Content: message, Contact_ID: route.params.contactId, Sent_From: route.params.myId }]);
 
       if (error) {
         console.error(error);
@@ -41,7 +41,7 @@ const MessagingUI = () => {
         setMessage("");
       }
     }
-  };
+  };``
 
   useEffect(() => {
     if (route.params && route.params.contactName) {

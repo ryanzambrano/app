@@ -21,7 +21,8 @@ const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-const ContactsUI = () => {
+const ContactsUI = ({ route }) => {
+  const { session } = route.params;
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -43,7 +44,7 @@ const ContactsUI = () => {
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
-    navigation.navigate("Message", { contactName: user.name, contactId: user.id, myId: user.userId });
+    navigation.navigate("Message", { contactName: user.name, contactId: user.user_id, myId: session.user.id });
   };
 
   const renderContact = ({ item }) => {

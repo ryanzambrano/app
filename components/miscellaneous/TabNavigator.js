@@ -32,7 +32,7 @@ const TabNavigator = ({ route }) => {
         showIcon: true, // Show the icons
       }}
     >
-      <Tab.Screen name="Contacts" component={ContactsUI} />
+      <Tab.Screen name="Contacts" component={ContactsUI} initialParams={{ session }}/>
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen
         name="Profile"
