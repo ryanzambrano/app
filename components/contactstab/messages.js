@@ -32,16 +32,21 @@ const MessagingUI = () => {
     if (message.trim() !== "") {
       const { data, error } = await supabase
         .from("Message")
-        .insert([{ Content: message, Contact_ID: route.params.contactId, Sent_From: route.params.myId }]);
+        .insert([{ Content: message, Contact_ID: route.params.contactId, Sent_From: route.params.myId }])
+        .select()
+        .single();
 
       if (error) {
         console.error(error);
       } else {
-        setMessages((prevMessages) => [message, ...prevMessages]);
+        setMessages((prevMessages) => [...prevMessages, data]);
         setMessage("");
       }
     }
-  };``
+  };
+  useEffect(() => {
+    console.log('messages', messages);
+  }, [messages]);
 
   useEffect(() => {
     if (route.params && route.params.contactName) {
@@ -77,7 +82,11 @@ const MessagingUI = () => {
   useEffect(() => {
     // Scroll to the bottom of the messages when a new message is added
     setTimeout(() => {
-      flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
+      //flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
+      if(message.length > 0)
+        {
+          flatListRef?.current?.scrollToIndex({ animated: true, index: messages.length - 1 });
+        }
     }, 100);
   }, [messages]);
 
@@ -133,7 +142,7 @@ const MessagingUI = () => {
           onChangeText={(text) => setMessage(text)}
           placeholder="Type a message..."
           placeholderTextColor="#888"
-          autoCorrect={false}
+          autoCorrect={true}
           multiline
         />
         <Button title="Send" onPress={sendMessage} color="#007AFF" />
