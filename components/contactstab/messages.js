@@ -32,21 +32,16 @@ const MessagingUI = () => {
     if (message.trim() !== "") {
       const { data, error } = await supabase
         .from("Message")
-        .insert([{ Content: message, Contact_ID: route.params.contactId, Sent_From: route.params.myId }])
-        .select()
-        .single();
+        .insert([{ Content: message, Contact_ID: route.params.contactId, Sent_From: route.params.myId }]);
 
       if (error) {
         console.error(error);
       } else {
-        setMessages((prevMessages) => [...prevMessages, data]);
+        setMessages((prevMessages) => [message, ...prevMessages]);
         setMessage("");
       }
     }
-  };
-  useEffect(() => {
-    console.log('messages', messages);
-  }, [messages]);
+  };``
 
   useEffect(() => {
     if (route.params && route.params.contactName) {
@@ -82,11 +77,7 @@ const MessagingUI = () => {
   useEffect(() => {
     // Scroll to the bottom of the messages when a new message is added
     setTimeout(() => {
-      //flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
-      if(message.length > 0)
-        {
-          flatListRef?.current?.scrollToIndex({ animated: true, index: messages.length - 1 });
-        }
+      flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
     }, 100);
   }, [messages]);
 
