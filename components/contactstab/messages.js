@@ -44,6 +44,9 @@ const MessagingUI = () => {
       }
     }
   };
+  useEffect(() => {
+    console.log('messages', messages);
+  }, [messages]);
 
   useEffect(() => {
     if (route.params && route.params.contactName) {
@@ -81,25 +84,10 @@ const MessagingUI = () => {
       schema: 'public',
       table: 'Messages',
     },
-    (payload) => console.log("Balls")
+    (payload) => fetchMessages()
   )
   .subscribe()
   }, [route.params.myId, route.params.contactId]);
-
-  useEffect(() => {
-    const channelB = supabase
-  .channel('table-db-changes')
-  .on(
-    'postgres_changes',
-    {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'Messages',
-    },
-    (payload) => console.log("Balls")
-  )
-  .subscribe()
-  }, []);
 
   useEffect(() => {
     // Scroll to the bottom of the messages when a new message is added
