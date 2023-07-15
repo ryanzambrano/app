@@ -74,9 +74,18 @@ const MessagingUI = () => {
 
 
   useEffect(() => {
-    fetchMessages();
+    const messageSubscription = supabase
+      .from("Message")
+      .on("*", () => {
+        // When a change occurs, fetch the updated messages
+        fetchMessages();
+      })
+      .subscribe();
 
-
+    // Clean up the subscription on component unmount
+    return () => {
+      messageSubscription.unsubscribe();
+    };
   }, [route.params.myId, route.params.contactId]);
 
   useEffect(() => {
