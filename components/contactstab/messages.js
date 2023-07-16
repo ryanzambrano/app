@@ -44,9 +44,7 @@ const MessagingUI = () => {
       }
     }
   };
-  useEffect(() => {
-    console.log('messages', messages);
-  }, [messages]);
+
 
   useEffect(() => {
     if (route.params && route.params.contactName) {
@@ -73,8 +71,19 @@ const MessagingUI = () => {
   };
 
 
+
   useEffect(() => {
     fetchMessages();
+    
+  const Message = supabase.channel('custom-all-channel')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'Message' },
+    (payload) => {
+    fetchMessages();
+    }
+   )
+  .subscribe()
 
 
   }, [route.params.myId, route.params.contactId]);
