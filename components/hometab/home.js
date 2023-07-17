@@ -20,7 +20,6 @@ const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
 const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM";
 const supabase = createClient(supabaseUrl, supabaseKey);
-import UserCard from "./userCard.js";
 
 const Home = () => {
   const navigation = useNavigation();
@@ -57,7 +56,7 @@ const Home = () => {
           />
           <View style={styles.userInfo}>
             <Text style={styles.name}> {item.name}</Text>
-            <Text style={styles.bio}>{item.user_id}</Text>
+            <Text style={styles.bio}>{item.bio}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -129,7 +128,6 @@ const styles = StyleSheet.create({
 
   userContainer: {
     flex: 1,
-
     //alignItems: "center",
     padding: 16,
     //marginBottom: 30,
@@ -150,15 +148,16 @@ const styles = StyleSheet.create({
   },
 
   profileImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 80,
+    height: 80,
+    borderRadius: 3,
     marginRight: 12,
   },
 
   name: {
     fontSize: 16,
     fontWeight: "bold",
+    marginTop: -5,
     marginBottom: 4,
   },
 

@@ -57,23 +57,27 @@ const UserCard = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={goBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>{'< Back'}</Text>
-        </TouchableOpacity>
-        <Text style={styles.name}>{name}</Text>
+          <TouchableOpacity onPress={goBack} style={styles.backButton}>
+            <Text style={styles.backButtonText}>{'< Back'}</Text>
+          </TouchableOpacity>
+          <Text style={styles.name}>{name}</Text>
       </View>
+      <ScrollView>
+        <ScrollView horizontal style={styles.photoContainer} pagingEnabled={true}>
+          {photos.map((photo, index) => (
+            <Image key={index} source={{ uri: photo }} style={styles.photo} />
+          ))}
+        </ScrollView>
 
-      <ScrollView horizontal style={styles.photoContainer} pagingEnabled={true}>
-        {photos.map((photo, index) => (
-          <Image key={index} source={{ uri: photo }} style={styles.photo} />
-        ))}
+        <View style={styles.bioContainer}>
+          <View style={styles.roundedContainer}>
+            <Text style={styles.bio}>{bio}</Text>
+          </View>
+        </View>
       </ScrollView>
-
-      <View style={styles.bioContainer}>
-        <Text style={styles.bio}>{bio}</Text>
-      </View>
     </SafeAreaView>
   );
+
 };
 
 const styles = StyleSheet.create({
@@ -84,33 +88,51 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 10,
+    justifyContent: 'flex-start',
+    paddingVertical: 5,
   },
   backButton: {
-    marginRight: 16,
+    marginRight: -48,
+    marginLeft: 8,
   },
   backButtonText: {
     fontSize: 16,
     color: '#000',
   },
   name: {
+    flex: 1,
     fontSize: 20,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   photoContainer: {
-    height: 200,
-    marginBottom: 287,
+    height: 440,
+    marginBottom: 8,
+    marginHorizontal: 6,
+    borderRadius: 15,
   },
   photo: {
     width: Dimensions.get('window').width,
-    height: 370
+    height: 440,
   },
   bioContainer: {
-    marginBottom: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#404040',
+    borderRadius: 15,
+    marginHorizontal: 6, 
+    marginBottom: 10, 
+  },
+  roundedContainer: {
+    backgroundColor: '#404040',
+    borderRadius: 50,
+    padding: 10,
   },
   bio: {
+    color: 'white',
     fontSize: 16,
-    lineHeight: 24,
+    textAlign: 'justify',
   },
 });
 
