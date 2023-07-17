@@ -57,7 +57,7 @@ const Home = () => {
           />
           <View style={styles.userInfo}>
             <Text style={styles.name}> {item.name}</Text>
-            <Text style={styles.bio}>{item.bio}</Text>
+            <Text style={styles.bio}>{item.user_id}</Text>
           </View>
         </View>
       </TouchableOpacity>
