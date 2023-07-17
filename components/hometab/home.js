@@ -28,11 +28,22 @@ const Home = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data, error } = await supabase.from("UGC").select("*");
-      if (error) {
-        console.error(error);
+      const { data: ugcData, error: ugcError } = await supabase.from("UGC").select("*");
+      const { data: profileData, error: profileError } = await supabase.from("profile").select("*");
+
+      if (ugcError || profileError) {
+        console.error(ugcError || profileError);
       } else {
-        setUsers(data);
+        // Merge data from both schemas based on a common identifier (e.g., user ID)
+        const mergedData = ugcData.map((ugcUser) => {
+          const relatedProfileData = profileData.filter((profileUser) => profileUser.user_id === ugcUser.user_id);
+          return {
+            ...ugcUser,
+            profiles: relatedProfileData,
+          };
+        });
+
+        setUsers(mergedData);
       }
     };
 
@@ -159,6 +170,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: -5,
     marginBottom: 4,
+    textAlign: "justify",
   },
 
   bio: {

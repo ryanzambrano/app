@@ -55,7 +55,7 @@ const UserCard = ({ navigation, route }) => {
   }, [user_id]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} >
       <View style={styles.header}>
           <TouchableOpacity onPress={goBack} style={styles.backButton}>
             <Text style={styles.backButtonText}>{'< Back'}</Text>
@@ -74,6 +74,10 @@ const UserCard = ({ navigation, route }) => {
             <Text style={styles.bio}>{bio}</Text>
           </View>
         </View>
+        <View style={styles.ageMajorGradeContainer}>
+          <Text style={styles.bio}>Age and shit </Text>
+        </View>
+      
       </ScrollView>
     </SafeAreaView>
   );
@@ -84,6 +88,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    marginHorizontal: 6,
   },
   header: {
     flexDirection: 'row',
@@ -109,11 +114,12 @@ const styles = StyleSheet.create({
   photoContainer: {
     height: 440,
     marginBottom: 8,
-    marginHorizontal: 6,
+    marginHorizontal: 0,
     borderRadius: 15,
+  
   },
   photo: {
-    width: Dimensions.get('window').width,
+    width: Dimensions.get('window').width - 12,
     height: 440,
   },
   bioContainer: {
@@ -121,19 +127,26 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: '#404040',
     borderRadius: 15,
-    marginHorizontal: 6, 
-    marginBottom: 10, 
+    marginBottom: 6, 
   },
   roundedContainer: {
     backgroundColor: '#404040',
     borderRadius: 50,
-    padding: 10,
+    padding: 1,
   },
   bio: {
     color: 'white',
     fontSize: 16,
     textAlign: 'justify',
   },
+  ageMajorGradeContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#404040',
+    borderRadius: 15,
+    
+    marginBottom: 10, 
+  }
 });
 
 export default UserCard;
