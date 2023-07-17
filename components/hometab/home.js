@@ -10,7 +10,7 @@ import {
   FlatList,
   SafeAreaView,
 } from "react-native";
-
+import { picURL } from "../auth/supabase.js";
 import { useNavigation } from "@react-navigation/native";
 
 import { createClient } from "@supabase/supabase-js";
@@ -52,7 +52,7 @@ const Home = () => {
           <Image
             style={styles.profileImage}
             source={{
-              uri: "https://pbs.twimg.com/media/FZK2qvKVQAE6Kbb?format=jpg&name=large",
+              uri: `${picURL}/${item.user_id}/${item.user_id}-0?${new Date().getTime()}`
             }}
           />
           <View style={styles.userInfo}>

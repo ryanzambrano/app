@@ -12,9 +12,11 @@ import {
 } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
-
+import { picURL } from "../auth/supabase.js";
+import { decode } from "base64-arraybuffer";
 import { createClient } from "@supabase/supabase-js";
 import { Button } from "react-native-paper";
+
 
 const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
 const supabaseKey =
@@ -26,6 +28,11 @@ const ContactsUI = ({ route }) => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+
+
+
+
+
 
   const fetchUsers = async () => {
     const { data, error } = await supabase.from("UGC").select("*");
@@ -39,6 +46,7 @@ const ContactsUI = ({ route }) => {
   useEffect(() => {
     fetchUsers();
   }, []);
+  
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
@@ -57,7 +65,7 @@ const ContactsUI = ({ route }) => {
           <Image
             style={styles.profilePicture}
             source={{
-              uri: "https://pbs.twimg.com/media/FZK2qvKVQAE6Kbb?format=jpg&name=large",
+              uri: `${picURL}/${item.user_id}/${item.user_id}-0?${new Date().getTime()}`
             }}
           />
           <View style={styles.contactInfo}>
