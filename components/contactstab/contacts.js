@@ -10,13 +10,12 @@ import {
   FlatList,
   SafeAreaView,
 } from "react-native";
-
+import { picURL } from "../auth/supabase";
 import { useNavigation } from "@react-navigation/native";
-import { picURL } from "../auth/supabase.js";
+
 import { decode } from "base64-arraybuffer";
 import { createClient } from "@supabase/supabase-js";
 import { Button } from "react-native-paper";
-
 
 const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
 const supabaseKey =
@@ -41,7 +40,6 @@ const ContactsUI = ({ route }) => {
   useEffect(() => {
     fetchUsers();
   }, []);
-  
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
@@ -60,7 +58,9 @@ const ContactsUI = ({ route }) => {
           <Image
             style={styles.profilePicture}
             source={{
-              uri: `${picURL}/${item.user_id}/${item.user_id}-0?${new Date().getTime()}`
+              uri: `${picURL}/${item.user_id}/${
+                item.user_id
+              }-0?${new Date().getTime()}`,
             }}
           />
           <View style={styles.contactInfo}>

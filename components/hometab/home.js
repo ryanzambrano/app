@@ -11,6 +11,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import { picURL } from "../auth/supabase.js";
+
 import { useNavigation } from "@react-navigation/native";
 
 import { createClient } from "@supabase/supabase-js";
@@ -21,21 +22,27 @@ const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM";
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-const Home = () => {
+const Home = (route) => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data: ugcData, error: ugcError } = await supabase.from("UGC").select("*");
-      const { data: profileData, error: profileError } = await supabase.from("profile").select("*");
+      const { data: ugcData, error: ugcError } = await supabase
+        .from("UGC")
+        .select("*");
+      const { data: profileData, error: profileError } = await supabase
+        .from("profile")
+        .select("*");
 
       if (ugcError || profileError) {
         console.error(ugcError || profileError);
       } else {
         const mergedData = ugcData.map((ugcUser) => {
-          const relatedProfileData = profileData.filter((profileUser) => profileUser.user_id === ugcUser.user_id);
+          const relatedProfileData = profileData.filter(
+            (profileUser) => profileUser.user_id === ugcUser.user_id
+          );
           return {
             ...ugcUser,
             profiles: relatedProfileData,
@@ -61,16 +68,21 @@ const Home = () => {
           <Image
             style={styles.profileImage}
             source={{
-              uri: `${picURL}/${item.user_id}/${item.user_id}-0?${new Date().getTime()}`
+              uri: `${picURL}/${item.user_id}/${
+                item.user_id
+              }-0?${new Date().getTime()}`,
             }}
           />
           <View style={styles.userInfo}>
-            <Text style={styles.name}> {item.name}, {item.age} </Text>
+            <Text style={styles.name}>
+              {" "}
+              {item.name}, {item.age}{" "}
+            </Text>
             <View style={styles.tagsContainer}>
               {item.tags.map((tag, index) => (
-              <View key={index} style={styles.tag}>
-                <Text style={styles.tagText}>{tag}</Text>
-              </View>
+                <View key={index} style={styles.tag}>
+                  <Text style={styles.tagText}>{tag}</Text>
+                </View>
               ))}
             </View>
           </View>
@@ -184,15 +196,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3,
   },
   tagsContainer: {
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    backgroundColor: "white",
+    flexDirection: "row",
+    flexWrap: "wrap",
     paddingVertical: 10,
     borderRadius: 15,
-    justifyContent: 'left',
+    justifyContent: "left",
   },
   tag: {
-    backgroundColor: '#f3a034',
+    backgroundColor: "#f3a034",
     borderRadius: 20,
     paddingVertical: 3,
     paddingHorizontal: 6,
@@ -200,8 +212,8 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 12,
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
 });
 
