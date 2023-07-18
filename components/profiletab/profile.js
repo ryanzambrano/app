@@ -66,31 +66,24 @@ export const Profile = ({ navigation, route }) => {
       console.error(error.message);
     } else {
       setEditedUser(data);
-      //setProfilePicture(data.profile_picture);
     }
   };
 
-  const getProfilePicture = async (navigation) => {
+  const getProfilePicture = async () => {
     try {
-      const profilePictureURL = `${picURL}/${session.user.id}/${session.user.id}-0`; // Replace '...' with the actual URL of the profile picture
+      // Add timestamp as a query parameter to the URL
+      const profilePictureURL = `${picURL}/${session.user.id}/${
+        session.user.id
+      }-0?${new Date().getTime()}`;
+      const response = await fetch(profilePictureURL);
 
-      const response = await fetch(profilePictureURL, {
-        cache: "no-store",
-      });
       if (response.ok) {
-        const blob = await response.blob();
-
-        const reader = new FileReader();
-        reader.onload = () => {
-          const decodedData = reader.result;
-          setProfilePicture(decodedData);
-        };
-        reader.readAsDataURL(blob);
+        setProfilePicture(profilePictureURL); // Set the profile picture URL
       } else {
-        // Handle response error
+        setProfilePicture(null); // Set profile picture to null if the image at the URL does not exist
       }
     } catch (error) {
-      // Handle fetch or other errors
+      console.error(error);
     }
   };
 
@@ -142,15 +135,12 @@ export const Profile = ({ navigation, route }) => {
       const imagePickerResult = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        //forceJpg: true,
         base64: true,
         aspect: [1, 1],
         quality: 1,
       });
 
       if (!imagePickerResult.canceled) {
-        //const response = await fetch(imagePickerResult.assets[0].uri);
-
         setProfilePicture(imagePickerResult.assets[0].uri);
 
         const { error: removeError } = await supabase.storage
@@ -162,9 +152,8 @@ export const Profile = ({ navigation, route }) => {
         }
 
         const base64Data = imagePickerResult.assets[0].base64;
-        //alert(base64Data);
+
         const buffer = decode(base64Data);
-        //const buffer = Buffer.from(base64Data, "base64");
 
         const { data, error: uploadError } = await supabase.storage
           .from("user_pictures")
