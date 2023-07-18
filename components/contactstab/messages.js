@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef} from "react";
 import {
   View,
   TextInput,
@@ -6,12 +6,14 @@ import {
   FlatList,
   StyleSheet,
   Text,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
   Image,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import { ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { createClient } from "@supabase/supabase-js";
@@ -21,6 +23,8 @@ const supabaseKey =
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const MessagingUI = () => {
+  const scrollViewRef = useRef();
+  const [inputHeight, setInputHeight] = useState(40); 
   const navigation = useNavigation();
   const route = useRoute();
   const [message, setMessage] = useState("");
@@ -86,9 +90,24 @@ const MessagingUI = () => {
   .subscribe()
 
 
-  }, [route.params.myId, route.params.contactId]);
+  }, [route.params.myId, route.params.contactId,messages]);
 
   useEffect(() => {
+    if (messages.length > 0)
+    {
+      const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
+        setTimeout(() => {
+          //flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
+              flatListRef?.current?.scrollToIndex({ animated: true, index: messages.length - 1 });
+        }, 100);})
+  
+      return () => {
+        keyboardDidShowListener.remove();
+      };
+    }
+  }, [messages]);
+
+  /*useEffect(() => {
     // Scroll to the bottom of the messages when a new message is added
     setTimeout(() => {
       //flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
@@ -97,7 +116,7 @@ const MessagingUI = () => {
           flatListRef?.current?.scrollToIndex({ animated: true, index: messages.length - 1 });
         }
     }, 100);
-  }, [messages]);
+  }, [messages]);*/
 
   const flatListRef = React.useRef();
 
@@ -111,6 +130,12 @@ const MessagingUI = () => {
       behavior={Platform.OS === "ios" ? "padding" : null}
       keyboardVerticalOffset={Platform.OS === "ios" ? 2 : 0}
     >
+    <View style={{ flex: .01 }}>
+    <ScrollView
+      ref={scrollViewRef}
+      contentContainerStyle={{ flexGrow: 1 }}
+    ></ScrollView>
+    </View>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.button}
@@ -145,15 +170,16 @@ const MessagingUI = () => {
         />
       </View>
       <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          value={message}
-          onChangeText={(text) => setMessage(text)}
-          placeholder="Type a message..."
-          placeholderTextColor="#888"
-          autoCorrect={true}
-          multiline
-        />
+      <TextInput
+        style={[styles.input, { height: Math.max(40, inputHeight) }]}
+        value={message}
+        onChangeText={(text) => setMessage(text)}
+        placeholder="Type a message..."
+        placeholderTextColor="#888"
+        autoCorrect={true}
+        multiline
+        onContentSizeChange={(e) => setInputHeight(e.nativeEvent.contentSize.height)}
+/>
         <Button title="Send" onPress={sendMessage} color="#007AFF" />
       </View>
     </KeyboardAvoidingView>
@@ -235,10 +261,10 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: 40,
-    marginRight: 10,
+    marginRight: 0,
     color: "#333",
     borderRadius: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: 0,
     backgroundColor: "#FFF",
     fontSize: 20,
     paddingTop: 10,

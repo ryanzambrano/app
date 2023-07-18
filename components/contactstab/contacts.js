@@ -66,6 +66,7 @@ const ContactsUI = ({ route }) => {
           />
           <View style={styles.contactInfo}>
             <Text style={styles.contactName}>{item.name}</Text>
+            <Text style={styles.RecentMessage}>{"Recent Message"}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -146,6 +147,10 @@ const styles = StyleSheet.create({
   contactName: {
     fontSize: 18,
     fontWeight: "bold",
+  },
+  RecentMessage: {
+    fontSize: 14,
+    fontWeight: "light",
   },
   contactStatus: {
     fontSize: 14,
