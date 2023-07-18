@@ -65,7 +65,7 @@ const Home = () => {
             }}
           />
           <View style={styles.userInfo}>
-            <Text style={styles.name}> {item.name}</Text>
+            <Text style={styles.name}> {item.name}, {item.age} </Text>
             <View style={styles.tagsContainer}>
               {item.tags.map((tag, index) => (
               <View key={index} style={styles.tag}>
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: 20,
     backgroundColor: "white",
     marginVertical: 5,
     marginHorizontal: 16,

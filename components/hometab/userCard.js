@@ -14,11 +14,13 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 const UserCard = ({ navigation, route }) => {
+  const { session } = route.params;
   const { name, tags, bio, major, user_id, age, gender, living_preferences, for_fun } = route.params.user;
   const [photos, setPhotos] = useState([]);
   const [isFriendAdded, setIsFriendAdded] = useState(false);
   const buttonColor = isFriendAdded ? 'green' : 'dodgerblue';
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const handlePhotoPress = (index) => {
     setSelectedPhotoIndex(index);
@@ -74,7 +76,15 @@ const UserCard = ({ navigation, route }) => {
     getProfilePictures();
   }, [user_id]);
 
+const handleUserCardPress = (user) => {
+    setSelectedUser(user);
 
+    navigation.navigate("Message", {
+      contactName: user.name,
+      contactId: user.user_id,
+      myId: session.user.id,
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container} >
@@ -99,18 +109,24 @@ const UserCard = ({ navigation, route }) => {
         <TouchableWithoutFeedback onPress={handleOverlayPress}>
           <View style={styles.modalContainer}>
             <Image source={{ uri: photos[selectedPhotoIndex] }} style={styles.fullPhoto} />
-            <TouchableOpacity style={styles.closeButton} onPress={handleModalClose}>
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
+          
           </View>
         </TouchableWithoutFeedback>
       </Modal>
 
-        <TouchableOpacity style={[styles.button, { backgroundColor: buttonColor }]} onPress={handleAddFriend}>
-          <Text style={styles.buttonText}>
-            {isFriendAdded ? 'Friend Request Sent! ✓' : '+ Add Friend'}
-          </Text>
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity style={[styles.friendButton, { backgroundColor: buttonColor }]} onPress={handleAddFriend}>
+        <Text style={styles.friendButtonText}>
+          {isFriendAdded ? 'Friend Request Sent! ✓' : '+ Add Friend'}
+        </Text>
       </TouchableOpacity>
+
+      <TouchableOpacity style={styles.chatButton} onPress={handleUserCardPress}>
+        <Text style={styles.chatButtonText}>Message</Text>
+      </TouchableOpacity>
+      
+      </View>
+      
 
         <View style={styles.bioContainer}>
           <View style={styles.roundedContainer}>
@@ -187,14 +203,35 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'contain',
   },
-  button: {
+  buttonsContainer: {
+    flexDirection: 'row', // Arrange items horizontally
+    alignItems: 'center', // Align items vertically
+    justifyContent: 'space-between', // Space items evenly along the main axis
+    paddingHorizontal: 0,
+  },
+  friendButton: {
     backgroundColor: 'dodgerblue',
     borderRadius: 10,
     padding: 13,
     alignItems: 'center',
     marginBottom: 5,
+    width: Dimensions.get('window').width * 0.6,
+    marginRight: 3,
   },
-  buttonText: {
+  friendButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  chatButton: {
+    backgroundColor: 'dodgerblue',
+    borderRadius: 10,
+    padding: 13,
+    alignItems: 'center',
+    marginBottom: 5,
+    width: Dimensions.get('window').width * 0.36,
+  },
+  chatButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
