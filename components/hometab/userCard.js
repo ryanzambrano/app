@@ -1,5 +1,5 @@
 import {React, useEffect, useState } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, TouchableWithoutFeedback, Modal } from 'react-native';
 import { createClient } from '@supabase/supabase-js';
 import { picURL } from '../auth/supabase';
 
@@ -14,9 +14,29 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 const UserCard = ({ navigation, route }) => {
-  const { name, bio, user_id } = route.params.user;
+  const { name, tags, bio, major, user_id, age, gender, living_preferences, for_fun } = route.params.user;
   const [photos, setPhotos] = useState([]);
+  const [isFriendAdded, setIsFriendAdded] = useState(false);
+  const buttonColor = isFriendAdded ? 'green' : 'dodgerblue';
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
 
+  const handlePhotoPress = (index) => {
+    setSelectedPhotoIndex(index);
+  };
+
+  const handleModalClose = () => {
+    setSelectedPhotoIndex(null);
+  };
+
+  const handleOverlayPress = () => {
+    if (selectedPhotoIndex !== null) {
+      setSelectedPhotoIndex(null);
+    }
+  };
+
+  const handleAddFriend = () => {
+    setIsFriendAdded(!isFriendAdded);
+  };
   
   const goBack = () => {
     navigation.goBack();
@@ -54,6 +74,8 @@ const UserCard = ({ navigation, route }) => {
     getProfilePictures();
   }, [user_id]);
 
+
+
   return (
     <SafeAreaView style={styles.container} >
       <View style={styles.header}>
@@ -62,12 +84,33 @@ const UserCard = ({ navigation, route }) => {
           </TouchableOpacity>
           <Text style={styles.name}>{name}</Text>
       </View>
+
       <ScrollView>
-        <ScrollView horizontal style={styles.photoContainer} pagingEnabled={true}>
-          {photos.map((photo, index) => (
-            <Image key={index} source={{ uri: photo }} style={styles.photo} />
-          ))}
-        </ScrollView>
+
+      <ScrollView horizontal style={styles.photoContainer} pagingEnabled={true}>
+        {photos.map((photo, index) => (
+          <TouchableWithoutFeedback key={index} onPress={() => handlePhotoPress(index)}>
+            <Image source={{ uri: photo }} style={styles.photo} />
+          </TouchableWithoutFeedback>
+        ))}
+      </ScrollView>
+
+      <Modal visible={selectedPhotoIndex !== null} transparent={true} onRequestClose={handleModalClose}>
+        <TouchableWithoutFeedback onPress={handleOverlayPress}>
+          <View style={styles.modalContainer}>
+            <Image source={{ uri: photos[selectedPhotoIndex] }} style={styles.fullPhoto} />
+            <TouchableOpacity style={styles.closeButton} onPress={handleModalClose}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+        <TouchableOpacity style={[styles.button, { backgroundColor: buttonColor }]} onPress={handleAddFriend}>
+          <Text style={styles.buttonText}>
+            {isFriendAdded ? 'Friend Request Sent! ✓' : '+ Add Friend'}
+          </Text>
+      </TouchableOpacity>
 
         <View style={styles.bioContainer}>
           <View style={styles.roundedContainer}>
@@ -75,9 +118,21 @@ const UserCard = ({ navigation, route }) => {
           </View>
         </View>
         <View style={styles.ageMajorGradeContainer}>
-          <Text style={styles.bio}>Age and shit </Text>
+          <Text style={styles.bio}>Major: {major}</Text>
+            <View style={styles.divider} />
+          <Text style={styles.bio}>Age: {age}</Text>
+            <View style={styles.divider} />
+          <Text style={styles.bio}>Gender: {gender}</Text>
         </View>
-      
+
+        <View style={styles.tagsContainer}>
+          {tags.map((tag, index) => (
+            <View key={index} style={styles.tag}>
+              <Text style={styles.tagText}>{tag}</Text>
+            </View>
+          ))}
+      </View>
+        
       </ScrollView>
     </SafeAreaView>
   );
@@ -98,7 +153,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   backButton: {
-    marginRight: -48,
+    marginRight: -57,
     marginLeft: 8,
   },
   backButtonText: {
@@ -113,18 +168,40 @@ const styles = StyleSheet.create({
   },
   photoContainer: {
     height: 440,
-    marginBottom: 8,
+    marginBottom: 5,
     marginHorizontal: 0,
     borderRadius: 15,
-  
   },
   photo: {
     width: Dimensions.get('window').width - 12,
     height: 440,
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.95)',
+  },
+  fullPhoto: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
+  },
+  button: {
+    backgroundColor: 'dodgerblue',
+    borderRadius: 10,
+    padding: 13,
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   bioContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 15,
     backgroundColor: '#404040',
     borderRadius: 15,
     marginBottom: 6, 
@@ -141,12 +218,40 @@ const styles = StyleSheet.create({
   },
   ageMajorGradeContainer: {
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    justifyContent: 'center',
     backgroundColor: '#404040',
     borderRadius: 15,
-    
     marginBottom: 10, 
-  }
+    paddingVertical: 15,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: 'grey',
+    marginVertical: 8,
+  },
+  tagsContainer: {
+    backgroundColor: '#404040',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingVertical: 10,
+    borderRadius: 15,
+    justifyContent: 'center',
+  },
+  tag: {
+    backgroundColor: 'red',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    margin: 5,
+  },
+  tagText: {
+    fontSize: 14,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  
 });
 
 export default UserCard;
