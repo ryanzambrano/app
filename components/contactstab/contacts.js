@@ -50,6 +50,7 @@ const ContactsUI = ({ route }) => {
       contactName: user.name,
       contactId: user.user_id,
       myId: session.user.id,
+      contactImage: `${picURL}/${user.user_id}/${user.user_id}-0?${new Date().getTime()}`
     });
   };
 
