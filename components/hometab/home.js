@@ -34,7 +34,6 @@ const Home = () => {
       if (ugcError || profileError) {
         console.error(ugcError || profileError);
       } else {
-        // Merge data from both schemas based on a common identifier (e.g., user ID)
         const mergedData = ugcData.map((ugcUser) => {
           const relatedProfileData = profileData.filter((profileUser) => profileUser.user_id === ugcUser.user_id);
           return {
@@ -67,7 +66,13 @@ const Home = () => {
           />
           <View style={styles.userInfo}>
             <Text style={styles.name}> {item.name}</Text>
-            <Text style={styles.bio}>{item.bio}</Text>
+            <View style={styles.tagsContainer}>
+              {item.tags.map((tag, index) => (
+              <View key={index} style={styles.tag}>
+                <Text style={styles.tagText}>{tag}</Text>
+              </View>
+              ))}
+            </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -80,7 +85,7 @@ const Home = () => {
         <Image
           style={styles.logo}
           source={{
-            uri: "https://cdn3.iconfinder.com/data/icons/user-interface-865/24/36_Home_App_House-256.png",
+            uri: "https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg",
           }}
         />
         <Text style={styles.headerText}> Cabana </Text>
@@ -123,12 +128,12 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 25,
     fontWeight: "bold",
-    marginTop: -7,
+    marginTop: -10,
   },
 
   logo: {
-    width: 27,
-    height: 27,
+    width: 30,
+    height: 30,
     marginRight: 0,
     marginTop: -10,
   },
@@ -154,7 +159,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     marginHorizontal: 16,
     paddingHorizontal: 16,
-    paddingVertical: 20,
+    paddingVertical: 5,
     marginTop: 7,
   },
 
@@ -168,8 +173,8 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: "bold",
-    marginTop: -5,
-    marginBottom: 4,
+    marginTop: 10,
+    marginBottom: 0,
     textAlign: "justify",
   },
 
@@ -177,6 +182,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "gray",
     paddingHorizontal: 3,
+  },
+  tagsContainer: {
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingVertical: 10,
+    borderRadius: 15,
+    justifyContent: 'left',
+  },
+  tag: {
+    backgroundColor: '#f3a034',
+    borderRadius: 20,
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    margin: 2,
+  },
+  tagText: {
+    fontSize: 12,
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 

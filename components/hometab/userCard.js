@@ -131,7 +131,7 @@ const UserCard = ({ navigation, route }) => {
               <Text style={styles.tagText}>{tag}</Text>
             </View>
           ))}
-      </View>
+        </View>
         
       </ScrollView>
     </SafeAreaView>
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   tag: {
-    backgroundColor: 'red',
+    backgroundColor: '#f3a034',
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,

@@ -29,11 +29,6 @@ const ContactsUI = ({ route }) => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
 
-
-
-
-
-
   const fetchUsers = async () => {
     const { data, error } = await supabase.from("UGC").select("*");
     if (error) {
@@ -79,13 +74,13 @@ const ContactsUI = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Contacts</Text>
         <Image
           style={styles.logo}
           source={{
-            uri: "https://example.com/logo.png",
+            uri: "https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg",
           }}
         />
+        <Text style={styles.headerText}>Cabana</Text>
       </View>
       <View style={styles.viewContainer}>
         <FlatList
@@ -105,22 +100,26 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 15,
-    paddingTop: 15,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#DDD",
+    alignContent: "center",
+    //borderBottomWidth: 1,
+    borderColor: "gray",
+    paddingTop: 13,
+    paddingBottom: 6,
+    paddingLeft: 15,
+    paddingRight: 15,
+    //marginBottom: 8,
   },
   headerText: {
-    fontSize: 22,
+    fontSize: 25,
     fontWeight: "bold",
+    marginTop: -10,
   },
   logo: {
     width: 30,
     height: 30,
-    borderRadius: 15,
+    marginRight: 5,
+    marginTop: -10,
   },
   viewContainer: {
     flex: 1,
