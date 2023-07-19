@@ -263,7 +263,9 @@ export default function Questionaire2({ navigation, route }) {
             </View>
 
             <View style={styles.input}>
-              <Text style={styles.inputHeader}>What are you studying?</Text>
+              <Text style={styles.inputHeader}>
+                What is your general area of study?
+              </Text>
 
               <TouchableOpacity
                 onPress={() => {

@@ -27,14 +27,14 @@ export const Questionaire1 = ({ navigation, route }) => {
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
 
-  const [isBirthdayModalVisible, setIsBirthdayModalVisible] = useState(false);
+  const [isAgeModalVisible, setIsAgeModalVisible] = useState(false);
   const [isGenderModalVisible, setIsGenderModalVisible] = useState(false);
   const [isRaceModalVisible, setIsRaceModalVisible] = useState(false);
 
   const [selectedDay, setSelectedDay] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
-  const [selectedBirthday, setSelectedBirthday] = useState("");
+  const [selectedAge, setSelectedAge] = useState("");
   const [formattedBirthday, setFormattedBirthday] = useState("");
 
   const [selectedGender, setSelectedGender] = useState("");
@@ -67,12 +67,19 @@ export const Questionaire1 = ({ navigation, route }) => {
 
   const race = ["White", "Black", "Brown", "Yellow"];
 
-  const openBirthdayModal = () => {
-    setIsBirthdayModalVisible(true);
+  const age = [
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+    22, 23, 24, 25, 26, 27, 28, 29, 30,
+  ];
+
+  const ages = Array.from(Array(31).keys()).map((age) => String(age + 1));
+
+  const openAgeModal = () => {
+    setIsAgeModalVisible(true);
   };
 
-  const closeBirthdayModal = () => {
-    setIsBirthdayModalVisible(false);
+  const closeAgeModal = () => {
+    setIsAgeModalVisible(false);
   };
 
   const openGenderModal = () => {
@@ -121,6 +128,13 @@ export const Questionaire1 = ({ navigation, route }) => {
     closeBirthdayModal();
   };
 
+  handleSaveAge = () => {
+    if (!selectedAge) {
+      setSelectedAge(1);
+    }
+    closeAgeModal();
+  };
+
   handleSaveGender = () => {
     if (!selectedGender) {
       setSelectedGender("Male");
@@ -136,7 +150,7 @@ export const Questionaire1 = ({ navigation, route }) => {
   };
 
   const userData = {
-    birthday: selectedBirthday,
+    age: selectedAge,
     race: selectedRace,
     gender: selectedGender,
   };
@@ -145,11 +159,11 @@ export const Questionaire1 = ({ navigation, route }) => {
     setIsError(null);
 
     if (session?.user) {
-      if (!!userData.birthday && !!userData.gender) {
+      if (!!userData.age && !!userData.gender) {
         const { data, error } = await supabase
           .from("profile")
           .update({
-            birthday: userData.birthday,
+            age: userData.age,
             race: userData.race,
             gender: userData.gender,
           })
@@ -191,58 +205,45 @@ export const Questionaire1 = ({ navigation, route }) => {
 
           <View style={styles.form}>
             <View style={styles.input}>
-              <Text style={styles.inputHeader}>Select your Birthday</Text>
+              <Text style={styles.inputHeader}>Select your age</Text>
 
               <TouchableOpacity
                 onPress={() => {
-                  openBirthdayModal();
+                  openAgeModal();
                 }}
               >
                 <View style={styles.inputControl}>
-                  <Text style={styles.inputText}>{formattedBirthday}</Text>
+                  <Text
+                    style={styles.inputText}
+                    placeholder="Select your Gender"
+                    placeholderTextColor="#6b7280"
+                    value={`${selectedAge}`}
+                  >
+                    {selectedAge}
+                  </Text>
                 </View>
               </TouchableOpacity>
 
               <Modal
-                visible={isBirthdayModalVisible}
+                visible={isAgeModalVisible}
                 animationType="slide"
                 transparent
               >
-                <View style={styles.modalContainer}>
-                  <View style={styles.pickerContainer}>
-                    <Picker
-                      style={styles.pickerDate}
-                      selectedValue={selectedDay}
-                      onValueChange={(itemValue) => setSelectedDay(itemValue)}
-                    >
-                      {days.map((day) => (
-                        <Picker.Item key={day} label={day} value={day} />
-                      ))}
-                    </Picker>
-
+                <View style={styles.modalContainerGender}>
+                  <View style={styles.pickerContainerGender}>
                     <Picker
                       style={styles.picker}
-                      selectedValue={selectedMonth}
-                      onValueChange={(itemValue) => setSelectedMonth(itemValue)}
+                      selectedValue={selectedAge}
+                      onValueChange={(itemValue) => setSelectedAge(itemValue)}
                     >
-                      {months.map((month) => (
-                        <Picker.Item key={month} label={month} value={month} />
-                      ))}
-                    </Picker>
-
-                    <Picker
-                      style={styles.pickerYear}
-                      selectedValue={selectedYear}
-                      onValueChange={(itemValue) => setSelectedYear(itemValue)}
-                    >
-                      {years.map((year) => (
-                        <Picker.Item key={year} label={year} value={year} />
+                      {ages.map((age) => (
+                        <Picker.Item key={age} label={age} value={age} />
                       ))}
                     </Picker>
                   </View>
                   <View style={styles.bbuttons}>
-                    <Button title="Save" onPress={handleSaveBirthday} />
-                    <Button title="Cancel" onPress={closeBirthdayModal} />
+                    <Button title="Save" onPress={handleSaveAge} />
+                    <Button title="Cancel" onPress={closeAgeModal} />
                   </View>
                 </View>
               </Modal>
