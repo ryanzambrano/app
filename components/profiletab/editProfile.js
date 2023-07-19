@@ -72,7 +72,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
     }
   };
 
-  const updateProfile = async () => {
+  const updateProfil = async () => {
     const { data, error } = await supabase
       .from("UGC")
       .update([
@@ -89,6 +89,45 @@ export const EditProfileScreen = ({ navigation, route }) => {
     } else {
       console.log("Profile updated successfully: ", data);
       navigation.navigate("Tabs", { updated: true });
+    }
+  };
+
+  const updateProfile = async () => {
+    // Update the user's profile in the database
+    if (session?.user) {
+      const { data, error } = await supabase.from("UGC").upsert([
+        {
+          user_id: session.user.id,
+          name: editedUser.name,
+          bio: editedUser.bio,
+          major: editedUser.major,
+        },
+      ]);
+
+      if (error) {
+        if (error.message.includes("UGC_user_id_key")) {
+          const { data, error: updateError } = await supabase
+            .from("UGC")
+            .update([
+              {
+                name: editedUser.name,
+                bio: editedUser.bio,
+                major: editedUser.major,
+              },
+            ])
+            .eq("user_id", session.user.id);
+
+          if (updateError) {
+            alert(updateError.message);
+          } else {
+            navigation.navigate("Tabs", { updated: true });
+          }
+        } else {
+          alert(error.message);
+        }
+      } else {
+        navigation.navigate("Tabs", { updated: true });
+      }
     }
   };
 

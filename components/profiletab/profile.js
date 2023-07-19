@@ -130,55 +130,6 @@ export const Profile = ({ navigation, route }) => {
     }
     setEditing(false);
   };
-  const handleImageUpload = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
-      alert("Permission to access camera roll is required!");
-      return;
-    }
-
-    try {
-      const imagePickerResult = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        //forceJpg: true,
-        base64: true,
-        aspect: [1, 1],
-        quality: 1,
-      });
-
-      if (!imagePickerResult.canceled) {
-        //const response = await fetch(imagePickerResult.assets[0].uri);
-
-        setProfilePicture(imagePickerResult.assets[0].uri);
-
-        const { error: removeError } = await supabase.storage
-          .from("user_pictures")
-          .remove(`profile_pictures/profile_${session.user.id}`);
-
-        if (removeError) {
-          alert(removeError.message + `profile_${session.user.id}`);
-        }
-
-        const base64Data = imagePickerResult.assets[0].base64;
-        //alert(base64Data);
-        const buffer = decode(base64Data);
-        //const buffer = Buffer.from(base64Data, "base64");
-
-        const { data, error: uploadError } = await supabase.storage
-          .from("user_pictures")
-          .upload(`profile_pictures/profile_${session.user.id}`, buffer, {
-            contentType: "image/jpeg", // Replace with the appropriate content type if necessary
-          });
-        if (uploadError) {
-          alert(uploadError.message);
-        }
-      }
-    } catch (error) {
-      alert(error.message);
-    }
-  };
 
   handleEditPictures = async () => {
     navigation.navigate("AddProfileImages");
