@@ -98,6 +98,7 @@ export default function Questionaire2({ navigation, route }) {
             living_preferences: userData.livingPreferences,
             for_fun: userData.forFun,
             studies: userData.studies,
+            profile_complete: true,
           })
           .eq("user_id", session.user.id);
 

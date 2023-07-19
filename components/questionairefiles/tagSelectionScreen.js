@@ -76,10 +76,6 @@ const TagSelectionScreen = ({ navigation, route }) => {
     );
   };
 
-  async function signOut() {
-    const { error } = await supabase.auth.signOut();
-  }
-
   async function refreshSession() {
     const { data, error } = await supabase.auth.refreshSession();
     const { session, user } = data;
@@ -110,10 +106,9 @@ const TagSelectionScreen = ({ navigation, route }) => {
     if (session?.user) {
       if (userData.tags.length >= 3 && userData.tags.length <= 7) {
         const { data, error } = await supabase
-          .from("profile")
+          .from("UGC")
           .update({
             tags: userData.tags,
-            profile_complete: true,
           })
           .eq("user_id", session.user.id);
 
@@ -134,30 +129,6 @@ const TagSelectionScreen = ({ navigation, route }) => {
       }
     }
   };
-
-  /*const startShakeAnimation = () => {
-    shakeAnimationValue.setValue(0);
-    Animated.sequence([
-      Animated.timing(shakeAnimationValue, {
-        toValue: 1,
-        duration: 100,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnimationValue, {
-        toValue: -1,
-        duration: 100,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnimationValue, {
-        toValue: 0,
-        duration: 100,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };*/
 
   const shakeAnimationStyle = {
     transform: [
