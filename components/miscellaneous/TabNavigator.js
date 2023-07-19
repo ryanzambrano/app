@@ -1,14 +1,14 @@
 import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"; // Package that allows for a bottom tab navigator
+import Icon from "react-native-vector-icons/FontAwesome"; // Package that introduces icons 
 
-import ContactsUI from "../contactstab/contacts";
+import ContactsUI from "../contactstab/contacts"; // Imports for use in Tab Navigator
 import Home from "../hometab/home";
 import Profile from "../profiletab/profile";
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator(); // Initializes bottom tab navigator 
 
-const TabNavigator = ({ route }) => {
+const TabNavigator = ({ route }) => {     
   const { session } = route.params;
   return (
     <Tab.Navigator
@@ -16,7 +16,7 @@ const TabNavigator = ({ route }) => {
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-          if (route.name === "Contacts") {
+          if (route.name === "Contacts") { // Based on where the user clicks, it highlights the icon to clarify what page they are on
             iconName = focused ? "comment" : "comment-o"; // Set the icons for the 'Messages
           } else if (route.name === "Home") {
             iconName = focused ? "home" : "home"; // Set the icons for the 'Home' screen
@@ -26,19 +26,21 @@ const TabNavigator = ({ route }) => {
 
           return <Icon name={iconName} size={size} color={color} />;
         },
-        tabBarLabel: () => null, // Remove the labels
+        tabBarLabel: () => null, // Removes the labels
       })}
       tabBarOptions={{
-        showIcon: true, // Show the icons
+        showIcon: true, // Shows the icons
       }}
     >
       <Tab.Screen
         name="Contacts"
         component={ContactsUI}
-        initialParams={{ session }}
+        initialParams={{ session }} // These three Tab.Screen blocks bring in the components from each of the files that allow the Tab navigator to access and change pages
       />
-
-      <Tab.Screen name="Home" component={Home} />
+      <Tab.Screen 
+        name="Home" 
+        component={Home} 
+        initialParams={{ session }}/>
       <Tab.Screen
         name="Profile"
         component={Profile}

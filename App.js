@@ -16,7 +16,7 @@ import ThreeMainPages from "./components/miscellaneous/ThreeMainPages.js";
 // npm install @react-navigation/native react-native-tab-view react-native-gesture-handler react-native-reanimated
 // npm install react-native-vector-icons
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator(); // Creating a stack is important for navigation. Must initialize the stack with creatStackNavigator().
 
 const App = () => {
   const [session, setSession] = useState(null);

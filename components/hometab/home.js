@@ -10,16 +10,16 @@ import {
   FlatList,
   SafeAreaView,
 } from "react-native";
-import { picURL } from "../auth/supabase.js";
+
+import { picURL } from "../auth/supabase.js"; // This is the base url of the photos bucket that is in our Supabase project. It makes referencing user pictures easier
 import { useNavigation } from "@react-navigation/native";
+import { createClient } from "@supabase/supabase-js"; // Create client is responsible for drawing profile data from each user in the database
 
-import { createClient } from "@supabase/supabase-js";
-import { Button } from "react-native-paper";
-
+// Supabase API information that allows us to connect to our server and pull/send information between the app and the server
 const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
 const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM";
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey); // Command used to connect supabase
 
 const Home = () => {
   const navigation = useNavigation();
