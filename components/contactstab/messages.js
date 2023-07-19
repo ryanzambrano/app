@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   TextInput,
@@ -15,16 +15,16 @@ import {
 import { AntDesign } from "@expo/vector-icons";
 import { ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-
+import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
 import { createClient } from "@supabase/supabase-js";
-const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
+/*const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
 const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM";
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey);*/
 
 const MessagingUI = () => {
   const scrollViewRef = useRef();
-  const [inputHeight, setInputHeight] = useState(40); 
+  const [inputHeight, setInputHeight] = useState(40);
   const navigation = useNavigation();
   const route = useRoute();
   const [message, setMessage] = useState("");
@@ -36,7 +36,13 @@ const MessagingUI = () => {
     if (message.trim() !== "") {
       const { data, error } = await supabase
         .from("Message")
-        .insert([{ Content: message, Contact_ID: route.params.contactId, Sent_From: route.params.myId }])
+        .insert([
+          {
+            Content: message,
+            Contact_ID: route.params.contactId,
+            Sent_From: route.params.myId,
+          },
+        ])
         .select()
         .single();
 
@@ -48,7 +54,6 @@ const MessagingUI = () => {
       }
     }
   };
-
 
   useEffect(() => {
     if (route.params && route.params.contactName) {
@@ -63,10 +68,12 @@ const MessagingUI = () => {
     const { data, error } = await supabase
       .from("Message")
       .select("*")
-      .or(`and(Sent_From.eq.${myId},Contact_ID.eq.${contactId}),and(Contact_ID.eq.${myId},Sent_From.eq.${contactId})`)
+      .or(
+        `and(Sent_From.eq.${myId},Contact_ID.eq.${contactId}),and(Contact_ID.eq.${myId},Sent_From.eq.${contactId})`
+      )
       .order("createdat", { ascending: false })
       .limit(250);
-  
+
     if (error) {
       console.error(error);
     } else {
@@ -74,33 +81,36 @@ const MessagingUI = () => {
     }
   };
 
-
-
   useEffect(() => {
     fetchMessages();
-    
-  const Message = supabase.channel('custom-all-channel')
-  .on(
-    'postgres_changes',
-    { event: '*', schema: 'public', table: 'Message' },
-    (payload) => {
-    fetchMessages();
-    }
-   )
-  .subscribe()
 
-
-  }, [route.params.myId, route.params.contactId,messages]);
+    const Message = supabase
+      .channel("custom-all-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "Message" },
+        (payload) => {
+          fetchMessages();
+        }
+      )
+      .subscribe();
+  }, [route.params.myId, route.params.contactId, messages]);
 
   useEffect(() => {
-    if (messages.length > 0)
-    {
-      const keyboardDidShowListener = Keyboard.addListener("keyboardDidShow", () => {
-        setTimeout(() => {
-          //flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
-              flatListRef?.current?.scrollToIndex({ animated: true, index: messages.length - 1 });
-        }, 100);})
-  
+    if (messages.length > 0) {
+      const keyboardDidShowListener = Keyboard.addListener(
+        "keyboardDidShow",
+        () => {
+          setTimeout(() => {
+            //flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
+            flatListRef?.current?.scrollToIndex({
+              animated: true,
+              index: messages.length - 1,
+            });
+          }, 100);
+        }
+      );
+
       return () => {
         keyboardDidShowListener.remove();
       };
@@ -130,12 +140,12 @@ const MessagingUI = () => {
       behavior={Platform.OS === "ios" ? "padding" : null}
       keyboardVerticalOffset={Platform.OS === "ios" ? 2 : 0}
     >
-    <View style={{ flex: .01 }}>
-    <ScrollView
-      ref={scrollViewRef}
-      contentContainerStyle={{ flexGrow: 1 }}
-    ></ScrollView>
-    </View>
+      <View style={{ flex: 0.01 }}>
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={{ flexGrow: 1 }}
+        ></ScrollView>
+      </View>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.button}
@@ -161,7 +171,13 @@ const MessagingUI = () => {
           ref={flatListRef}
           data={messages}
           renderItem={({ item }) => (
-            <View style={item.Sent_From===myId?styles.messageContainerRight:styles.messageContainerLeft}>
+            <View
+              style={
+                item.Sent_From === myId
+                  ? styles.messageContainerRight
+                  : styles.messageContainerLeft
+              }
+            >
               <Text style={styles.message}>{item.Content}</Text>
             </View>
           )}
@@ -170,16 +186,18 @@ const MessagingUI = () => {
         />
       </View>
       <View style={styles.inputContainer}>
-      <TextInput
-        style={[styles.input, { height: Math.max(40, inputHeight) }]}
-        value={message}
-        onChangeText={(text) => setMessage(text)}
-        placeholder="Type a message..."
-        placeholderTextColor="#888"
-        autoCorrect={true}
-        multiline
-        onContentSizeChange={(e) => setInputHeight(e.nativeEvent.contentSize.height)}
-/>
+        <TextInput
+          style={[styles.input, { height: Math.max(40, inputHeight) }]}
+          value={message}
+          onChangeText={(text) => setMessage(text)}
+          placeholder="Type a message..."
+          placeholderTextColor="#888"
+          autoCorrect={true}
+          multiline
+          onContentSizeChange={(e) =>
+            setInputHeight(e.nativeEvent.contentSize.height)
+          }
+        />
         <Button title="Send" onPress={sendMessage} color="#007AFF" />
       </View>
     </KeyboardAvoidingView>

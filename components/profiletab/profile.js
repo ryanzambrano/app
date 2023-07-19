@@ -14,21 +14,16 @@ import {
   ScrollView,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
-
 import { fetchUsername } from "../auth/profileUtils.js";
 import { supabase } from "../auth/supabase.js";
-import * as ImagePicker from "expo-image-picker";
 import { StatusBar } from "expo-status-bar";
 import { picURL } from "../auth/supabase.js";
-import { decode } from "base64-arraybuffer";
-// npm install base64-arraybuffer
 
 export const Profile = ({ navigation, route }) => {
   const { updated, session } = route.params;
 
   const [editedUser, setEditedUser] = useState(session.user);
-  const [isName, setIsName] = useState("");
-  const [isBio, setIsBio] = useState("");
+
   const [profilePicture, setProfilePicture] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [isUsername, setUsername] = useState("");
@@ -42,6 +37,7 @@ export const Profile = ({ navigation, route }) => {
     fetchProfile();
     fetchData();
     getProfilePicture();
+    console.log(editedUser.tags);
     if (updated && isFocused) {
       fetchProfile();
       fetchData();
@@ -58,7 +54,7 @@ export const Profile = ({ navigation, route }) => {
   const fetchProfile = async () => {
     const { data, error } = await supabase
       .from("UGC")
-      .select("name, bio") // add the profile picture later
+      .select("name, bio, tags, major") // add the profile picture later
       .eq("user_id", session.user.id)
       .single();
 
@@ -78,57 +74,13 @@ export const Profile = ({ navigation, route }) => {
         cache: "no-store",
       });
       if (response.ok) {
-        const blob = await response.blob();
-
-        const reader = new FileReader();
-        reader.onload = () => {
-          const decodedData = reader.result;
-          setProfilePicture(decodedData);
-        };
-        reader.readAsDataURL(blob);
+        setProfilePicture(profilePictureURL);
       } else {
-        // Handle response error
+        setProfilePicture(null);
       }
     } catch (error) {
-      // Handle fetch or other errors
+      alert("Couldn't fetch profile picture");
     }
-  };
-
-  const upserts = {
-    name: isName,
-    bio: isBio,
-  };
-
-  const handleSave = async () => {
-    // Update the user's profile in the database
-    if (session?.user) {
-      const { data, error } = await supabase.from("UGC").upsert([
-        {
-          user_id: session.user.id,
-          name: upserts.name,
-          bio: editedUser.bio,
-        },
-      ]);
-
-      if (error) {
-        if (error.message.includes("UGC_user_id_key")) {
-          const { data, error } = await supabase
-            .from("UGC")
-            .update([
-              {
-                name: editedUser.name,
-                bio: editedUser.bio,
-              },
-            ])
-            .eq("user_id", session.user.id);
-        } else {
-          alert(error.message);
-        }
-      } else {
-        setEditing(false);
-      }
-    }
-    setEditing(false);
   };
 
   handleEditPictures = async () => {
@@ -137,85 +89,90 @@ export const Profile = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableWithoutFeedback onPress={dismissKeyboard}>
-        <View style={styles.viewContainer}>
-          <View style={styles.topBar}>
-            <Text style={styles.username}>{isUsername}</Text>
+      <View style={styles.viewContainer}>
+        <View style={styles.topBar}>
+          <Text style={styles.username}>{isUsername}</Text>
 
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => {
-                  navigation.navigate("EditProfileScreen");
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => {
+                navigation.navigate("EditProfileScreen");
+              }}
+            >
+              <Text style={styles.buttonText}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.settingsButton}
+              onPress={() => {
+                navigation.navigate("SettingsScreen");
+              }}
+            >
+              <Image
+                style={styles.settingsIcon}
+                source={{
+                  uri: "https://th.bing.com/th/id/OIP.nEKx7qYL-7aettL7yMDiOgHaHv?pid=ImgDet&rs=1",
                 }}
-              >
-                <Text style={styles.buttonText}>Edit</Text>
-              </TouchableOpacity>
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <ScrollView style={styles.scrollContainer}>
+          <View style={styles.profileContainer}>
+            {profilePicture ? (
               <TouchableOpacity
-                style={styles.settingsButton}
-                onPress={() => {
-                  navigation.navigate("SettingsScreen");
-                }}
+                style={styles.profilePictureContainer}
+                onPress={handleEditPictures}
+                disabled={uploading}
               >
                 <Image
-                  style={styles.settingsIcon}
-                  source={{
-                    uri: "https://th.bing.com/th/id/OIP.nEKx7qYL-7aettL7yMDiOgHaHv?pid=ImgDet&rs=1",
-                  }}
+                  source={{ uri: profilePicture }}
+                  style={styles.profilePicture}
                 />
+                {uploading && (
+                  <View style={styles.uploadingIndicatorContainer}>
+                    <ActivityIndicator size="small" color="#fff" />
+                  </View>
+                )}
               </TouchableOpacity>
-            </View>
-          </View>
-          <ScrollView style={styles.scrollContainer}>
-            <View style={styles.profileContainer}>
-              {profilePicture ? (
-                <TouchableOpacity
-                  style={styles.profilePictureContainer}
-                  //onPress={handleImageUpload}
-                  onPress={handleEditPictures}
-                  disabled={uploading}
-                >
-                  <Image
-                    source={{ uri: profilePicture }}
-                    style={styles.profilePicture}
-                  />
-                  {uploading && (
-                    <View style={styles.uploadingIndicatorContainer}>
-                      <ActivityIndicator size="small" color="#fff" />
-                    </View>
-                  )}
-                </TouchableOpacity>
-              ) : (
-                <TouchableOpacity
-                  style={styles.profilePictureContainer}
-                  //onPress={handleImageUpload}
-                  onPress={handleEditPictures}
-                  disabled={uploading}
-                >
-                  <Text style={styles.profilePictureText}>Add Photo</Text>
-                  {uploading && (
-                    <View style={styles.uploadingIndicatorContainer}>
-                      <ActivityIndicator size="small" color="#fff" />
-                    </View>
-                  )}
-                </TouchableOpacity>
-              )}
-              <View style={styles.profileDetails}>
-                <View>
-                  <Text style={styles.label}></Text>
-                  <Text style={styles.name}>{editedUser.name}</Text>
-                </View>
-              </View>
-            </View>
-            <View style={styles.bio}>
+            ) : (
+              <TouchableOpacity
+                style={styles.profilePictureContainer}
+                onPress={handleEditPictures}
+                disabled={uploading}
+              >
+                <Text style={styles.profilePictureText}>Add Photo</Text>
+                {uploading && (
+                  <View style={styles.uploadingIndicatorContainer}>
+                    <ActivityIndicator size="small" color="#fff" />
+                  </View>
+                )}
+              </TouchableOpacity>
+            )}
+            <View style={styles.profileDetails}>
               <View>
                 <Text style={styles.label}></Text>
-                <Text style={styles.text}>{editedUser.bio}</Text>
+                <Text style={styles.name}>{editedUser.name}</Text>
               </View>
             </View>
-          </ScrollView>
-        </View>
-      </TouchableWithoutFeedback>
+          </View>
+          <View style={styles.bio}>
+            <View>
+              <Text style={styles.label}></Text>
+              <Text style={styles.text}>{editedUser.bio}</Text>
+            </View>
+          </View>
+          {editedUser.tags && editedUser.tags.length > 0 && (
+            <View style={styles.tagsContainer}>
+              {editedUser.tags.map((tag, index) => (
+                <View key={index} style={styles.tag}>
+                  <Text style={styles.tagText}>{tag}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+        </ScrollView>
+      </View>
       <StatusBar style="dark" />
     </SafeAreaView>
   );
@@ -227,7 +184,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
 
-  scrollContainer: { flex: 1 },
+  scrollContainer: {
+    flex: 1,
+  },
 
   settingsIcon: {
     padding: 8,
@@ -347,6 +306,26 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 4,
+  },
+  tagsContainer: {
+    //backgroundColor: "#404040",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingVertical: 10,
+    borderRadius: 15,
+    justifyContent: "center",
+  },
+  tag: {
+    backgroundColor: "#f3a034",
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    margin: 5,
+  },
+  tagText: {
+    fontSize: 14,
+    color: "white",
+    fontWeight: "bold",
   },
 });
 
