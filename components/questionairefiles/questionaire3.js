@@ -14,11 +14,12 @@ import {
   Keyboard,
   Animated,
 } from "react-native";
+
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
 
-export default function Questionaire2({ navigation, route }) {
+export default function Questionaire3({ navigation, route }) {
   const { session } = route.params;
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -95,7 +96,6 @@ export default function Questionaire2({ navigation, route }) {
           startShakeAnimation(shakeAnimationValue);
           setIsError(error.message);
         } else {
-          //navigation.navigate("Questionaire3");
           navigation.navigate("TagSelectionScreen");
         }
       } else {

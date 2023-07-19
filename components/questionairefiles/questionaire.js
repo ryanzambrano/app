@@ -4,9 +4,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import Questionaire1 from "./questionaire1.js";
 import Questionaire2 from "./questionaire2.js";
+import Questionaire3 from "./questionaire3.js";
 import Username from "./username.js";
 import TagSelectionScreen from "./tagSelectionScreen.js";
-
 
 const Stack = createStackNavigator();
 
@@ -32,6 +32,11 @@ const Questionaire = ({ navigation, route }) => {
         component={Questionaire2}
         initialParams={{ session }}
       />
+      {/*<Stack.Screen
+        name="Questionaire3"
+        component={Questionaire3}
+        initialParams={{ session }}
+      />*/}
       <Stack.Screen
         name="TagSelectionScreen"
         component={TagSelectionScreen}

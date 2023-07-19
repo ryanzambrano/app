@@ -31,101 +31,31 @@ export const Questionaire1 = ({ navigation, route }) => {
   const [isGenderModalVisible, setIsGenderModalVisible] = useState(false);
   const [isRaceModalVisible, setIsRaceModalVisible] = useState(false);
 
-  const [selectedDay, setSelectedDay] = useState("");
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
   const [selectedAge, setSelectedAge] = useState("");
-  const [formattedBirthday, setFormattedBirthday] = useState("");
-
   const [selectedGender, setSelectedGender] = useState("");
-
   const [selectedRace, setSelectedRace] = useState("");
 
-  const days = Array.from(Array(31).keys()).map((day) => String(day + 1));
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  const monthIndex = months.indexOf(selectedMonth);
-  const numericalMonth = monthIndex + 1;
-  const years = Array.from(Array(100).keys()).map((year) =>
-    String(2023 - year)
-  );
-
   const gender = ["Male", "Female", "Other"];
-
   const race = ["White", "Black", "Brown", "Yellow"];
-
-  const age = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22, 23, 24, 25, 26, 27, 28, 29, 30,
-  ];
-
   const ages = Array.from(Array(31).keys()).map((age) => String(age + 1));
 
   const openAgeModal = () => {
     setIsAgeModalVisible(true);
   };
-
   const closeAgeModal = () => {
     setIsAgeModalVisible(false);
   };
-
   const openGenderModal = () => {
     setIsGenderModalVisible(true);
   };
-
   const closeGenderModal = () => {
     setIsGenderModalVisible(false);
   };
-
   const openRaceModal = () => {
     setIsRaceModalVisible(true);
   };
-
   const closeRaceModal = () => {
     setIsRaceModalVisible(false);
-  };
-
-  const handleSaveBirthday = () => {
-    let tempMonth = selectedMonth;
-    let tempYear = selectedYear;
-    let tempDay = selectedDay;
-    let tempNumericalMonth = numericalMonth;
-
-    if (!selectedMonth) {
-      tempMonth = "January";
-      tempNumericalMonth = "1";
-    }
-
-    if (!selectedYear) {
-      tempYear = "2023";
-    }
-
-    if (!selectedDay) {
-      tempDay = "1";
-    }
-
-    setFormattedBirthday(tempMonth + " " + tempDay + " " + tempYear);
-
-    setSelectedBirthday(
-      `${tempYear}-${tempNumericalMonth.toString().padStart(2, "0")}-${tempDay
-        .toString()
-        .padStart(2, "0")}`
-    );
-
-    closeBirthdayModal();
   };
 
   handleSaveAge = () => {
@@ -134,14 +64,12 @@ export const Questionaire1 = ({ navigation, route }) => {
     }
     closeAgeModal();
   };
-
   handleSaveGender = () => {
     if (!selectedGender) {
       setSelectedGender("Male");
     }
     closeGenderModal();
   };
-
   handleSaveRace = () => {
     if (!selectedRace) {
       setSelectedRace("White");
