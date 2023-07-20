@@ -9,8 +9,6 @@ import {
   SafeAreaView,
   Image,
   ActivityIndicator,
-  TouchableWithoutFeedback,
-  Keyboard,
   ScrollView,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
@@ -24,13 +22,17 @@ export const Profile = ({ navigation, route }) => {
   const { updated, session } = route.params;
 
   const [editedUser, setEditedUser] = useState(session.user);
-
   const [profilePicture, setProfilePicture] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [isUsername, setUsername] = useState("");
+  const [isProfileVisible, setIsProfileVisible] = useState(true);
   const isFocused = useIsFocused();
 
   const scrollY = new Animated.Value(0);
+
+  scrollY.addListener(({ value }) => {
+    setIsProfileVisible(value < DISABLE_TOUCHABLE_SCROLL_POINT);
+  });
 
   const profileOpacity = scrollY.interpolate({
     inputRange: [0, 100],
@@ -38,24 +40,28 @@ export const Profile = ({ navigation, route }) => {
     extrapolate: "clamp",
   });
 
-  const dismissKeyboard = () => {
-    Keyboard.dismiss();
-  };
+  const profileZIndex = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [1, -1], // You might need to adjust these values based on your needs
+    extrapolate: "clamp", // This will prevent the output from exceeding outputRange
+  });
+
+  const DISABLE_TOUCHABLE_SCROLL_POINT = 100;
 
   useEffect(() => {
-    fetchProfile();
     fetchData();
-    getProfilePicture();
-    console.log(editedUser.tags);
     if (updated && isFocused) {
-      fetchProfile();
       fetchData();
-      getProfilePicture(); // your data fetching function here
     }
+
+    return () => {
+      scrollY.removeAllListeners();
+    };
   }, [updated, isFocused]);
 
   const fetchData = async () => {
-    await fetchProfile();
+    fetchProfile();
+    getProfilePicture();
     const username = await fetchUsername(session);
     setUsername(username);
   };
@@ -71,7 +77,6 @@ export const Profile = ({ navigation, route }) => {
       console.error(error.message);
     } else {
       setEditedUser(data);
-      //setProfilePicture(data.profile_picture);
     }
   };
 
@@ -79,7 +84,7 @@ export const Profile = ({ navigation, route }) => {
     try {
       const profilePictureURL = `${picURL}/${session.user.id}/${
         session.user.id
-      }-0?${new Date().getTime()}`; // Replace '...' with the actual URL of the profile picture
+      }-0?${new Date().getTime()}`;
 
       const response = await fetch(profilePictureURL, {
         cache: "no-store",
@@ -95,7 +100,9 @@ export const Profile = ({ navigation, route }) => {
   };
 
   handleEditPictures = async () => {
-    navigation.navigate("AddProfileImages");
+    if (scrollY._value < DISABLE_TOUCHABLE_SCROLL_POINT) {
+      navigation.navigate("AddProfileImages");
+    }
   };
 
   return (
@@ -114,7 +121,6 @@ export const Profile = ({ navigation, route }) => {
               <Text style={styles.buttonText}>Edit</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.settingsButton}
               onPress={() => {
                 navigation.navigate("SettingsScreen");
               }}
@@ -130,7 +136,11 @@ export const Profile = ({ navigation, route }) => {
         </View>
 
         <Animated.View
-          style={{ ...styles.profileContainer, opacity: profileOpacity }}
+          style={{
+            ...styles.profileContainer,
+            opacity: profileOpacity,
+            zIndex: profileZIndex,
+          }}
         >
           <View>
             {profilePicture ? (
@@ -155,12 +165,7 @@ export const Profile = ({ navigation, route }) => {
                 onPress={handleEditPictures}
                 disabled={uploading}
               >
-                <Image
-                  source={{
-                    uri: "https://www.nicepng.com/png/detail/73-730154_open-default-profile-picture-png.png",
-                  }}
-                  style={styles.profilePicture}
-                />
+                <Icon name={"plus"} size={40} color={"darkgrey"} />
                 {uploading && (
                   <View style={styles.uploadingIndicatorContainer}>
                     <ActivityIndicator size="small" color="#fff" />
@@ -183,9 +188,7 @@ export const Profile = ({ navigation, route }) => {
         >
           <View style={styles.tab}>
             <View style={styles.profileDetails}>
-              <View style={styles.name}>
-                <Text style={styles.name}>{editedUser.name}</Text>
-              </View>
+              <Text style={styles.name}>{editedUser.name}</Text>
 
               <View style={styles.major}>
                 <View style={styles.icons}>
@@ -236,11 +239,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    //backgroundColor: "white",
   },
   scrollViewContent: {
     paddingTop: 450, // this should be the same as the profile picture height
-    //backgroundColor: "white",
   },
 
   settingsIcon: {
@@ -265,7 +266,6 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    //height: 50,
     zIndex: 10,
     backgroundColor: "white",
   },
@@ -292,7 +292,6 @@ const styles = StyleSheet.create({
   editButton: {
     padding: 8,
     borderRadius: 4,
-    //marginRight: 20,
     backgroundColor: "#4EB1A3",
   },
   buttonText: {
@@ -304,23 +303,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
-  saveButton: {
-    marginLeft: 8,
-    padding: 8,
-    borderRadius: 4,
-    backgroundColor: "#4EB1A3",
-  },
-  cancelButton: {
-    padding: 8,
-    borderRadius: 4,
-    backgroundColor: "#aaa",
-  },
   profileContainer: {
     flex: 1,
     padding: 16,
+    position: "absolute",
     flexDirection: "row",
     justifyContent: "center",
     margin: 0,
+    alignSelf: "center",
   },
   profilePictureContainer: {
     marginTop: "25%",
@@ -332,15 +322,11 @@ const styles = StyleSheet.create({
     borderRadius: 150,
   },
   profilePicture: {
-    //marginTop: 5,
     width: 250,
     height: 250,
     borderRadius: 150,
   },
-  profilePictureText: {
-    fontSize: 16,
-    color: "#fff",
-  },
+
   uploadingIndicatorContainer: {
     position: "absolute",
     backgroundColor: "rgba(0, 0, 0, 0.6)",
@@ -364,7 +350,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    //marginBottom: 16,
   },
   input: {
     fontSize: 16,
@@ -376,7 +361,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   tagsContainer: {
-    //backgroundColor: "#404040",
     flexDirection: "row",
     flexWrap: "wrap",
     paddingVertical: 10,
@@ -397,27 +381,22 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
   },
-
   major: {
-    //paddingLeft: 16,
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
     justifyContent: "left",
   },
-
   icons: {
     alignContent: "center",
     alignItems: "center",
   },
-
   details: {
     alignItems: "left",
     justifyContent: "center",
     gap: 13,
   },
-
   tab: {
     backgroundColor: "white",
     flex: 1,
