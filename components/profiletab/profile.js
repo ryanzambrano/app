@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import {
   View,
   Text,
-  TextInput,
+  Animated,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
@@ -18,6 +18,7 @@ import { fetchUsername } from "../auth/profileUtils.js";
 import { supabase } from "../auth/supabase.js";
 import { StatusBar } from "expo-status-bar";
 import { picURL } from "../auth/supabase.js";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 export const Profile = ({ navigation, route }) => {
   const { updated, session } = route.params;
@@ -28,6 +29,14 @@ export const Profile = ({ navigation, route }) => {
   const [uploading, setUploading] = useState(false);
   const [isUsername, setUsername] = useState("");
   const isFocused = useIsFocused();
+
+  const scrollY = new Animated.Value(0);
+
+  const profileOpacity = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [1, 0],
+    extrapolate: "clamp",
+  });
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -54,7 +63,7 @@ export const Profile = ({ navigation, route }) => {
   const fetchProfile = async () => {
     const { data, error } = await supabase
       .from("UGC")
-      .select("name, bio, tags, major") // add the profile picture later
+      .select("name, bio, tags, major, class_year, hometown") // add the profile picture later
       .eq("user_id", session.user.id)
       .single();
 
@@ -68,7 +77,9 @@ export const Profile = ({ navigation, route }) => {
 
   const getProfilePicture = async (navigation) => {
     try {
-      const profilePictureURL = `${picURL}/${session.user.id}/${session.user.id}-0`; // Replace '...' with the actual URL of the profile picture
+      const profilePictureURL = `${picURL}/${session.user.id}/${
+        session.user.id
+      }-0?${new Date().getTime()}`; // Replace '...' with the actual URL of the profile picture
 
       const response = await fetch(profilePictureURL, {
         cache: "no-store",
@@ -117,8 +128,11 @@ export const Profile = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
         </View>
-        <ScrollView style={styles.scrollContainer}>
-          <View style={styles.profileContainer}>
+
+        <Animated.View
+          style={{ ...styles.profileContainer, opacity: profileOpacity }}
+        >
+          <View>
             {profilePicture ? (
               <TouchableOpacity
                 style={styles.profilePictureContainer}
@@ -141,7 +155,12 @@ export const Profile = ({ navigation, route }) => {
                 onPress={handleEditPictures}
                 disabled={uploading}
               >
-                <Text style={styles.profilePictureText}>Add Photo</Text>
+                <Image
+                  source={{
+                    uri: "https://www.nicepng.com/png/detail/73-730154_open-default-profile-picture-png.png",
+                  }}
+                  style={styles.profilePicture}
+                />
                 {uploading && (
                   <View style={styles.uploadingIndicatorContainer}>
                     <ActivityIndicator size="small" color="#fff" />
@@ -149,28 +168,54 @@ export const Profile = ({ navigation, route }) => {
                 )}
               </TouchableOpacity>
             )}
+          </View>
+        </Animated.View>
+
+        <ScrollView
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false } // Add this line if it's missing
+          )}
+          scrollEventThrottle={16}
+          bounces={false}
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollViewContent}
+        >
+          <View style={styles.tab}>
             <View style={styles.profileDetails}>
-              <View>
-                <Text style={styles.label}></Text>
+              <View style={styles.name}>
                 <Text style={styles.name}>{editedUser.name}</Text>
               </View>
-            </View>
-          </View>
-          <View style={styles.bio}>
-            <View>
-              <Text style={styles.label}></Text>
-              <Text style={styles.text}>{editedUser.bio}</Text>
-            </View>
-          </View>
-          {editedUser.tags && editedUser.tags.length > 0 && (
-            <View style={styles.tagsContainer}>
-              {editedUser.tags.map((tag, index) => (
-                <View key={index} style={styles.tag}>
-                  <Text style={styles.tagText}>{tag}</Text>
+
+              <View style={styles.major}>
+                <View style={styles.icons}>
+                  <Icon name="graduation-cap" size={30} color="grey" />
+                  <Icon name="book" size={30} color="grey" />
+                  <Icon name="map-marker" size={30} color="grey" />
                 </View>
-              ))}
+                <View style={styles.details}>
+                  <Text style={styles.text}>{editedUser.class_year}</Text>
+                  <Text style={styles.text}>{editedUser.major}</Text>
+                  <Text style={styles.text}>{editedUser.hometown}</Text>
+                </View>
+              </View>
             </View>
-          )}
+            <View style={styles.bio}>
+              <View>
+                <Text style={styles.text}>{editedUser.bio}</Text>
+              </View>
+            </View>
+
+            {editedUser.tags && editedUser.tags.length > 0 && (
+              <View style={styles.tagsContainer}>
+                {editedUser.tags.map((tag, index) => (
+                  <View key={index} style={styles.tag}>
+                    <Text style={styles.tagText}>{tag}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
         </ScrollView>
       </View>
       <StatusBar style="dark" />
@@ -184,8 +229,18 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
 
-  scrollContainer: {
+  scrollView: {
     flex: 1,
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    //backgroundColor: "white",
+  },
+  scrollViewContent: {
+    paddingTop: 450, // this should be the same as the profile picture height
+    //backgroundColor: "white",
   },
 
   settingsIcon: {
@@ -206,7 +261,12 @@ const styles = StyleSheet.create({
     padding: 6,
     paddingLeft: 15,
     paddingRight: 15,
-
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    //height: 50,
+    zIndex: 10,
     backgroundColor: "white",
   },
   username: {
@@ -214,16 +274,19 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   name: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "600",
     color: "black",
+    textAlign: "center",
+    marginBottom: 10,
   },
 
   bio: {
     fontSize: 18,
     fontWeight: "600",
     paddingLeft: 16,
-    margin: 0,
+    marginTop: 20,
+    marginBottom: 20,
   },
 
   editButton: {
@@ -260,17 +323,19 @@ const styles = StyleSheet.create({
     margin: 0,
   },
   profilePictureContainer: {
-    width: 171,
-    height: 311,
+    marginTop: "25%",
+    width: 250,
+    height: 250,
     backgroundColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 20,
+    borderRadius: 150,
   },
   profilePicture: {
-    width: 171,
-    height: 311,
-    borderRadius: 20,
+    //marginTop: 5,
+    width: 250,
+    height: 250,
+    borderRadius: 150,
   },
   profilePictureText: {
     fontSize: 16,
@@ -288,6 +353,9 @@ const styles = StyleSheet.create({
   profileDetails: {
     flex: 1,
     padding: 16,
+    gap: 10,
+    borderBottomColor: "lightgrey",
+    borderBottomWidth: 1,
   },
   label: {
     fontSize: 18,
@@ -314,6 +382,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 15,
     justifyContent: "center",
+    marginTop: 50,
+    marginBottom: 100,
   },
   tag: {
     backgroundColor: "#f3a034",
@@ -326,6 +396,38 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "white",
     fontWeight: "bold",
+  },
+
+  major: {
+    //paddingLeft: 16,
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    justifyContent: "left",
+  },
+
+  icons: {
+    alignContent: "center",
+    alignItems: "center",
+  },
+
+  details: {
+    alignItems: "left",
+    justifyContent: "center",
+    gap: 13,
+  },
+
+  tab: {
+    backgroundColor: "white",
+    flex: 1,
+    height: 500,
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
+  },
+  color: {
+    flex: 1,
+    backgroundColor: "lightblue",
   },
 });
 

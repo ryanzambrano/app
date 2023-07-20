@@ -17,9 +17,7 @@ import { picURL } from "../auth/supabase";
 
 export const EditProfileScreen = ({ navigation, route }) => {
   const { session } = route.params;
-  const [name, setName] = useState("");
-  const [bio, setBio] = useState("");
-  const [major, setMajor] = useState("");
+
   const [editedUser, setEditedUser] = useState(session.user);
   const [profilePicture, setProfilePicture] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -35,7 +33,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
   const fetchProfile = async () => {
     const { data, error } = await supabase
       .from("UGC")
-      .select("name, bio, major")
+      .select("name, bio, major, class_year, hometown")
       .eq("user_id", session.user.id)
       .single();
 
@@ -50,46 +48,25 @@ export const EditProfileScreen = ({ navigation, route }) => {
   };
   const getProfilePicture = async (navigation) => {
     try {
-      const profilePictureURL = `${picURL}/${session.user.id}/${session.user.id}-0`; // Replace '...' with the actual URL of the profile picture
+      const profilePictureURL = `${picURL}/${session.user.id}/${
+        session.user.id
+      }-0?${new Date().getTime()}`; // Replace '...' with the actual URL of the profile picture
 
       const response = await fetch(profilePictureURL, {
         cache: "no-store",
       });
       if (response.ok) {
-        const blob = await response.blob();
-
-        const reader = new FileReader();
-        reader.onload = () => {
-          const decodedData = reader.result;
-          setProfilePicture(decodedData);
-        };
-        reader.readAsDataURL(blob);
+        setProfilePicture(profilePictureURL);
       } else {
-        // Handle response error
+        setProfilePicture(null);
       }
     } catch (error) {
-      // Handle fetch or other errors
+      alert("Couldn't fetch profile picture");
     }
   };
 
-  const updateProfil = async () => {
-    const { data, error } = await supabase
-      .from("UGC")
-      .update([
-        {
-          name: editedUser.name,
-          bio: editedUser.bio,
-          major: editedUser.major,
-        },
-      ])
-      .eq("user_id", session.user.id);
-
-    if (error) {
-      console.log("Error updating profile: ", error);
-    } else {
-      console.log("Profile updated successfully: ", data);
-      navigation.navigate("Tabs", { updated: true });
-    }
+  handleEditPictures = async () => {
+    navigation.navigate("AddProfileImages");
   };
 
   const updateProfile = async () => {
@@ -101,6 +78,8 @@ export const EditProfileScreen = ({ navigation, route }) => {
           name: editedUser.name,
           bio: editedUser.bio,
           major: editedUser.major,
+          class_year: editedUser.class_year,
+          hometown: editedUser.hometown,
         },
       ]);
 
@@ -113,6 +92,8 @@ export const EditProfileScreen = ({ navigation, route }) => {
                 name: editedUser.name,
                 bio: editedUser.bio,
                 major: editedUser.major,
+                class_year: editedUser.class_year,
+                hometown: editedUser.hometown,
               },
             ])
             .eq("user_id", session.user.id);
@@ -190,13 +171,14 @@ export const EditProfileScreen = ({ navigation, route }) => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Bio:</Text>
+          <Text style={styles.label}>Class Year:</Text>
           <TextInput
             style={styles.input}
-            value={editedUser.bio}
-            onChangeText={(bio) => setEditedUser({ ...editedUser, bio })}
-            multiline
-            placeholder="Bio"
+            value={editedUser.class_year}
+            onChangeText={(class_year) =>
+              setEditedUser({ ...editedUser, class_year })
+            }
+            placeholder="Select your Graduation Year"
           />
         </View>
 
@@ -207,6 +189,29 @@ export const EditProfileScreen = ({ navigation, route }) => {
             value={editedUser.major}
             onChangeText={(major) => setEditedUser({ ...editedUser, major })}
             placeholder="Major"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Hometown:</Text>
+          <TextInput
+            style={styles.input}
+            value={editedUser.hometown}
+            onChangeText={(hometown) =>
+              setEditedUser({ ...editedUser, hometown })
+            }
+            placeholder="Hometown"
+          />
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Bio:</Text>
+          <TextInput
+            style={styles.input}
+            value={editedUser.bio}
+            onChangeText={(bio) => setEditedUser({ ...editedUser, bio })}
+            multiline
+            placeholder="Bio"
           />
         </View>
 
@@ -223,7 +228,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   label: {
-    fontSize: 20,
+    fontSize: 16,
     marginBottom: 10,
     marginLeft: 20,
     marginTop: 10,
@@ -231,7 +236,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 0,
-    fontSize: 18,
+    fontSize: 16,
   },
   inputContainer: {
     flexDirection: "row",
@@ -248,18 +253,20 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   profilePictureContainer: {
-    width: 171,
-    height: 311,
+    margin: 30,
+    width: 100,
+    height: 100,
     backgroundColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
-    borderRadius: 20,
+    borderRadius: 100,
   },
   profilePicture: {
-    width: 171,
-    height: 311,
-    borderRadius: 20,
+    //marginTop: 5,
+    width: 100,
+    height: 100,
+    borderRadius: 100,
   },
   profilePictureText: {
     fontSize: 16,

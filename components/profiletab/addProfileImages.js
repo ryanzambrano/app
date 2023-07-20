@@ -34,7 +34,9 @@ const ImagePickerScreen = ({ navigation, route }) => {
   const getProfilePicturs = async () => {
     try {
       for (let i = 0; i < MAX_IMAGES; i++) {
-        const profilePictureURL = `${picURL}/${session.user.id}/${session.user.id}-${i}`;
+        const profilePictureURL = `${picURL}/${session.user.id}/${
+          session.user.id
+        }-${i}?${new Date().getTime()}`;
         const response = await fetch(profilePictureURL, {
           cache: "no-cache",
         });
