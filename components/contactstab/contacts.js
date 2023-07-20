@@ -30,16 +30,48 @@ const ContactsUI = ({ route }) => {
   const [selectedUser, setSelectedUser] = useState(null);
 
   const fetchUsers = async () => {
-    const { data, error } = await supabase.from("UGC").select("*");
+    const { data: users, error } = await supabase.from("UGC").select("*");
     if (error) {
       console.error(error);
-    } else {
-      setUsers(data);
+      return;
     }
+
+    const recentMessagesPromises = users.map(async (user) => {
+      // Fetch the most recent message for each user
+      const { data: messages, error: messageError } = await supabase
+        .from("Message")
+        .select("Content")
+        .or(
+          `and(Sent_From.eq.${session.user.id},Contact_ID.eq.${user.user_id}),and(Contact_ID.eq.${session.user.id},Sent_From.eq.${user.user_id})`
+        )
+        .order("createdat", { ascending: false })
+        .limit(1);
+
+      if (messageError) {
+        console.error(messageError);
+        return { ...user, recentMessage: "Error fetching message" };
+      }
+
+      const recentMessage = messages.length > 0 ? messages[0].Content : "No recent messages";
+      return { ...user, recentMessage };
+    });
+
+    const usersWithRecentMessages = await Promise.all(recentMessagesPromises);
+    setUsers(usersWithRecentMessages);
   };
 
   useEffect(() => {
     fetchUsers();
+    const Message = supabase
+      .channel("custom-all-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "Message" },
+        (payload) => {
+          fetchUsers();
+        }
+      )
+      .subscribe();
   }, []);
   
 
@@ -52,7 +84,10 @@ const ContactsUI = ({ route }) => {
       myId: session.user.id,
       contactImage: `${picURL}/${user.user_id}/${user.user_id}-0?${new Date().getTime()}`
     });
+    console.log(user.recentMessage);
   };
+
+  
 
   const renderContact = ({ item }) => {
     return (
@@ -66,7 +101,7 @@ const ContactsUI = ({ route }) => {
           />
           <View style={styles.contactInfo}>
             <Text style={styles.contactName}>{item.name}</Text>
-            <Text style={styles.RecentMessage}>{"Recent Message"}</Text>
+            <Text style={styles.RecentMessage}>{item.recentMessage}</Text>
           </View>
         </View>
       </TouchableOpacity>
