@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  FlatList,
 } from "react-native";
 import { supabase } from "../auth/supabase";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -21,6 +22,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
   const [editedUser, setEditedUser] = useState(session.user);
   const [profilePicture, setProfilePicture] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [prompts, setPrompts] = useState([]);
 
   // Assume we have a user and user id, for this example I'll use a static id
   const userId = "1";
@@ -44,6 +46,16 @@ export const EditProfileScreen = ({ navigation, route }) => {
       setEditedUser(data);
     } else {
       console.log("Error fetching profile: ", error);
+    }
+
+    const { data: promptsData, error: promptsError } = await supabase
+      .from("prompts") // Replace "PromptsTable" with the actual table name.
+      .select("*")
+      .eq("user_id", session.user.id);
+    if (promptsData) {
+      setPrompts(promptsData);
+    } else {
+      console.log("Error fetching prompts: ", promptsError);
     }
   };
   const getProfilePicture = async (navigation) => {
@@ -215,6 +227,30 @@ export const EditProfileScreen = ({ navigation, route }) => {
           />
         </View>
 
+        <FlatList
+          data={prompts}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.promptItem}
+              onPress={() =>
+                navigation.navigate("AddPrompts", { prompt: item })
+              }
+            >
+              <Text style={styles}>Add prompts!</Text>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item.id.toString()}
+          scrollEnabled={false}
+          // Replace "id" with the actual column name for the prompt id.
+        />
+
+        <TouchableOpacity
+          style={styles.promptItem}
+          onPress={() => navigation.navigate("AddPrompts")}
+        >
+          <Text style={styles}>Add prompts</Text>
+        </TouchableOpacity>
+
         <Button title="Update Profile" onPress={updateProfile} />
       </ScrollView>
     </SafeAreaView>
@@ -271,6 +307,17 @@ const styles = StyleSheet.create({
   profilePictureText: {
     fontSize: 16,
     color: "#fff",
+  },
+
+  promptItem: {
+    //backgroundColor: "#F0F0F0", // This can be any color you choose
+    padding: 30, // Adjusts the size of the rectangle
+    marginVertical: 8, // Adjusts the space between rectangles
+    marginHorizontal: 16, // Adjusts the space to the side of the rectangles
+    borderRadius: 40, // Makes the corners slightly rounded
+    // If you want a border around the rectangle you can uncomment the following lines:
+    borderColor: "grey",
+    borderWidth: 1,
   },
 });
 

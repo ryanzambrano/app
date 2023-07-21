@@ -403,6 +403,14 @@ const styles = StyleSheet.create({
     height: 500,
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
+    //shadowing
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.75,
+    shadowRadius: 4.84,
   },
   color: {
     flex: 1,
