@@ -21,7 +21,8 @@ const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM";
 const supabase = createClient(supabaseUrl, supabaseKey); // Command used to connect supabase*/
 
-const Home = () => {
+const Home = ( route ) => {
+  
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -179,6 +180,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 3,
     marginRight: 12,
+    borderRadius: 40,
   },
 
   name: {

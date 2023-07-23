@@ -27,10 +27,8 @@ const TabNavigator = ({ route }) => {
           return <Icon name={iconName} size={size} color={color} />;
         },
         tabBarLabel: () => null, // Removes the labels
+        
       })}
-      tabBarOptions={{
-        showIcon: true, // Shows the icons
-      }}
     >
       <Tab.Screen
         name="Contacts"

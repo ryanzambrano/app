@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   scrollViewContent: {
-    paddingTop: 450,
+    paddingTop: 370,
   },
 
   settingsIcon: {
@@ -359,11 +359,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 150,
+    
   },
   profilePicture: {
-    width: 250,
-    height: 250,
+    width: 255,
+    height: 255,
     borderRadius: 150,
+    borderWidth: 1,
+    borderColor: "black",
   },
 
   uploadingIndicatorContainer: {
