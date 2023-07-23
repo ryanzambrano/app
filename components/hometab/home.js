@@ -110,7 +110,10 @@ const Home = ( route ) => {
         <Text style={styles.headerText}> Cabana </Text>
       </View>
 
-      <View style={styles.searchContainer}>
+      
+
+      <View style={styles.viewContainer}>
+        <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
           placeholder="🔎 Search by name or tag"
@@ -118,8 +121,6 @@ const Home = ( route ) => {
           value={searchQuery}
         />
       </View>
-
-      <View style={styles.viewContainer}>
         <FlatList
           data={filteredUsers}
           renderItem={renderUserCard}
@@ -171,14 +172,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 30,
+    borderRadius: 10,
     paddingHorizontal: 15,
+    marginTop: 5,
+    marginBottom: 1,
     elevation: 3,
-    width: '95%',
-    marginHorizontal: 10,
+    marginHorizontal: 5,
     borderWidth: 0.3,
     borderColor: 'grey',
   },
+
   searchInput: {
     flex: 1,
     paddingVertical: 10,
@@ -204,7 +207,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: "white",
     marginVertical: 1,
-    marginHorizontal: 16,
+    marginHorizontal: 7,
     paddingHorizontal: 16,
     paddingVertical: 10,
     marginTop: 3,

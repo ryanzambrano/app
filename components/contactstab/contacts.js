@@ -129,15 +129,15 @@ const ContactsUI = ({ route }) => {
         />
         <Text style={styles.headerText}>Cabana</Text>
       </View>
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="🔎 Search by name"
-          onChangeText={handleSearch}
-          value={searchQuery}
-        />
-      </View>
       <View style={styles.viewContainer}>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="🔎 Search by name"
+            onChangeText={handleSearch}
+            value={searchQuery}
+          />
+        </View>
         <FlatList
           data={filteredUsers}
           renderItem={renderContact}
@@ -184,15 +184,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    borderRadius: 30,
+    borderRadius: 10,
     paddingHorizontal: 15,
+    marginTop: 5,
+    marginBottom: 1,
     elevation: 3,
-    width: '95%',
-    marginHorizontal: 10,
+    marginHorizontal: 5,
     borderWidth: 0.3,
     borderColor: 'grey',
-    marginBottom: 3,
   },
+
   searchInput: {
     flex: 1,
     paddingVertical: 10,
