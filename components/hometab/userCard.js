@@ -218,6 +218,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     marginHorizontal: 0,
     borderRadius: 15,
+    borderWidth: 0.7,
+    borderColor: "grey",
   },
   photo: {
     width: Dimensions.get("window").width - 12,
@@ -235,9 +237,9 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   buttonsContainer: {
-    flexDirection: "row", // Arrange items horizontally
-    alignItems: "center", // Align items vertically
-    justifyContent: "space-between", // Space items evenly along the main axis
+    flexDirection: "row", 
+    alignItems: "center", 
+    justifyContent: "space-between", 
     paddingHorizontal: 0,
   },
   friendButton: {
@@ -248,6 +250,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     width: Dimensions.get("window").width * 0.6,
     marginRight: 3,
+    borderWidth: 0.4,
+    borderColor: "grey",
   },
   friendButtonText: {
     color: "white",
@@ -261,6 +265,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 5,
     width: Dimensions.get("window").width * 0.36,
+    borderWidth: 0.4,
+    borderColor: "grey",
   },
   chatButtonText: {
     color: "white",
@@ -270,17 +276,19 @@ const styles = StyleSheet.create({
   bioContainer: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: "#404040",
+    backgroundColor: "white",
     borderRadius: 15,
     marginBottom: 6,
+    borderWidth: 0.4,
+    borderColor: "grey",
   },
   roundedContainer: {
-    backgroundColor: "#404040",
+    backgroundColor: "white",
     borderRadius: 50,
     padding: 1,
   },
   bio: {
-    color: "white",
+    color: "black",
     fontSize: 16,
     textAlign: "justify",
   },
@@ -289,10 +297,12 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "stretch",
     justifyContent: "center",
-    backgroundColor: "#404040",
+    backgroundColor: "white",
     borderRadius: 15,
     marginBottom: 10,
     paddingVertical: 15,
+    borderWidth: 0.4,
+    borderColor: "grey",
   },
   divider: {
     height: 1,
@@ -300,23 +310,27 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   tagsContainer: {
-    backgroundColor: "#404040",
+    backgroundColor: "white",
     flexDirection: "row",
     flexWrap: "wrap",
     paddingVertical: 10,
     borderRadius: 15,
     justifyContent: "center",
+    borderWidth: 0.4,
+    borderColor: "grey",
   },
   tag: {
-    backgroundColor: "#f3a034",
+    backgroundColor: "white",
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,
     margin: 5,
+    borderWidth: 1,
+    borderColor: "grey",
   },
   tagText: {
     fontSize: 14,
-    color: "white",
+    color: "grey",
     fontWeight: "bold",
   },
 });

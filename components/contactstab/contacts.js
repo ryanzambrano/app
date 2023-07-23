@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   profilePicture: {
     width: 50,
     height: 50,
-    borderRadius: 4,
+    borderRadius: 30,
     marginRight: 15,
   },
   contactInfo: {

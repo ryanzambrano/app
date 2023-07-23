@@ -235,7 +235,7 @@ export const Profile = ({ navigation, route }) => {
               </View>
             </View>
 
-            <ScrollView horizontal style={styles.horizontalScrollView}>
+            <ScrollView horizontal style={styles.horizontalScrollView} showsHorizontalScrollIndicator={false}>
               {prompts.map((item, index) =>
                 item.answer ? (
                   <View key={index} style={styles.itemContainer}>
@@ -365,8 +365,8 @@ const styles = StyleSheet.create({
     width: 255,
     height: 255,
     borderRadius: 150,
-    borderWidth: 1,
-    borderColor: "black",
+    borderWidth: 0.8,
+    borderColor: "grey",
   },
 
   uploadingIndicatorContainer: {
