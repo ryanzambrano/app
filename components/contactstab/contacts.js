@@ -28,6 +28,16 @@ const ContactsUI = ({ route }) => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+  };
+
+  const filteredUsers = users.filter((user) => {
+    const nameMatch = user.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return nameMatch;
+  });
 
   const fetchUsers = async () => {
     const { data: users, error } = await supabase.from("UGC").select("*");
@@ -87,7 +97,7 @@ const ContactsUI = ({ route }) => {
     console.log(user.recentMessage);
   };
 
-  
+
 
   const renderContact = ({ item }) => {
     return (
@@ -119,9 +129,17 @@ const ContactsUI = ({ route }) => {
         />
         <Text style={styles.headerText}>Cabana</Text>
       </View>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="🔎 Search by name"
+          onChangeText={handleSearch}
+          value={searchQuery}
+        />
+      </View>
       <View style={styles.viewContainer}>
         <FlatList
-          data={users}
+          data={filteredUsers}
           renderItem={renderContact}
           keyExtractor={(item) => item.id.toString()}
         />
@@ -161,6 +179,24 @@ const styles = StyleSheet.create({
   viewContainer: {
     flex: 1,
     backgroundColor: "#F4F4F4",
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    paddingHorizontal: 15,
+    elevation: 3,
+    width: '95%',
+    marginHorizontal: 10,
+    borderWidth: 0.3,
+    borderColor: 'grey',
+    marginBottom: 3,
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 10,
+    fontSize: 16,
   },
   contactItem: {
     flexDirection: "row",
