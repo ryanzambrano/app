@@ -88,13 +88,13 @@ export const AddPrompts = ({ navigation, route }) => {
           if (updateError) {
             alert(updateError.message);
           } else {
-            //navigation.navigate("Tabs", { updated: true });
+            navigation.navigate("EditProfileScreen", { updated: true });
           }
         } else {
           alert(error.message);
         }
       } else {
-        //navigation.navigate("Tabs", { updated: true });
+        navigation.navigate("EditProfileScreen", { updated: true });
       }
     }
   };
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     height: 40,
-    fontSize: 16,
+    fontSize: 26,
     fontFamily: "Helvetica",
   },
   saveButton: {

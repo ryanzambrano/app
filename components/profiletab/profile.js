@@ -26,7 +26,15 @@ export const Profile = ({ navigation, route }) => {
   const [uploading, setUploading] = useState(false);
   const [isUsername, setUsername] = useState("");
   const [isProfileVisible, setIsProfileVisible] = useState(true);
+  const [prompts, setPrompts] = useState([]);
   const isFocused = useIsFocused();
+
+  const promptQuestions = {
+    greek_life: "Are you participating in Greek Life?",
+    night_out: "What is your idea of a perfect night out?",
+    pet_peeves: "What are your biggest pet peeves?",
+    favorite_movies: "What are your favorite movies?",
+  };
 
   const scrollY = new Animated.Value(0);
 
@@ -42,8 +50,8 @@ export const Profile = ({ navigation, route }) => {
 
   const profileZIndex = scrollY.interpolate({
     inputRange: [0, 100],
-    outputRange: [1, -1], // You might need to adjust these values based on your needs
-    extrapolate: "clamp", // This will prevent the output from exceeding outputRange
+    outputRange: [1, -1],
+    extrapolate: "clamp",
   });
 
   const DISABLE_TOUCHABLE_SCROLL_POINT = 100;
@@ -69,7 +77,7 @@ export const Profile = ({ navigation, route }) => {
   const fetchProfile = async () => {
     const { data, error } = await supabase
       .from("UGC")
-      .select("name, bio, tags, major, class_year, hometown") // add the profile picture later
+      .select("name, bio, tags, major, class_year, hometown")
       .eq("user_id", session.user.id)
       .single();
 
@@ -77,6 +85,24 @@ export const Profile = ({ navigation, route }) => {
       console.error(error.message);
     } else {
       setEditedUser(data);
+    }
+
+    const { data: promptsData, error: promptsError } = await supabase
+      .from("prompts")
+      .select("*")
+      .eq("user_id", session.user.id);
+    if (promptsData) {
+      const answeredPrompts = Object.entries(promptsData[0])
+        .filter(
+          ([prompt, answer]) =>
+            answer !== null && prompt !== "id" && prompt !== "user_id"
+        )
+        .map(([prompt, answer]) => ({ prompt, answer }));
+
+      setPrompts(answeredPrompts);
+      console.log(answeredPrompts);
+    } else {
+      console.log("Error fetching prompts: ", promptsError);
     }
   };
 
@@ -179,7 +205,7 @@ export const Profile = ({ navigation, route }) => {
         <ScrollView
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: false } // Add this line if it's missing
+            { useNativeDriver: false }
           )}
           scrollEventThrottle={16}
           bounces={false}
@@ -208,6 +234,19 @@ export const Profile = ({ navigation, route }) => {
                 <Text style={styles.text}>{editedUser.bio}</Text>
               </View>
             </View>
+
+            <ScrollView horizontal style={styles.horizontalScrollView}>
+              {prompts.map((item, index) =>
+                item.answer ? (
+                  <View key={index} style={styles.itemContainer}>
+                    <Text style={styles.itemPrompt}>
+                      {promptQuestions[item.prompt]}
+                    </Text>
+                    <Text style={styles.itemAnswer}>{item.answer}</Text>
+                  </View>
+                ) : null
+              )}
+            </ScrollView>
 
             {editedUser.tags && editedUser.tags.length > 0 && (
               <View style={styles.tagsContainer}>
@@ -241,7 +280,7 @@ const styles = StyleSheet.create({
     right: 0,
   },
   scrollViewContent: {
-    paddingTop: 450, // this should be the same as the profile picture height
+    paddingTop: 450,
   },
 
   settingsIcon: {
@@ -285,7 +324,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     paddingLeft: 16,
-    marginTop: 20,
+    marginTop: 30,
     marginBottom: 20,
   },
 
@@ -333,8 +372,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    //justifyContent: "center",
-    //alignItems: "center",
   },
   profileDetails: {
     flex: 1,
@@ -400,10 +437,8 @@ const styles = StyleSheet.create({
   tab: {
     backgroundColor: "white",
     flex: 1,
-    height: 500,
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
-    //shadowing
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -415,6 +450,30 @@ const styles = StyleSheet.create({
   color: {
     flex: 1,
     backgroundColor: "lightblue",
+  },
+
+  horizontalScrollView: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  itemContainer: {
+    marginHorizontal: 15,
+    borderWidth: 1,
+    borderColor: "#000",
+    borderRadius: 50,
+    padding: 30,
+    width: 300,
+    marginRight: 10,
+    minWidth: 150,
+    gap: 10,
+  },
+  itemPrompt: {
+    fontSize: 15,
+    marginBottom: 5,
+  },
+  itemAnswer: {
+    fontWeight: "bold",
+    fontSize: 20,
   },
 });
 

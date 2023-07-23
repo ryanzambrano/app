@@ -12,25 +12,31 @@ import {
   ScrollView,
   FlatList,
 } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { picURL } from "../auth/supabase";
 
 export const EditProfileScreen = ({ navigation, route }) => {
-  const { session } = route.params;
+  const { updated, session } = route.params;
 
   const [editedUser, setEditedUser] = useState(session.user);
   const [profilePicture, setProfilePicture] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [prompts, setPrompts] = useState([]);
+  const isFocused = useIsFocused();
 
-  // Assume we have a user and user id, for this example I'll use a static id
-  const userId = "1";
+  const promptQuestions = {
+    greek_life: "Are you participating in Greek Life?",
+    night_out: "What is your idea of a perfect night out?",
+    pet_peeves: "What are your biggest pet peeves?",
+    favorite_movies: "What are your favorite movies?",
+  };
 
   useEffect(() => {
     fetchProfile();
     getProfilePicture();
-  }, []);
+  }, [updated, isFocused]);
 
   const fetchProfile = async () => {
     const { data, error } = await supabase
@@ -40,20 +46,25 @@ export const EditProfileScreen = ({ navigation, route }) => {
       .single();
 
     if (data) {
-      /*setName(data.name);
-      setBio(data.bio);
-      setMajor(data.major);*/
       setEditedUser(data);
     } else {
       console.log("Error fetching profile: ", error);
     }
 
     const { data: promptsData, error: promptsError } = await supabase
-      .from("prompts") // Replace "PromptsTable" with the actual table name.
+      .from("prompts")
       .select("*")
       .eq("user_id", session.user.id);
     if (promptsData) {
-      setPrompts(promptsData);
+      const answeredPrompts = Object.entries(promptsData[0])
+        .filter(
+          ([prompt, answer]) =>
+            answer !== null && prompt !== "id" && prompt !== "user_id"
+        )
+        .map(([prompt, answer]) => ({ prompt, answer }));
+
+      setPrompts(answeredPrompts);
+      console.log(answeredPrompts);
     } else {
       console.log("Error fetching prompts: ", promptsError);
     }
@@ -62,7 +73,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
     try {
       const profilePictureURL = `${picURL}/${session.user.id}/${
         session.user.id
-      }-0?${new Date().getTime()}`; // Replace '...' with the actual URL of the profile picture
+      }-0?${new Date().getTime()}`;
 
       const response = await fetch(profilePictureURL, {
         cache: "no-store",
@@ -82,7 +93,6 @@ export const EditProfileScreen = ({ navigation, route }) => {
   };
 
   const updateProfile = async () => {
-    // Update the user's profile in the database
     if (session?.user) {
       const { data, error } = await supabase.from("UGC").upsert([
         {
@@ -129,136 +139,137 @@ export const EditProfileScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.contain}>
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.goBack()}
       >
         <Icon name="arrow-left" size={28} color="blue" />
       </TouchableOpacity>
-      <ScrollView>
-        <View style={styles.profileContainer}>
-          {profilePicture ? (
-            <TouchableOpacity
-              style={styles.profilePictureContainer}
-              //onPress={handleImageUpload}
-              onPress={handleEditPictures}
-              //disabled={uploading}
-            >
-              <Image
-                source={{ uri: profilePicture }}
-                style={styles.profilePicture}
-              />
-              {uploading && (
-                <View style={styles.uploadingIndicatorContainer}>
-                  <ActivityIndicator size="small" color="#fff" />
-                </View>
-              )}
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              style={styles.profilePictureContainer}
-              //onPress={handleImageUpload}
-              onPress={handleEditPictures}
-              //disabled={uploading}
-            >
-              <Text style={styles.profilePictureText}>Add Photo</Text>
-              {uploading && (
-                <View style={styles.uploadingIndicatorContainer}>
-                  <ActivityIndicator size="small" color="#fff" />
-                </View>
-              )}
-            </TouchableOpacity>
-          )}
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Name:</Text>
-          <TextInput
-            style={styles.input}
-            value={editedUser.name}
-            onChangeText={(name) => setEditedUser({ ...editedUser, name })}
-            placeholder="Name"
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Class Year:</Text>
-          <TextInput
-            style={styles.input}
-            value={editedUser.class_year}
-            onChangeText={(class_year) =>
-              setEditedUser({ ...editedUser, class_year })
-            }
-            placeholder="Select your Graduation Year"
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Major:</Text>
-          <TextInput
-            style={styles.input}
-            value={editedUser.major}
-            onChangeText={(major) => setEditedUser({ ...editedUser, major })}
-            placeholder="Major"
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Hometown:</Text>
-          <TextInput
-            style={styles.input}
-            value={editedUser.hometown}
-            onChangeText={(hometown) =>
-              setEditedUser({ ...editedUser, hometown })
-            }
-            placeholder="Hometown"
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Bio:</Text>
-          <TextInput
-            style={styles.input}
-            value={editedUser.bio}
-            onChangeText={(bio) => setEditedUser({ ...editedUser, bio })}
-            multiline
-            placeholder="Bio"
-          />
-        </View>
-
-        <FlatList
-          data={prompts}
-          renderItem={({ item }) => (
+      <FlatList
+        data={prompts}
+        renderItem={({ item }) =>
+          item.answer ? (
             <TouchableOpacity
               style={styles.promptItem}
-              onPress={() =>
-                navigation.navigate("AddPrompts", { prompt: item })
-              }
+              onPress={() => navigation.navigate("AddPrompts")}
             >
-              <Text style={styles}>Add prompts!</Text>
+              <Text style={styles.prompt}>{promptQuestions[item.prompt]}</Text>
+              <Text style={styles.answer}>{item.answer}</Text>
             </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.id.toString()}
-          scrollEnabled={false}
-          // Replace "id" with the actual column name for the prompt id.
-        />
+          ) : null
+        }
+        keyExtractor={(item) => item.prompt}
+        ListHeaderComponent={
+          <>
+            <View style={styles.profileContainer}>
+              {profilePicture ? (
+                <TouchableOpacity
+                  style={styles.profilePictureContainer}
+                  onPress={handleEditPictures}
+                >
+                  <Image
+                    source={{ uri: profilePicture }}
+                    style={styles.profilePicture}
+                  />
+                  {uploading && (
+                    <View style={styles.uploadingIndicatorContainer}>
+                      <ActivityIndicator size="small" color="#fff" />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.profilePictureContainer}
+                  onPress={handleEditPictures}
+                >
+                  <Text style={styles.profilePictureText}>Add Photo</Text>
+                  {uploading && (
+                    <View style={styles.uploadingIndicatorContainer}>
+                      <ActivityIndicator size="small" color="#fff" />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              )}
+            </View>
 
-        <TouchableOpacity
-          style={styles.promptItem}
-          onPress={() => navigation.navigate("AddPrompts")}
-        >
-          <Text style={styles}>Add prompts</Text>
-        </TouchableOpacity>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Name:</Text>
+              <TextInput
+                style={styles.input}
+                value={editedUser.name}
+                onChangeText={(name) => setEditedUser({ ...editedUser, name })}
+                placeholder="Name"
+              />
+            </View>
 
-        <Button title="Update Profile" onPress={updateProfile} />
-      </ScrollView>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Class Year:</Text>
+              <TextInput
+                style={styles.input}
+                value={editedUser.class_year}
+                onChangeText={(class_year) =>
+                  setEditedUser({ ...editedUser, class_year })
+                }
+                placeholder="Select your Graduation Year"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Major:</Text>
+              <TextInput
+                style={styles.input}
+                value={editedUser.major}
+                onChangeText={(major) =>
+                  setEditedUser({ ...editedUser, major })
+                }
+                placeholder="Major"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Hometown:</Text>
+              <TextInput
+                style={styles.input}
+                value={editedUser.hometown}
+                onChangeText={(hometown) =>
+                  setEditedUser({ ...editedUser, hometown })
+                }
+                placeholder="Hometown"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Bio:</Text>
+              <TextInput
+                style={styles.input}
+                value={editedUser.bio}
+                onChangeText={(bio) => setEditedUser({ ...editedUser, bio })}
+                multiline
+                placeholder="Bio"
+              />
+            </View>
+          </>
+        }
+        ListFooterComponent={
+          <>
+            <TouchableOpacity
+              style={styles.promptAdd}
+              onPress={() => navigation.navigate("AddPrompts")}
+            >
+              <Text style={styles}>Add prompts</Text>
+            </TouchableOpacity>
+
+            <Button title="Update Profile" onPress={updateProfile} />
+          </>
+        }
+      />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  contain: {
     flex: 1,
     padding: 16,
     backgroundColor: "#fff",
@@ -277,14 +288,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     justifyContent: "start",
-    // centers TextInput horizontally
     borderBottomColor: "#1499",
     borderBottomWidth: 2,
     marginBottom: 20,
-
     gap: 20,
   },
-
   backButton: {
     marginLeft: 10,
   },
@@ -299,7 +307,6 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   profilePicture: {
-    //marginTop: 5,
     width: 100,
     height: 100,
     borderRadius: 100,
@@ -308,16 +315,30 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#fff",
   },
-
   promptItem: {
-    //backgroundColor: "#F0F0F0", // This can be any color you choose
-    padding: 30, // Adjusts the size of the rectangle
-    marginVertical: 8, // Adjusts the space between rectangles
-    marginHorizontal: 16, // Adjusts the space to the side of the rectangles
-    borderRadius: 40, // Makes the corners slightly rounded
-    // If you want a border around the rectangle you can uncomment the following lines:
+    padding: 30,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 40,
+    gap: 10,
     borderColor: "grey",
     borderWidth: 1,
+  },
+  promptAdd: {
+    padding: 30,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 40,
+    gap: 10,
+    borderColor: "black",
+    borderWidth: 1,
+    borderStyle: "dashed",
+  },
+  answer: {
+    fontSize: 16,
+    color: "#1",
+    fontFamily: "Helvetica",
+    fontWeight: "bold",
   },
 });
 
