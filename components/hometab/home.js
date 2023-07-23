@@ -10,6 +10,7 @@ import {
   FlatList,
   SafeAreaView,
 } from "react-native";
+
 import { supabase } from "../auth/supabase.js"; // we have our client here!!! no need to worry about creating it again
 import { picURL } from "../auth/supabase.js"; // This is the base url of the photos bucket that is in our Supabase project. It makes referencing user pictures easier
 import { useNavigation } from "@react-navigation/native";
@@ -21,7 +22,17 @@ const Home = ( route ) => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+  };
+
+  const filteredUsers = users.filter((user) => {
+    const nameMatch = user.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const tagMatch = user.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    return nameMatch || tagMatch;
+  });
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -98,11 +109,21 @@ const Home = ( route ) => {
         />
         <Text style={styles.headerText}> Cabana </Text>
       </View>
+
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="🔎 Search by name or tag"
+          onChangeText={handleSearch}
+          value={searchQuery}
+        />
+      </View>
+
       <View style={styles.viewContainer}>
         <FlatList
-          data={users}
+          data={filteredUsers}
           renderItem={renderUserCard}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.user_id.toString()}
         />
       </View>
     </SafeAreaView>
@@ -146,6 +167,24 @@ const styles = StyleSheet.create({
     marginTop: -10,
   },
 
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    paddingHorizontal: 15,
+    elevation: 3,
+    width: '95%',
+    marginHorizontal: 10,
+    borderWidth: 0.3,
+    borderColor: 'grey',
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 10,
+    fontSize: 16,
+  },
+
   userInfo: {
     flex: 1,
   },
@@ -164,11 +203,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 20,
     backgroundColor: "white",
-    marginVertical: 5,
+    marginVertical: 1,
     marginHorizontal: 16,
     paddingHorizontal: 16,
-    paddingVertical: 5,
+    paddingVertical: 10,
     marginTop: 7,
+    borderWidth: 0.3,
+    borderColor: 'grey',
   },
 
   profileImage: {
