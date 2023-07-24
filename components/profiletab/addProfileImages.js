@@ -234,6 +234,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
               style={styles.profilePictureContainer}
               onPress={() => handleImageUpload1(0)}
             >
+              
               {image0 ? (
                 <Image source={{ uri: image0 }} style={styles.image} />
               ) : null}

@@ -112,7 +112,7 @@ const UserCard = ({ navigation, route }) => {
         <Text style={styles.name}>{name}</Text>
       </View>
 
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         <ScrollView
           horizontal
           style={styles.photoContainer}
@@ -149,7 +149,7 @@ const UserCard = ({ navigation, route }) => {
             onPress={handleAddFriend}
           >
             <Text style={styles.friendButtonText}>
-              {isFriendAdded ? "Friend Request Sent! ✓" : "+ Add Friend"}
+              {isFriendAdded ? "Bookmarked! ✓" : "+ Bookmark"}
             </Text>
           </TouchableOpacity>
 
@@ -191,6 +191,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     marginHorizontal: 6,
+    backgroundColor: "white",
   },
   header: {
     flexDirection: "row",
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
   },
   photoContainer: {
     height: 440,
-    marginBottom: 5,
+    marginBottom: 10,
     marginHorizontal: 0,
     borderRadius: 15,
     borderWidth: 0.7,
@@ -247,7 +248,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 13,
     alignItems: "center",
-    marginBottom: 5,
+    marginBottom: 10,
     width: Dimensions.get("window").width * 0.6,
     marginRight: 3,
     borderWidth: 0.4,
@@ -263,7 +264,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 13,
     alignItems: "center",
-    marginBottom: 5,
+    marginBottom: 10,
     width: Dimensions.get("window").width * 0.36,
     borderWidth: 0.4,
     borderColor: "grey",
@@ -278,7 +279,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     backgroundColor: "white",
     borderRadius: 15,
-    marginBottom: 6,
+    marginBottom: 10,
     borderWidth: 0.4,
     borderColor: "grey",
   },
@@ -306,8 +307,9 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: "grey",
+    backgroundColor: "lightgrey",
     marginVertical: 8,
+    marginHorizontal: -10,
   },
   tagsContainer: {
     backgroundColor: "white",

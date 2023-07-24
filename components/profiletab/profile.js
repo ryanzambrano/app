@@ -211,6 +211,7 @@ export const Profile = ({ navigation, route }) => {
           bounces={false}
           style={styles.scrollView}
           contentContainerStyle={styles.scrollViewContent}
+          showsVerticalScrollIndicator={false}
         >
           <View style={styles.tab}>
             <View style={styles.profileDetails}>
@@ -218,9 +219,9 @@ export const Profile = ({ navigation, route }) => {
 
               <View style={styles.major}>
                 <View style={styles.icons}>
-                  <Icon name="graduation-cap" size={30} color="grey" />
-                  <Icon name="book" size={30} color="grey" />
-                  <Icon name="map-marker" size={30} color="grey" />
+                  <Icon name="graduation-cap" size={30} color="darkblue" />
+                  <Icon name="book" size={30} color="darkblue" />
+                  <Icon name="home" size={30} color="darkblue" />
                 </View>
                 <View style={styles.details}>
                   <Text style={styles.text}>{editedUser.class_year}</Text>
@@ -231,10 +232,11 @@ export const Profile = ({ navigation, route }) => {
             </View>
             <View style={styles.bio}>
               <View>
+                <Text style={styles.bioHeader}>About me</Text>
                 <Text style={styles.text}>{editedUser.bio}</Text>
               </View>
             </View>
-
+            <Text style={styles.promptsHeader}>Prompts</Text>
             <ScrollView horizontal style={styles.horizontalScrollView} showsHorizontalScrollIndicator={false}>
               {prompts.map((item, index) =>
                 item.answer ? (
@@ -247,7 +249,7 @@ export const Profile = ({ navigation, route }) => {
                 ) : null
               )}
             </ScrollView>
-
+            <Text style={styles.promptsHeader}>Tags</Text>
             {editedUser.tags && editedUser.tags.length > 0 && (
               <View style={styles.tagsContainer}>
                 {editedUser.tags.map((tag, index) => (
@@ -292,13 +294,14 @@ const styles = StyleSheet.create({
 
   viewContainer: {
     flex: 1,
-    backgroundColor: "#F4F4F4",
+    backgroundColor: "white",
   },
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 6,
+    paddingBottom: 10,
     paddingLeft: 15,
     paddingRight: 15,
     position: "absolute",
@@ -324,14 +327,38 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     paddingLeft: 16,
-    marginTop: 30,
-    marginBottom: 20,
+    paddingBottom: 25,
+    paddingTop: 25,
+    marginBottom: 0,
+    borderBottomColor: "lightgrey",
+    borderBottomWidth: 1,
+    borderBottomEndRadius: 20,
+    borderBottomStartRadius: 20,
+  },
+
+  bioHeader: {
+    alignSelf: "center",
+    fontWeight: "600",
+    marginBottom: 10,
+    marginTop: -7,
+    fontSize: 20,
+    marginLeft: -20,
+  },
+
+  promptsHeader: {
+    paddingTop: 20,
+    alignSelf: "center",
+    fontWeight: "600",
+    marginBottom: -5,
+    marginTop: -7,
+    fontSize: 20,
+    marginLeft: -20,
   },
 
   editButton: {
     padding: 8,
     borderRadius: 4,
-    backgroundColor: "#4EB1A3",
+    backgroundColor: "black",
   },
   buttonText: {
     color: "#fff",
@@ -379,9 +406,12 @@ const styles = StyleSheet.create({
   profileDetails: {
     flex: 1,
     padding: 16,
+    paddingBottom: 20,
     gap: 10,
     borderBottomColor: "lightgrey",
     borderBottomWidth: 1,
+    borderBottomEndRadius: 20,
+    borderBottomStartRadius: 20,
   },
   label: {
     fontSize: 18,
@@ -390,6 +420,8 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
+    
+    color: "black",
   },
   input: {
     fontSize: 16,
@@ -403,39 +435,43 @@ const styles = StyleSheet.create({
   tagsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    paddingVertical: 10,
+    paddingVertical: 20,
     borderRadius: 15,
     justifyContent: "center",
-    marginTop: 50,
+    marginTop: 0,
     marginBottom: 100,
   },
   tag: {
-    backgroundColor: "#f3a034",
+    backgroundColor: "white",
     borderRadius: 20,
+    borderColor: "grey",
+    borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 5,
     margin: 5,
   },
   tagText: {
     fontSize: 14,
-    color: "white",
+    color: "grey",
     fontWeight: "bold",
   },
   major: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
+    marginBottom: 0,
+    gap: 10,
     justifyContent: "left",
   },
   icons: {
     alignContent: "center",
     alignItems: "center",
+    gap: 10,
   },
   details: {
     alignItems: "left",
     justifyContent: "center",
-    gap: 13,
+    gap: 23,
   },
   tab: {
     backgroundColor: "white",
@@ -456,13 +492,19 @@ const styles = StyleSheet.create({
   },
 
   horizontalScrollView: {
-    marginTop: 10,
-    marginBottom: 10,
+    
+    paddingTop: 20,
+    marginBottom: 5,
+    borderBottomColor: "lightgrey",
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomEndRadius: 20,
+    borderBottomStartRadius: 20,
   },
   itemContainer: {
     marginHorizontal: 15,
-    borderWidth: 1,
-    borderColor: "#000",
+    borderWidth: 0.5,
+    borderColor: "lightgrey",
     borderRadius: 50,
     padding: 30,
     width: 300,

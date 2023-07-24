@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
 
   viewContainer: {
     flex: 1,
-    backgroundColor: "#F4F4F4",
+    backgroundColor: "white",
   },
 
   header: {

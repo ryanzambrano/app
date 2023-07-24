@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
   },
   viewContainer: {
     flex: 1,
-    backgroundColor: "#F4F4F4",
+    backgroundColor: "white",
   },
   searchContainer: {
     flexDirection: 'row',
@@ -209,6 +209,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#DDD",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
   },
   profilePicture: {
     width: 50,
