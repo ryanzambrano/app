@@ -90,15 +90,14 @@ const UserCard = ({ navigation, route }) => {
     }
   };
 
-  const handleUserCardPress = (user) => {
-    setSelectedUser(user);
+  const handleUserCardPress = () => {
 
     navigation.navigate("Message", {
-      contactName: user.name,
-      contactId: user.user_id,
+      contactName: name,
+      contactId: user_id,
       myId: session.user.id,
-      contactImage: `${picURL}/${user.user_id}/${
-        user.user_id
+      contactImage: `${picURL}/${user_id}/${
+        user_id
       }-0?${new Date().getTime()}`,
     });
   };
