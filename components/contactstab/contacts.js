@@ -28,6 +28,16 @@ const ContactsUI = ({ route }) => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (text) => {
+    setSearchQuery(text);
+  };
+
+  const filteredUsers = users.filter((user) => {
+    const nameMatch = user.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return nameMatch;
+  });
 
   const fetchUsers = async () => {
     const { data: users, error } = await supabase.from("UGC").select("*");
@@ -62,7 +72,6 @@ const ContactsUI = ({ route }) => {
 
   useEffect(() => {
     fetchUsers();
-    //filter
     const Message = supabase
       .channel("custom-all-channel")
       .on(
@@ -73,9 +82,6 @@ const ContactsUI = ({ route }) => {
         }
       )
       .subscribe();
-      return () => {
-        supabase.removeChannel(channel);
-      }
   }, []);
   
 
@@ -88,9 +94,10 @@ const ContactsUI = ({ route }) => {
       myId: session.user.id,
       contactImage: `${picURL}/${user.user_id}/${user.user_id}-0?${new Date().getTime()}`
     });
+    console.log(user.recentMessage);
   };
 
-  
+
 
   const renderContact = ({ item }) => {
     return (
@@ -123,8 +130,16 @@ const ContactsUI = ({ route }) => {
         <Text style={styles.headerText}>Cabana</Text>
       </View>
       <View style={styles.viewContainer}>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="🔎 Search by name"
+            onChangeText={handleSearch}
+            value={searchQuery}
+          />
+        </View>
         <FlatList
-          data={users}
+          data={filteredUsers}
           renderItem={renderContact}
           keyExtractor={(item) => item.id.toString()}
         />
@@ -165,6 +180,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F4F4F4",
   },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    marginTop: 5,
+    marginBottom: 1,
+    elevation: 3,
+    marginHorizontal: 5,
+    borderWidth: 0.3,
+    borderColor: 'grey',
+  },
+
+  searchInput: {
+    flex: 1,
+    paddingVertical: 10,
+    fontSize: 16,
+  },
   contactItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -176,7 +210,7 @@ const styles = StyleSheet.create({
   profilePicture: {
     width: 50,
     height: 50,
-    borderRadius: 4,
+    borderRadius: 30,
     marginRight: 15,
   },
   contactInfo: {
