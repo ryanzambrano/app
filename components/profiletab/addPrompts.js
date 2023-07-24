@@ -130,15 +130,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: 'white',
   },
   card: {
     backgroundColor: "#ffffff",
     gap: 40,
-    paddingTop: 80,
+    paddingTop: 50,
     paddingBottom: 40,
     padding: 40,
     borderRadius: 50,
-    margin: 20,
+    margin: 15,
     //shadowing
     shadowColor: "#000",
     shadowOffset: {
@@ -173,7 +174,9 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: "#ffffff",
+    fontWeight: 'bold',
     textAlign: "center",
+    fontSize: 15,
   },
 });
 
