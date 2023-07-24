@@ -72,11 +72,11 @@ const ContactsUI = ({ route }) => {
 
   useEffect(() => {
     fetchUsers();
-    const Message = supabase
+    const channel = supabase
       .channel("custom-all-channel")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "Message" },
+        { event: "*", schema: "public", table: "Message", /*filter: `.or(Sent_From.eq.${session.user.id}, Contact_ID.eq.${session.user.id})`, */},
         (payload) => {
           fetchUsers();
         }
@@ -98,7 +98,6 @@ const ContactsUI = ({ route }) => {
       myId: session.user.id,
       contactImage: `${picURL}/${user.user_id}/${user.user_id}-0?${new Date().getTime()}`
     });
-    console.log(user.recentMessage);
   };
 
 

@@ -52,6 +52,15 @@ const MessagingUI = () => {
         setMessages((prevMessages) => [...prevMessages, data]);
         setMessage("");
       }
+      if (messages.length > 1) {
+      setTimeout(() => {
+        //flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
+        flatListRef?.current?.scrollToIndex({
+          animated: true,
+          index: messages.length - 1,
+        });
+      }, 100);
+    }
     }
   };
 
@@ -84,11 +93,11 @@ const MessagingUI = () => {
   useEffect(() => {
     fetchMessages();
 
-    const Message = supabase
+    const channel = supabase
       .channel("custom-all-channel")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "Message" },
+        { event: "*", schema: "public", table: "Message", filter: `.or(and(Sent_From.eq.${myId}, Contact_ID.eq.${contactId}), and(Contact_ID.eq.${myId}, Sent_From.eq.${contactId}))`},
         (payload) => {
           fetchMessages();
         }
