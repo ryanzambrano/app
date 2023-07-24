@@ -82,6 +82,10 @@ const ContactsUI = ({ route }) => {
         }
       )
       .subscribe();
+      return () => {
+        supabase.removeChannel(channel);
+      }
+      
   }, []);
   
 

@@ -94,6 +94,9 @@ const MessagingUI = () => {
         }
       )
       .subscribe();
+      return () => {
+        supabase.removeChannel(channel);
+      }
   }, [route.params.myId, route.params.contactId, messages]);
 
   useEffect(() => {
