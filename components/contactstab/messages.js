@@ -90,10 +90,14 @@ const MessagingUI = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "Message" },
         (payload) => {
+          console.log(payload.new);
           fetchMessages();
         }
       )
       .subscribe();
+      return () => {
+        supabase.removeChannel(channel);
+      }
   }, [route.params.myId, route.params.contactId, messages]);
 
   useEffect(() => {
