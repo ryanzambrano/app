@@ -8,7 +8,7 @@ const ProfileUI = ({ route }) => {
   const navigation = useNavigation();
 
   const handleBackPress = () => {
-    navigation.navigate('Message');
+    navigation.goBack()
   };
 
   return (
