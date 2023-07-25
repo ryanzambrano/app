@@ -24,6 +24,13 @@ const Home = ( route ) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const notBookmarkedURI = "https://th.bing.com/th/id/R.cecd7b5d152ec027d92ce420e7501628?rik=4KyY5UzmnBAdQw&riu=http%3a%2f%2fcdn.onlinewebfonts.com%2fsvg%2fimg_198285.png&ehk=w90yvbSPjeB5mEVLfPbIbZH632mVWZquCJG%2bo3yyous%3d&risl=&pid=ImgRaw&r=0";
+  const isBookmarkedURI = "https://cdn0.iconfinder.com/data/icons/glyph-set-two/32/glyph-set-two-75-512.png";
+ 
+  const toggleBookmarkButton = () => {
+    setIsBookmarked((prev) => !prev);
+  };
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -117,6 +124,10 @@ const Home = ( route ) => {
           }}
         />
         <Text style={styles.headerText}> Cabana </Text>
+        <TouchableOpacity onPress={toggleBookmarkButton}>
+          <Image style={{marginLeft: isBookmarked? 197 : 203, marginTop: -10, height: isBookmarked ? 28 : 28, width: isBookmarked ? 32 : 21 }} 
+            source ={{ uri: isBookmarked ? isBookmarkedURI : notBookmarkedURI }} ></Image>
+        </TouchableOpacity>
       </View>
 
       
