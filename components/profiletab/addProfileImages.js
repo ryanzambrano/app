@@ -146,7 +146,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
         allowsEditing: true,
         base64: true,
         aspect: [1, 1],
-        quality: 0.7,
+        quality: 0.2,
       });
 
       if (!imagePickerResult.canceled) {
@@ -234,7 +234,6 @@ const ImagePickerScreen = ({ navigation, route }) => {
               style={styles.profilePictureContainer}
               onPress={() => handleImageUpload1(0)}
             >
-              
               {image0 ? (
                 <Image source={{ uri: image0 }} style={styles.image} />
               ) : null}

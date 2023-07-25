@@ -61,10 +61,6 @@ export const Profile = ({ navigation, route }) => {
     if (updated && isFocused) {
       fetchData();
     }
-
-    return () => {
-      scrollY.removeAllListeners();
-    };
   }, [updated, isFocused]);
 
   const fetchData = async () => {
@@ -237,7 +233,11 @@ export const Profile = ({ navigation, route }) => {
               </View>
             </View>
             <Text style={styles.promptsHeader}>Prompts</Text>
-            <ScrollView horizontal style={styles.horizontalScrollView} showsHorizontalScrollIndicator={false}>
+            <ScrollView
+              horizontal
+              style={styles.horizontalScrollView}
+              showsHorizontalScrollIndicator={false}
+            >
               {prompts.map((item, index) =>
                 item.answer ? (
                   <View key={index} style={styles.itemContainer}>
@@ -386,7 +386,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 150,
-    
   },
   profilePicture: {
     width: 255,
@@ -420,7 +419,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    
+
     color: "black",
   },
   input: {
@@ -492,7 +491,6 @@ const styles = StyleSheet.create({
   },
 
   horizontalScrollView: {
-    
     paddingTop: 20,
     marginBottom: 5,
     borderBottomColor: "lightgrey",
