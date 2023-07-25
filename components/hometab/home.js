@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   FlatList,
   SafeAreaView,
+  RefreshControl,
 } from "react-native";
 
 import { supabase } from "../auth/supabase.js"; // we have our client here!!! no need to worry about creating it again
@@ -18,11 +19,19 @@ import { createClient } from "@supabase/supabase-js"; // Create client is respon
 
 
 const Home = ( route ) => {
-  
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setUsers(users);
+      setRefreshing(false);
+    }, 500); 
+  };
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -125,6 +134,12 @@ const Home = ( route ) => {
           data={filteredUsers}
           renderItem={renderUserCard}
           keyExtractor={(item) => item.user_id.toString()}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />
+          }
         />
       </View>
     </SafeAreaView>

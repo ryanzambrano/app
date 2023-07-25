@@ -31,7 +31,8 @@ const MessagingUI = () => {
   const [messages, setMessages] = useState([]);
   const [contactName, setContactName] = useState("");
   const [contactImage, setContactImage] = useState("");
-
+  const [refreshing, setRefreshing] = useState(false);
+  
   const sendMessage = async () => {
     if (message.trim() !== "") {
       const { data, error } = await supabase
@@ -129,16 +130,6 @@ const MessagingUI = () => {
     }
   }, [messages]);
 
-  /*useEffect(() => {
-    // Scroll to the bottom of the messages when a new message is added
-    setTimeout(() => {
-      //flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
-      if(message.length > 0)
-        {
-          flatListRef?.current?.scrollToIndex({ animated: true, index: messages.length - 1 });
-        }
-    }, 100);
-  }, [messages]);*/
 
   const flatListRef = React.useRef();
 
