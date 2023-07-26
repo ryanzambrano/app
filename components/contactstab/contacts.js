@@ -47,28 +47,55 @@ const ContactsUI = ({ route }) => {
     }
 
     const recentMessagesPromises = users.map(async (user) => {
-      // Fetch the most recent message for each user
       const { data: messages, error: messageError } = await supabase
         .from("Message")
-        .select("Content")
+        .select("Content, createdat")
         .or(
           `and(Sent_From.eq.${session.user.id},Contact_ID.eq.${user.user_id}),and(Contact_ID.eq.${session.user.id},Sent_From.eq.${user.user_id})`
         )
         .order("createdat", { ascending: false })
         .limit(1);
-
+  
       if (messageError) {
         console.error(messageError);
-        return { ...user, recentMessage: "Error fetching message" };
+        return { ...user, recentMessage: "Error fetching message", recentTime: null };
       }
-
+  
       const recentMessage = messages.length > 0 ? messages[0].Content : "No recent messages";
-      return { ...user, recentMessage };
+      const RTime = messages.length > 0 ? messages[0].createdat : null;
+      const recentTime = formatRecentTime(RTime);
+      return { ...user, recentMessage, recentTime };
     });
-
+  
     const usersWithRecentMessages = await Promise.all(recentMessagesPromises);
     setUsers(usersWithRecentMessages);
   };
+
+  const formatRecentTime = (timestamp) => {
+    if (!timestamp) return "";
+  
+    const date = new Date(timestamp);
+    const currentTime = new Date();
+    const diffInMs = currentTime - date;
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+  
+    if (diffInDays < 1) {
+      // Less than a day ago, display time in AM/PM format
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const formattedTime = `${hours % 12 || 12}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+      return formattedTime;
+    } else {
+      // More than a day ago, display the full date
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const formattedDate = `${month.toString().padStart(2, "0")}/${day.toString().padStart(2, "0")}/${year}`;
+      return formattedDate;
+    }
+  };
+
 
   useEffect(() => {
     fetchUsers();
@@ -113,14 +140,16 @@ const ContactsUI = ({ route }) => {
             }}
           />
           <View style={styles.contactInfo}>
-            <Text style={styles.contactName}>{item.name}</Text>
+            <View style={styles.contactNameContainer}>
+              <Text style={styles.contactName}>{item.name}</Text>
+              <Text style={styles.MessageTime}>{item.recentTime}</Text>
+            </View>
             <Text style={styles.RecentMessage}>{item.recentMessage}</Text>
           </View>
         </View>
       </TouchableOpacity>
     );
   };
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -204,7 +233,7 @@ const styles = StyleSheet.create({
   },
   contactItem: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start", // Align elements at the top of the container
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderBottomWidth: 1,
@@ -225,6 +254,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+  MessageTime: {
+    fontSize: 14,
+    fontWeight: "light",
+    color: "gray", // Add the color for the recent time (optional)
+  },
   RecentMessage: {
     fontSize: 14,
     fontWeight: "light",
@@ -232,6 +266,11 @@ const styles = StyleSheet.create({
   contactStatus: {
     fontSize: 14,
     color: "#888",
+  },
+  contactNameContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
   },
 });
 
