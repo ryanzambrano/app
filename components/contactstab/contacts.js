@@ -58,17 +58,24 @@ const ContactsUI = ({ route }) => {
   
       if (messageError) {
         console.error(messageError);
-        return { ...user, recentMessage: "Error fetching message", recentTime: null };
+        return null;
       }
   
       const recentMessage = messages.length > 0 ? messages[0].Content : "No recent messages";
       const RTime = messages.length > 0 ? messages[0].createdat : null;
       const recentTime = formatRecentTime(RTime);
-      return { ...user, recentMessage, recentTime };
+      if (recentTime) {
+        // Only include users with a recent message
+        return { ...user, recentMessage, recentTime };
+      } else {
+        return null;
+      }
     });
   
     const usersWithRecentMessages = await Promise.all(recentMessagesPromises);
-    setUsers(usersWithRecentMessages);
+    // Filter out null values (users without a recent message)
+    const filteredUsersWithRecentMessages = usersWithRecentMessages.filter(Boolean);
+    setUsers(filteredUsersWithRecentMessages);
   };
 
   const formatRecentTime = (timestamp) => {
