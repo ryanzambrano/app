@@ -14,8 +14,6 @@ import {
 import { createClient } from "../auth/supabase.js";
 import { picURL } from "../auth/supabase";
 
-import Swiper from "react-native-swiper";
-// npm install react-native-swiper
 
 const MAX_IMAGES = 6;
 const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
@@ -57,36 +55,8 @@ const UserCard = ({ navigation, route }) => {
     }
   };
 
-  const handleAddFriend = async () => {
+  const handleAddFriend = () => {
     setIsFriendAdded(!isFriendAdded);
-    try {
-      const currentUserID = session.user_id; // Get the current user ID
-      const friendIDToAdd = user_id; // Replace this with the actual friend's ID
-
-      const { data: userData, error: userError } = await supabase
-        .from('UGC')
-        .select('bookmarked_profiles')
-        .eq('user_id', currentUserID)
-        .single();
-
-      let bookmarkedProfiles = bookmarked_profiles || [];
-
-      if (isFriendAdded) {
-        // If friend is already added, remove them from the friend list
-        bookmarkedProfiles = bookmarkedProfiles.filter((friendID) => friendID !== friendIDToAdd);
-      } else {
-        // If friend is not added, add them to the friend list
-        bookmarkedProfiles.push(friendIDToAdd);
-      }
-
-      // Update the "bookmarked_profiles" column in the "UGC" table
-      const { data: updateData, error: updateError } = await supabase
-        .from('UGC')
-        .update({ bookmarked_profiles: bookmarkedProfiles })
-        .eq('user_id', currentUserID);
-    } catch (error) {
-      console.error('Error adding/removing friend:', error.message);
-    }
   };
 
   const goBack = () => {
