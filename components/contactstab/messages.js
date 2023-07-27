@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
+import { picURL } from "../auth/supabase.js";
 import { AntDesign } from "@expo/vector-icons";
 import { ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -29,8 +30,20 @@ const MessagingUI = () => {
   const route = useRoute();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [contactName, setContactName] = useState("");
-  const [contactImage, setContactImage] = useState("");
+  const { session } = route.params;
+  const {user} = route.params;
+  const {
+    name,
+    tags,
+    bio,
+    major,
+    user_id,
+    age,
+    gender,
+    living_preferences,
+    for_fun,
+    bookmarked_profiles,
+  } = route.params.user;
 
   const sendMessage = async () => {
     if (message.trim() !== "") {
@@ -39,8 +52,8 @@ const MessagingUI = () => {
         .insert([
           {
             Content: message,
-            Contact_ID: route.params.contactId,
-            Sent_From: route.params.myId,
+            Contact_ID: user_id,
+            Sent_From: session.user.id,
           },
         ])
         .select()
@@ -63,22 +76,16 @@ const MessagingUI = () => {
     }
     }
   };
-
   useEffect(() => {
-    if (route.params && route.params.contactName) {
-      setContactName(route.params.contactName);
-    }
-    if (route.params && route.params.contactImage) {
-      setContactImage(route.params.contactImage);
-    }
-  }, [route.params]);
-  const { myId, contactId } = route.params;
+    //setContactImage(`${picURL}/${user_id}/${user_id}-0?${new Date().getTime()}`);
+  }, );
+
   const fetchMessages = async () => {
     const { data, error } = await supabase
       .from("Message")
       .select("*")
       .or(
-        `and(Sent_From.eq.${myId},Contact_ID.eq.${contactId}),and(Contact_ID.eq.${myId},Sent_From.eq.${contactId})`
+        `and(Sent_From.eq.${session.user.id},Contact_ID.eq.${user_id}),and(Contact_ID.eq.${session.user.id},Sent_From.eq.${user_id})`
       )
       .order("createdat", { ascending: false })
       .limit(250);
@@ -97,7 +104,7 @@ const MessagingUI = () => {
       .channel("custom-all-channel")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "Message", filter: `.or(and(Sent_From.eq.${myId}, Contact_ID.eq.${contactId}), and(Contact_ID.eq.${myId}, Sent_From.eq.${contactId}))`},
+        { event: "*", schema: "public", table: "Message", filter: `.or(and(Sent_From.eq.${session.user.id}, Contact_ID.eq.${user_id}), and(Contact_ID.eq.${session.user.id}, Sent_From.eq.${user_id}))`},
         (payload) => {
           fetchMessages();
         }
@@ -106,7 +113,7 @@ const MessagingUI = () => {
       return () => {
         supabase.removeChannel(channel);
       }
-  }, [route.params.myId, route.params.contactId, messages]);
+  }, [session.user.id, user_id, messages]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -143,7 +150,7 @@ const MessagingUI = () => {
   const flatListRef = React.useRef();
 
   const navigateToProfile = () => {
-    navigation.navigate("OtherProfile", { contactName, contactImage });
+    navigation.navigate("OtherProfile", { user });
   };
 
   return (
@@ -165,14 +172,14 @@ const MessagingUI = () => {
         >
           <AntDesign name="arrowleft" size={24} color="#007AFF" />
         </TouchableOpacity>
-        <Text style={styles.contactName}>{contactName}</Text>
+        <Text style={styles.contactName}>{name}</Text>
         <TouchableOpacity
           style={styles.profileContainer}
           onPress={navigateToProfile}
         >
-          {contactImage && (
+          {(
             <Image
-              source={{ uri: contactImage }}
+              source={{ uri: `${picURL}/${user_id}/${user_id}-0?${new Date().getTime()}` }}
               style={styles.profilePicture}
             />
           )}
@@ -185,7 +192,7 @@ const MessagingUI = () => {
           renderItem={({ item }) => (
             <View
               style={
-                item.Sent_From === myId
+                item.Sent_From === session.user.id
                   ? styles.messageContainerRight
                   : styles.messageContainerLeft
               }
