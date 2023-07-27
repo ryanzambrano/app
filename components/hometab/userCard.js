@@ -11,9 +11,11 @@ import {
   TouchableWithoutFeedback,
   Modal,
 } from "react-native";
-import { createClient } from "../auth/supabase.js";
+import { createClient } from "@supabase/supabase-js";
 import { picURL } from "../auth/supabase";
 
+import Swiper from "react-native-swiper";
+// npm install react-native-swiper
 
 const MAX_IMAGES = 6;
 const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
@@ -33,7 +35,6 @@ const UserCard = ({ navigation, route }) => {
     gender,
     living_preferences,
     for_fun,
-    bookmarked_profiles,
   } = route.params.user;
   const [photos, setPhotos] = useState([]);
   const [isFriendAdded, setIsFriendAdded] = useState(false);
@@ -89,14 +90,15 @@ const UserCard = ({ navigation, route }) => {
     }
   };
 
-  const handleUserCardPress = () => {
+  const handleUserCardPress = (user) => {
+    setSelectedUser(user);
 
     navigation.navigate("Message", {
-      contactName: name,
-      contactId: user_id,
+      contactName: user.name,
+      contactId: user.user_id,
       myId: session.user.id,
-      contactImage: `${picURL}/${user_id}/${
-        user_id
+      contactImage: `${picURL}/${user.user_id}/${
+        user.user_id
       }-0?${new Date().getTime()}`,
     });
   };
