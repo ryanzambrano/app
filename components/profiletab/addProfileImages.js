@@ -14,6 +14,8 @@ import { supabase } from "../auth/supabase";
 import { decode } from "base64-arraybuffer";
 import { picURL } from "../auth/supabase";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator";
+import * as FileSystem from "expo-file-system";
 
 const MAX_IMAGES = 6;
 
@@ -146,7 +148,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
         allowsEditing: true,
         base64: true,
         aspect: [1, 1],
-        quality: 0.2,
+        quality: 1,
       });
 
       if (!imagePickerResult.canceled) {
@@ -154,7 +156,14 @@ const ImagePickerScreen = ({ navigation, route }) => {
         const filename = `${session.user.id}/${session.user.id}-${index}`;
 
         const base64Data = imagePickerResult.assets[0].base64;
-        const buffer = decode(base64Data);
+
+        const compressedImage = await manipulateAsync(
+          imagePickerResult.assets[0].uri,
+          [], // No transforms
+          { compress: 0.2, format: "jpeg", base64: true }
+        );
+        //compressedUri = compressedImage.uri;
+        const buffer = decode(compressedImage.base64);
 
         const { data, error: uploadError } = await supabase.storage
           .from("user_pictures")

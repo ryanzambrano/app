@@ -38,9 +38,9 @@ export const Profile = ({ navigation, route }) => {
 
   const scrollY = new Animated.Value(0);
 
-  scrollY.addListener(({ value }) => {
+  /*scrollY.addListener(({ value }) => {
     setIsProfileVisible(value < DISABLE_TOUCHABLE_SCROLL_POINT);
-  });
+  });*/
 
   const profileOpacity = scrollY.interpolate({
     inputRange: [0, 100],
@@ -232,7 +232,7 @@ export const Profile = ({ navigation, route }) => {
                 <Text style={styles.text}>{editedUser.bio}</Text>
               </View>
             </View>
-            <Text style={styles.promptsHeader}>Prompts</Text>
+            <Text style={styles /*styles.promptsHeader*/}>{/*Prompts*/}</Text>
             <ScrollView
               horizontal
               style={styles.horizontalScrollView}
@@ -249,7 +249,7 @@ export const Profile = ({ navigation, route }) => {
                 ) : null
               )}
             </ScrollView>
-            <Text style={styles.promptsHeader}>Tags</Text>
+            <Text style={styles.promptsHeader}>Interests</Text>
             {editedUser.tags && editedUser.tags.length > 0 && (
               <View style={styles.tagsContainer}>
                 {editedUser.tags.map((tag, index) => (
@@ -477,6 +477,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
+    //shadow
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

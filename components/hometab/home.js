@@ -16,16 +16,16 @@ import { picURL } from "../auth/supabase.js"; // This is the base url of the pho
 import { useNavigation } from "@react-navigation/native";
 import { createClient } from "@supabase/supabase-js"; // Create client is responsible for drawing profile data from each user in the database
 
-const isBookmarkedURI = "https://th.bing.com/th/id/OIP.Pzc03rRYlwOdKsolfgcwogHaJQ?pid=ImgDet&rs=1";
+const isBookmarkedURI =
+  "https://th.bing.com/th/id/OIP.Pzc03rRYlwOdKsolfgcwogHaJQ?pid=ImgDet&rs=1";
 const notBookmarkedURI = "https://i.pngimg.me/thumb/f/720/m2H7m2K9Z5i8Z5d3.jpg";
 
-
-const Home = ({route}) => {
+const Home = ({ route }) => {
   const { session } = route.params;
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
 
   const toggleBookmarkButton = () => {
@@ -37,8 +37,12 @@ const Home = ({route}) => {
   };
 
   const filteredUsers = users.filter((user) => {
-    const nameMatch = user.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const tagMatch = user.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    const nameMatch = user.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const tagMatch = user.tags.some((tag) =>
+      tag.toLowerCase().includes(searchQuery.toLowerCase())
+    );
     return nameMatch || tagMatch;
   });
 
@@ -117,22 +121,27 @@ const Home = ({route}) => {
         />
         <Text style={styles.headerText}> Cabana </Text>
         <TouchableOpacity onPress={toggleBookmarkButton}>
-          <Image style={{marginLeft: isBookmarked ? 202 : 203, marginTop: -10, height: isBookmarked ? 26 : 28, width: isBookmarked ? 22.5 : 21 }} 
-            source ={{ uri: isBookmarked ? isBookmarkedURI : notBookmarkedURI }} ></Image>
-        </TouchableOpacity>     
+          <Image
+            style={{
+              marginLeft: isBookmarked ? 202 : 203,
+              marginTop: -10,
+              height: isBookmarked ? 26 : 28,
+              width: isBookmarked ? 22.5 : 21,
+            }}
+            source={{ uri: isBookmarked ? isBookmarkedURI : notBookmarkedURI }}
+          ></Image>
+        </TouchableOpacity>
       </View>
-
-      
 
       <View style={styles.viewContainer}>
         <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="🔎 Search by name or tag"
-          onChangeText={handleSearch}
-          value={searchQuery}
-        />
-      </View>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="🔎 Search by name or tag"
+            onChangeText={handleSearch}
+            value={searchQuery}
+          />
+        </View>
         <FlatList
           data={filteredUsers}
           renderItem={renderUserCard}
@@ -181,9 +190,9 @@ const styles = StyleSheet.create({
   },
 
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
     borderRadius: 10,
     paddingHorizontal: 15,
     marginTop: 5,
@@ -191,7 +200,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     marginHorizontal: 5,
     borderWidth: 0.3,
-    borderColor: 'grey',
+    borderColor: "grey",
   },
 
   searchInput: {
@@ -224,7 +233,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginTop: 3,
     borderWidth: 0.3,
-    borderColor: 'grey',
+    borderColor: "grey",
   },
 
   profileImage: {

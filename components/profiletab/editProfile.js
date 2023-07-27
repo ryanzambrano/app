@@ -249,6 +249,8 @@ export const EditProfileScreen = ({ navigation, route }) => {
                 placeholder="Bio"
               />
             </View>
+
+            <Text style={styles.more}>More about me:</Text>
           </>
         }
         ListFooterComponent={
@@ -257,7 +259,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
               style={styles.promptAdd}
               onPress={() => navigation.navigate("AddPrompts")}
             >
-              <Text style={styles}>Add prompts</Text>
+              <Text style={styles.prompt}>Add prompts</Text>
             </TouchableOpacity>
 
             <Button title="Update Profile" onPress={updateProfile} />
@@ -277,7 +279,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: "bold",
-    textAlign: "start",
   },
   input: {
     flex: 0,
@@ -286,7 +287,6 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: "column",
-    justifyContent: "start",
     borderBottomColor: "lightgrey",
     borderBottomWidth: 1,
     marginLeft: 20,
@@ -300,8 +300,6 @@ const styles = StyleSheet.create({
     margin: 30,
     width: 250,
     height: 250,
-    borderWidth: 5,
-    borderColor: "grey",
     backgroundColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
@@ -310,7 +308,7 @@ const styles = StyleSheet.create({
   },
   profilePicture: {
     borderWidth: 3,
-    borderColor: "lightgrey",
+    borderColor: "darkblue",
     width: 250,
     height: 250,
     borderRadius: 200,
@@ -340,9 +338,16 @@ const styles = StyleSheet.create({
   },
   answer: {
     fontSize: 16,
-    color: "#1",
+    color: "black",
     fontFamily: "Helvetica",
     fontWeight: "bold",
+  },
+
+  more: {
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "bold",
+    margin: 20,
   },
 });
 
