@@ -16,13 +16,20 @@ import { picURL } from "../auth/supabase.js"; // This is the base url of the pho
 import { useNavigation } from "@react-navigation/native";
 import { createClient } from "@supabase/supabase-js"; // Create client is responsible for drawing profile data from each user in the database
 
+const isBookmarkedURI = "https://th.bing.com/th/id/OIP.Pzc03rRYlwOdKsolfgcwogHaJQ?pid=ImgDet&rs=1";
+const notBookmarkedURI = "https://i.pngimg.me/thumb/f/720/m2H7m2K9Z5i8Z5d3.jpg";
+
 
 const Home = ( route ) => {
-  
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  const toggleBookmarkButton = () => {
+    setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
+  };
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -108,7 +115,10 @@ const Home = ( route ) => {
           }}
         />
         <Text style={styles.headerText}> Cabana </Text>
-
+        <TouchableOpacity onPress={toggleBookmarkButton}>
+          <Image style={{marginLeft: isBookmarked ? 202 : 203, marginTop: -10, height: isBookmarked ? 26 : 28, width: isBookmarked ? 22.5 : 21 }} 
+            source ={{ uri: isBookmarked ? isBookmarkedURI : notBookmarkedURI }} ></Image>
+        </TouchableOpacity>     
       </View>
 
       
