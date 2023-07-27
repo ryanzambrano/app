@@ -12,6 +12,7 @@ import {
   ScrollView,
   FlatList,
 } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -141,10 +142,10 @@ export const EditProfileScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.contain}>
       <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Icon name="arrow-left" size={28} color="blue" />
+        style={styles.button}
+          onPress={() => navigation.goBack()}
+        >
+          <AntDesign name="arrowleft" size={24} color="#007AFF" />
       </TouchableOpacity>
       <FlatList
         data={prompts}
@@ -279,6 +280,9 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: "bold",
+  },
+  button: {
+    marginLeft: 15,
   },
   input: {
     flex: 0,
