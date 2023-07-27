@@ -108,10 +108,7 @@ const Home = ( route ) => {
           }}
         />
         <Text style={styles.headerText}> Cabana </Text>
-        <TouchableOpacity onPress={toggleBookmarkButton}>
-          <Image style={{marginLeft: isBookmarked? 197 : 203, marginTop: -10, height: isBookmarked ? 28 : 28, width: isBookmarked ? 32 : 21 }} 
-            source ={{ uri: isBookmarked ? isBookmarkedURI : notBookmarkedURI }} ></Image>
-        </TouchableOpacity>
+
       </View>
 
       

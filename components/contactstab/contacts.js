@@ -166,7 +166,7 @@ const ContactsUI = ({ route }) => {
             uri: "https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg",
           }}
         />
-        <Text style={styles.headerText}>𝙲𝚊𝚋𝚊𝚗𝚊</Text>
+        <Text style={styles.headerText}>Cabana</Text>
       </View>
       <View style={styles.viewContainer}>
         <View style={styles.searchContainer}>
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 25,
     fontWeight: "bold",
-    marginTop: -7,
+    marginTop: -10,
   },
   logo: {
     width: 30,
