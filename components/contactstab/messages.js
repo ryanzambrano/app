@@ -75,8 +75,6 @@ const MessagingUI = () => {
       }, 100);
     }
     }
-    console.log(session.user.id);
-    console.log(user_id);
 
   };
   useEffect(() => {
