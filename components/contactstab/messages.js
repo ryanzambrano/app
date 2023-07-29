@@ -75,6 +75,9 @@ const MessagingUI = () => {
       }, 100);
     }
     }
+    console.log(session.user.id);
+    console.log(user_id);
+
   };
   useEffect(() => {
     //setContactImage(`${picURL}/${user_id}/${user_id}-0?${new Date().getTime()}`);

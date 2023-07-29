@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   FlatList,
   SafeAreaView,
+  Animated,
 } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
@@ -16,7 +17,9 @@ import { picURL } from "../auth/supabase.js";
 import { decode } from "base64-arraybuffer";
 import { createClient } from "@supabase/supabase-js";
 import { Button } from "react-native-paper";
-
+import { SwipeListView } from 'react-native-swipe-list-view'; //install
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler'; //install
+import { Swipeable } from 'react-native-gesture-handler';
 
 const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
 const supabaseKey =
@@ -130,26 +133,61 @@ const ContactsUI = ({ route }) => {
   };
 
 
-
   const renderContact = ({ item }) => {
-    return (
-      <TouchableOpacity onPress={() => handleUserCardPress(item)}>
-        <View style={styles.contactItem}>
-          <Image
-            style={styles.profilePicture}
-            source={{
-              uri: `${picURL}/${item.user_id}/${item.user_id}-0?${new Date().getTime()}`
+    const handleDelete = async () => {
+      const { error } = await supabase
+      .from('Message')
+      .delete()
+      .or(
+        `and(Sent_From.eq.${session.user.id},Contact_ID.eq.${item.user_id}),and(Contact_ID.eq.${session.user.id},Sent_From.eq.${item.user_id})`
+      )
+      fetchUsers();
+    };
+  
+    const renderRightActions = (progress, dragX) => {
+      const trans = dragX.interpolate({
+        inputRange: [-75, 0],
+        outputRange: [0, 75],
+      });
+  
+      return (
+        <TouchableOpacity onPress={handleDelete}>
+          <Animated.View
+            style={{
+              backgroundColor: 'red',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: 75,
+              height: '100%',
+              transform: [{ translateX: trans }],
             }}
-          />
-          <View style={styles.contactInfo}>
-            <View style={styles.contactNameContainer}>
-              <Text style={styles.contactName}>{item.name}</Text>
-              <Text style={styles.MessageTime}>{item.recentTime}</Text>
+          >
+            <Text style={styles.deleteButtonText}>Delete</Text>
+          </Animated.View>
+        </TouchableOpacity>
+      );
+    };
+  
+    return (
+      <Swipeable renderRightActions={renderRightActions}>
+        <TouchableOpacity onPress={() => handleUserCardPress(item)}>
+          <View style={styles.contactItem}>
+            <Image
+              style={styles.profilePicture}
+              source={{
+                uri: `${picURL}/${item.user_id}/${item.user_id}-0?${new Date().getTime()}`
+              }}
+            />
+            <View style={styles.contactInfo}>
+              <View style={styles.contactNameContainer}>
+                <Text style={styles.contactName}>{item.name}</Text>
+                <Text style={styles.MessageTime}>{item.recentTime}</Text>
+              </View>
+              <Text style={styles.RecentMessage}>{item.recentMessage}</Text>
             </View>
-            <Text style={styles.RecentMessage}>{item.recentMessage}</Text>
           </View>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </Swipeable>
     );
   };
   return (
@@ -274,6 +312,26 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     justifyContent: "space-between",
   },
+  rowBack: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    backgroundColor: 'red',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  deleteButton: {
+    width: 75,
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
 
-export default ContactsUI;
+export default gestureHandlerRootHOC(ContactsUI);

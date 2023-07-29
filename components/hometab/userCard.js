@@ -90,19 +90,9 @@ const UserCard = ({ navigation, route }) => {
     }
   };
 
-  const handleUserCardPress = (user) => {
-    setSelectedUser(user);
-
-    navigation.navigate("Message", {
-      contactName: user.name,
-      contactId: user.user_id,
-      myId: session.user.id,
-      contactImage: `${picURL}/${user.user_id}/${
-        user.user_id
-      }-0?${new Date().getTime()}`,
-    });
+  const handleUserCardPress = () => {
+    navigation.navigate("Message", { user: route.params.user });
   };
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
