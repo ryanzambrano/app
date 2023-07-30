@@ -35,7 +35,12 @@ const UserCard = ({ navigation, route }) => {
     gender,
     living_preferences,
     for_fun,
+    bookmarked_profiles,
   } = route.params.user;
+
+  // current user is session.user.id
+  // other user is user_id
+
   const [photos, setPhotos] = useState([]);
   const [isFriendAdded, setIsFriendAdded] = useState(false);
   const buttonColor = isFriendAdded ? "green" : "dodgerblue";
@@ -56,9 +61,87 @@ const UserCard = ({ navigation, route }) => {
     }
   };
 
-  const handleAddFriend = () => {
-    setIsFriendAdded(!isFriendAdded);
+  useEffect(() => {
+    // Function to fetch the bookmarked profiles for the current user
+    const fetchBookmarkedProfiles = async () => {
+      const userId = session.user.id; // Assuming session.user.id provides the current user's ID
+
+      try {
+        const { data, error } = await supabase.from('UGC').select('bookmarked_profiles').eq('user_id', userId);
+
+        if (error) {
+          console.error('Error fetching bookmarked_profiles:', error.message);
+          return;
+        }
+
+        const { bookmarked_profiles } = data[0];
+
+        // Check if the current profile's user_id is in the bookmarked_profiles array
+        if (bookmarked_profiles.includes(user_id)) {
+          setIsFriendAdded(true);
+        } else {
+          setIsFriendAdded(false);
+        }
+      } catch (error) {
+        console.error('Error fetching bookmarked_profiles:', error.message);
+      }
+    };
+
+    fetchBookmarkedProfiles(); // Call the function to fetch bookmarked profiles when the component mounts
+  }, []); // The empty dependency array ensures this effect runs only once when the component mounts
+
+  
+  const handleAddFriend = async (user_id) => {
+    const userId = session.user.id; // Assuming session.user.id provides the current user's ID
+
+    try {
+      const { data, error } = await supabase.from('UGC').select('bookmarked_profiles').eq('user_id', userId);
+
+      if (error) {
+        console.error('Error fetching bookmarked_profiles:', error.message);
+        return;
+      }
+
+      const { bookmarked_profiles } = data[0];
+
+      if (!bookmarked_profiles.includes(user_id)) {
+        const updatedBookmarkedProfiles = [...bookmarked_profiles, user_id];
+        const { data: updateData, error: updateError } = await supabase
+          .from('UGC')
+          .update({ bookmarked_profiles: updatedBookmarkedProfiles })
+          .eq('user_id', userId);
+
+        if (updateError) {
+          console.error('Error updating bookmarked_profiles:', updateError.message);
+        } 
+        else {
+          console.log('Bookmark added successfully!');
+          setIsFriendAdded(true); // Update the state to reflect the change
+        
+        }
+      } 
+      else {
+        const updatedBookmarkedProfiles = bookmarked_profiles.filter((id) => id !== user_id);
+        const { data: updateData, error: updateError } = await supabase
+          .from('UGC')
+          .update({ bookmarked_profiles: updatedBookmarkedProfiles })
+          .eq('user_id', userId);
+
+        if (updateError) {
+          console.error('Error updating bookmarked_profiles:', updateError.message);
+        } 
+        else {
+          console.log('Bookmark removed successfully!');
+          setIsFriendAdded(false); // Update the state to reflect the change
+        
+        }
+      }
+    } 
+    catch (error) {
+      console.error('Error adding/removing bookmark:', error.message);
+    }
   };
+  
 
   const goBack = () => {
     navigation.goBack();
@@ -93,6 +176,7 @@ const UserCard = ({ navigation, route }) => {
   const handleUserCardPress = () => {
     navigation.navigate("Message", { user: route.params.user });
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -136,7 +220,7 @@ const UserCard = ({ navigation, route }) => {
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
             style={[styles.friendButton, { backgroundColor: buttonColor }]}
-            onPress={handleAddFriend}
+            onPress={() => handleAddFriend(user_id)}
           >
             <Text style={styles.friendButtonText}>
               {isFriendAdded ? "Bookmarked! ✓" : "+ Bookmark"}
