@@ -195,7 +195,6 @@ const ImagePickerScreen = ({ navigation, route }) => {
             default:
               break;
           }
-          //getProfilePicturs();
         }
       }
     } catch (error) {

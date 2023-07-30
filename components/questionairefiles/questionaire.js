@@ -1,5 +1,5 @@
 import "react-native-url-polyfill/auto";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import Questionaire1 from "./questionaire1.js";
@@ -12,6 +12,7 @@ const Stack = createStackNavigator();
 
 const Questionaire = ({ navigation, route }) => {
   const { session } = route.params;
+  const [progress, setProgress] = useState(0);
   useEffect(() => {
     if (!session) alert("session not found");
   }, [session]);
@@ -20,23 +21,23 @@ const Questionaire = ({ navigation, route }) => {
       <Stack.Screen
         name="Username"
         component={Username}
-        initialParams={{ session }}
+        initialParams={{ session, progress }}
       />
       <Stack.Screen
         name="Questionaire1"
         component={Questionaire1}
-        initialParams={{ session }}
+        initialParams={{ session, progress }}
       />
       <Stack.Screen
         name="Questionaire2"
         component={Questionaire2}
-        initialParams={{ session }}
+        initialParams={{ session, progress }}
       />
-      {/*<Stack.Screen
+      <Stack.Screen
         name="Questionaire3"
         component={Questionaire3}
-        initialParams={{ session }}
-      />*/}
+        initialParams={{ session, progress }}
+      />
       <Stack.Screen
         name="TagSelectionScreen"
         component={TagSelectionScreen}

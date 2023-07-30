@@ -14,13 +14,14 @@ import {
   Keyboard,
   Animated,
 } from "react-native";
-
+import * as Progress from "react-native-progress";
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
 
 export default function Questionaire3({ navigation, route }) {
   const { session } = route.params;
+  const { progress } = route.params;
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
@@ -29,15 +30,13 @@ export default function Questionaire3({ navigation, route }) {
 
   const [isStudiesModalVisible, setIsStudiesModalVisible] = useState(false);
   const [isForFunModalVisible, setIsForFunModalVisible] = useState(false);
-  const [isLivingPreferencesModalVisible, setIsLivingPreferencesModalVisible] =
-    useState(false);
+  const [isGradYearModalVisible, setIsGradYearModalVisible] = useState(false);
 
   const [selectedStudies, setSelectedStudies] = useState("");
   const [selectedForFun, setSelectedForFun] = useState("");
-  const [selectedLivingPreferences, setSelectedLivingPreferences] =
-    useState("");
+  const [selectedGradYear, setSelectedGradYear] = useState("");
 
-  const livingPreferences = ["Apartment", "Dorm", "No Preferences", "Other"];
+  const gradYear = [2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030];
   const forFun = ["Stay in", "Go out"];
   const studies = [
     "Science",
@@ -60,15 +59,15 @@ export default function Questionaire3({ navigation, route }) {
   const closeForFunModal = () => {
     setIsForFunModalVisible(false);
   };
-  const openLivingPreferencesModal = () => {
-    setIsLivingPreferencesModalVisible(true);
+  const openGradYearModal = () => {
+    setGradYearModalVisible(true);
   };
-  const closeLivingPreferencesModal = () => {
-    setIsLivingPreferencesModalVisible(false);
+  const closeGradYearModal = () => {
+    setIsGradYearModalVisible(false);
   };
 
   const userData = {
-    livingPreferences: selectedLivingPreferences,
+    gradYear: selectedGradYear,
     forFun: selectedForFun,
     studies: selectedStudies,
   };
@@ -77,15 +76,11 @@ export default function Questionaire3({ navigation, route }) {
     setIsError(null);
 
     if (session?.user) {
-      if (
-        !!userData.livingPreferences &&
-        !!userData.forFun &&
-        !!userData.studies
-      ) {
+      if (!!userData.gradYear && !!userData.forFun && !!userData.studies) {
         const { data, error } = await supabase
           .from("profile")
           .update({
-            living_preferences: userData.livingPreferences,
+            living_preferences: userData.gradYear,
             for_fun: userData.forFun,
             studies: userData.studies,
             profile_complete: true,
@@ -105,11 +100,11 @@ export default function Questionaire3({ navigation, route }) {
     }
   };
 
-  handleLivingPreferences = () => {
+  handleGradYear = () => {
     if (!selectedLivingPreferences) {
-      setSelectedLivingPreferences("Apartment");
+      setSelectedGradYear(2023);
     }
-    closeLivingPreferencesModal();
+    closeGradYearModal();
   };
   handleForFun = () => {
     if (!selectedForFun) {
@@ -139,32 +134,28 @@ export default function Questionaire3({ navigation, route }) {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
+          <Progress.Bar progress={progress} width={null} color={"#14999999"} />
+
           <View style={styles.header}>
-            <Text style={styles.titleText}>
-              Answer some lifestyle questions!
-            </Text>
+            <Text style={styles.titleText}>Tell us about you!</Text>
           </View>
 
           <View style={styles.form}>
             <View style={styles.input}>
-              <Text style={styles.inputHeader}>
-                Do you have living preferences?
-              </Text>
+              <Text style={styles.inputHeader}>What year do you graduate?</Text>
 
               <TouchableOpacity
                 onPress={() => {
-                  openLivingPreferencesModal();
+                  openGradYearModal();
                 }}
               >
                 <View style={styles.inputControl}>
-                  <Text style={styles.inputText}>
-                    {selectedLivingPreferences}
-                  </Text>
+                  <Text style={styles.inputText}>{selectedGradYear}</Text>
                 </View>
               </TouchableOpacity>
 
               <Modal
-                visible={isLivingPreferencesModalVisible}
+                visible={isGradYearModalVisible}
                 animationType="slide"
                 transparent
               >
@@ -172,28 +163,25 @@ export default function Questionaire3({ navigation, route }) {
                   <View style={styles.pickerContainer}>
                     <Picker
                       style={styles.picker}
-                      selectedValue={selectedLivingPreferences}
+                      selectedValue={selectedGradYear}
                       onValueChange={(itemValue) =>
-                        setSelectedLivingPreferences(itemValue)
+                        setSelectedGradYear(itemValue)
                       }
                     >
-                      {livingPreferences.map((livingPreferences) => (
+                      {gradYear.map((gradYear) => (
                         <Picker.Item
-                          key={livingPreferences}
-                          label={livingPreferences}
-                          value={livingPreferences}
+                          key={gradYear}
+                          label={gradYear}
+                          value={gradYear}
                         />
                       ))}
                     </Picker>
                   </View>
 
                   <View style={styles.bbuttons}>
-                    <Button title="Save" onPress={handleLivingPreferences} />
+                    <Button title="Save" onPress={handleGradYear} />
 
-                    <Button
-                      title="Cancel"
-                      onPress={closeLivingPreferencesModal}
-                    />
+                    <Button title="Cancel" onPress={closeGradYeaModal} />
                   </View>
                 </View>
               </Modal>

@@ -166,7 +166,8 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    alignContent: "center",
+    //alignContent: "center",
+    justifyContent: "space-between",
     //borderBottomWidth: 1,
     borderColor: "gray",
     paddingTop: 13,
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
 
   userContainer: {
     flex: 1,
-    //alignItems: "center",
+    alignItems: "center",
     padding: 16,
     //marginBottom: 30,
     backgroundColor: "#F4F4F4",

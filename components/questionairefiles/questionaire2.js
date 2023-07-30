@@ -17,9 +17,11 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
+import * as Progress from "react-native-progress";
 
 export default function Questionaire2({ navigation, route }) {
   const { session } = route.params;
+  const { progress } = route.params;
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
@@ -96,7 +98,8 @@ export default function Questionaire2({ navigation, route }) {
           setIsError(error.message);
         } else {
           //navigation.navigate("Questionaire3");
-          navigation.navigate("TagSelectionScreen");
+          const newProgress = progress + 0.3;
+          navigation.navigate("Questionaire3", { progress: newProgress });
         }
       } else {
         startShakeAnimation(shakeAnimationValue);
@@ -139,6 +142,8 @@ export default function Questionaire2({ navigation, route }) {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
+          <Progress.Bar progress={progress} width={null} color={"#14999999"} />
+
           <View style={styles.header}>
             <Text style={styles.titleText}>
               Answer some lifestyle questions!

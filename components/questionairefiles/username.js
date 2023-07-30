@@ -13,11 +13,12 @@ import {
   Animated,
   Easing,
 } from "react-native";
-
+import * as Progress from "react-native-progress";
 import { supabase } from "../auth/supabase.js";
 
 export const Username = ({ navigation, route }) => {
   const { session } = route.params;
+  const { progress } = route.params;
   const [selectedUsername, setSelectedUsername] = useState("");
   const [isError, setIsError] = useState("");
 
@@ -53,7 +54,8 @@ export const Username = ({ navigation, route }) => {
             setIsError(error.message);
           }
         } else {
-          navigation.navigate("Questionaire1");
+          const newProgress = progress + 0.1;
+          navigation.navigate("Questionaire1", { progress: newProgress });
         }
       } else setIsError("Enter a Username");
     }
@@ -118,10 +120,11 @@ export const Username = ({ navigation, route }) => {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
+          <Progress.Bar progress={progress} width={null} color={"#14999999"} />
+
           <View style={styles.header}>
             <Text style={styles.titleText}>Create a Username!</Text>
           </View>
-
           <View style={styles.input}>
             <Text style={styles.inputHeader}>Username</Text>
 
@@ -135,7 +138,6 @@ export const Username = ({ navigation, route }) => {
               }
             ></TextInput>
           </View>
-
           {isError && (
             <Animated.Text
               style={[styles.errorText, shakeAnimationStyle]}
@@ -144,7 +146,6 @@ export const Username = ({ navigation, route }) => {
               {isError}
             </Animated.Text>
           )}
-
           <View style={styles.formAction}>
             <TouchableOpacity
               onPress={() => {

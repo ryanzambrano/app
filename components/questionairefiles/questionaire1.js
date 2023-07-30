@@ -14,13 +14,15 @@ import {
   Keyboard,
   Animated,
 } from "react-native";
-
+import * as Progress from "react-native-progress";
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
 
 export const Questionaire1 = ({ navigation, route }) => {
   const { session } = route.params;
+  const { progress } = route.params;
+  //const [progress, setProgress] = useState(0);
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
@@ -101,7 +103,8 @@ export const Questionaire1 = ({ navigation, route }) => {
           startShakeAnimation(shakeAnimationValue);
           setIsError(error.message);
         } else {
-          navigation.navigate("Questionaire2");
+          const newProgress = progress + 0.3;
+          navigation.navigate("Questionaire2", { progress: newProgress });
         }
       } else {
         startShakeAnimation(shakeAnimationValue);
@@ -125,6 +128,7 @@ export const Questionaire1 = ({ navigation, route }) => {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
+          <Progress.Bar progress={progress} width={null} color={"#14999999"} />
           <View style={styles.header}>
             <Text style={styles.titleText}>
               Answer some questions about yourself!
