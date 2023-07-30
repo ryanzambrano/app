@@ -17,11 +17,9 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
-import * as Progress from "react-native-progress";
 
 export default function Questionaire2({ navigation, route }) {
   const { session } = route.params;
-  const { progress } = route.params;
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
@@ -41,8 +39,10 @@ export default function Questionaire2({ navigation, route }) {
   const livingPreferences = ["Apartment", "Dorm", "No Preferences", "Other"];
   const forFun = ["Stay in", "Go out"];
   const studies = [
-    "Science",
     "Business",
+    "Natural Science",
+    "Social Science",
+    "Mathematics",
     "Engineering",
     "Art",
     "Exploratory",
@@ -89,7 +89,6 @@ export default function Questionaire2({ navigation, route }) {
             living_preferences: userData.livingPreferences,
             for_fun: userData.forFun,
             studies: userData.studies,
-            profile_complete: true,
           })
           .eq("user_id", session.user.id);
 
@@ -98,8 +97,7 @@ export default function Questionaire2({ navigation, route }) {
           setIsError(error.message);
         } else {
           //navigation.navigate("Questionaire3");
-          const newProgress = progress + 0.3;
-          navigation.navigate("Questionaire3", { progress: newProgress });
+          navigation.navigate("Questionaire3");
         }
       } else {
         startShakeAnimation(shakeAnimationValue);
@@ -142,8 +140,6 @@ export default function Questionaire2({ navigation, route }) {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
-          <Progress.Bar progress={progress} width={null} color={"#14999999"} />
-
           <View style={styles.header}>
             <Text style={styles.titleText}>
               Answer some lifestyle questions!
@@ -153,7 +149,7 @@ export default function Questionaire2({ navigation, route }) {
           <View style={styles.form}>
             <View style={styles.input}>
               <Text style={styles.inputHeader}>
-                Do you have living preferences?
+                Where are you planning to live?
               </Text>
 
               <TouchableOpacity

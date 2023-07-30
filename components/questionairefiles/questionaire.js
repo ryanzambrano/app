@@ -6,37 +6,40 @@ import Questionaire1 from "./questionaire1.js";
 import Questionaire2 from "./questionaire2.js";
 import Questionaire3 from "./questionaire3.js";
 import Username from "./username.js";
+import Name from "./fullName.js";
 import TagSelectionScreen from "./tagSelectionScreen.js";
 
 const Stack = createStackNavigator();
 
 const Questionaire = ({ navigation, route }) => {
   const { session } = route.params;
-  const [progress, setProgress] = useState(0);
+
   useEffect(() => {
     if (!session) alert("session not found");
   }, [session]);
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Name" component={Name} initialParams={{ session }} />
       <Stack.Screen
         name="Username"
         component={Username}
-        initialParams={{ session, progress }}
+        initialParams={{ session }}
       />
+
       <Stack.Screen
         name="Questionaire1"
         component={Questionaire1}
-        initialParams={{ session, progress }}
+        initialParams={{ session }}
       />
       <Stack.Screen
         name="Questionaire2"
         component={Questionaire2}
-        initialParams={{ session, progress }}
+        initialParams={{ session }}
       />
       <Stack.Screen
         name="Questionaire3"
         component={Questionaire3}
-        initialParams={{ session, progress }}
+        initialParams={{ session }}
       />
       <Stack.Screen
         name="TagSelectionScreen"

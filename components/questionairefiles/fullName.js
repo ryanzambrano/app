@@ -15,15 +15,15 @@ import {
 } from "react-native";
 import { supabase } from "../auth/supabase.js";
 
-export const Username = ({ navigation, route }) => {
+export const Name = ({ navigation, route }) => {
   const { session } = route.params;
-  const [selectedUsername, setSelectedUsername] = useState("");
+  const [selectedName, setSelectedName] = useState("");
   const [isError, setIsError] = useState("");
 
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
 
   const userData = {
-    username: selectedUsername,
+    name: selectedName,
   };
 
   const handleUpdate = async (userData, session) => {
@@ -31,46 +31,21 @@ export const Username = ({ navigation, route }) => {
 
     if (session?.user) {
       //alert("session.user");
-      if (!!userData.username) {
+      if (!!userData.name) {
         const { data, error } = await supabase
-          .from("profile")
+          .from("UGC")
           .update({
-            username: selectedUsername,
-            email: session.user.email,
+            name: selectedName,
           })
           .eq("user_id", session.user.id);
 
         if (error) {
-          if (
-            error.message.includes(
-              "duplicate key value violates unique constraint"
-            )
-          ) {
-            setIsError("Username is already taken");
-          } else {
-            startShakeAnimation();
-            setIsError(error.message);
-          }
+          startShakeAnimation();
+          setIsError(error.message);
         } else {
-          navigation.navigate("Questionaire1");
+          navigation.navigate("Username");
         }
       } else setIsError("Enter a Username");
-    }
-  };
-
-  const updateProfile = async (userData, session) => {
-    if (session?.user) {
-      const { data, error } = await supabase
-        .from("profile")
-        .update({
-          username: userData.username,
-          email: session.user.email,
-        })
-        .eq("user_id", session.user.id);
-
-      if (error) {
-        alert("Error updating profile:", error.message);
-      }
     }
   };
 
@@ -118,19 +93,17 @@ export const Username = ({ navigation, route }) => {
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.titleText}>Create a Username!</Text>
+            <Text style={styles.titleText}>What's your name?</Text>
           </View>
           <View style={styles.input}>
-            <Text style={styles.inputHeader}>Username</Text>
+            <Text style={styles.inputHeader}>Name</Text>
 
             <TextInput
               style={styles.inputControl}
               //placeholder=""
               placeholderTextColor="#6b7280"
-              value={selectedUsername}
-              onChangeText={(selectedUsername) =>
-                setSelectedUsername(selectedUsername)
-              }
+              value={selectedName}
+              onChangeText={(selectedName) => setSelectedName(selectedName)}
             ></TextInput>
           </View>
           {isError && (
@@ -300,4 +273,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Username;
+export default Name;

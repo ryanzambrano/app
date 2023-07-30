@@ -232,7 +232,7 @@ export const Profile = ({ navigation, route }) => {
                 <Text style={styles.text}>{editedUser.bio}</Text>
               </View>
             </View>
-            <Text style={styles /*styles.promptsHeader*/}>{/*Prompts*/}</Text>
+
             <ScrollView
               horizontal
               style={styles.horizontalScrollView}
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontWeight: "600",
     marginBottom: 10,
-    marginTop: -7,
+
     fontSize: 20,
     marginLeft: -20,
   },
@@ -349,8 +349,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     alignSelf: "center",
     fontWeight: "600",
-    marginBottom: -5,
-    marginTop: -7,
     fontSize: 20,
     marginLeft: -20,
   },
@@ -438,7 +436,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     justifyContent: "center",
     marginTop: 0,
-    marginBottom: 100,
+    marginBottom: 20,
   },
   tag: {
     backgroundColor: "white",

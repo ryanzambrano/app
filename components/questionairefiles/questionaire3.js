@@ -14,53 +14,36 @@ import {
   Keyboard,
   Animated,
 } from "react-native";
-import * as Progress from "react-native-progress";
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
 
 export default function Questionaire3({ navigation, route }) {
   const { session } = route.params;
-  const { progress } = route.params;
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
 
-  const [isStudiesModalVisible, setIsStudiesModalVisible] = useState(false);
-  const [isForFunModalVisible, setIsForFunModalVisible] = useState(false);
   const [isGradYearModalVisible, setIsGradYearModalVisible] = useState(false);
 
-  const [selectedStudies, setSelectedStudies] = useState("");
-  const [selectedForFun, setSelectedForFun] = useState("");
   const [selectedGradYear, setSelectedGradYear] = useState("");
 
-  const gradYear = [2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030];
-  const forFun = ["Stay in", "Go out"];
-  const studies = [
-    "Science",
-    "Business",
-    "Engineering",
-    "Art",
-    "Exploratory",
-    "Other",
+  const gradYear = [
+    "2023",
+    "2024",
+    "2025",
+    "2026",
+    "2027",
+    "2028",
+    "2029",
+    "2030",
   ];
 
-  const openStudiesModal = () => {
-    setIsStudiesModalVisible(true);
-  };
-  const closeStudiesModal = () => {
-    setIsStudiesModalVisible(false);
-  };
-  const openForFunModal = () => {
-    setIsForFunModalVisible(true);
-  };
-  const closeForFunModal = () => {
-    setIsForFunModalVisible(false);
-  };
   const openGradYearModal = () => {
-    setGradYearModalVisible(true);
+    setIsGradYearModalVisible(true);
   };
   const closeGradYearModal = () => {
     setIsGradYearModalVisible(false);
@@ -68,57 +51,46 @@ export default function Questionaire3({ navigation, route }) {
 
   const userData = {
     gradYear: selectedGradYear,
-    forFun: selectedForFun,
-    studies: selectedStudies,
   };
 
   const handleUpdate = async (userData, session) => {
     setIsError(null);
 
     if (session?.user) {
-      if (!!userData.gradYear && !!userData.forFun && !!userData.studies) {
-        const { data, error } = await supabase
-          .from("profile")
-          .update({
-            living_preferences: userData.gradYear,
-            for_fun: userData.forFun,
-            studies: userData.studies,
-            profile_complete: true,
-          })
+      if (!userData.gradYear) {
+        startShakeAnimation(shakeAnimationValue);
+        return setIsError("All fields are required");
+      }
+
+      try {
+        const { error: ugcError } = await supabase
+          .from("UGC")
+          .update({ class_year: userData.gradYear })
           .eq("user_id", session.user.id);
 
-        if (error) {
-          startShakeAnimation(shakeAnimationValue);
-          setIsError(error.message);
-        } else {
-          navigation.navigate("TagSelectionScreen");
-        }
-      } else {
+        if (ugcError) throw ugcError;
+
+        const { error: profileError } = await supabase
+          .from("profile")
+          .update({ profile_complete: true })
+          .eq("user_id", session.user.id);
+
+        if (profileError) throw profileError;
+
+        navigation.navigate("TagSelectionScreen");
+      } catch (error) {
         startShakeAnimation(shakeAnimationValue);
-        setIsError("All fields are required");
+        setIsError(error.message);
       }
     }
   };
 
   handleGradYear = () => {
-    if (!selectedLivingPreferences) {
+    if (!selectedGradYear) {
       setSelectedGradYear(2023);
     }
     closeGradYearModal();
   };
-  handleForFun = () => {
-    if (!selectedForFun) {
-      setSelectedForFun("Stay in");
-    }
-    closeForFunModal();
-  };
-  handleStudies = () => {
-    if (!selectedStudies) {
-      setSelectedStudies("Science");
-    }
-    closeStudiesModal();
-  };
-
   const shakeAnimationStyle = {
     transform: [
       {
@@ -134,15 +106,13 @@ export default function Questionaire3({ navigation, route }) {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
-          <Progress.Bar progress={progress} width={null} color={"#14999999"} />
-
           <View style={styles.header}>
-            <Text style={styles.titleText}>Tell us about you!</Text>
+            <Text style={styles.titleText}>What year do you graduate?</Text>
           </View>
 
           <View style={styles.form}>
             <View style={styles.input}>
-              <Text style={styles.inputHeader}>What year do you graduate?</Text>
+              <Text style={styles.inputHeader}>Class Year</Text>
 
               <TouchableOpacity
                 onPress={() => {
@@ -181,100 +151,7 @@ export default function Questionaire3({ navigation, route }) {
                   <View style={styles.bbuttons}>
                     <Button title="Save" onPress={handleGradYear} />
 
-                    <Button title="Cancel" onPress={closeGradYeaModal} />
-                  </View>
-                </View>
-              </Modal>
-            </View>
-
-            <View style={styles.input}>
-              <Text style={styles.inputHeader}>
-                For fun, would you rather stay in or go out?
-              </Text>
-
-              <TouchableOpacity
-                onPress={() => {
-                  openForFunModal();
-                }}
-              >
-                <View style={styles.inputControl}>
-                  <Text style={styles.inputText}>{selectedForFun}</Text>
-                </View>
-              </TouchableOpacity>
-
-              <Modal
-                visible={isForFunModalVisible}
-                animationType="slide"
-                transparent
-              >
-                <View style={styles.modalContainer}>
-                  <View style={styles.pickerContainer}>
-                    <Picker
-                      style={styles.picker}
-                      selectedValue={selectedForFun}
-                      onValueChange={(itemValue) =>
-                        setSelectedForFun(itemValue)
-                      }
-                    >
-                      {forFun.map((Gender) => (
-                        <Picker.Item
-                          key={Gender}
-                          label={Gender}
-                          value={Gender}
-                        />
-                      ))}
-                    </Picker>
-                  </View>
-                  <View style={styles.bbuttons}>
-                    <Button title="Save" onPress={handleForFun} />
-                    <Button title="Cancel" onPress={closeForFunModal} />
-                  </View>
-                </View>
-              </Modal>
-            </View>
-
-            <View style={styles.input}>
-              <Text style={styles.inputHeader}>
-                What is your general area of study?
-              </Text>
-
-              <TouchableOpacity
-                onPress={() => {
-                  openStudiesModal();
-                }}
-              >
-                <View style={styles.inputControl}>
-                  <Text style={styles.inputText}>{selectedStudies}</Text>
-                </View>
-              </TouchableOpacity>
-
-              <Modal
-                visible={isStudiesModalVisible}
-                animationType="slide"
-                transparent
-              >
-                <View style={styles.modalContainer}>
-                  <View style={styles.pickerContainer}>
-                    <Picker
-                      style={styles.picker}
-                      selectedValue={selectedStudies}
-                      onValueChange={(itemValue) =>
-                        setSelectedStudies(itemValue)
-                      }
-                    >
-                      {studies.map((studies) => (
-                        <Picker.Item
-                          key={studies}
-                          label={studies}
-                          value={studies}
-                        />
-                      ))}
-                    </Picker>
-                  </View>
-
-                  <View style={styles.bbuttons}>
-                    <Button title="Save" onPress={handleStudies} />
-                    <Button title="Cancel" onPress={closeStudiesModal} />
+                    <Button title="Cancel" onPress={closeGradYearModal} />
                   </View>
                 </View>
               </Modal>

@@ -14,15 +14,14 @@ import {
   Keyboard,
   Animated,
 } from "react-native";
-import * as Progress from "react-native-progress";
+
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
 
 export const Questionaire1 = ({ navigation, route }) => {
   const { session } = route.params;
-  const { progress } = route.params;
-  //const [progress, setProgress] = useState(0);
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
@@ -31,11 +30,11 @@ export const Questionaire1 = ({ navigation, route }) => {
 
   const [isAgeModalVisible, setIsAgeModalVisible] = useState(false);
   const [isGenderModalVisible, setIsGenderModalVisible] = useState(false);
-  const [isRaceModalVisible, setIsRaceModalVisible] = useState(false);
+  const [isWhoModalVisible, setIsWhoModalVisible] = useState(false);
 
   const [selectedAge, setSelectedAge] = useState("");
   const [selectedGender, setSelectedGender] = useState("");
-  const [selectedRace, setSelectedRace] = useState("");
+  const [selectedWho, setSelectedWho] = useState("");
 
   const gender = ["Male", "Female", "Other"];
   const race = ["White", "Black", "Brown", "Yellow"];
@@ -53,11 +52,11 @@ export const Questionaire1 = ({ navigation, route }) => {
   const closeGenderModal = () => {
     setIsGenderModalVisible(false);
   };
-  const openRaceModal = () => {
-    setIsRaceModalVisible(true);
+  const openWhoModal = () => {
+    setIsWhoModalVisible(true);
   };
-  const closeRaceModal = () => {
-    setIsRaceModalVisible(false);
+  const closeWhoModal = () => {
+    setIsWhoModalVisible(false);
   };
 
   handleSaveAge = () => {
@@ -72,16 +71,16 @@ export const Questionaire1 = ({ navigation, route }) => {
     }
     closeGenderModal();
   };
-  handleSaveRace = () => {
-    if (!selectedRace) {
-      setSelectedRace("White");
+  handleSaveWho = () => {
+    if (!selectedWho) {
+      setSelectedWho("Male");
     }
-    closeRaceModal();
+    closeWhoModal();
   };
 
   const userData = {
     age: selectedAge,
-    race: selectedRace,
+    who: selectedWho,
     gender: selectedGender,
   };
 
@@ -89,12 +88,12 @@ export const Questionaire1 = ({ navigation, route }) => {
     setIsError(null);
 
     if (session?.user) {
-      if (!!userData.age && !!userData.gender) {
+      if (!!userData.age && !!userData.gender && !!userData.who) {
         const { data, error } = await supabase
           .from("profile")
           .update({
             age: userData.age,
-            race: userData.race,
+            who: userData.who,
             gender: userData.gender,
           })
           .eq("user_id", session.user.id);
@@ -103,8 +102,7 @@ export const Questionaire1 = ({ navigation, route }) => {
           startShakeAnimation(shakeAnimationValue);
           setIsError(error.message);
         } else {
-          const newProgress = progress + 0.3;
-          navigation.navigate("Questionaire2", { progress: newProgress });
+          navigation.navigate("Questionaire2");
         }
       } else {
         startShakeAnimation(shakeAnimationValue);
@@ -128,7 +126,6 @@ export const Questionaire1 = ({ navigation, route }) => {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
-          <Progress.Bar progress={progress} width={null} color={"#14999999"} />
           <View style={styles.header}>
             <Text style={styles.titleText}>
               Answer some questions about yourself!
@@ -233,11 +230,13 @@ export const Questionaire1 = ({ navigation, route }) => {
             </View>
 
             <View style={styles.input}>
-              <Text style={styles.inputHeader}>Select your race</Text>
+              <Text style={styles.inputHeader}>
+                Who do you want to room with?
+              </Text>
 
               <TouchableOpacity
                 onPress={() => {
-                  openRaceModal();
+                  openWhoModal();
                 }}
               >
                 <View style={styles.inputControl}>
@@ -247,13 +246,13 @@ export const Questionaire1 = ({ navigation, route }) => {
                     placeholderTextColor="#6b7280"
                     value={`${selectedGender}`}
                   >
-                    {selectedRace}
+                    {selectedWho}
                   </Text>
                 </View>
               </TouchableOpacity>
 
               <Modal
-                visible={isRaceModalVisible}
+                visible={isWhoModalVisible}
                 animationType="slide"
                 transparent
               >
@@ -261,18 +260,22 @@ export const Questionaire1 = ({ navigation, route }) => {
                   <View style={styles.pickerContainerGender}>
                     <Picker
                       style={styles.picker}
-                      selectedValue={selectedRace}
-                      onValueChange={(itemValue) => setSelectedRace(itemValue)}
+                      selectedValue={selectedWho}
+                      onValueChange={(itemValue) => setSelectedWho(itemValue)}
                     >
-                      {race.map((race) => (
-                        <Picker.Item key={race} label={race} value={race} />
+                      {gender.map((gender) => (
+                        <Picker.Item
+                          key={gender}
+                          label={gender}
+                          value={gender}
+                        />
                       ))}
                     </Picker>
                   </View>
 
                   <View style={styles.bbuttons}>
-                    <Button title="Save" onPress={handleSaveRace} />
-                    <Button title="Cancel" onPress={closeRaceModal} />
+                    <Button title="Save" onPress={handleSaveWho} />
+                    <Button title="Cancel" onPress={closeWhoModal} />
                   </View>
                 </View>
               </Modal>

@@ -115,12 +115,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
           case 3:
             setImage3(null);
             break;
-          case 4:
-            setImage4(null);
-            break;
-          case 5:
-            setImage5(null);
-            break;
+
           default:
             console.error("Invalid index for image deletion");
         }
@@ -186,12 +181,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
             case 3:
               setImage3(imagePickerResult.assets[0].uri);
               break;
-            case 4:
-              setImage4(imagePickerResult.assets[0].uri);
-              break;
-            case 5:
-              setImage5(imagePickerResult.assets[0].uri);
-              break;
+
             default:
               break;
           }
@@ -228,10 +218,13 @@ const ImagePickerScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.back}>
+        <View style={styles.left}>
           <Button title="back" onPress={handleBackPress} />
         </View>
-        <Text style={styles.title}>Edit Your Images</Text>
+        <View style={styles.center}>
+          <Text style={styles.title}>Add Images</Text>
+        </View>
+        <View style={styles.right} />
       </View>
 
       <ScrollView>
@@ -255,15 +248,6 @@ const ImagePickerScreen = ({ navigation, route }) => {
                 <Image source={{ uri: image2 }} style={styles.image} />
               ) : null}
             </TouchableOpacity>
-            {renderItem(4)}
-            <TouchableOpacity
-              style={styles.profilePictureContainer}
-              onPress={() => handleImageUpload1(4)}
-            >
-              {image4 ? (
-                <Image source={{ uri: image4 }} style={styles.image} />
-              ) : null}
-            </TouchableOpacity>
           </View>
 
           <View style={styles.column}>
@@ -285,15 +269,6 @@ const ImagePickerScreen = ({ navigation, route }) => {
                 <Image source={{ uri: image3 }} style={styles.image} />
               ) : null}
             </TouchableOpacity>
-            {renderItem(5)}
-            <TouchableOpacity
-              style={styles.profilePictureContainer}
-              onPress={() => handleImageUpload1(5)}
-            >
-              {image5 ? (
-                <Image source={{ uri: image5 }} style={styles.image} />
-              ) : null}
-            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -301,32 +276,40 @@ const ImagePickerScreen = ({ navigation, route }) => {
   );
 };
 const styles = StyleSheet.create({
-  title: {
-    fontFamily: "Helvetica Neue",
-    fontSize: 20,
-    textAlign: "center",
-    alignSelf: "center",
-  },
   header: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
-    justifyContent: "flex-start",
-    paddingVertical: 5,
+    alignItems: "center",
+    alignSelf: "center",
+    alignContent: "center",
+
+    padding: 10, // You can adjust this value
+  },
+  left: {
+    flex: 1,
+    alignItems: "flex-start",
+  },
+  center: {
+    flex: 1,
+    alignItems: "center",
+    alignSelf: "center",
+    alignContent: "center",
+  },
+  right: {
+    flex: 1,
+    alignItems: "flex-end",
   },
   back: {
-    marginRight: -57,
-    marginLeft: 8,
+    //textAlign: "left",
+    //marginLeft: 8,
   },
-  backButtonText: {
-    fontSize: 16,
-    color: "#000",
-  },
+
   title: {
     flex: 1,
     fontSize: 20,
     fontWeight: "bold",
-    textAlign: "center",
+    alignItems: "center",
   },
 
   container: {
@@ -343,10 +326,8 @@ const styles = StyleSheet.create({
   column: {
     flex: 1,
     flexDirection: "column",
-    //gap: 10,
   },
   button: {
-    //flex: 1,
     flexDirection: "row",
     justifyContent: "flex-end",
     marginRight: 15,
