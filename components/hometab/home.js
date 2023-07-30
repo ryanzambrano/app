@@ -16,8 +16,7 @@ import { picURL } from "../auth/supabase.js"; // This is the base url of the pho
 import { useNavigation } from "@react-navigation/native";
 import { createClient } from "@supabase/supabase-js"; // Create client is responsible for drawing profile data from each user in the database
 
-const isBookmarkedURI =
-  "https://th.bing.com/th/id/OIP.Pzc03rRYlwOdKsolfgcwogHaJQ?pid=ImgDet&rs=1";
+const isBookmarkedURI = "https://th.bing.com/th/id/OIP.Pzc03rRYlwOdKsolfgcwogHaJQ?pid=ImgDet&rs=1";
 const notBookmarkedURI = "https://i.pngimg.me/thumb/f/720/m2H7m2K9Z5i8Z5d3.jpg";
 
 const Home = ({ route }) => {
@@ -27,7 +26,8 @@ const Home = ({ route }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
-
+  const [bookmarkedProfiles, setBookmarkedProfiles] = useState([]);
+  
   const toggleBookmarkButton = () => {
     setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
   };
@@ -37,47 +37,69 @@ const Home = ({ route }) => {
   };
 
   const filteredUsers = users.filter((user) => {
-    const nameMatch = user.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const tagMatch = user.tags.some((tag) =>
-      tag.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const nameMatch = user.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const tagMatch = user.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    if (isBookmarked) {
+      return bookmarkedProfiles.includes(user.user_id) && (nameMatch || tagMatch);
+    }
     return nameMatch || tagMatch;
   });
+  
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data: ugcData, error: ugcError } = await supabase
-        .from("UGC")
-        .select("*");
-      const { data: profileData, error: profileError } = await supabase
-        .from("profile")
-        .select("*");
+      try {
+        const { data: ugcData, error: ugcError } = await supabase
+          .from("UGC")
+          .select("*");
+        const { data: profileData, error: profileError } = await supabase
+          .from("profile")
+          .select("*");
 
-      if (ugcError || profileError) {
-        console.error(ugcError || profileError);
-      } else {
-        const mergedData = ugcData.map((ugcUser) => {
-          const relatedProfileData = profileData.filter(
-            (profileUser) => profileUser.user_id === ugcUser.user_id
-          );
-          return {
-            ...ugcUser,
-            profiles: relatedProfileData,
-          };
-        });
+        if (ugcError || profileError) {
+          console.error(ugcError || profileError);
+        } 
 
-        setUsers(mergedData);
+        else {
+          const mergedData = ugcData.map((ugcUser) => {
+            const relatedProfileData = profileData.filter(
+              (profileUser) => profileUser.user_id === ugcUser.user_id
+            );
+            return {
+              ...ugcUser,
+              profiles: relatedProfileData,
+            };
+          });
+
+          setUsers(mergedData);
+          const userId = session.user.id;
+          const { data: bookmarkedData, error: bookmarkedError } = await supabase
+            .from("UGC")
+            .select("bookmarked_profiles")
+            .eq("user_id", userId);
+
+          if (bookmarkedError) {
+            console.error("Error fetching bookmarked profiles:", bookmarkedError.message);
+          } 
+
+          else {
+            const { bookmarked_profiles } = bookmarkedData[0];
+            setBookmarkedProfiles(bookmarked_profiles);
+          }
+        }
+      } 
+      catch (error) {
+        console.error("Error fetching data:", error.message);
       }
     };
-
+  
     fetchUsers();
   }, []);
+  
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
-    navigation.navigate("userCard", { user }); // Navigate to UserProfile component with selected user data
+    navigation.navigate("userCard", { user });
   };
 
   const renderUserCard = ({ item }) => {

@@ -62,21 +62,15 @@ const UserCard = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    // Function to fetch the bookmarked profiles for the current user
     const fetchBookmarkedProfiles = async () => {
-      const userId = session.user.id; // Assuming session.user.id provides the current user's ID
-
+      const userId = session.user.id;
       try {
         const { data, error } = await supabase.from('UGC').select('bookmarked_profiles').eq('user_id', userId);
-
         if (error) {
           console.error('Error fetching bookmarked_profiles:', error.message);
           return;
         }
-
         const { bookmarked_profiles } = data[0];
-
-        // Check if the current profile's user_id is in the bookmarked_profiles array
         if (bookmarked_profiles.includes(user_id)) {
           setIsFriendAdded(true);
         } else {
@@ -86,38 +80,31 @@ const UserCard = ({ navigation, route }) => {
         console.error('Error fetching bookmarked_profiles:', error.message);
       }
     };
+    fetchBookmarkedProfiles();
+  }, []); 
 
-    fetchBookmarkedProfiles(); // Call the function to fetch bookmarked profiles when the component mounts
-  }, []); // The empty dependency array ensures this effect runs only once when the component mounts
 
-  
   const handleAddFriend = async (user_id) => {
-    const userId = session.user.id; // Assuming session.user.id provides the current user's ID
-
+    const userId = session.user.id;
     try {
-      const { data, error } = await supabase.from('UGC').select('bookmarked_profiles').eq('user_id', userId);
-
+      const { data, error } = await supabase.from('UGC').select('bookmarked_profiles').eq('user_id', userId)
       if (error) {
         console.error('Error fetching bookmarked_profiles:', error.message);
         return;
       }
-
       const { bookmarked_profiles } = data[0];
-
       if (!bookmarked_profiles.includes(user_id)) {
         const updatedBookmarkedProfiles = [...bookmarked_profiles, user_id];
         const { data: updateData, error: updateError } = await supabase
           .from('UGC')
           .update({ bookmarked_profiles: updatedBookmarkedProfiles })
           .eq('user_id', userId);
-
         if (updateError) {
           console.error('Error updating bookmarked_profiles:', updateError.message);
         } 
         else {
           console.log('Bookmark added successfully!');
-          setIsFriendAdded(true); // Update the state to reflect the change
-        
+          setIsFriendAdded(true);
         }
       } 
       else {
@@ -132,8 +119,7 @@ const UserCard = ({ navigation, route }) => {
         } 
         else {
           console.log('Bookmark removed successfully!');
-          setIsFriendAdded(false); // Update the state to reflect the change
-        
+          setIsFriendAdded(false);  
         }
       }
     } 
@@ -141,7 +127,6 @@ const UserCard = ({ navigation, route }) => {
       console.error('Error adding/removing bookmark:', error.message);
     }
   };
-  
 
   const goBack = () => {
     navigation.goBack();
