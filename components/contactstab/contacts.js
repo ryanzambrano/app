@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, } from "react";
 import {
   Image,
   TextInput,
@@ -10,8 +10,11 @@ import {
   FlatList,
   SafeAreaView,
   Animated,
+  Alert,
 } from "react-native";
 
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { Dimensions } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { picURL } from "../auth/supabase.js";
 import { decode } from "base64-arraybuffer";
@@ -145,13 +148,30 @@ const ContactsUI = ({ route }) => {
     };
   
     const renderRightActions = (progress, dragX) => {
+     // console.log("Progress:", progress);
       const trans = dragX.interpolate({
         inputRange: [-75, 0],
-        outputRange: [0, 75],
+        outputRange: [0, 75], // Modify this line to change the direction of the expansion
       });
-  
+    
+      const handleDeleteConfirmation = () => {
+        Alert.alert(
+          "Delete Contact",
+          "Are you sure you want to delete this contact? This will permanently delete all messages for both you and the recipient.",
+          [
+            {
+              text: "No",
+              style: "cancel",
+            },
+            {
+              text: "Yes",
+              onPress: handleDelete,
+            },
+          ]
+        );
+      };
       return (
-        <TouchableOpacity onPress={handleDelete}>
+        <TouchableOpacity onPress={handleDeleteConfirmation}>
           <Animated.View
             style={{
               backgroundColor: 'red',
@@ -162,11 +182,13 @@ const ContactsUI = ({ route }) => {
               transform: [{ translateX: trans }],
             }}
           >
-            <Text style={styles.deleteButtonText}>Delete</Text>
+            {/* Replace 'Delete' text with trashcan icon */}
+            <Icon name="trash" size={24} color="white" />
           </Animated.View>
         </TouchableOpacity>
       );
     };
+    
   
     return (
       <Swipeable renderRightActions={renderRightActions}>
@@ -280,6 +302,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#DDD",
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
+    width: '100%', // Set the width to 100% to fill the container
   },
   profilePicture: {
     width: 50,

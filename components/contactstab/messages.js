@@ -187,23 +187,32 @@ const MessagingUI = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.messagesContainer}>
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={({ item }) => (
-            <View
-              style={
-                item.Sent_From === session.user.id
-                  ? styles.messageContainerRight
-                  : styles.messageContainerLeft
-              }
-            >
-              <Text style={styles.message}>{item.Content}</Text>
-            </View>
-          )}
-          keyExtractor={(_, index) => index.toString()}
-          contentContainerStyle={styles.messagesContent}
-        />
+      <FlatList
+  ref={flatListRef}
+  data={messages}
+  renderItem={({ item }) => (
+    <View
+      style={
+        item.Sent_From === session.user.id
+          ? styles.messageContainerRight
+          : styles.messageContainerLeft
+      }
+    >
+      <Text
+        style={[
+          styles.message,
+          item.Sent_From === session.user.id
+            ? { color: "white" } // Change text color for messages from current user
+            : null, // Use default text color for messages from other user
+        ]}
+      >
+        {item.Content}
+      </Text>
+    </View>
+  )}
+  keyExtractor={(_, index) => index.toString()}
+  contentContainerStyle={styles.messagesContent}
+/>
       </View>
       <View style={styles.inputContainer}>
         <TextInput
@@ -273,13 +282,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 10,
     alignSelf: "flex-end",
-    backgroundColor: "#dedede",
+    backgroundColor: "#037cff",
   },
   messageContainerLeft: {
     borderRadius: 20,
     marginBottom: 10,
     alignSelf: "flex-start",
-    backgroundColor: "#c4c4c4",
+    backgroundColor: "#e8e8ea",
   },
   message: {
     fontSize: 16,
