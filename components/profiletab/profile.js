@@ -96,7 +96,7 @@ export const Profile = ({ navigation, route }) => {
         .map(([prompt, answer]) => ({ prompt, answer }));
 
       setPrompts(answeredPrompts);
-      console.log(answeredPrompts);
+      //console.log(answeredPrompts);
     } else {
       console.log("Error fetching prompts: ", promptsError);
     }

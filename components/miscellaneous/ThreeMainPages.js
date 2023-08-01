@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 // Page Imports
 import MessagingUI from "../contactstab/messages";
+import ComposeMessageScreen from "../contactstab/Compose";
 import TabNavigator from "./TabNavigator";
 import ProfileUI from "../contactstab/otherprofile";
 import UserCard from "../hometab/userCard.js";
@@ -59,6 +60,13 @@ const ThreeMainPages = ({ route }) => {
           name="AddPrompts"
           component={AddPrompts}
           initialParams={{ session }}
+        />
+        <Stack.Screen
+          name="ComposeMessage"
+          mode="modal"
+          component={ComposeMessageScreen}
+          initialParams={{ session }}
+          options={{ presentation: "modal" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

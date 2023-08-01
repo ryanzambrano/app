@@ -13,6 +13,7 @@ import {
   Alert,
 } from "react-native";
 
+import { AntDesign } from "@expo/vector-icons";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dimensions } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
@@ -135,6 +136,14 @@ const ContactsUI = ({ route }) => {
     navigation.navigate("Message", { user });
   };
 
+  
+  const handlePlusIconPress = () => {
+    // Implement the logic when the plus icon is pressed
+    // For example, you can navigate to the compose message screen
+    navigation.navigate("ComposeMessage");
+  };  
+  
+
 
   const renderContact = ({ item }) => {
     const handleDelete = async () => {
@@ -218,10 +227,16 @@ const ContactsUI = ({ route }) => {
         <Image
           style={styles.logo}
           source={{
-            uri: "https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg",
+            uri: 'https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg',
           }}
         />
         <Text style={styles.headerText}>Cabana</Text>
+        <TouchableOpacity
+          onPress={handlePlusIconPress}
+          style={{ position: 'absolute', top: 10, right: 13 }}
+        >
+          <AntDesign name="plus" size={25} color="blue" />
+        </TouchableOpacity>
       </View>
       <View style={styles.viewContainer}>
         <View style={styles.searchContainer}>
