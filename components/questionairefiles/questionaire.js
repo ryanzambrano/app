@@ -8,6 +8,7 @@ import Questionaire3 from "./questionaire3.js";
 import Username from "./username.js";
 import Name from "./fullName.js";
 import TagSelectionScreen from "./tagSelectionScreen.js";
+import Colleges from "./college.js";
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,11 @@ const Questionaire = ({ navigation, route }) => {
       <Stack.Screen
         name="Username"
         component={Username}
+        initialParams={{ session }}
+      />
+      <Stack.Screen
+        name="Colleges"
+        component={Colleges}
         initialParams={{ session }}
       />
 

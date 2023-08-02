@@ -52,7 +52,7 @@ export const Username = ({ navigation, route }) => {
             setIsError(error.message);
           }
         } else {
-          navigation.navigate("Questionaire1");
+          navigation.navigate("Colleges");
         }
       } else setIsError("Enter a Username");
     }
