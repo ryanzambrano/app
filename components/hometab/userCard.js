@@ -13,11 +13,12 @@ import {
 } from "react-native";
 import { createClient } from "@supabase/supabase-js";
 import { picURL } from "../auth/supabase";
+import { getLastModifiedFromSupabase } from "../auth/profileUtils.js";
 
 import Swiper from "react-native-swiper";
 // npm install react-native-swiper
 
-const MAX_IMAGES = 6;
+const MAX_IMAGES = 4;
 const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
 const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM";
@@ -46,6 +47,7 @@ const UserCard = ({ navigation, route }) => {
   const buttonColor = isFriendAdded ? "green" : "dodgerblue";
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [lastModified, setLastModified] = useState(null);
 
   const handlePhotoPress = (index) => {
     setSelectedPhotoIndex(index);
@@ -65,9 +67,12 @@ const UserCard = ({ navigation, route }) => {
     const fetchBookmarkedProfiles = async () => {
       const userId = session.user.id;
       try {
-        const { data, error } = await supabase.from('UGC').select('bookmarked_profiles').eq('user_id', userId);
+        const { data, error } = await supabase
+          .from("UGC")
+          .select("bookmarked_profiles")
+          .eq("user_id", userId);
         if (error) {
-          console.error('Error fetching bookmarked_profiles:', error.message);
+          console.error("Error fetching bookmarked_profiles:", error.message);
           return;
         }
         const { bookmarked_profiles } = data[0];
@@ -77,54 +82,60 @@ const UserCard = ({ navigation, route }) => {
           setIsFriendAdded(false);
         }
       } catch (error) {
-        console.error('Error fetching bookmarked_profiles:', error.message);
+        console.error("Error fetching bookmarked_profiles:", error.message);
       }
     };
     fetchBookmarkedProfiles();
-  }, []); 
-
+  }, []);
 
   const handleAddFriend = async (user_id) => {
     const userId = session.user.id;
     try {
-      const { data, error } = await supabase.from('UGC').select('bookmarked_profiles').eq('user_id', userId)
+      const { data, error } = await supabase
+        .from("UGC")
+        .select("bookmarked_profiles")
+        .eq("user_id", userId);
       if (error) {
-        console.error('Error fetching bookmarked_profiles:', error.message);
+        console.error("Error fetching bookmarked_profiles:", error.message);
         return;
       }
       const { bookmarked_profiles } = data[0];
       if (!bookmarked_profiles.includes(user_id)) {
         const updatedBookmarkedProfiles = [...bookmarked_profiles, user_id];
         const { data: updateData, error: updateError } = await supabase
-          .from('UGC')
+          .from("UGC")
           .update({ bookmarked_profiles: updatedBookmarkedProfiles })
-          .eq('user_id', userId);
+          .eq("user_id", userId);
         if (updateError) {
-          console.error('Error updating bookmarked_profiles:', updateError.message);
-        } 
-        else {
-          console.log('Bookmark added successfully!');
+          console.error(
+            "Error updating bookmarked_profiles:",
+            updateError.message
+          );
+        } else {
+          console.log("Bookmark added successfully!");
           setIsFriendAdded(true);
         }
-      } 
-      else {
-        const updatedBookmarkedProfiles = bookmarked_profiles.filter((id) => id !== user_id);
+      } else {
+        const updatedBookmarkedProfiles = bookmarked_profiles.filter(
+          (id) => id !== user_id
+        );
         const { data: updateData, error: updateError } = await supabase
-          .from('UGC')
+          .from("UGC")
           .update({ bookmarked_profiles: updatedBookmarkedProfiles })
-          .eq('user_id', userId);
+          .eq("user_id", userId);
 
         if (updateError) {
-          console.error('Error updating bookmarked_profiles:', updateError.message);
-        } 
-        else {
-          console.log('Bookmark removed successfully!');
-          setIsFriendAdded(false);  
+          console.error(
+            "Error updating bookmarked_profiles:",
+            updateError.message
+          );
+        } else {
+          console.log("Bookmark removed successfully!");
+          setIsFriendAdded(false);
         }
       }
-    } 
-    catch (error) {
-      console.error('Error adding/removing bookmark:', error.message);
+    } catch (error) {
+      console.error("Error adding/removing bookmark:", error.message);
     }
   };
 
@@ -138,21 +149,37 @@ const UserCard = ({ navigation, route }) => {
 
   const getProfilePictures = async () => {
     try {
-      const imagePromises = Array(MAX_IMAGES)
-        .fill(null)
-        .map(async (_, i) => {
-          const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}`;
-          const response = await fetch(profilePictureURL, {
-            cache: "no-store",
-          });
-          if (response.ok) {
-            return profilePictureURL;
-          }
-        });
+      //alert(user_id);
+      const cachedTimestamp = await getLastModifiedFromSupabase(user_id);
+      //alert(cachedTimestamp);
 
-      const newImages = await Promise.all(imagePromises);
-      const nonNullImages = newImages.filter(Boolean);
-      setPhotos(nonNullImages);
+      /*if (cachedTimestamp === null) {
+        alert("Failed to retrieve the last modified timestamp");
+        return;
+      }*/
+
+      for (let i = 0; i < MAX_IMAGES; i++) {
+        const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}`;
+        const response = await fetch(profilePictureURL, { method: "HEAD" });
+        if (!response.ok) {
+          continue;
+        }
+
+        const responseLastModified = response.headers.get("Last-Modified");
+
+        //if (responseLastModified !== cachedTimestamp) {
+        const imageResponse = await fetch(profilePictureURL, {
+          cache: "no-store",
+        });
+        if (imageResponse.ok) {
+          setPhotos((prevPhotos) => [...prevPhotos, profilePictureURL]);
+        }
+
+        setLastModified(responseLastModified);
+        //} else {
+        // If the last modified timestamp matches the cached one, you could load the image from cache
+        // This can vary depending on how your cache system is implemented
+      }
     } catch (error) {
       console.error(error);
     }
@@ -297,9 +324,9 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   buttonsContainer: {
-    flexDirection: "row", 
-    alignItems: "center", 
-    justifyContent: "space-between", 
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 0,
   },
   friendButton: {

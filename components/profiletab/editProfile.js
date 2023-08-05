@@ -21,11 +21,14 @@ import { picURL } from "../auth/supabase";
 export const EditProfileScreen = ({ navigation, route }) => {
   const { updated, session } = route.params;
 
-  const [editedUser, setEditedUser] = useState(session.user);
+  const [editedUser, setEditedUser] = useState(route.params.editedUser);
   const [profilePicture, setProfilePicture] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [prompts, setPrompts] = useState([]);
+  const [prompts, setPrompts] = useState(route.params.prompts);
   const isFocused = useIsFocused();
+
+  //const { name, bio, major, class_year, hometown, tags } =
+  //route.params.editedUser;
 
   const promptQuestions = {
     greek_life: "Are you participating in Greek Life?",
@@ -35,23 +38,11 @@ export const EditProfileScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    fetchProfile();
     getProfilePicture();
+    fetchPrompts();
   }, [updated, isFocused]);
 
-  const fetchProfile = async () => {
-    const { data, error } = await supabase
-      .from("UGC")
-      .select("name, bio, major, class_year, hometown")
-      .eq("user_id", session.user.id)
-      .single();
-
-    if (data) {
-      setEditedUser(data);
-    } else {
-      console.log("Error fetching profile: ", error);
-    }
-
+  const fetchPrompts = async () => {
     const { data: promptsData, error: promptsError } = await supabase
       .from("prompts")
       .select("*")
@@ -141,12 +132,23 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.contain}>
-      <TouchableOpacity
-        style={styles.button}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.bbuttonContainer}
           onPress={() => navigation.goBack()}
         >
-          <AntDesign name="arrowleft" size={24} color="#007AFF" />
-      </TouchableOpacity>
+          <Text style={styles.bbutton}>Cancel</Text>
+        </TouchableOpacity>
+        <View style={styles.centerContainer}>
+          <Text style={styles.center}>Edit Profile</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.dbuttonContainer}
+          onPress={() => navigation.goBack()} // Change this if you want a different action for the 'done' button
+        >
+          <Text style={styles.dbutton}>Done</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={prompts}
         renderItem={({ item }) =>
@@ -251,6 +253,21 @@ export const EditProfileScreen = ({ navigation, route }) => {
               />
             </View>
 
+            <Text style={styles.more}>Interests</Text>
+            {editedUser.tags && editedUser.tags.length > 0 && (
+              <View style={styles.tagsContainer}>
+                {editedUser.tags.map((tag, index) => (
+                  <View key={index} style={styles.tag}>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate("TagSelectionEdit")}
+                    >
+                      <Text style={styles.tagText}>{tag}</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )}
+
             <Text style={styles.more}>More about me:</Text>
           </>
         }
@@ -281,9 +298,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  button: {
-    marginLeft: 15,
-  },
   input: {
     flex: 0,
     fontSize: 16,
@@ -297,13 +311,74 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     gap: 5,
   },
-  backButton: {
-    marginLeft: 10,
+
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 5,
+    //backgroundColor: "transparent",
+  },
+
+  centerContainer: {
+    padding: 7,
+    alignSelf: "center",
+    //backgroundColor: "transparent",
+    // Style for the 'cancel' button container if needed
+  },
+
+  center: {
+    alignSelf: "center",
+
+    fontSize: 16,
+    color: "black",
+    fontWeight: "bold",
+  },
+  bbuttonContainer: {
+    padding: 7,
+    //backgroundColor: "transparent",
+    // Style for the 'cancel' button container if needed
+  },
+  bbutton: {
+    marginLeft: 15,
+    fontSize: 16,
+    color: "grey",
+    fontWeight: "bold",
+  },
+  dbuttonContainer: {
+    padding: 7,
+  },
+  dbutton: {
+    marginRight: 16,
+    fontSize: 17,
+    color: "#149999",
+    fontWeight: "bold",
+    // Add other styling as needed
+  },
+
+  tag: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    borderColor: "grey",
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    margin: 5,
+  },
+
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    borderBottomColor: "lightgrey",
+    borderRadius: 15,
+    justifyContent: "center",
+    paddingBottom: 10,
+    marginBottom: 10,
+    borderBottomWidth: 1,
   },
   profilePictureContainer: {
     margin: 30,
-    width: 250,
-    height: 250,
+    width: 150,
+    height: 150,
     backgroundColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
@@ -313,8 +388,8 @@ const styles = StyleSheet.create({
   profilePicture: {
     borderWidth: 3,
     borderColor: "darkblue",
-    width: 250,
-    height: 250,
+    width: 150,
+    height: 150,
     borderRadius: 200,
   },
   profilePictureText: {
@@ -351,7 +426,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 16,
     fontWeight: "bold",
-    margin: 20,
+    margin: 10,
   },
 });
 

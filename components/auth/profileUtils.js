@@ -50,27 +50,73 @@ export const fetchUsername = async (session) => {
     // Set hasProfile based on the presence of username
   }
 };
+// Assuming you have a Supabase client configured
 
-export const getProfilePicture = async (navigation) => {
+export const createTimestamp = async (user_id) => {
   try {
-    const profilePictureURL = `${picURL}/${session.user.id}/${session.user.id}-0`; // Replace '...' with the actual URL of the profile picture
+    const timestamp = new Date().toISOString(); // Create a timestamp in ISO format
 
-    const response = await fetch(profilePictureURL, {
-      cache: "no-store",
-    });
-    if (response.ok) {
-      const blob = await response.blob();
+    // Check if the record exists
+    const { data, error: fetchError } = await supabase
+      .from("images")
+      .select()
+      .eq("user_id", user_id);
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        const decodedData = reader.result;
-        return decodedData;
-      };
-      reader.readAsDataURL(blob);
-    } else {
-      // Handle response error
+    if (fetchError) {
+      console.error(fetchError);
+      return false;
     }
+
+    if (data && data.length > 0) {
+      // Update existing record
+      const { error: updateError } = await supabase
+        .from("images")
+        .update({ last_modified: timestamp })
+        .eq("user_id", user_id);
+
+      if (updateError) {
+        console.error(updateError);
+        return false;
+      }
+    } else {
+      // Insert new record
+      const { error: insertError } = await supabase.from("images").insert([
+        {
+          user_id: user_id,
+
+          last_modified: timestamp,
+          // other fields as needed
+        },
+      ]);
+
+      if (insertError) {
+        console.error(insertError);
+        return false;
+      }
+    }
+
+    return true;
   } catch (error) {
-    // Handle fetch or other errors
+    console.error(error);
+    return false;
+  }
+};
+export const getLastModifiedFromSupabase = async (user_id) => {
+  try {
+    const { data, error } = await supabase
+      .from("images") // Assuming 'images' is the table name
+      .select("last_modified") // Assuming 'last_modified' is the column name for the timestamp
+      .eq("user_id", user_id) // Assuming 'user_id' is the column to filter by
+      .single(); // Get a single record
+
+    if (error) {
+      console.error(error);
+      return null;
+    }
+
+    return data.last_modified; // Return the last modified timestamp
+  } catch (error) {
+    console.error(error);
+    return null;
   }
 };

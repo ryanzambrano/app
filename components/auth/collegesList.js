@@ -1,6 +1,5 @@
 import React, { memo, useState } from "react";
 import { Text, View } from "react-native";
-import { AutocompleteDropdown } from "react-native-autocomplete-dropdown";
 
 export const colleges = [
   { label: "University of Central Florida", value: "UCF" },

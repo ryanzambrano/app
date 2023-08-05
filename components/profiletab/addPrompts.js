@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   card: {
     backgroundColor: "#ffffff",
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: "#ffffff",
-    fontWeight: 'bold',
+    fontWeight: "bold",
     textAlign: "center",
     fontSize: 15,
   },

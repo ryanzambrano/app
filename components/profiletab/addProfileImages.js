@@ -15,7 +15,7 @@ import { decode } from "base64-arraybuffer";
 import { picURL } from "../auth/supabase";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator";
-import * as FileSystem from "expo-file-system";
+import { createTimestamp } from "../auth/profileUtils.js";
 
 const MAX_IMAGES = 6;
 
@@ -150,8 +150,6 @@ const ImagePickerScreen = ({ navigation, route }) => {
         deletePictures(index);
         const filename = `${session.user.id}/${session.user.id}-${index}`;
 
-        const base64Data = imagePickerResult.assets[0].base64;
-
         const compressedImage = await manipulateAsync(
           imagePickerResult.assets[0].uri,
           [], // No transforms
@@ -165,6 +163,9 @@ const ImagePickerScreen = ({ navigation, route }) => {
           .upload(filename, buffer, {
             contentType: "image/jpeg",
           });
+
+        createTimestamp(session.user.id);
+
         if (uploadError) {
           alert(uploadError.message);
         } else {

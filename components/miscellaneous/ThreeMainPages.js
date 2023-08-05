@@ -12,6 +12,7 @@ import SettingsScreen from "./settings";
 import AddProfileImages from "../profiletab/addProfileImages";
 import EditProfileScreen from "../profiletab/editProfile";
 import { AddPrompts } from "../profiletab/addPrompts";
+import TagSelectionEdit from "../profiletab/TagSelectionEdit";
 
 const Stack = createStackNavigator(); // Initialize stack navigator
 
@@ -54,6 +55,12 @@ const ThreeMainPages = ({ route }) => {
         <Stack.Screen
           name="EditProfileScreen"
           component={EditProfileScreen}
+          initialParams={{ session }}
+        />
+
+        <Stack.Screen
+          name="TagSelectionEdit"
+          component={TagSelectionEdit}
           initialParams={{ session }}
         />
         <Stack.Screen

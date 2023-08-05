@@ -137,7 +137,10 @@ export const Profile = ({ navigation, route }) => {
             <TouchableOpacity
               style={styles.editButton}
               onPress={() => {
-                navigation.navigate("EditProfileScreen");
+                navigation.navigate("EditProfileScreen", {
+                  editedUser,
+                  prompts,
+                });
               }}
             >
               <Text style={styles.buttonText}>Edit</Text>
