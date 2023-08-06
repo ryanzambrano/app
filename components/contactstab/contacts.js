@@ -3,7 +3,6 @@ import {
   Image,
   TextInput,
   View,
-  ScrollView,
   Text,
   StyleSheet,
   TouchableOpacity,
@@ -15,13 +14,9 @@ import {
 
 import { AntDesign } from "@expo/vector-icons";
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Dimensions } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import { picURL } from "../auth/supabase.js";
-import { decode } from "base64-arraybuffer";
 import { createClient } from "@supabase/supabase-js";
-import { Button } from "react-native-paper";
-import { SwipeListView } from 'react-native-swipe-list-view'; //install
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler'; //install
 import { Swipeable } from 'react-native-gesture-handler';
 
@@ -169,12 +164,11 @@ const ContactsUI = ({ route }) => {
           "Are you sure you want to delete this contact? This will permanently delete all messages for both you and the recipient.",
           [
             {
-              text: "No",
-              style: "cancel",
-            },
-            {
               text: "Yes",
               onPress: handleDelete,
+            },
+            {
+              text: "No",
             },
           ]
         );
