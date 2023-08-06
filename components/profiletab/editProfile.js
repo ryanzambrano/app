@@ -19,16 +19,23 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { picURL } from "../auth/supabase";
 
 export const EditProfileScreen = ({ navigation, route }) => {
-  const { updated, session } = route.params;
-
+  const { session } = route.params;
   const [editedUser, setEditedUser] = useState(route.params.editedUser);
+  //editedUser.tags = route.params.selectedTags;
+
+  const { updated } = route.params;
+  const selectedTags = route.params.selectedTags;
+  //alert(updated);
   const [profilePicture, setProfilePicture] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [prompts, setPrompts] = useState(route.params.prompts);
   const isFocused = useIsFocused();
 
+  if (updated == true) {
+    editedUser.tags = selectedTags;
+  }
+
   //const { name, bio, major, class_year, hometown, tags } =
-  //route.params.editedUser;
 
   const promptQuestions = {
     greek_life: "Are you participating in Greek Life?",
@@ -39,10 +46,10 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
   useEffect(() => {
     getProfilePicture();
-    fetchPrompts();
+    fetchLists();
   }, [updated, isFocused]);
 
-  const fetchPrompts = async () => {
+  const fetchLists = async () => {
     const { data: promptsData, error: promptsError } = await supabase
       .from("prompts")
       .select("*")
@@ -56,7 +63,6 @@ export const EditProfileScreen = ({ navigation, route }) => {
         .map(([prompt, answer]) => ({ prompt, answer }));
 
       setPrompts(answeredPrompts);
-      console.log(answeredPrompts);
     } else {
       console.log("Error fetching prompts: ", promptsError);
     }
@@ -144,7 +150,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
         </View>
         <TouchableOpacity
           style={styles.dbuttonContainer}
-          onPress={() => navigation.goBack()} // Change this if you want a different action for the 'done' button
+          onPress={updateProfile}
         >
           <Text style={styles.dbutton}>Done</Text>
         </TouchableOpacity>
@@ -259,7 +265,9 @@ export const EditProfileScreen = ({ navigation, route }) => {
                 {editedUser.tags.map((tag, index) => (
                   <View key={index} style={styles.tag}>
                     <TouchableOpacity
-                      onPress={() => navigation.navigate("TagSelectionEdit")}
+                      onPress={() =>
+                        navigation.navigate("TagSelectionEdit", { editedUser })
+                      }
                     >
                       <Text style={styles.tagText}>{tag}</Text>
                     </TouchableOpacity>
@@ -279,8 +287,6 @@ export const EditProfileScreen = ({ navigation, route }) => {
             >
               <Text style={styles.prompt}>Add prompts</Text>
             </TouchableOpacity>
-
-            <Button title="Update Profile" onPress={updateProfile} />
           </>
         }
       />
@@ -335,8 +341,6 @@ const styles = StyleSheet.create({
   },
   bbuttonContainer: {
     padding: 7,
-    //backgroundColor: "transparent",
-    // Style for the 'cancel' button container if needed
   },
   bbutton: {
     marginLeft: 15,

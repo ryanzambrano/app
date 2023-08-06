@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 
 import {
@@ -13,28 +13,15 @@ import {
 
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
-import { NavigationHelpersContext } from "@react-navigation/native";
 
 const TagSelectionEdit = ({ navigation, route }) => {
   const { session } = route.params;
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState(
+    route.params.editedUser.tags
+  );
 
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
-
-  const fetchProfile = async () => {
-    const { data, error } = await supabase
-      .from("UGC")
-      .select("tags")
-      .eq("user_id", session.user.id)
-      .single();
-
-    if (data) {
-      setSelectedTags(data);
-    } else {
-      console.log("Error fetching profile: ", error);
-    }
-  };
 
   const availableTags = [
     "Technology",
@@ -111,8 +98,10 @@ const TagSelectionEdit = ({ navigation, route }) => {
           startShakeAnimation();
           setIsError(error.message);
         } else {
-          navigation.goBack();
-          //signOut();
+          navigation.navigate("EditProfileScreen", {
+            updated: true,
+            selectedTags,
+          });
         }
       } else if (userData.tags.length > 7) {
         setIsError("Less than 7 interests");
@@ -136,6 +125,25 @@ const TagSelectionEdit = ({ navigation, route }) => {
   };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.bbuttonContainer}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.bbutton}>Cancel</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.dbuttonContainer}
+          onPress={() => {
+            {
+              handleUpdate(userData, session);
+            }
+          }}
+        >
+          <Text style={styles.dbutton}>Done</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.container}>
         <Text style={styles.title}>Select Your Interests</Text>
         <ScrollView
@@ -157,19 +165,6 @@ const TagSelectionEdit = ({ navigation, route }) => {
           </Animated.Text>
         )}
 
-        <View style={styles.formAction}>
-          <TouchableOpacity
-            onPress={() => {
-              {
-                handleUpdate(userData, session);
-              }
-            }}
-          >
-            <View style={styles.continue}>
-              <Text style={styles.continueText}>Update</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
         <StatusBar style="dark" />
       </View>
     </SafeAreaView>
@@ -249,6 +244,35 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 10,
+  },
+
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 5,
+
+    //backgroundColor: "transparent",
+  },
+  bbuttonContainer: {
+    padding: 7,
+    //backgroundColor: "transparent",
+    // Style for the 'cancel' button container if needed
+  },
+  bbutton: {
+    marginLeft: 15,
+    fontSize: 16,
+    color: "grey",
+    fontWeight: "bold",
+  },
+  dbuttonContainer: {
+    padding: 7,
+  },
+  dbutton: {
+    marginRight: 16,
+    fontSize: 17,
+    color: "#149999",
+    fontWeight: "bold",
+    // Add other styling as needed
   },
 });
 
