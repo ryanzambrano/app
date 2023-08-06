@@ -1,56 +1,79 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, Button, FlatList, StyleSheet, Text, KeyboardAvoidingView, Platform, TouchableOpacity, Image } from 'react-native';
-import { AntDesign } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { View, TextInput, FlatList, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons'; // Import Feather icons
+import { supabase } from "../auth/supabase";
+import { picURL } from "../auth/supabase.js";
 
 const ComposeMessageScreen = () => {
   const navigation = useNavigation();
-  const route = useRoute();
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]);
-  const [contactName, setContactName] = useState('');
-  const [contactImage, setContactImage] = useState('');
+  const [users, setUsers] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]); // Store selected users
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const sendMessage = () => {
-    if (message.trim() !== '') {
-      setMessages(prevMessages => [message, ...prevMessages]);
-      setMessage('');
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    const { data: users, error } = await supabase.from("UGC").select("*");
+    if (error) {
+      console.error(error);
+      return;
+    }
+    setUsers(users);
+  };
+
+  const handleUserCardPress = (user) => {
+    if (selectedUsers.includes(user)) {
+      // User already selected, remove from selection
+      setSelectedUsers(selectedUsers.filter(selectedUser => selectedUser !== user));
+    } else {
+      // User not selected, add to selection
+      setSelectedUsers([...selectedUsers, user]);
     }
   };
 
-  useEffect(() => {
-    if (route.params && route.params.contactName) {
-      setContactName(route.params.contactName);
-    }
-    if (route.params && route.params.contactImage) {
-      setContactImage(route.params.contactImage);
-    }
-  }, [route.params]);
+  const createButtonLabel = selectedUsers.length <= 1 ? "Create Message" : "Create Group Chat";
 
-  useEffect(() => {
-    // Scroll to the bottom of the messages when a new message is added
-    setTimeout(() => {
-      flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
-    }, 100);
-  }, [messages]);
+  const filteredUsers = users.filter(user => user.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  const flatListRef = React.useRef();
-
-  const navigateToProfile = () => {
-    navigation.navigate('Profile', { contactName, contactImage });
-  };
+  const renderUserItem = ({ item }) => (
+    <TouchableOpacity onPress={() => handleUserCardPress(item)}>
+      <View style={styles.contactItem}>
+        <View style={styles.profileContainer}>
+          <Image
+            style={styles.profilePicture}
+            source={{
+              uri: `${picURL}/${item.user_id}/${item.user_id}-0?${new Date().getTime()}`
+            }}
+          />
+        </View>
+        <View style={styles.contactInfo}>
+          <View style={styles.contactNameContainer}>
+            <Text style={styles.contactName}>{item.name}</Text>
+            <Text style={styles.MessageTime}>{item.recentTime}</Text>
+          </View>
+          <Text style={styles.RecentMessage}>{item.recentMessage}</Text>
+        </View>
+        <View style={styles.buttonContainer}>
+          <Feather
+            name={selectedUsers.includes(item) ? 'check-circle' : 'circle'}
+            size={24}
+            color={selectedUsers.includes(item) ? 'green' : 'gray'}
+          />
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : null}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 55 : 0}
-    >
+    <View style={styles.container}>
       <SafeAreaView style={styles.headerSafeArea}>
         <View style={styles.header}>
           <Text style={styles.composeHeader}>{"Compose Message"}</Text>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
             <Text style={styles.cancelButtonText}>{"Cancel"}</Text>
           </TouchableOpacity>
         </View>
@@ -63,39 +86,75 @@ const ComposeMessageScreen = () => {
           placeholder=""
           placeholderTextColor="#888"
           autoCorrect={false}
+          value={searchQuery}
+          onChangeText={setSearchQuery} // Update searchQuery when text changes
         />
       </View>
-      <View style={styles.messagesContainer}>
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={({ item }) => (
-            <View style={styles.messageContainer}>
-              <Text style={styles.message}>{item}</Text>
-            </View>
-          )}
-          keyExtractor={(_, index) => index.toString()}
-          contentContainerStyle={styles.messagesContent}
-          inverted
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          value={message}
-          onChangeText={text => setMessage(text)}
-          placeholder="Type a message..."
-          placeholderTextColor="#888"
-          autoCorrect={false}
-          multiline
-        />
-        <Button title="Send" onPress={sendMessage} color="#007AFF" />
-      </View>
-    </KeyboardAvoidingView>
+
+      <FlatList
+        data={filteredUsers} // Use the filteredUsers array
+        renderItem={renderUserItem}
+        keyExtractor={(item) => item.id.toString()}
+      />
+
+      <TouchableOpacity style={styles.createButton}>
+        <Text style={styles.createButtonText}>{createButtonLabel}</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
+
 const styles = StyleSheet.create({
+  contactItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#DDD",
+    width: '100%',
+  },
+  createButton: {
+    marginVertical: 20,
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: 'blue',
+    borderRadius: 10,
+  },
+  createButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  buttonContainer: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  contactInfo: {
+    flex: 1,
+  },
+  contactName: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  profileContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50, // Half of the width and height to create a circular shape
+    backgroundColor: '#dedede',
+    overflow: 'hidden',
+    marginRight: 10,
+  },
+  profilePicture: {
+    width: '100%',
+    height: '100%',
+  },
+  contactNameContainer: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+  },
     toInputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -103,7 +162,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         paddingHorizontal: 10,
         paddingVertical: 5,
-        marginBottom: 10,
+        marginBottom: 1,
       },
       toLabel: {
         fontSize: 16,
@@ -128,12 +187,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   profileContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     backgroundColor: '#dedede',
     overflow: 'hidden',
-    marginRight: 10,
+    marginRight: 5,
   },
   profilePicture: {
     width: '100%',
@@ -210,14 +269,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 5,
-    backgroundColor: '#007AFF',
   },
   cancelButtonText: {
     fontSize: 16,
     fontWeight: 'light',
     color: 'blue',
     paddingLeft: 50,
-  },
+  }
 });
-
 export default ComposeMessageScreen;
