@@ -285,7 +285,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
               style={styles.promptAdd}
               onPress={() => navigation.navigate("AddPrompts")}
             >
-              <Text style={styles.prompt}>Add prompts</Text>
+              <Text style={styles.prompt}>Edit prompts</Text>
             </TouchableOpacity>
           </>
         }

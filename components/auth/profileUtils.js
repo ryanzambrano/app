@@ -106,11 +106,11 @@ export const getLastModifiedFromSupabase = async (user_id) => {
     const { data, error } = await supabase
       .from("images") // Assuming 'images' is the table name
       .select("last_modified") // Assuming 'last_modified' is the column name for the timestamp
-      .eq("user_id", user_id) // Assuming 'user_id' is the column to filter by
-      .single(); // Get a single record
+      .eq("user_id", user_id); // Assuming 'user_id' is the column to filter by
+    // Get a single record
 
     if (error) {
-      console.error(error);
+      alert(error.message);
       return null;
     }
 

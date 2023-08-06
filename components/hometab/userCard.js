@@ -147,38 +147,36 @@ const UserCard = ({ navigation, route }) => {
     getProfilePictures();
   }, [user_id, picURL]);
 
+  const getLastModifiedFromSupabase = async (user_id) => {
+    try {
+      const { data, error } = await supabase
+        .from("images") // Assuming 'images' is the table name
+        .select("last_modified") // Assuming 'last_modified' is the column name for the timestamp
+        .eq("user_id", user_id) // Assuming 'user_id' is the column to filter by
+        .single(); // Get a single record
+
+      if (error) {
+        alert(error.message);
+        return null;
+      }
+
+      return data.last_modified; // Return the last modified timestamp
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  };
+
   const getProfilePictures = async () => {
     try {
-      //alert(user_id);
-      const cachedTimestamp = await getLastModifiedFromSupabase(user_id);
-      //alert(cachedTimestamp);
-
-      /*if (cachedTimestamp === null) {
-        alert("Failed to retrieve the last modified timestamp");
-        return;
-      }*/
-
       for (let i = 0; i < MAX_IMAGES; i++) {
         const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}`;
-        const response = await fetch(profilePictureURL, { method: "HEAD" });
-        if (!response.ok) {
-          continue;
-        }
 
-        const responseLastModified = response.headers.get("Last-Modified");
+        const imageResponse = await fetch(profilePictureURL);
 
-        //if (responseLastModified !== cachedTimestamp) {
-        const imageResponse = await fetch(profilePictureURL, {
-          cache: "no-store",
-        });
         if (imageResponse.ok) {
           setPhotos((prevPhotos) => [...prevPhotos, profilePictureURL]);
         }
-
-        setLastModified(responseLastModified);
-        //} else {
-        // If the last modified timestamp matches the cached one, you could load the image from cache
-        // This can vary depending on how your cache system is implemented
       }
     } catch (error) {
       console.error(error);
