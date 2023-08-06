@@ -92,7 +92,7 @@ const ComposeMessageScreen = () => {
       </View>
 
       <FlatList
-        data={filteredUsers} // Use the filteredUsers array
+        data={filteredUsers.slice(0, 50)} // Use the filteredUsers array
         renderItem={renderUserItem}
         keyExtractor={(item) => item.id.toString()}
       />
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    backgroundColor: 'blue',
+    backgroundColor: '#14999999',
     borderRadius: 10,
   },
   createButtonText: {
