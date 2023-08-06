@@ -1,9 +1,11 @@
-import { React, useEffect, useState } from "react";
+import { React, useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
   ScrollView,
   Image,
+  Animated,
+  ActivityIndicator,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
@@ -12,6 +14,7 @@ import {
   Modal,
 } from "react-native";
 import { createClient } from "@supabase/supabase-js";
+import { useIsFocused } from "@react-navigation/native";
 import { picURL } from "../auth/supabase";
 import { getLastModifiedFromSupabase } from "../auth/profileUtils.js";
 
@@ -23,6 +26,26 @@ const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
 const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM";
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+const scrollY = new Animated.Value(0);
+
+/*scrollY.addListener(({ value }) => {
+  setIsProfileVisible(value < DISABLE_TOUCHABLE_SCROLL_POINT);
+});*/
+
+const profileOpacity = scrollY.interpolate({
+  inputRange: [0, 100],
+  outputRange: [1, 0],
+  extrapolate: "clamp",
+});
+
+const profileZIndex = scrollY.interpolate({
+  inputRange: [0, 100],
+  outputRange: [1, -1],
+  extrapolate: "clamp",
+});
+
+const DISABLE_TOUCHABLE_SCROLL_POINT = 100;
 
 const UserCard = ({ navigation, route }) => {
   const { session } = route.params;
@@ -36,6 +59,8 @@ const UserCard = ({ navigation, route }) => {
     gender,
     living_preferences,
     for_fun,
+    class_year,
+    hometown,
     bookmarked_profiles,
   } = route.params.user;
 
@@ -46,8 +71,16 @@ const UserCard = ({ navigation, route }) => {
   const [isFriendAdded, setIsFriendAdded] = useState(false);
   const buttonColor = isFriendAdded ? "green" : "dodgerblue";
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
+  const [prompts, setPrompts] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [lastModified, setLastModified] = useState(null);
+
+  const promptQuestions = {
+    greek_life: "Are you participating in Greek Life?",
+    night_out: "What is your idea of a perfect night out?",
+    pet_peeves: "What are your biggest pet peeves?",
+    favorite_movies: "What are your favorite movies?",
+  };
 
   const handlePhotoPress = (index) => {
     setSelectedPhotoIndex(index);
@@ -62,6 +95,8 @@ const UserCard = ({ navigation, route }) => {
       setSelectedPhotoIndex(null);
     }
   };
+
+  
 
   useEffect(() => {
     const fetchBookmarkedProfiles = async () => {
@@ -85,7 +120,27 @@ const UserCard = ({ navigation, route }) => {
         console.error("Error fetching bookmarked_profiles:", error.message);
       }
     };
+    const fetchPrompts = async () => {
+      const { data: promptsData, error: promptsError } = await supabase
+        .from("prompts")
+        .select("*")
+        .eq("user_id", session.user.id);
+      if (promptsData) {
+        const answeredPrompts = Object.entries(promptsData[0])
+          .filter(
+            ([prompt, answer]) =>
+              answer !== null && prompt !== "id" && prompt !== "user_id"
+          )
+          .map(([prompt, answer]) => ({ prompt, answer }));
+  
+        setPrompts(answeredPrompts);
+        //console.log(answeredPrompts);
+      } else {
+        console.log("Error fetching prompts: ", promptsError);
+      }
+    };
     fetchBookmarkedProfiles();
+    fetchPrompts();
   }, []);
 
   const handleAddFriend = async (user_id) => {
@@ -246,6 +301,9 @@ const UserCard = ({ navigation, route }) => {
         </View>
 
         <View style={styles.bioContainer}>
+            <Text style={styles.bio}>Graduating Class: {class_year}</Text>
+        </View>
+        <View style={styles.bioContainer}>
           <View style={styles.roundedContainer}>
             <Text style={styles.bio}>{bio}</Text>
           </View>
@@ -256,6 +314,8 @@ const UserCard = ({ navigation, route }) => {
           <Text style={styles.bio}>Age: {age}</Text>
           <View style={styles.divider} />
           <Text style={styles.bio}>Gender: {gender}</Text>
+          <View style={styles.divider}/>
+          <Text style={styles.bio}>Hometown: {hometown}</Text>
         </View>
 
         <View style={styles.tagsContainer}>
@@ -265,6 +325,31 @@ const UserCard = ({ navigation, route }) => {
             </View>
           ))}
         </View>
+
+        <View style={styles.ageMajorGradeContainer}>
+          <Text style={styles.bio}>Do you plan on living in an apartment or dorm?: {"\n"}{living_preferences}</Text>          
+          <View style={styles.divider}/>
+          <Text style={styles.bio}>Would you rather stay in or go out for fun?: {"\n"}{for_fun}</Text>
+        </View>
+        <ScrollView
+              horizontal
+              style={styles.horizontalScrollView}
+              showsHorizontalScrollIndicator={false}
+              bounces={false}
+            >
+              {prompts.map((item, index) =>
+                item.answer ? (
+                  <View key={index} style={styles.itemContainer}>
+                    <Text style={styles.itemPrompt}>
+                      {promptQuestions[item.prompt]}
+                    </Text>
+                    <Text style={styles.itemAnswer}>{item.answer}</Text>
+                  </View>
+                ) : null
+              )}
+            </ScrollView>
+
+        
       </ScrollView>
     </SafeAreaView>
   );
@@ -387,6 +472,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingVertical: 15,
     borderWidth: 0.4,
+    
     borderColor: "grey",
   },
   divider: {
@@ -400,6 +486,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     paddingVertical: 10,
+    marginBottom: 10,
     borderRadius: 15,
     justifyContent: "center",
     borderWidth: 0.4,
@@ -418,6 +505,34 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "grey",
     fontWeight: "bold",
+  },
+  horizontalScrollView: {
+    paddingTop: 20,
+    marginBottom: 5,
+    borderBottomColor: "lightgrey",
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomEndRadius: 20,
+    borderBottomStartRadius: 20,
+  },
+  itemContainer: {
+    marginHorizontal: 15,
+    borderWidth: 0.5,
+    borderColor: "lightgrey",
+    borderRadius: 50,
+    padding: 30,
+    width: 300,
+    marginRight: 10,
+    minWidth: 150,
+    gap: 10,
+  },
+  itemPrompt: {
+    fontSize: 15,
+    marginBottom: 5,
+  },
+  itemAnswer: {
+    fontWeight: "bold",
+    fontSize: 20,
   },
 });
 
