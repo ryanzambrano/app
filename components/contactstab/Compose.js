@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, FlatList, StyleSheet, Text, TouchableOpacity, Image } from 'react-native';
+import { View, TextInput, FlatList, StyleSheet, Text, TouchableOpacity, Image, Animated, Easing,LayoutAnimation } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons'; // Import Feather icons
@@ -27,12 +27,13 @@ const ComposeMessageScreen = () => {
 
   const handleUserCardPress = (user) => {
     if (selectedUsers.includes(user)) {
-      // User already selected, remove from selection
       setSelectedUsers(selectedUsers.filter(selectedUser => selectedUser !== user));
     } else {
-      // User not selected, add to selection
       setSelectedUsers([...selectedUsers, user]);
     }
+  
+    // Toggle user label visibility with LayoutAnimation
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
 
   const selectedUserNames = selectedUsers.map(user => user.name).join(' ');
@@ -83,27 +84,27 @@ const ComposeMessageScreen = () => {
       </SafeAreaView>
 
       <View style={styles.toInputContainer}>
-  <View style={styles.toLabelContainer}>
-    <Text style={styles.toLabel}>To:</Text>
-    {selectedUsers.length > 0 && (
-      <View style={styles.selectedUserContainer}>
-        {selectedUsers.map(user => (
-          <View key={user.id} style={styles.selectedUser}>
-            <Text style={styles.selectedUserName}>{user.name}</Text>
-          </View>
-        ))}
+      <View style={styles.toLabelContainer}>
+  <Text style={styles.toLabel}>To:</Text>
+  <View style={styles.selectedUserContainer}>
+    {selectedUsers.map(user => (
+      <View key={user.id} style={styles.selectedUser}>
+        <Text style={styles.selectedUserName}>{user.name}</Text>
       </View>
-    )}
+    ))}
   </View>
-  <TextInput
-    style={styles.toInput}
-    placeholder=""
-    placeholderTextColor="#888"
-    autoCorrect={false}
-    value={searchQuery}
-    onChangeText={setSearchQuery}
-  />
 </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.toInput}
+            placeholder=""
+            placeholderTextColor="#888"
+            autoCorrect={false}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </View>
+      </View>
 
       <FlatList
         data={filteredUsers.slice(0, 50)}
@@ -168,19 +169,25 @@ const styles = StyleSheet.create({
     alignItems: 'center', // Vertically center the selected users
     marginRight: 10,
   },
+  inputContainer: {
+    flex: 1,
+  },
   createButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
   },
   toLabelContainer: {
-    flexDirection: 'row', // Make the label and selected users container side by side
-    alignItems: 'center', // Vertically center the label and selected users
-    flex: 1, // Allow the label and selected users to take available space
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 10,
+    height: 30,
   },
   buttonContainer: {
     flex: 1,
     alignItems: 'flex-end',
+    color: '#14999999',
+    
   },
   contactInfo: {
     flex: 1,
@@ -207,13 +214,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   toInputContainer: {
-    flexDirection: 'row', // Make the label and input container side by side
-    alignItems: 'center', // Vertically center the label and input
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: '#FFF',
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    marginBottom: 1,
+    marginBottom: 10,
   },
   toLabel: {
     fontSize: 16,
@@ -268,16 +275,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     color: '#000',
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginBottom: 10,
-    paddingTop: 0,
   },
   input: {
     flex: 1,

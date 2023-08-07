@@ -151,7 +151,7 @@ const MessagingUI = () => {
   const flatListRef = React.useRef();
 
   const navigateToProfile = () => {
-    navigation.navigate("OtherProfile", { user });
+    navigation.navigate("userCard", { user });
   };
 
   return (

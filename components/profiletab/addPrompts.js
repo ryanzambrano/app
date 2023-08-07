@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
   },
   saveButton: {
-    backgroundColor: "#007BFF",
+    backgroundColor: "#14999999",
     padding: 20,
     borderRadius: 50,
     marginBottom: 20,

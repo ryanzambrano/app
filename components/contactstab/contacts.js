@@ -194,25 +194,29 @@ const ContactsUI = ({ route }) => {
     
   
     return (
-      <Swipeable renderRightActions={renderRightActions}>
-        <TouchableOpacity onPress={() => handleUserCardPress(item)}>
-          <View style={styles.contactItem}>
-            <Image
-              style={styles.profilePicture}
-              source={{
-                uri: `${picURL}/${item.user_id}/${item.user_id}-0?${new Date().getTime()}`
-              }}
-            />
-            <View style={styles.contactInfo}>
-              <View style={styles.contactNameContainer}>
-                <Text style={styles.contactName}>{item.name}</Text>
-                <Text style={styles.MessageTime}>{item.recentTime}</Text>
-              </View>
-              <Text style={styles.RecentMessage}>{item.recentMessage}</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-      </Swipeable>
+<Swipeable
+  renderRightActions={renderRightActions}
+  overshootRight={false} // Disable the bounce effect
+  useNativeDriver={true} // Use native driver to prevent bounce effect
+>
+  <TouchableOpacity onPress={() => handleUserCardPress(item)}>
+    <View style={styles.contactItem}>
+      <Image
+        style={styles.profilePicture}
+        source={{
+          uri: `${picURL}/${item.user_id}/${item.user_id}-0?${new Date().getTime()}`
+        }}
+      />
+      <View style={styles.contactInfo}>
+        <View style={styles.contactNameContainer}>
+          <Text style={styles.contactName}>{item.name}</Text>
+          <Text style={styles.MessageTime}>{item.recentTime}</Text>
+        </View>
+        <Text style={styles.RecentMessage}>{item.recentMessage}</Text>
+      </View>
+    </View>
+  </TouchableOpacity>
+</Swipeable>
     );
   };
   return (
@@ -229,7 +233,7 @@ const ContactsUI = ({ route }) => {
           onPress={handlePlusIconPress}
           style={{ position: 'absolute', top: 10, right: 13 }}
         >
-          <AntDesign name="plus" size={25} color="blue" />
+          <AntDesign name="plus" size={25} color="#14999999" fontWeight = "bold" />
         </TouchableOpacity>
       </View>
       <View style={styles.viewContainer}>
