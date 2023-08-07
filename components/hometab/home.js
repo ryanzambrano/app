@@ -29,6 +29,7 @@ const Home = ({ route }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkedProfiles, setBookmarkedProfiles] = useState([]);
+  const [selectedHousingPreference, setSelectedHousingPreference] = useState(null);
   
   const handleFiltersPress = () => {
     navigation.navigate("Filters");
@@ -48,6 +49,9 @@ const Home = ({ route }) => {
     const nameMatch = user.name.toLowerCase().includes(searchQuery.toLowerCase());
     const tagMatch = user.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     if (isSessionUser) {
+      return false;
+    }
+    if (selectedHousingPreference && user.living_preferences !== selectedHousingPreference) {
       return false;
     }
     if (isBookmarked) {
