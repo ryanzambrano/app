@@ -37,8 +37,12 @@ const Home = ({ route }) => {
   };
 
   const filteredUsers = users.filter((user) => {
+    const isSessionUser = user.user_id === session.user.id;
     const nameMatch = user.name.toLowerCase().includes(searchQuery.toLowerCase());
     const tagMatch = user.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    if (isSessionUser) {
+      return false;
+    }
     if (isBookmarked) {
       return bookmarkedProfiles.includes(user.user_id) && (nameMatch || tagMatch);
     }
