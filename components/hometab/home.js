@@ -11,6 +11,8 @@ import {
   SafeAreaView,
 } from "react-native";
 
+import FiltersUI from "./filters.js";
+
 import { supabase } from "../auth/supabase.js"; // we have our client here!!! no need to worry about creating it again
 import { picURL } from "../auth/supabase.js"; // This is the base url of the photos bucket that is in our Supabase project. It makes referencing user pictures easier
 import { useNavigation } from "@react-navigation/native";
@@ -28,8 +30,13 @@ const Home = ({ route }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkedProfiles, setBookmarkedProfiles] = useState([]);
   
+  const handleFiltersPress = () => {
+    navigation.navigate("Filters");
+  };
+
   const toggleBookmarkButton = () => {
     setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
+
   };
 
   const handleSearch = (text) => {
@@ -146,10 +153,16 @@ const Home = ({ route }) => {
           }}
         />
         <Text style={styles.headerText}> Cabana </Text>
+
+        <TouchableOpacity onPress={handleFiltersPress}>
+          <Image style={{ marginLeft: 167, marginTop: -14, marginBottom: -7, height: 40, width: 40}} 
+          source={{ uri: "https://icon-library.com/images/filter-icon-png/filter-icon-png-17.jpg" }}></Image>
+        </TouchableOpacity>
+
         <TouchableOpacity onPress={toggleBookmarkButton}>
           <Image
             style={{
-              marginLeft: isBookmarked ? 202 : 203,
+              marginLeft: isBookmarked ? 4 : 5,
               marginTop: -10,
               height: isBookmarked ? 26 : 28,
               width: isBookmarked ? 22.5 : 21,
@@ -157,6 +170,7 @@ const Home = ({ route }) => {
             source={{ uri: isBookmarked ? isBookmarkedURI : notBookmarkedURI }}
           ></Image>
         </TouchableOpacity>
+        
       </View>
 
       <View style={styles.viewContainer}>

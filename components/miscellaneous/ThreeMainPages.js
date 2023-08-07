@@ -13,6 +13,7 @@ import AddProfileImages from "../profiletab/addProfileImages";
 import EditProfileScreen from "../profiletab/editProfile";
 import { AddPrompts } from "../profiletab/addPrompts";
 import TagSelectionEdit from "../profiletab/TagSelectionEdit";
+import FiltersUI from "../hometab/filters.js";
 
 const Stack = createStackNavigator(); // Initialize stack navigator
 
@@ -73,6 +74,12 @@ const ThreeMainPages = ({ route }) => {
           mode="modal"
           component={ComposeMessageScreen}
           initialParams={{ session }}
+          options={{ presentation: "modal" }}
+        />
+        <Stack.Screen
+          name="Filters"
+          mode="modal"
+          component={FiltersUI}
           options={{ presentation: "modal" }}
         />
       </Stack.Navigator>
