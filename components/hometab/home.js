@@ -109,7 +109,21 @@ const Home = ({ route }) => {
     };
   
     fetchUsers();
+    const channel = supabase
+    .channel("custom-all-channel")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "UGC", /*filter: `.or(Sent_From.eq.${session.user.id}, Contact_ID.eq.${session.user.id})`, */},
+      (payload) => {
+        fetchUsers();
+      }
+    )
+    .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    }
   }, []);
+  
   
 
   const handleUserCardPress = (user) => {
