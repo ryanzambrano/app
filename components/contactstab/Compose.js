@@ -35,6 +35,9 @@ const ComposeMessageScreen = () => {
     }
   };
 
+  const selectedUserNames = selectedUsers.map(user => user.name).join(' ');
+  const isNamesSelected = selectedUserNames.length > 0;
+
   const createButtonLabel = selectedUsers.length <= 1 ? "Create Message" : "Create Group Chat";
 
   const filteredUsers = users.filter(user => user.name.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -80,19 +83,30 @@ const ComposeMessageScreen = () => {
       </SafeAreaView>
 
       <View style={styles.toInputContainer}>
-        <Text style={styles.toLabel}>To:</Text>
-        <TextInput
-          style={styles.toInput}
-          placeholder=""
-          placeholderTextColor="#888"
-          autoCorrect={false}
-          value={searchQuery}
-          onChangeText={setSearchQuery} // Update searchQuery when text changes
-        />
+  <View style={styles.toLabelContainer}>
+    <Text style={styles.toLabel}>To:</Text>
+    {selectedUsers.length > 0 && (
+      <View style={styles.selectedUserContainer}>
+        {selectedUsers.map(user => (
+          <View key={user.id} style={styles.selectedUser}>
+            <Text style={styles.selectedUserName}>{user.name}</Text>
+          </View>
+        ))}
       </View>
+    )}
+  </View>
+  <TextInput
+    style={styles.toInput}
+    placeholder=""
+    placeholderTextColor="#888"
+    autoCorrect={false}
+    value={searchQuery}
+    onChangeText={setSearchQuery}
+  />
+</View>
 
       <FlatList
-        data={filteredUsers.slice(0, 50)} // Use the filteredUsers array
+        data={filteredUsers.slice(0, 50)}
         renderItem={renderUserItem}
         keyExtractor={(item) => item.id.toString()}
       />
@@ -105,6 +119,9 @@ const ComposeMessageScreen = () => {
 };
 
 
+
+
+
 const styles = StyleSheet.create({
   contactItem: {
     flexDirection: "row",
@@ -114,6 +131,21 @@ const styles = StyleSheet.create({
     borderBottomColor: "#DDD",
     width: '100%',
   },
+  selectedUserNamesWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  selectedUser: {
+    backgroundColor: '#14999999',
+    borderRadius: 15,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginHorizontal: 2,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   createButton: {
     marginVertical: 20,
     alignSelf: 'center',
@@ -122,10 +154,29 @@ const styles = StyleSheet.create({
     backgroundColor: '#14999999',
     borderRadius: 10,
   },
+  selectedUserName: {
+    color: 'white',
+    fontSize: 14,
+  },
+  toLabelAndNames: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: 5,
+  },
+  selectedUserContainer: {
+    flexDirection: 'row', // Align the selected users horizontally
+    alignItems: 'center', // Vertically center the selected users
+    marginRight: 10,
+  },
   createButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  toLabelContainer: {
+    flexDirection: 'row', // Make the label and selected users container side by side
+    alignItems: 'center', // Vertically center the label and selected users
+    flex: 1, // Allow the label and selected users to take available space
   },
   buttonContainer: {
     flex: 1,
@@ -155,26 +206,27 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     justifyContent: "space-between",
   },
-    toInputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#FFF',
-        borderRadius: 20,
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        marginBottom: 1,
-      },
-      toLabel: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginRight: 10,
-      },
-      toInput: {
-        flex: 1,
-        height: 40,
-        color: '#333',
-        fontSize: 20,
-      },
+  toInputContainer: {
+    flexDirection: 'row', // Make the label and input container side by side
+    alignItems: 'center', // Vertically center the label and input
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginBottom: 1,
+  },
+  toLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 10,
+  },
+  toInput: {
+    flex: 1,
+    height: 40,
+    color: '#333',
+    fontSize: 15,
+    marginRight: 10,
+  },
   button: {
     padding: 10,
     marginBottom: 0,
