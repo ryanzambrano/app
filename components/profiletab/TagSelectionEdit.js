@@ -13,6 +13,7 @@ import {
 
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
+import { availableTags } from "../auth/profileUtils.js";
 
 const TagSelectionEdit = ({ navigation, route }) => {
   const { session } = route.params;
@@ -22,10 +23,6 @@ const TagSelectionEdit = ({ navigation, route }) => {
 
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
-
-  const availableTags = [
-    "70s", "80s", "90s", "2000s", "Activism", "Adventures", "Animals", "Art", "Baseball", "Basketball", "Beauty", "Board Games", "Books", "Boxing", "Business", "Camping", "Cars", "Coding", "Clubbing", "Cooking", "Country Music", "Craft Beer", "DJ", "Design", "DIY", "Drumming", "Education", "Environmentalism", "Fashion", "Fishing", "Fitness", "Football", "Gaming", "Greek Life", "Guitar", "Health", "Hiking", "History", "Interior Design", "Instagram", "JROTC", "Journalism", "Jiu-Jitsu", "Karoake", "Live Music", "Makeup/Beauty", "Medical/Nursing", "Mixology", "Movies", "Multilingual", "Music", "Nature", "Piano", "Photography", "Politics", "Rap/Hip Hop", "Raves", "Road Trips", "Rock", "Rollerblading", "Running", "Science", "Singing", "Sneakers", "Soccer", "Sports", "Stand-Up Comedy", "Start Ups", "Surfing", "Swimming", "Tattoos", "Technology", "Thrifting", "Travel", "Urban Exploration", "Volunteering", "Writing"
-  ];
 
   const handleTagSelection = (tag) => {
     const isTagSelected = selectedTags.includes(tag);

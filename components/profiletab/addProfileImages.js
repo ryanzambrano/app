@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   },
   profilePictureContainer: {
     width: 171,
-    height: 311,
+    height: 171,
     backgroundColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",

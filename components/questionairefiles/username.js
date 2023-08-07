@@ -30,47 +30,33 @@ export const Username = ({ navigation, route }) => {
     setIsError(null);
 
     if (session?.user) {
-      //alert("session.user");
       if (!!userData.username) {
+        // Check if the name is longer than 30 characters
+        if (userData.username.length > 30) {
+          setIsError("Too many characters");
+          return; // Stop the function execution
+        }
+
+        // Check if the name contains non-alphabetic characters
+        if (!/^[a-z0-9]+$/i.test(userData.username)) {
+          setIsError("Invalid characters");
+          return; // Stop the function execution
+        }
+
         const { data, error } = await supabase
           .from("profile")
           .update({
             username: selectedUsername,
-            email: session.user.email,
           })
           .eq("user_id", session.user.id);
 
         if (error) {
-          if (
-            error.message.includes(
-              "duplicate key value violates unique constraint"
-            )
-          ) {
-            setIsError("Username is already taken");
-          } else {
-            startShakeAnimation();
-            setIsError(error.message);
-          }
+          startShakeAnimation();
+          setIsError(error.message);
         } else {
           navigation.navigate("Colleges");
         }
       } else setIsError("Enter a Username");
-    }
-  };
-
-  const updateProfile = async (userData, session) => {
-    if (session?.user) {
-      const { data, error } = await supabase
-        .from("profile")
-        .update({
-          username: userData.username,
-          email: session.user.email,
-        })
-        .eq("user_id", session.user.id);
-
-      if (error) {
-        alert("Error updating profile:", error.message);
-      }
     }
   };
 

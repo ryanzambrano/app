@@ -96,8 +96,6 @@ const UserCard = ({ navigation, route }) => {
     }
   };
 
-  
-
   useEffect(() => {
     const fetchBookmarkedProfiles = async () => {
       const userId = session.user.id;
@@ -132,7 +130,7 @@ const UserCard = ({ navigation, route }) => {
               answer !== null && prompt !== "id" && prompt !== "user_id"
           )
           .map(([prompt, answer]) => ({ prompt, answer }));
-  
+
         setPrompts(answeredPrompts);
         //console.log(answeredPrompts);
       } else {
@@ -225,7 +223,7 @@ const UserCard = ({ navigation, route }) => {
   const getProfilePictures = async () => {
     try {
       for (let i = 0; i < MAX_IMAGES; i++) {
-        const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}`;
+        const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}?${new Date().getTime()}`;
 
         const imageResponse = await fetch(profilePictureURL);
 
@@ -301,7 +299,7 @@ const UserCard = ({ navigation, route }) => {
         </View>
 
         <View style={styles.bioContainer}>
-            <Text style={styles.bio}>Graduating Class: {class_year}</Text>
+          <Text style={styles.bio}>Graduating Class: {class_year}</Text>
         </View>
         <View style={styles.bioContainer}>
           <View style={styles.roundedContainer}>
@@ -314,7 +312,7 @@ const UserCard = ({ navigation, route }) => {
           <Text style={styles.bio}>Age: {age}</Text>
           <View style={styles.divider} />
           <Text style={styles.bio}>Gender: {gender}</Text>
-          <View style={styles.divider}/>
+          <View style={styles.divider} />
           <Text style={styles.bio}>Hometown: {hometown}</Text>
         </View>
 
@@ -327,29 +325,33 @@ const UserCard = ({ navigation, route }) => {
         </View>
 
         <View style={styles.ageMajorGradeContainer}>
-          <Text style={styles.bio}>Do you plan on living in an apartment or dorm?: {"\n"}{living_preferences}</Text>          
-          <View style={styles.divider}/>
-          <Text style={styles.bio}>Would you rather stay in or go out for fun?: {"\n"}{for_fun}</Text>
+          <Text style={styles.bio}>
+            Do you plan on living in an apartment or dorm?: {"\n"}
+            {living_preferences}
+          </Text>
+          <View style={styles.divider} />
+          <Text style={styles.bio}>
+            Would you rather stay in or go out for fun?: {"\n"}
+            {for_fun}
+          </Text>
         </View>
         <ScrollView
-              horizontal
-              style={styles.horizontalScrollView}
-              showsHorizontalScrollIndicator={false}
-              bounces={false}
-            >
-              {prompts.map((item, index) =>
-                item.answer ? (
-                  <View key={index} style={styles.itemContainer}>
-                    <Text style={styles.itemPrompt}>
-                      {promptQuestions[item.prompt]}
-                    </Text>
-                    <Text style={styles.itemAnswer}>{item.answer}</Text>
-                  </View>
-                ) : null
-              )}
-            </ScrollView>
-
-        
+          horizontal
+          style={styles.horizontalScrollView}
+          showsHorizontalScrollIndicator={false}
+          bounces={false}
+        >
+          {prompts.map((item, index) =>
+            item.answer ? (
+              <View key={index} style={styles.itemContainer}>
+                <Text style={styles.itemPrompt}>
+                  {promptQuestions[item.prompt]}
+                </Text>
+                <Text style={styles.itemAnswer}>{item.answer}</Text>
+              </View>
+            ) : null
+          )}
+        </ScrollView>
       </ScrollView>
     </SafeAreaView>
   );
@@ -472,7 +474,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingVertical: 15,
     borderWidth: 0.4,
-    
+
     borderColor: "grey",
   },
   divider: {

@@ -30,8 +30,19 @@ export const Name = ({ navigation, route }) => {
     setIsError(null);
 
     if (session?.user) {
-      //alert("session.user");
       if (!!userData.name) {
+        // Check if the name is longer than 30 characters
+        if (userData.name.length > 30) {
+          setIsError("Too many characters");
+          return; // Stop the function execution
+        }
+
+        // Check if the name contains non-alphabetic characters
+        if (!/^[a-z\s]+$/i.test(userData.name)) {
+          setIsError("Invalid characters");
+          return; // Stop the function execution
+        }
+
         const { data, error } = await supabase
           .from("UGC")
           .update({
