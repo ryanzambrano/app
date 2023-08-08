@@ -84,20 +84,7 @@ const Home = ({ route }) => {
           });
 
           setUsers(mergedData);
-
-          const filteredUsers = mergedData.filter((user) => {
-            if (housingPreference === null || housingPreference === "Any") {
-              return true; // Show all users when no preference selected
-            } 
-            else {
-              //console.log(housingPreference);
-              return user.profiles.some(
-                (profile) => profile.living_preferences === housingPreference
-              );
-            }
-          });
-  
-          setUsers(filteredUsers);
+          
           const userId = session.user.id;
           const { data: bookmarkedData, error: bookmarkedError } = await supabase
             .from("UGC")

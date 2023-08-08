@@ -6,11 +6,11 @@ import { useNavigation } from '@react-navigation/native';
 const FiltersUI = () => {
   
   const navigation = useNavigation();
-  const [housingPreference, setHousingPreference] = useState(null);
-  const [genderPreference, setGenderPreference] = useState(null);
-  const [youngestAgePreference, setYoungestAgePreference] = useState(null);
-  const [oldestAgePreference, setOldestAgePreference] = useState(null);
-  const [studyPreference, setStudyPreference] = useState(null);
+  const [housingPreference, setHousingPreference] = useState("Any");
+  const [genderPreference, setGenderPreference] = useState("Any");
+  const [youngestAgePreference, setYoungestAgePreference] = useState("Any");
+  const [oldestAgePreference, setOldestAgePreference] = useState("Any");
+  const [studyPreference, setStudyPreference] = useState("Any");
   const [isFocus, setIsFocus] = useState(false);
 
   const roomOptions = [
@@ -46,8 +46,8 @@ const FiltersUI = () => {
   ];
 
   const handleApplyFilters = () => {
-    console.log('Selected Housing Preference:', housingPreference);
-    navigation.navigate('Home', { housingPreference: housingPreference });
+    console.log( housingPreference, genderPreference, youngestAgePreference, oldestAgePreference, studyPreference ); 
+    navigation.navigate('Home', {  });
   };
 
   return (

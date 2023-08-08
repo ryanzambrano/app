@@ -29,18 +29,14 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const scrollY = new Animated.Value(0);
 
-/*scrollY.addListener(({ value }) => {
-  setIsProfileVisible(value < DISABLE_TOUCHABLE_SCROLL_POINT);
-});*/
-
 const profileOpacity = scrollY.interpolate({
-  inputRange: [0, 100],
+  inputRange: [0, 800],
   outputRange: [1, 0],
   extrapolate: "clamp",
 });
 
 const profileZIndex = scrollY.interpolate({
-  inputRange: [0, 100],
+  inputRange: [0, 800],
   outputRange: [1, -1],
   extrapolate: "clamp",
 });
@@ -69,7 +65,7 @@ const UserCard = ({ navigation, route }) => {
 
   const [photos, setPhotos] = useState([]);
   const [isFriendAdded, setIsFriendAdded] = useState(false);
-  const buttonColor = isFriendAdded ? "green" : "dodgerblue";
+  const buttonColor = isFriendAdded ? "green" : "black";
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
   const [prompts, setPrompts] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -253,7 +249,13 @@ const UserCard = ({ navigation, route }) => {
         <Text style={styles.name}>{name}</Text>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <Animated.View
+          style={{
+            ...styles.profileContainer,
+            opacity: profileOpacity,
+            zIndex: profileZIndex,
+          }}
+        >
         <ScrollView
           horizontal
           style={styles.photoContainer}
@@ -283,7 +285,20 @@ const UserCard = ({ navigation, route }) => {
             </View>
           </TouchableWithoutFeedback>
         </Modal>
+      </Animated.View>
 
+        <ScrollView
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+          scrollEventThrottle={16}
+          bounces={false}
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollViewContent}
+          showsVerticalScrollIndicator={false}
+        >
+        <View style={styles.tab}>
         <View style={styles.buttonsContainer}>
           <TouchableOpacity
             style={[styles.friendButton, { backgroundColor: buttonColor }]}
@@ -356,6 +371,7 @@ const UserCard = ({ navigation, route }) => {
             ) : null
           )}
         </ScrollView>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -374,6 +390,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     justifyContent: "flex-start",
     paddingVertical: 5,
+  },
+  scrollView: {
+    flex: 1,
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  scrollViewContent: {
+    paddingTop: 537,
   },
   backButton: {
     marginRight: -57,
@@ -407,6 +434,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.95)",
   },
+  tab: {
+    backgroundColor: "white",
+    flex: 1,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 10,
+    //shadow
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.75,
+    shadowRadius: 4.84,
+  },
   fullPhoto: {
     width: "100%",
     height: "100%",
@@ -424,9 +466,10 @@ const styles = StyleSheet.create({
     padding: 13,
     alignItems: "center",
     marginBottom: 10,
-    width: Dimensions.get("window").width * 0.6,
+    width: Dimensions.get("window").width * 0.55,
     marginRight: 3,
     borderWidth: 0.4,
+    marginLeft: 7,
     borderColor: "grey",
   },
   friendButtonText: {
@@ -435,8 +478,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   chatButton: {
-    backgroundColor: "dodgerblue",
+    backgroundColor: "black",
     borderRadius: 10,
+    marginRight: 10,
     padding: 13,
     alignItems: "center",
     marginBottom: 10,

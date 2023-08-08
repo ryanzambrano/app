@@ -24,7 +24,7 @@ const TabNavigator = ({ route }) => {
             iconName = focused ? "user" : "user"; // Set the icons for the 'Profile' screen
           }
 
-          return <Icon name={iconName} size={size} color={color} />;
+          return <Icon name={iconName} size={size} color={"black"} />;
         },
         tabBarLabel: () => null, // Removes the labels
         
