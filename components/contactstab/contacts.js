@@ -233,7 +233,7 @@ const ContactsUI = ({ route }) => {
           onPress={handlePlusIconPress}
           style={{ position: 'absolute', top: 10, right: 13 }}
         >
-          <AntDesign name="plus" size={25} color="#14999999" fontWeight = "bold" />
+          <AntDesign name="plus" size={25} color="#14999999" />
         </TouchableOpacity>
       </View>
       <View style={styles.viewContainer}>

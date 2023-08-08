@@ -5,9 +5,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons'; // Import Feather icons
 import { supabase } from "../auth/supabase";
 import { picURL } from "../auth/supabase.js";
+import { v4 as uuidv4 } from 'react-native-uuid-generator';
 
-const ComposeMessageScreen = () => {
+const ComposeMessageScreen = ({route}) => {
   const navigation = useNavigation();
+  const { session } = route.params;
   const [users, setUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]); // Store selected users
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,7 +24,11 @@ const ComposeMessageScreen = () => {
       console.error(error);
       return;
     }
-    setUsers(users);
+  
+    // Filter out the current user using session.user.id
+    const filteredUsers = users.filter(user => user.user_id !== session.user.id);
+  
+    setUsers(filteredUsers);
   };
 
   const handleUserCardPress = (user) => {
@@ -35,6 +41,59 @@ const ComposeMessageScreen = () => {
     // Toggle user label visibility with LayoutAnimation
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
+  const handleCreateMessage = async () => {
+    try {
+      // Insert the new record with User_ID and Group_ID
+      const { data: insertData, error: insertError } = await supabase
+        .from('Group Chats')
+        .insert([
+          { User_ID: session.user.id }, // Use uuidv4() to generate a new UUID for Group_ID
+        ])
+        .select();
+  
+      if (insertError) {
+        console.error('Error inserting into Group Chats:', insertError);
+        return;
+      }
+  
+      // Retrieve the most recent Group_ID
+      const { data: recentGroupData, error: recentGroupError } = await supabase
+        .from('Group Chats')
+        .select('Group_ID')
+        .order('Group_ID', { ascending: false })
+        .limit(1);
+  
+      if (recentGroupError) {
+        console.error('Error retrieving recent Group_ID:', recentGroupError);
+        return;
+      }
+  
+      // Extract and assign the Group_ID to the variable
+      const groupid = recentGroupData[0].Group_ID;
+  
+      // Insert selected user IDs into User_ID column
+      const insertSelectedUsers = selectedUsers.map(user => ({
+        User_ID: user.id,
+        Group_ID: groupid,
+      }));
+      
+      const { data: insertSelectedUsersData, error: insertSelectedUsersError } = await supabase
+        .from('Group Chats')
+        .insert(insertSelectedUsers)
+        .select();
+  
+      if (insertSelectedUsersError) {
+        console.error('Error inserting selected users into Group Chats:', insertSelectedUsersError);
+        return;
+      }
+  
+      // Log the Group_ID
+      console.log('Most recent Group_ID:', groupid);
+    } catch (err) {
+      console.error('An error occurred:', err);
+    }
+  };
+  
 
   const selectedUserNames = selectedUsers.map(user => user.name).join(' ');
   const isNamesSelected = selectedUserNames.length > 0;
@@ -112,9 +171,9 @@ const ComposeMessageScreen = () => {
         keyExtractor={(item) => item.id.toString()}
       />
 
-      <TouchableOpacity style={styles.createButton}>
-        <Text style={styles.createButtonText}>{createButtonLabel}</Text>
-      </TouchableOpacity>
+<TouchableOpacity style={styles.createButton} onPress={handleCreateMessage}>
+  <Text style={styles.createButtonText}>{createButtonLabel}</Text>
+</TouchableOpacity>
     </View>
   );
 };

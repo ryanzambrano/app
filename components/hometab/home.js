@@ -90,7 +90,7 @@ const Home = ({ route }) => {
               return true; // Show all users when no preference selected
             } 
             else {
-              console.log(housingPreference);
+              //console.log(housingPreference);
               return user.profiles.some(
                 (profile) => profile.living_preferences === housingPreference
               );
