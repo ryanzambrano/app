@@ -29,14 +29,15 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const scrollY = new Animated.Value(0);
 
+
 const profileOpacity = scrollY.interpolate({
-  inputRange: [0, 800],
+  inputRange: [0, 550],
   outputRange: [1, 0],
   extrapolate: "clamp",
 });
 
 const profileZIndex = scrollY.interpolate({
-  inputRange: [0, 800],
+  inputRange: [0, 550],
   outputRange: [1, -1],
   extrapolate: "clamp",
 });
@@ -381,7 +382,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    marginHorizontal: 6,
+    marginHorizontal: 0,
     backgroundColor: "white",
   },
   header: {
@@ -418,6 +419,8 @@ const styles = StyleSheet.create({
   },
   photoContainer: {
     height: 440,
+    marginLeft: 6,
+    width: Dimensions.get("window").width - 12,
     marginBottom: 10,
     marginHorizontal: 0,
     borderRadius: 15,
@@ -498,6 +501,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     backgroundColor: "white",
     borderRadius: 15,
+    marginRight: 10,
+    marginLeft: 10,
     marginBottom: 10,
     borderWidth: 0.4,
     borderColor: "grey",
@@ -522,7 +527,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingVertical: 15,
     borderWidth: 0.4,
-
+    marginRight: 10,
+    marginLeft: 10,
     borderColor: "grey",
   },
   divider: {
@@ -541,6 +547,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 0.4,
     borderColor: "grey",
+    marginRight: 10,
+    marginLeft: 10,
   },
   tag: {
     backgroundColor: "white",
@@ -564,6 +572,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomEndRadius: 20,
     borderBottomStartRadius: 20,
+    
   },
   itemContainer: {
     marginHorizontal: 15,
@@ -575,6 +584,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     minWidth: 150,
     gap: 10,
+    
   },
   itemPrompt: {
     fontSize: 15,
