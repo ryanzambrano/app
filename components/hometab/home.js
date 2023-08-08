@@ -22,15 +22,14 @@ const isBookmarkedURI = "https://th.bing.com/th/id/OIP.Pzc03rRYlwOdKsolfgcwogHaJ
 const notBookmarkedURI = "https://i.pngimg.me/thumb/f/720/m2H7m2K9Z5i8Z5d3.jpg";
 
 const Home = ({ route }) => {
-  const { session } = route.params;
+  const { session, housingPreference } = route.params;
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkedProfiles, setBookmarkedProfiles] = useState([]);
-  const [selectedHousingPreference, setSelectedHousingPreference] = useState(null);
-  
+ 
   const handleFiltersPress = () => {
     navigation.navigate("Filters");
   };
@@ -51,9 +50,7 @@ const Home = ({ route }) => {
     if (isSessionUser) {
       return false;
     }
-    if (selectedHousingPreference && user.living_preferences !== selectedHousingPreference) {
-      return false;
-    }
+    
     if (isBookmarked) {
       return bookmarkedProfiles.includes(user.user_id) && (nameMatch || tagMatch);
     }
@@ -70,7 +67,7 @@ const Home = ({ route }) => {
         const { data: profileData, error: profileError } = await supabase
           .from("profile")
           .select("*");
-
+        
         if (ugcError || profileError) {
           console.error(ugcError || profileError);
         } 
@@ -87,6 +84,20 @@ const Home = ({ route }) => {
           });
 
           setUsers(mergedData);
+
+          const filteredUsers = mergedData.filter((user) => {
+            if (housingPreference === null || housingPreference === "Any") {
+              return true; // Show all users when no preference selected
+            } 
+            else {
+              console.log(housingPreference);
+              return user.profiles.some(
+                (profile) => profile.living_preferences === housingPreference
+              );
+            }
+          });
+  
+          setUsers(filteredUsers);
           const userId = session.user.id;
           const { data: bookmarkedData, error: bookmarkedError } = await supabase
             .from("UGC")
@@ -102,6 +113,7 @@ const Home = ({ route }) => {
             setBookmarkedProfiles(bookmarked_profiles);
           }
         }
+        
       } 
       catch (error) {
         console.error("Error fetching data:", error.message);
@@ -109,11 +121,12 @@ const Home = ({ route }) => {
     };
   
     fetchUsers();
+
     const channel = supabase
     .channel("custom-all-channel")
     .on(
       "postgres_changes",
-      { event: "*", schema: "public", table: "UGC", /*filter: `.or(Sent_From.eq.${session.user.id}, Contact_ID.eq.${session.user.id})`, */},
+      { event: "*", schema: "public", table: "UGC" },
       (payload) => {
         fetchUsers();
       }
@@ -122,7 +135,7 @@ const Home = ({ route }) => {
     return () => {
       supabase.removeChannel(channel);
     }
-  }, []);
+  }, [housingPreference]);
   
   
 
