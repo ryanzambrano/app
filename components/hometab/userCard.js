@@ -223,12 +223,16 @@ const UserCard = ({ navigation, route }) => {
   const getProfilePictures = async () => {
     try {
       for (let i = 0; i < MAX_IMAGES; i++) {
-        const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}?${new Date().getTime()}`;
+        const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}`;
+        const response = await fetch(profilePictureURL, { method: "HEAD" });
 
-        const imageResponse = await fetch(profilePictureURL);
-
-        if (imageResponse.ok) {
-          setPhotos((prevPhotos) => [...prevPhotos, profilePictureURL]);
+        if (response.ok) {
+          const imageResponse = await fetch(profilePictureURL, {
+            cache: "no-cache",
+          });
+          if (imageResponse.ok) {
+            setPhotos((prevPhotos) => [...prevPhotos, profilePictureURL]);
+          }
         }
       }
     } catch (error) {

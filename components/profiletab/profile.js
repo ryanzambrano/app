@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
 
   viewContainer: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#f5f5f5",
   },
   topBar: {
     flexDirection: "row",
