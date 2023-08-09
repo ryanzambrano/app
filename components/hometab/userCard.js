@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width * 0.55,
     marginRight: 3,
     borderWidth: 0.4,
-    marginLeft: 7,
+    marginLeft: 10,
     borderColor: "grey",
   },
   friendButtonText: {

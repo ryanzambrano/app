@@ -94,7 +94,20 @@ const Home = ({ route }) => {
               lastModified: relatedImageData?.last_modified || null,
             };
           });
+          const userId = session.user.id;
+          const { data: bookmarkedData, error: bookmarkedError } = await supabase
+            .from("UGC")
+            .select("bookmarked_profiles")
+            .eq("user_id", userId);
 
+          if (bookmarkedError) {
+            console.error("Error fetching bookmarked profiles:", bookmarkedError.message);
+          } 
+
+          else {
+            const { bookmarked_profiles } = bookmarkedData[0];
+            setBookmarkedProfiles(bookmarked_profiles);
+        }
           setUsers(mergedData);
         }
       } catch (error) {
