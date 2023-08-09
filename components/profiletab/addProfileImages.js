@@ -147,8 +147,10 @@ const ImagePickerScreen = ({ navigation, route }) => {
       });
 
       if (!imagePickerResult.canceled) {
+        const timestamp = new Date().toISOString();
+        alert(timestamp);
         deletePictures(index);
-        const filename = `${session.user.id}/${session.user.id}-${index}`;
+        const filename = `${session.user.id}/${session.user.id}-${index}-${timestamp}`;
 
         const compressedImage = await manipulateAsync(
           imagePickerResult.assets[0].uri,
@@ -164,7 +166,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
             contentType: "image/jpeg",
           });
 
-        createTimestamp(session.user.id);
+        createTimestamp(session.user.id, timestamp);
 
         if (uploadError) {
           alert(uploadError.message);

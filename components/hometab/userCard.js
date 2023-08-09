@@ -29,7 +29,6 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const scrollY = new Animated.Value(0);
 
-
 const profileOpacity = scrollY.interpolate({
   inputRange: [0, 550],
   outputRange: [1, 0],
@@ -225,7 +224,7 @@ const UserCard = ({ navigation, route }) => {
 
         if (response.ok) {
           const imageResponse = await fetch(profilePictureURL, {
-            cache: "no-cache",
+            cache: "no-store",
           });
           if (imageResponse.ok) {
             setPhotos((prevPhotos) => [...prevPhotos, profilePictureURL]);
@@ -251,12 +250,12 @@ const UserCard = ({ navigation, route }) => {
       </View>
 
       <Animated.View
-          style={{
-            ...styles.profileContainer,
-            opacity: profileOpacity,
-            zIndex: profileZIndex,
-          }}
-        >
+        style={{
+          ...styles.profileContainer,
+          opacity: profileOpacity,
+          zIndex: profileZIndex,
+        }}
+      >
         <ScrollView
           horizontal
           style={styles.photoContainer}
@@ -288,90 +287,90 @@ const UserCard = ({ navigation, route }) => {
         </Modal>
       </Animated.View>
 
-        <ScrollView
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: false }
-          )}
-          scrollEventThrottle={16}
-          bounces={false}
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollViewContent}
-          showsVerticalScrollIndicator={false}
-        >
+      <ScrollView
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false }
+        )}
+        scrollEventThrottle={16}
+        bounces={false}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollViewContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.tab}>
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity
-            style={[styles.friendButton, { backgroundColor: buttonColor }]}
-            onPress={() => handleAddFriend(user_id)}
-          >
-            <Text style={styles.friendButtonText}>
-              {isFriendAdded ? "Bookmarked! ✓" : "+ Bookmark"}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+              style={[styles.friendButton, { backgroundColor: buttonColor }]}
+              onPress={() => handleAddFriend(user_id)}
+            >
+              <Text style={styles.friendButtonText}>
+                {isFriendAdded ? "Bookmarked! ✓" : "+ Bookmark"}
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.chatButton}
-            onPress={handleUserCardPress}
-          >
-            <Text style={styles.chatButtonText}>Message</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.bioContainer}>
-          <Text style={styles.bio}>Graduating Class: {class_year}</Text>
-        </View>
-        <View style={styles.bioContainer}>
-          <View style={styles.roundedContainer}>
-            <Text style={styles.bio}>{bio}</Text>
+            <TouchableOpacity
+              style={styles.chatButton}
+              onPress={handleUserCardPress}
+            >
+              <Text style={styles.chatButtonText}>Message</Text>
+            </TouchableOpacity>
           </View>
-        </View>
-        <View style={styles.ageMajorGradeContainer}>
-          <Text style={styles.bio}>Major: {major}</Text>
-          <View style={styles.divider} />
-          <Text style={styles.bio}>Age: {age}</Text>
-          <View style={styles.divider} />
-          <Text style={styles.bio}>Gender: {gender}</Text>
-          <View style={styles.divider} />
-          <Text style={styles.bio}>Hometown: {hometown}</Text>
-        </View>
 
-        <View style={styles.tagsContainer}>
-          {tags.map((tag, index) => (
-            <View key={index} style={styles.tag}>
-              <Text style={styles.tagText}>{tag}</Text>
+          <View style={styles.bioContainer}>
+            <Text style={styles.bio}>Graduating Class: {class_year}</Text>
+          </View>
+          <View style={styles.bioContainer}>
+            <View style={styles.roundedContainer}>
+              <Text style={styles.bio}>{bio}</Text>
             </View>
-          ))}
-        </View>
+          </View>
+          <View style={styles.ageMajorGradeContainer}>
+            <Text style={styles.bio}>Major: {major}</Text>
+            <View style={styles.divider} />
+            <Text style={styles.bio}>Age: {age}</Text>
+            <View style={styles.divider} />
+            <Text style={styles.bio}>Gender: {gender}</Text>
+            <View style={styles.divider} />
+            <Text style={styles.bio}>Hometown: {hometown}</Text>
+          </View>
 
-        <View style={styles.ageMajorGradeContainer}>
-          <Text style={styles.bio}>
-            Do you plan on living in an apartment or dorm?: {"\n"}
-            {living_preferences}
-          </Text>
-          <View style={styles.divider} />
-          <Text style={styles.bio}>
-            Would you rather stay in or go out for fun?: {"\n"}
-            {for_fun}
-          </Text>
-        </View>
-        <ScrollView
-          horizontal
-          style={styles.horizontalScrollView}
-          showsHorizontalScrollIndicator={false}
-          bounces={false}
-        >
-          {prompts.map((item, index) =>
-            item.answer ? (
-              <View key={index} style={styles.itemContainer}>
-                <Text style={styles.itemPrompt}>
-                  {promptQuestions[item.prompt]}
-                </Text>
-                <Text style={styles.itemAnswer}>{item.answer}</Text>
+          <View style={styles.tagsContainer}>
+            {tags.map((tag, index) => (
+              <View key={index} style={styles.tag}>
+                <Text style={styles.tagText}>{tag}</Text>
               </View>
-            ) : null
-          )}
-        </ScrollView>
+            ))}
+          </View>
+
+          <View style={styles.ageMajorGradeContainer}>
+            <Text style={styles.bio}>
+              Do you plan on living in an apartment or dorm?: {"\n"}
+              {living_preferences}
+            </Text>
+            <View style={styles.divider} />
+            <Text style={styles.bio}>
+              Would you rather stay in or go out for fun?: {"\n"}
+              {for_fun}
+            </Text>
+          </View>
+          <ScrollView
+            horizontal
+            style={styles.horizontalScrollView}
+            showsHorizontalScrollIndicator={false}
+            bounces={false}
+          >
+            {prompts.map((item, index) =>
+              item.answer ? (
+                <View key={index} style={styles.itemContainer}>
+                  <Text style={styles.itemPrompt}>
+                    {promptQuestions[item.prompt]}
+                  </Text>
+                  <Text style={styles.itemAnswer}>{item.answer}</Text>
+                </View>
+              ) : null
+            )}
+          </ScrollView>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -572,7 +571,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomEndRadius: 20,
     borderBottomStartRadius: 20,
-    
   },
   itemContainer: {
     marginHorizontal: 15,
@@ -584,7 +582,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
     minWidth: 150,
     gap: 10,
-    
   },
   itemPrompt: {
     fontSize: 15,

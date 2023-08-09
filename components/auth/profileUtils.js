@@ -52,9 +52,9 @@ export const fetchUsername = async (session) => {
 };
 // Assuming you have a Supabase client configured
 
-export const createTimestamp = async (user_id) => {
+export const createTimestamp = async (user_id, timestamp) => {
   try {
-    const timestamp = new Date().toISOString(); // Create a timestamp in ISO format
+    // Create a timestamp in ISO format
 
     // Check if the record exists
     const { data, error: fetchError } = await supabase
@@ -95,7 +95,7 @@ export const createTimestamp = async (user_id) => {
       }
     }
 
-    return true;
+    return timestamp;
   } catch (error) {
     console.error(error);
     return false;

@@ -18,7 +18,8 @@ import { picURL } from "../auth/supabase.js"; // This is the base url of the pho
 import { useNavigation } from "@react-navigation/native";
 import { createClient } from "@supabase/supabase-js"; // Create client is responsible for drawing profile data from each user in the database
 
-const isBookmarkedURI = "https://th.bing.com/th/id/OIP.Pzc03rRYlwOdKsolfgcwogHaJQ?pid=ImgDet&rs=1";
+const isBookmarkedURI =
+  "https://th.bing.com/th/id/OIP.Pzc03rRYlwOdKsolfgcwogHaJQ?pid=ImgDet&rs=1";
 const notBookmarkedURI = "https://i.pngimg.me/thumb/f/720/m2H7m2K9Z5i8Z5d3.jpg";
 
 const Home = ({ route }) => {
@@ -29,14 +30,13 @@ const Home = ({ route }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkedProfiles, setBookmarkedProfiles] = useState([]);
- 
+
   const handleFiltersPress = () => {
     navigation.navigate("Filters");
   };
 
   const toggleBookmarkButton = () => {
     setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
-
   };
 
   const handleSearch = (text) => {
@@ -45,18 +45,23 @@ const Home = ({ route }) => {
 
   const filteredUsers = users.filter((user) => {
     const isSessionUser = user.user_id === session.user.id;
-    const nameMatch = user.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const tagMatch = user.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    const nameMatch = user.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const tagMatch = user.tags.some((tag) =>
+      tag.toLowerCase().includes(searchQuery.toLowerCase())
+    );
     if (isSessionUser) {
       return false;
     }
-    
+
     if (isBookmarked) {
-      return bookmarkedProfiles.includes(user.user_id) && (nameMatch || tagMatch);
+      return (
+        bookmarkedProfiles.includes(user.user_id) && (nameMatch || tagMatch)
+      );
     }
     return nameMatch || tagMatch;
   });
-  
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -67,64 +72,52 @@ const Home = ({ route }) => {
         const { data: profileData, error: profileError } = await supabase
           .from("profile")
           .select("*");
-        
-        if (ugcError || profileError) {
-          console.error(ugcError || profileError);
-        } 
+        const { data: imageData, error: imageError } = await supabase
+          .from("images")
+          .select("user_id, last_modified");
 
-        else {
+        if (ugcError || profileError || imageError) {
+          console.error(ugcError || profileError || imageError);
+        } else {
           const mergedData = ugcData.map((ugcUser) => {
-            const relatedProfileData = profileData.filter(
+            const relatedProfileData = profileData.find(
               (profileUser) => profileUser.user_id === ugcUser.user_id
             );
+
+            const relatedImageData = imageData.find(
+              (img) => img.user_id === ugcUser.user_id
+            );
+
             return {
               ...ugcUser,
               profiles: relatedProfileData,
+              lastModified: relatedImageData?.last_modified || null,
             };
           });
 
           setUsers(mergedData);
-          
-          const userId = session.user.id;
-          const { data: bookmarkedData, error: bookmarkedError } = await supabase
-            .from("UGC")
-            .select("bookmarked_profiles")
-            .eq("user_id", userId);
-
-          if (bookmarkedError) {
-            console.error("Error fetching bookmarked profiles:", bookmarkedError.message);
-          } 
-
-          else {
-            const { bookmarked_profiles } = bookmarkedData[0];
-            setBookmarkedProfiles(bookmarked_profiles);
-          }
         }
-        
-      } 
-      catch (error) {
-        console.error("Error fetching data:", error.message);
+      } catch (error) {
+        console.error("An unexpected error occurred:", error);
       }
     };
-  
+
     fetchUsers();
 
     const channel = supabase
-    .channel("custom-all-channel")
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "UGC" },
-      (payload) => {
-        fetchUsers();
-      }
-    )
-    .subscribe();
+      .channel("custom-all-channel")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "UGC" },
+        (payload) => {
+          fetchUsers();
+        }
+      )
+      .subscribe();
     return () => {
       supabase.removeChannel(channel);
-    }
+    };
   }, [housingPreference]);
-  
-  
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
@@ -138,9 +131,7 @@ const Home = ({ route }) => {
           <Image
             style={styles.profileImage}
             source={{
-              uri: `${picURL}/${item.user_id}/${
-                item.user_id
-              }-0?${new Date().getTime()}`,
+              uri: `${picURL}/${item.user_id}/${item.user_id}-0?${item.lastModified}`,
             }}
           />
           <View style={styles.userInfo}>
@@ -173,8 +164,18 @@ const Home = ({ route }) => {
         <Text style={styles.headerText}> Cabana </Text>
 
         <TouchableOpacity onPress={handleFiltersPress}>
-          <Image style={{ marginLeft: 167, marginTop: -14, marginBottom: -7, height: 40, width: 40}} 
-          source={{ uri: "https://icon-library.com/images/filter-icon-png/filter-icon-png-17.jpg" }}></Image>
+          <Image
+            style={{
+              marginLeft: 167,
+              marginTop: -14,
+              marginBottom: -7,
+              height: 40,
+              width: 40,
+            }}
+            source={{
+              uri: "https://icon-library.com/images/filter-icon-png/filter-icon-png-17.jpg",
+            }}
+          ></Image>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={toggleBookmarkButton}>
@@ -188,7 +189,6 @@ const Home = ({ route }) => {
             source={{ uri: isBookmarked ? isBookmarkedURI : notBookmarkedURI }}
           ></Image>
         </TouchableOpacity>
-        
       </View>
 
       <View style={styles.viewContainer}>
@@ -202,6 +202,7 @@ const Home = ({ route }) => {
         </View>
         <FlatList
           data={filteredUsers}
+          extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
           renderItem={renderUserCard}
           keyExtractor={(item) => item.user_id.toString()}
         />
