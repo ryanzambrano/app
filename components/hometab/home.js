@@ -26,6 +26,7 @@ const Home = ({ route }) => {
   const { session, housingPreference } = route.params;
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
+  const [sessionUser, setSessionuser] = useState(session.user);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -43,7 +44,31 @@ const Home = ({ route }) => {
     setSearchQuery(text);
   };
 
-  const filteredUsers = users.filter((user) => {
+  const calculateCompatibility = (sessionUser, otherUser) => {
+    let score = 0;
+    console.log(sessionUser.for_fun, otherUser.for_fun);
+    if (Array.isArray(sessionUser.tags) && Array.isArray(otherUser.tags)) {
+        sessionUser.tags.forEach(tag => {
+            if (otherUser.tags.includes(tag)) score += 12;
+        });
+    }
+    if (sessionUser.for_fun === otherUser.for_fun) score += 15;
+    if (sessionUser.living_preferences === otherUser.living_preferences) score += 15;
+    if (sessionUser.gender === otherUser.gender) score += 1;
+    if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 1; 
+    if (sessionUser.class_year === otherUser.class_year) score += 2;
+
+    return score;
+}
+
+  const sortedUsers = users.sort((a, b) => {
+    console.log(a, b);
+    const aScore = calculateCompatibility(sessionUser, a);
+    const bScore = calculateCompatibility(sessionUser, b);
+    return bScore - aScore; 
+  });
+  
+  const filteredUsers = sortedUsers.filter(user => {
     const isSessionUser = user.user_id === session.user.id;
     const nameMatch = user.name
       .toLowerCase()
@@ -95,6 +120,19 @@ const Home = ({ route }) => {
             };
           });
           const userId = session.user.id;
+
+          const { data, error } = await supabase
+            .from("UGC")
+            .select("name, bio, tags, major, class_year, hometown")
+            .eq("user_id", userId)
+            .single();
+
+          if (error) {
+            console.error(error.message);
+          } else {
+            setSessionuser(data);
+          }
+
           const { data: bookmarkedData, error: bookmarkedError } = await supabase
             .from("UGC")
             .select("bookmarked_profiles")
@@ -130,12 +168,17 @@ const Home = ({ route }) => {
     return () => {
       supabase.removeChannel(channel);
     };
+
   }, [housingPreference]);
+
+
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
     navigation.navigate("userCard", { user });
   };
+
+
 
   const renderUserCard = ({ item }) => {
     return (
@@ -165,6 +208,9 @@ const Home = ({ route }) => {
     );
   };
 
+
+
+  
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
