@@ -9,14 +9,43 @@ import { v4 as uuidv4 } from 'react-native-uuid-generator';
 
 const ComposeMessageScreen = ({route}) => {
   const navigation = useNavigation();
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const { session } = route.params;
   const [users, setUsers] = useState([]);
-  const [selectedUsers, setSelectedUsers] = useState([]); // Store selected users
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sessionusername, setSessionUsername] = useState(''); // Initialize sessionusername state
+
+
 
   useEffect(() => {
     fetchUsers();
+    fetchSessionUsername();
   }, []);
+
+  useEffect(() => {
+    // Check if there are any selected users
+    if (selectedUsers.length > 0) {
+      setIsButtonDisabled(false);
+    } else {
+      setIsButtonDisabled(true);
+    }
+  }, [selectedUsers]);
+
+  const fetchSessionUsername = async () => {
+    const { data, error } = await supabase
+      .from('UGC')
+      .select('name')
+      .eq('user_id', session.user.id)
+      .single();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setSessionUsername(data.name);
+  };
 
   const fetchUsers = async () => {
     const { data: users, error } = await supabase.from("UGC").select("*");
@@ -43,11 +72,37 @@ const ComposeMessageScreen = ({route}) => {
   };
   const handleCreateMessage = async () => {
     try {
-      // Insert the new record with User_ID and Group_ID
+       // Create an array of selected user names
+       const selectedUserNames = selectedUsers.map(user => user.name);
+       selectedUserNames.push(sessionusername);
+   
+       // Get the IDs of the selected users
+       const selectedUserIDs = selectedUsers.map(user => user.id);
+       selectedUserIDs.push(session.user.id);
+   
+    // Check if a group with the same set of user IDs already exists
+// Check if a group with the same set of user IDs already exists
+        const { data: existingGroupData, error: existingGroupError } = await supabase
+        .from('Group Chats')
+        .select('Group_ID')
+        .eq('User_ID', session.user.id)
+        .in('User_ID', selectedUserIDs)
+        .single();
+
+        if (existingGroupData) {
+        // A group already exists, display an alert
+        alert('A group chat already exists for these users.');
+        return;
+        }
+      
+      // Insert the new record with User_ID, Group_ID, and Group_Name
       const { data: insertData, error: insertError } = await supabase
         .from('Group Chats')
         .insert([
-          { User_ID: session.user.id }, // Use uuidv4() to generate a new UUID for Group_ID
+          {
+            User_ID: session.user.id,
+            Group_Name: selectedUserNames.join(', '), // Join selected user names with commas
+          },
         ])
         .select();
   
@@ -75,6 +130,7 @@ const ComposeMessageScreen = ({route}) => {
       const insertSelectedUsers = selectedUsers.map(user => ({
         User_ID: user.id,
         Group_ID: groupid,
+        Group_Name: selectedUserNames.join(', '),
       }));
       
       const { data: insertSelectedUsersData, error: insertSelectedUsersError } = await supabase
@@ -88,10 +144,11 @@ const ComposeMessageScreen = ({route}) => {
       }
   
       // Log the Group_ID
-      console.log('Most recent Group_ID:', groupid);
+      //console.log('Most recent Group_ID:', groupid);
     } catch (err) {
       console.error('An error occurred:', err);
     }
+    navigation.goBack();
   };
   
 
@@ -171,9 +228,16 @@ const ComposeMessageScreen = ({route}) => {
         keyExtractor={(item) => item.id.toString()}
       />
 
-<TouchableOpacity style={styles.createButton} onPress={handleCreateMessage}>
-  <Text style={styles.createButtonText}>{createButtonLabel}</Text>
-</TouchableOpacity>
+<TouchableOpacity
+        style={[
+          styles.createButton,
+          { backgroundColor: isButtonDisabled ? '#999' : '#14999999' }, // Apply grey color if disabled
+        ]}
+        onPress={handleCreateMessage}
+        disabled={isButtonDisabled} // Disable the button based on the state
+      >
+        <Text style={styles.createButtonText}>{createButtonLabel}</Text>
+      </TouchableOpacity>
     </View>
   );
 };
