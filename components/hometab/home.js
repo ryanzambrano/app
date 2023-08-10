@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   FlatList,
   SafeAreaView,
+  Alert,
 } from "react-native";
 
 import FiltersUI from "./filters.js";
@@ -27,6 +28,7 @@ const Home = ({ route }) => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [sessionUser, setSessionuser] = useState(session.user);
+  const [sortMethod, setSortMethod] = useState("Most Compatible");
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -42,6 +44,19 @@ const Home = ({ route }) => {
 
   const handleSearch = (text) => {
     setSearchQuery(text);
+  };
+
+  const showSortMenu = () => {
+    Alert.alert(
+      "Sort Options",
+      "Choose a sorting method:",
+      [
+        { text: "Alphabetical Order", onPress: () => setSortMethod("Alphabetical Order") },
+        { text: "Shared Interests", onPress: () => setSortMethod("Shared Interests") },
+        { text: "Most Compatible", onPress: () => setSortMethod("Most Compatible") }
+      ],
+      { cancelable: true }
+    );
   };
 
   const calculateCompatibility = (sessionUser, otherUser) => {
@@ -63,9 +78,19 @@ const Home = ({ route }) => {
 
   const sortedUsers = users.sort((a, b) => {
     console.log(a, b);
-    const aScore = calculateCompatibility(sessionUser, a);
-    const bScore = calculateCompatibility(sessionUser, b);
-    return bScore - aScore; 
+    switch(sortMethod) {
+      case "Alphabetical Order":
+        return a.name.localeCompare(b.name);
+      case "Shared Interests":
+        const aTagsCount = a.tags.filter(tag => sessionUser.tags.includes(tag)).length;
+        const bTagsCount = b.tags.filter(tag => sessionUser.tags.includes(tag)).length;
+        return bTagsCount - aTagsCount;
+      case "Most Compatible":
+      default:
+        const aScore = calculateCompatibility(sessionUser, a);
+        const bScore = calculateCompatibility(sessionUser, b);
+        return bScore - aScore;
+    }
   });
   
   const filteredUsers = sortedUsers.filter(user => {
@@ -171,14 +196,10 @@ const Home = ({ route }) => {
 
   }, [housingPreference]);
 
-
-
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
     navigation.navigate("userCard", { user });
   };
-
-
 
   const renderUserCard = ({ item }) => {
     return (
@@ -208,9 +229,6 @@ const Home = ({ route }) => {
     );
   };
 
-
-
-  
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -258,6 +276,12 @@ const Home = ({ route }) => {
             onChangeText={handleSearch}
             value={searchQuery}
           />
+        </View>
+        <View style={styles.sortContainer}>
+          <Text style={styles.sortText}>Sort by:</Text>
+          <TouchableOpacity onPress={() => showSortMenu()}>
+            <Text style={{color: '#0061db', fontWeight: 'bold', fontSize: '15'}}>{sortMethod}</Text>
+          </TouchableOpacity>
         </View>
         <FlatList
           data={filteredUsers}
@@ -399,6 +423,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "grey",
     fontWeight: "bold",
+  },
+  sortContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingHorizontal: 6,
+    paddingVertical: 8
+  },
+  sortText: {
+    marginHorizontal: 5,
+    fontSize: 15,
+    fontWeight: "bold",
+    textDecorationLine: 'underline',
   },
 });
 
