@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { useNavigation } from "@react-navigation/native";
+import { supabase } from "../auth/supabase";
 
 const FiltersUI = ({ route }) => {
   const { session } = route.params;

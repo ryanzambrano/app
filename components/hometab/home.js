@@ -153,12 +153,14 @@ const Home = ({ route }) => {
             const relatedImageData = imageData.find(
               (img) => img.user_id === ugcUser.user_id
             );
+
             return {
               ...ugcUser,
               profiles: relatedProfileData,
               lastModified: relatedImageData?.last_modified || null,
             };
           });
+
           const userId = session.user.id;
 
           const { data, error } = await supabase

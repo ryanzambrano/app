@@ -13,19 +13,16 @@ import {
   TouchableWithoutFeedback,
   Modal,
 } from "react-native";
-import { createClient } from "@supabase/supabase-js";
+
 import { useIsFocused } from "@react-navigation/native";
 import { picURL } from "../auth/supabase";
 import { getLastModifiedFromSupabase } from "../auth/profileUtils.js";
+import { supabase } from "../auth/supabase.js";
 
 import Swiper from "react-native-swiper";
 // npm install react-native-swiper
 
 const MAX_IMAGES = 4;
-const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM";
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 const scrollY = new Animated.Value(0);
 

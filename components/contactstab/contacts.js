@@ -16,14 +16,9 @@ import { AntDesign } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 import { picURL } from "../auth/supabase.js";
-import { createClient } from "@supabase/supabase-js";
 import { gestureHandlerRootHOC } from "react-native-gesture-handler"; //install
 import { Swipeable } from "react-native-gesture-handler";
-
-const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM";
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from "../auth/supabase.js";
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
@@ -44,67 +39,57 @@ const ContactsUI = ({ route }) => {
   });
 
   const fetchUsers = async () => {
-    const { data: users, error } = await supabase.from("UGC").select("*");
+    const { data: users, error } = await supabase
+      .from("UGC")
+      .select("*")
+      .neq("user_id", session.user.id);
     if (error) {
       console.error(error);
       return;
     }
 
-    const usersWithModifiedTimePromises = users.map(async (user) => {
-      const { data: images, error: imageError } = await supabase
-        .from("images")
-        .select("last_modified")
-        .eq("user_id", user.user_id)
-        .order("last_modified", { ascending: false })
-        .limit(1);
+    const combinedPromises = users.map(async (user) => {
+      const [
+        { data: images, error: imageError },
+        { data: messages, error: messageError },
+      ] = await Promise.all([
+        supabase
+          .from("images")
+          .select("last_modified, user_id")
+          .eq("user_id", user.user_id)
+          .eq("image_index", 0)
+          .order("last_modified", { ascending: false })
+          .limit(1),
+        supabase
+          .from("Message")
+          .select("Content, createdat")
+          .or(
+            `and(Sent_From.eq.${session.user.id},Contact_ID.eq.${user.user_id}),and(Contact_ID.eq.${session.user.id},Sent_From.eq.${user.user_id})`
+          )
+          .order("createdat", { ascending: false })
+          .limit(1),
+      ]);
 
-      if (imageError) {
-        console.error(imageError);
-        return user; // Return user data without last_modified if there's an error
-      }
-
-      const lastModified = images.length > 0 ? images[0].last_modified : null;
-
-      return { ...user, lastModified };
-    });
-
-    const usersWithModifiedTimes = await Promise.all(
-      usersWithModifiedTimePromises
-    );
-    setUsers(usersWithModifiedTimes);
-
-    const recentMessagesPromises = users.map(async (user) => {
-      const { data: messages, error: messageError } = await supabase
-        .from("Message")
-        .select("Content, createdat")
-        .or(
-          `and(Sent_From.eq.${session.user.id},Contact_ID.eq.${user.user_id}),and(Contact_ID.eq.${session.user.id},Sent_From.eq.${user.user_id})`
-        )
-        .order("createdat", { ascending: false })
-        .limit(1);
-
-      if (messageError) {
-        console.error(messageError);
-        return null;
-      }
+      if (imageError) throw imageError;
+      if (messageError) throw messageError;
 
       const recentMessage =
-        messages.length > 0 ? messages[0].Content : "No recent messages";
-      const RTime = messages.length > 0 ? messages[0].createdat : null;
+        messages && messages.length > 0
+          ? messages[0].Content
+          : "No recent messages";
+      const RTime =
+        messages && messages.length > 0 ? messages[0].createdat : null;
       const recentTime = formatRecentTime(RTime);
-      if (recentTime) {
-        // Only include users with a recent message
-        return { ...user, recentMessage, recentTime };
-      } else {
-        return null;
-      }
+      return {
+        ...user,
+        lastModified: images && images[0] ? images[0].last_modified : null,
+        recentMessage,
+        recentTime,
+      };
     });
 
-    const usersWithRecentMessages = await Promise.all(recentMessagesPromises);
-    // Filter out null values (users without a recent message)
-    const filteredUsersWithRecentMessages =
-      usersWithRecentMessages.filter(Boolean);
-    setUsers(filteredUsersWithRecentMessages);
+    const combinedResults = await Promise.all(combinedPromises);
+    setUsers(combinedResults);
   };
 
   const formatRecentTime = (timestamp) => {
@@ -233,7 +218,7 @@ const ContactsUI = ({ route }) => {
             <Image
               style={styles.profilePicture}
               source={{
-                uri: `${picURL}/${item.user_id}/${item.user_id}-0-${item.lastModified}}`,
+                uri: `${picURL}/${item.user_id}/${item.user_id}-0-${item.lastModified}`,
               }}
             />
             <View style={styles.contactInfo}>
