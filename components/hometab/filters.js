@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
-import { View, Text, SafeAreaView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
+import { useNavigation } from "@react-navigation/native";
 
-const FiltersUI = () => {
-  
+const FiltersUI = ({ route }) => {
+  const { session } = route.params;
+
   const navigation = useNavigation();
   const [housingPreference, setHousingPreference] = useState("Any");
   const [genderPreference, setGenderPreference] = useState("Any");
@@ -14,20 +21,20 @@ const FiltersUI = () => {
   const [isFocus, setIsFocus] = useState(false);
 
   const roomOptions = [
-    { label: 'Any', value: 'Any' },
-    { label: 'Apartment', value: 'Apartment' },
-    { label: 'Dorm', value: 'Dorm' },
+    { label: "Any", value: "Any" },
+    { label: "Apartment", value: "Apartment" },
+    { label: "Dorm", value: "Dorm" },
   ];
 
   const genders = [
-    { label: 'Any', value: 'Any' },
-    { label: 'Male', value: 'Male' },
-    { label: 'Female', value: 'Female' },
-    { label: 'Other', value: 'Other' },
+    { label: "Any", value: "Any" },
+    { label: "Male", value: "Male" },
+    { label: "Female", value: "Female" },
+    { label: "Other", value: "Other" },
   ];
 
   const ages = [
-    { label: 'Any', value: 'Any' },
+    { label: "Any", value: "Any" },
     ...Array.from({ length: 83 }, (_, index) => ({
       label: (18 + index).toString(),
       value: (18 + index).toString(),
@@ -46,8 +53,14 @@ const FiltersUI = () => {
   ];
 
   const handleApplyFilters = () => {
-    console.log( housingPreference, genderPreference, youngestAgePreference, oldestAgePreference, studyPreference ); 
-    navigation.navigate('Home', {  });
+    console.log(
+      housingPreference,
+      genderPreference,
+      youngestAgePreference,
+      oldestAgePreference,
+      studyPreference
+    );
+    navigation.navigate("Home", {});
   };
 
   return (
@@ -61,12 +74,12 @@ const FiltersUI = () => {
           maxHeight={300}
           labelField="label"
           valueField="value"
-          placeholder='Select Housing Preference'
+          placeholder="Select Housing Preference"
           searchPlaceholder="Search..."
           value={housingPreference}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onChange={item => {
+          onChange={(item) => {
             setHousingPreference(item.value);
             setIsFocus(false);
           }}
@@ -81,12 +94,12 @@ const FiltersUI = () => {
           maxHeight={300}
           labelField="label"
           valueField="value"
-          placeholder='Select Gender Preference'
+          placeholder="Select Gender Preference"
           searchPlaceholder="Search..."
           value={genderPreference}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onChange={item => {
+          onChange={(item) => {
             setGenderPreference(item.value);
             setIsFocus(false);
           }}
@@ -101,12 +114,12 @@ const FiltersUI = () => {
           maxHeight={300}
           labelField="label"
           valueField="value"
-          placeholder='Select Youngest Age Preference'
+          placeholder="Select Youngest Age Preference"
           searchPlaceholder="Search..."
           value={youngestAgePreference}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onChange={item => {
+          onChange={(item) => {
             setYoungestAgePreference(item.value);
             setIsFocus(false);
           }}
@@ -121,12 +134,12 @@ const FiltersUI = () => {
           maxHeight={300}
           labelField="label"
           valueField="value"
-          placeholder='Select Oldest Age Preference'
+          placeholder="Select Oldest Age Preference"
           searchPlaceholder="Search..."
           value={oldestAgePreference}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onChange={item => {
+          onChange={(item) => {
             setOldestAgePreference(item.value);
             setIsFocus(false);
           }}
@@ -141,12 +154,12 @@ const FiltersUI = () => {
           maxHeight={300}
           labelField="label"
           valueField="value"
-          placeholder='Select Area of Preference'
+          placeholder="Select Area of Preference"
           searchPlaceholder="Search..."
           value={studyPreference}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onChange={item => {
+          onChange={(item) => {
             setStudyPreference(item.value);
             setIsFocus(false);
           }}
@@ -162,18 +175,18 @@ const FiltersUI = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   headerText: {
     fontSize: 25,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 10,
     padding: 15,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   filterContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginVertical: 10,
     marginHorizontal: 16,
   },
@@ -183,7 +196,7 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     flex: 1,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
@@ -198,11 +211,11 @@ const styles = StyleSheet.create({
     marginHorizontal: -10,
   },
   applyButton: {
-    alignSelf: 'center',
+    alignSelf: "center",
     fontSize: 15,
-    fontWeight: 'bold',
-    backgroundColor: '#007AFF',
-    color: 'white',
+    fontWeight: "bold",
+    backgroundColor: "#007AFF",
+    color: "white",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 10,

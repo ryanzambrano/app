@@ -28,6 +28,7 @@ export const Profile = ({ navigation, route }) => {
   const [isProfileVisible, setIsProfileVisible] = useState(true);
   const [prompts, setPrompts] = useState([]);
   const isFocused = useIsFocused();
+  const [lastModified, setLastModified] = useState([]);
 
   const promptQuestions = {
     greek_life: "Are you participating in Greek Life?",
@@ -104,13 +105,25 @@ export const Profile = ({ navigation, route }) => {
 
   const getProfilePicture = async (navigation) => {
     try {
-      const profilePictureURL = `${picURL}/${session.user.id}/${
-        session.user.id
-      }-0?${new Date().getTime()}`;
+      let lastModified;
+      const { data, error } = await supabase
+        .from("images")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("image_index", 0)
+        .single();
 
-      const response = await fetch(profilePictureURL, {
-        cache: "no-store",
-      });
+      if (error) {
+        alert(error.message);
+      }
+
+      if (data) {
+        // alert(`Image data fetched: ${JSON.stringify(data)}`);
+        lastModified = data.last_modified;
+      }
+      const profilePictureURL = `${picURL}/${session.user.id}/${session.user.id}-0-${lastModified}`;
+
+      const response = await fetch(profilePictureURL);
       if (response.ok) {
         setProfilePicture(profilePictureURL);
       } else {

@@ -21,8 +21,11 @@ const ThreeMainPages = ({ route }) => {
   const { session } = route.params;
   return (
     // Independent (below) must be true as the app.js stack navigator directs to here. Nested navigators causes problems, so this must be clarified.
-    <NavigationContainer independent={true} style={{marginBottom: -20}}>
-      <Stack.Navigator screenOptions={{ headerShown: false }} style={{marginBottom: -20}}>
+    <NavigationContainer independent={true} style={{ marginBottom: -20 }}>
+      <Stack.Navigator
+        screenOptions={{ headerShown: false }}
+        style={{ marginBottom: -20 }}
+      >
         <Stack.Screen
           name="Tabs"
           component={TabNavigator}
@@ -80,6 +83,7 @@ const ThreeMainPages = ({ route }) => {
           name="Filters"
           mode="modal"
           component={FiltersUI}
+          initialParams={{ session }}
           options={{ presentation: "modal" }}
         />
       </Stack.Navigator>
