@@ -52,7 +52,7 @@ export const fetchUsername = async (session) => {
 };
 // Assuming you have a Supabase client configured
 
-export const createTimestamp = async (user_id, timestamp) => {
+export const createTimestamp = async (user_id, timestamp, index) => {
   try {
     // Create a timestamp in ISO format
 
@@ -60,7 +60,8 @@ export const createTimestamp = async (user_id, timestamp) => {
     const { data, error: fetchError } = await supabase
       .from("images")
       .select()
-      .eq("user_id", user_id);
+      .eq("user_id", user_id)
+      .eq("image_index", index);
 
     if (fetchError) {
       console.error(fetchError);
@@ -71,8 +72,9 @@ export const createTimestamp = async (user_id, timestamp) => {
       // Update existing record
       const { error: updateError } = await supabase
         .from("images")
-        .update({ last_modified: timestamp })
-        .eq("user_id", user_id);
+        .update({ last_modified: timestamp, image_index: index })
+        .eq("user_id", user_id)
+        .eq("image_index", index);
 
       if (updateError) {
         console.error(updateError);
@@ -83,9 +85,8 @@ export const createTimestamp = async (user_id, timestamp) => {
       const { error: insertError } = await supabase.from("images").insert([
         {
           user_id: user_id,
-
           last_modified: timestamp,
-          // other fields as needed
+          image_index: index,
         },
       ]);
 

@@ -17,7 +17,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator";
 import { createTimestamp } from "../auth/profileUtils.js";
 
-const MAX_IMAGES = 6;
+const MAX_IMAGES = 4;
 
 const ImagePickerScreen = ({ navigation, route }) => {
   const { session } = route.params;
@@ -29,19 +29,39 @@ const ImagePickerScreen = ({ navigation, route }) => {
   const [image4, setImage4] = useState();
   const [image5, setImage5] = useState();
 
+  const [lastModified, setLastModified] = useState([]);
+
   useEffect(() => {
     getProfilePicturs();
   }, []);
 
   const getProfilePicturs = async () => {
     try {
-      for (let i = 0; i < MAX_IMAGES; i++) {
-        const profilePictureURL = `${picURL}/${session.user.id}/${
-          session.user.id
-        }-${i}?${new Date().getTime()}`;
-        const response = await fetch(profilePictureURL, {
-          cache: "no-cache",
+      let lastModifiedList = [];
+      const { data, error } = await supabase
+        .from("images")
+        .select("*")
+        .eq("user_id", session.user.id);
+
+      if (error) {
+        alert(error.message);
+      }
+
+      if (data) {
+        // alert(`Image data fetched: ${JSON.stringify(data)}`);
+        data.forEach((item) => {
+          // Use the image_index as the position for the last_modified value
+          lastModifiedList[item.image_index] = item.last_modified;
         });
+
+        setLastModified(lastModifiedList);
+
+        // If you want just a single 'last_modified' value (assuming the first one), you can do:
+      }
+      for (let i = 0; i < MAX_IMAGES; i++) {
+        //alert(i + ":" + lastModifiedList[i]);
+        const profilePictureURL = `${picURL}/${session.user.id}/${session.user.id}-${i}-${lastModifiedList[i]}`;
+        const response = await fetch(profilePictureURL);
         if (response.ok) {
           const imageURI = profilePictureURL;
           switch (i) {
@@ -94,14 +114,27 @@ const ImagePickerScreen = ({ navigation, route }) => {
 
   const deletePictures = async (index) => {
     try {
-      const filename = `${session.user.id}/${session.user.id}-${index}`;
+      const filename = `${session.user.id}/${session.user.id}-${index}-${lastModified[index]}`;
+
       const { data: removeData, error: removeError } = await supabase.storage
         .from("user_pictures")
         .remove(filename);
 
-      if (removeData) {
-        //alert(`Successfully deleted image ${index + 1}`);
+      if (removeError) {
+        throw removeError;
+      }
 
+      const { data: removeRow, error: rowError } = await supabase
+        .from("images")
+        .delete()
+        .eq("user_id", session.user.id)
+        .eq("image_index", index);
+
+      if (rowError) {
+        throw rowError;
+      }
+
+      if (removeData && removeRow) {
         switch (index) {
           case 0:
             setImage0(null);
@@ -119,6 +152,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
           default:
             console.error("Invalid index for image deletion");
         }
+        getProfilePicturs();
       }
 
       if (removeError) {
@@ -148,7 +182,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
 
       if (!imagePickerResult.canceled) {
         const timestamp = new Date().toISOString();
-        alert(timestamp);
+
         deletePictures(index);
         const filename = `${session.user.id}/${session.user.id}-${index}-${timestamp}`;
 
@@ -166,7 +200,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
             contentType: "image/jpeg",
           });
 
-        createTimestamp(session.user.id, timestamp);
+        createTimestamp(session.user.id, timestamp, index);
 
         if (uploadError) {
           alert(uploadError.message);
@@ -210,7 +244,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
         style={styles.button}
         onPress={async () => {
           await deletePictures(index);
-          getProfilePicturs();
+          await getProfilePicturs();
         }}
       >
         <Icon name="times" size={25} color="grey" />

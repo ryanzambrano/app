@@ -1,4 +1,4 @@
-import React, { useEffect, useState, } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   TextInput,
@@ -13,12 +13,12 @@ import {
 } from "react-native";
 
 import { AntDesign } from "@expo/vector-icons";
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 import { picURL } from "../auth/supabase.js";
 import { createClient } from "@supabase/supabase-js";
-import { gestureHandlerRootHOC } from 'react-native-gesture-handler'; //install
-import { Swipeable } from 'react-native-gesture-handler';
+import { gestureHandlerRootHOC } from "react-native-gesture-handler"; //install
+import { Swipeable } from "react-native-gesture-handler";
 
 const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
 const supabaseKey =
@@ -30,14 +30,16 @@ const ContactsUI = ({ route }) => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = (text) => {
     setSearchQuery(text);
   };
 
   const filteredUsers = users.filter((user) => {
-    const nameMatch = user.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const nameMatch = user.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
     return nameMatch;
   });
 
@@ -48,6 +50,29 @@ const ContactsUI = ({ route }) => {
       return;
     }
 
+    const usersWithModifiedTimePromises = users.map(async (user) => {
+      const { data: images, error: imageError } = await supabase
+        .from("images")
+        .select("last_modified")
+        .eq("user_id", user.user_id)
+        .order("last_modified", { ascending: false })
+        .limit(1);
+
+      if (imageError) {
+        console.error(imageError);
+        return user; // Return user data without last_modified if there's an error
+      }
+
+      const lastModified = images.length > 0 ? images[0].last_modified : null;
+
+      return { ...user, lastModified };
+    });
+
+    const usersWithModifiedTimes = await Promise.all(
+      usersWithModifiedTimePromises
+    );
+    setUsers(usersWithModifiedTimes);
+
     const recentMessagesPromises = users.map(async (user) => {
       const { data: messages, error: messageError } = await supabase
         .from("Message")
@@ -57,13 +82,14 @@ const ContactsUI = ({ route }) => {
         )
         .order("createdat", { ascending: false })
         .limit(1);
-  
+
       if (messageError) {
         console.error(messageError);
         return null;
       }
-  
-      const recentMessage = messages.length > 0 ? messages[0].Content : "No recent messages";
+
+      const recentMessage =
+        messages.length > 0 ? messages[0].Content : "No recent messages";
       const RTime = messages.length > 0 ? messages[0].createdat : null;
       const recentTime = formatRecentTime(RTime);
       if (recentTime) {
@@ -73,38 +99,42 @@ const ContactsUI = ({ route }) => {
         return null;
       }
     });
-  
+
     const usersWithRecentMessages = await Promise.all(recentMessagesPromises);
     // Filter out null values (users without a recent message)
-    const filteredUsersWithRecentMessages = usersWithRecentMessages.filter(Boolean);
+    const filteredUsersWithRecentMessages =
+      usersWithRecentMessages.filter(Boolean);
     setUsers(filteredUsersWithRecentMessages);
   };
 
   const formatRecentTime = (timestamp) => {
     if (!timestamp) return "";
-  
+
     const date = new Date(timestamp);
     const currentTime = new Date();
     const diffInMs = currentTime - date;
     const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
-  
+
     if (diffInDays < 1) {
       // Less than a day ago, display time in AM/PM format
       const hours = date.getHours();
       const minutes = date.getMinutes();
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      const formattedTime = `${hours % 12 || 12}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+      const ampm = hours >= 12 ? "PM" : "AM";
+      const formattedTime = `${hours % 12 || 12}:${minutes
+        .toString()
+        .padStart(2, "0")} ${ampm}`;
       return formattedTime;
     } else {
       // More than a day ago, display the full date
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const day = date.getDate();
-      const formattedDate = `${month.toString().padStart(2, "0")}/${day.toString().padStart(2, "0")}/${year}`;
+      const formattedDate = `${month.toString().padStart(2, "0")}/${day
+        .toString()
+        .padStart(2, "0")}/${year}`;
       return formattedDate;
     }
   };
-
 
   useEffect(() => {
     fetchUsers();
@@ -112,18 +142,21 @@ const ContactsUI = ({ route }) => {
       .channel("custom-all-channel")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "Message", /*filter: `.or(Sent_From.eq.${session.user.id}, Contact_ID.eq.${session.user.id})`, */},
+        {
+          event: "*",
+          schema: "public",
+          table:
+            "Message" /*filter: `.or(Sent_From.eq.${session.user.id}, Contact_ID.eq.${session.user.id})`, */,
+        },
         (payload) => {
           fetchUsers();
         }
       )
       .subscribe();
-      return () => {
-        supabase.removeChannel(channel);
-      }
-      
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
-  
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
@@ -131,33 +164,30 @@ const ContactsUI = ({ route }) => {
     navigation.navigate("Message", { user });
   };
 
-  
   const handlePlusIconPress = () => {
     // Implement the logic when the plus icon is pressed
     // For example, you can navigate to the compose message screen
     navigation.navigate("ComposeMessage");
-  };  
-  
-
+  };
 
   const renderContact = ({ item }) => {
     const handleDelete = async () => {
       const { error } = await supabase
-      .from('Message')
-      .delete()
-      .or(
-        `and(Sent_From.eq.${session.user.id},Contact_ID.eq.${item.user_id}),and(Contact_ID.eq.${session.user.id},Sent_From.eq.${item.user_id})`
-      )
+        .from("Message")
+        .delete()
+        .or(
+          `and(Sent_From.eq.${session.user.id},Contact_ID.eq.${item.user_id}),and(Contact_ID.eq.${session.user.id},Sent_From.eq.${item.user_id})`
+        );
       fetchUsers();
     };
-  
+
     const renderRightActions = (progress, dragX) => {
-     // console.log("Progress:", progress);
+      // console.log("Progress:", progress);
       const trans = dragX.interpolate({
         inputRange: [-75, 0],
         outputRange: [0, 75], // Modify this line to change the direction of the expansion
       });
-    
+
       const handleDeleteConfirmation = () => {
         Alert.alert(
           "Delete Contact",
@@ -177,11 +207,11 @@ const ContactsUI = ({ route }) => {
         <TouchableOpacity onPress={handleDeleteConfirmation}>
           <Animated.View
             style={{
-              backgroundColor: 'red',
-              justifyContent: 'center',
-              alignItems: 'center',
+              backgroundColor: "red",
+              justifyContent: "center",
+              alignItems: "center",
               width: 75,
-              height: '100%',
+              height: "100%",
               transform: [{ translateX: trans }],
             }}
           >
@@ -191,32 +221,31 @@ const ContactsUI = ({ route }) => {
         </TouchableOpacity>
       );
     };
-    
-  
+
     return (
-<Swipeable
-  renderRightActions={renderRightActions}
-  overshootRight={false} // Disable the bounce effect
-  useNativeDriver={true} // Use native driver to prevent bounce effect
->
-  <TouchableOpacity onPress={() => handleUserCardPress(item)}>
-    <View style={styles.contactItem}>
-      <Image
-        style={styles.profilePicture}
-        source={{
-          uri: `${picURL}/${item.user_id}/${item.user_id}-0?${new Date().getTime()}`
-        }}
-      />
-      <View style={styles.contactInfo}>
-        <View style={styles.contactNameContainer}>
-          <Text style={styles.contactName}>{item.name}</Text>
-          <Text style={styles.MessageTime}>{item.recentTime}</Text>
-        </View>
-        <Text style={styles.RecentMessage}>{item.recentMessage}</Text>
-      </View>
-    </View>
-  </TouchableOpacity>
-</Swipeable>
+      <Swipeable
+        renderRightActions={renderRightActions}
+        overshootRight={false} // Disable the bounce effect
+        useNativeDriver={true} // Use native driver to prevent bounce effect
+      >
+        <TouchableOpacity onPress={() => handleUserCardPress(item)}>
+          <View style={styles.contactItem}>
+            <Image
+              style={styles.profilePicture}
+              source={{
+                uri: `${picURL}/${item.user_id}/${item.user_id}-0-${item.lastModified}}`,
+              }}
+            />
+            <View style={styles.contactInfo}>
+              <View style={styles.contactNameContainer}>
+                <Text style={styles.contactName}>{item.name}</Text>
+                <Text style={styles.MessageTime}>{item.recentTime}</Text>
+              </View>
+              <Text style={styles.RecentMessage}>{item.recentMessage}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Swipeable>
     );
   };
   return (
@@ -225,13 +254,13 @@ const ContactsUI = ({ route }) => {
         <Image
           style={styles.logo}
           source={{
-            uri: 'https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg',
+            uri: "https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg",
           }}
         />
         <Text style={styles.headerText}>Cabana</Text>
         <TouchableOpacity
           onPress={handlePlusIconPress}
-          style={{ position: 'absolute', top: 10, right: 13 }}
+          style={{ position: "absolute", top: 10, right: 13 }}
         >
           <AntDesign name="plus" size={25} color="#14999999" />
         </TouchableOpacity>
@@ -288,9 +317,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
     borderRadius: 10,
     paddingHorizontal: 15,
     marginTop: 5,
@@ -298,7 +327,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     marginHorizontal: 5,
     borderWidth: 0.3,
-    borderColor: 'grey',
+    borderColor: "grey",
   },
 
   searchInput: {
@@ -315,7 +344,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#DDD",
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-    width: '100%', // Set the width to 100% to fill the container
+    width: "100%", // Set the width to 100% to fill the container
   },
   profilePicture: {
     width: 50,
@@ -350,23 +379,23 @@ const styles = StyleSheet.create({
   },
   rowBack: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    backgroundColor: 'red',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    backgroundColor: "red",
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
   deleteButton: {
     width: 75,
-    height: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   deleteButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

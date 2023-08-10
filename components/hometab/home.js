@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   FlatList,
   SafeAreaView,
+  Alert,
 } from "react-native";
 
 import FiltersUI from "./filters.js";
@@ -27,6 +28,7 @@ const Home = ({ route }) => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [sessionUser, setSessionuser] = useState(session.user);
+  const [sortMethod, setSortMethod] = useState("Most Compatible");
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -44,31 +46,68 @@ const Home = ({ route }) => {
     setSearchQuery(text);
   };
 
+  const showSortMenu = () => {
+    Alert.alert(
+      "Sort Options",
+      "Choose a sorting method:",
+      [
+        {
+          text: "Alphabetical Order",
+          onPress: () => setSortMethod("Alphabetical Order"),
+        },
+        {
+          text: "Shared Interests",
+          onPress: () => setSortMethod("Shared Interests"),
+        },
+        {
+          text: "Most Compatible",
+          onPress: () => setSortMethod("Most Compatible"),
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   const calculateCompatibility = (sessionUser, otherUser) => {
     let score = 0;
     console.log(sessionUser.for_fun, otherUser.for_fun);
     if (Array.isArray(sessionUser.tags) && Array.isArray(otherUser.tags)) {
-        sessionUser.tags.forEach(tag => {
-            if (otherUser.tags.includes(tag)) score += 12;
-        });
+      sessionUser.tags.forEach((tag) => {
+        if (otherUser.tags.includes(tag)) score += 12;
+      });
     }
     if (sessionUser.for_fun === otherUser.for_fun) score += 15;
-    if (sessionUser.living_preferences === otherUser.living_preferences) score += 15;
+    if (sessionUser.living_preferences === otherUser.living_preferences)
+      score += 15;
     if (sessionUser.gender === otherUser.gender) score += 1;
-    if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 1; 
+    if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 1;
     if (sessionUser.class_year === otherUser.class_year) score += 2;
 
     return score;
-}
+  };
 
   const sortedUsers = users.sort((a, b) => {
     console.log(a, b);
-    const aScore = calculateCompatibility(sessionUser, a);
-    const bScore = calculateCompatibility(sessionUser, b);
-    return bScore - aScore; 
+    switch (sortMethod) {
+      case "Alphabetical Order":
+        return a.name.localeCompare(b.name);
+      case "Shared Interests":
+        const aTagsCount = a.tags.filter((tag) =>
+          sessionUser.tags.includes(tag)
+        ).length;
+        const bTagsCount = b.tags.filter((tag) =>
+          sessionUser.tags.includes(tag)
+        ).length;
+        return bTagsCount - aTagsCount;
+      case "Most Compatible":
+      default:
+        const aScore = calculateCompatibility(sessionUser, a);
+        const bScore = calculateCompatibility(sessionUser, b);
+        return bScore - aScore;
+    }
   });
-  
-  const filteredUsers = sortedUsers.filter(user => {
+
+  const filteredUsers = sortedUsers.filter((user) => {
     const isSessionUser = user.user_id === session.user.id;
     const nameMatch = user.name
       .toLowerCase()
@@ -94,12 +133,14 @@ const Home = ({ route }) => {
         const { data: ugcData, error: ugcError } = await supabase
           .from("UGC")
           .select("*");
+
         const { data: profileData, error: profileError } = await supabase
           .from("profile")
           .select("*");
+
         const { data: imageData, error: imageError } = await supabase
           .from("images")
-          .select("user_id, last_modified");
+          .select("*");
 
         if (ugcError || profileError || imageError) {
           console.error(ugcError || profileError || imageError);
@@ -112,7 +153,6 @@ const Home = ({ route }) => {
             const relatedImageData = imageData.find(
               (img) => img.user_id === ugcUser.user_id
             );
-
             return {
               ...ugcUser,
               profiles: relatedProfileData,
@@ -133,19 +173,21 @@ const Home = ({ route }) => {
             setSessionuser(data);
           }
 
-          const { data: bookmarkedData, error: bookmarkedError } = await supabase
-            .from("UGC")
-            .select("bookmarked_profiles")
-            .eq("user_id", userId);
+          const { data: bookmarkedData, error: bookmarkedError } =
+            await supabase
+              .from("UGC")
+              .select("bookmarked_profiles")
+              .eq("user_id", userId);
 
           if (bookmarkedError) {
-            console.error("Error fetching bookmarked profiles:", bookmarkedError.message);
-          } 
-
-          else {
+            console.error(
+              "Error fetching bookmarked profiles:",
+              bookmarkedError.message
+            );
+          } else {
             const { bookmarked_profiles } = bookmarkedData[0];
             setBookmarkedProfiles(bookmarked_profiles);
-        }
+          }
           setUsers(mergedData);
         }
       } catch (error) {
@@ -168,17 +210,12 @@ const Home = ({ route }) => {
     return () => {
       supabase.removeChannel(channel);
     };
-
-  }, [housingPreference]);
-
-
+  }, []);
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
     navigation.navigate("userCard", { user });
   };
-
-
 
   const renderUserCard = ({ item }) => {
     return (
@@ -187,7 +224,7 @@ const Home = ({ route }) => {
           <Image
             style={styles.profileImage}
             source={{
-              uri: `${picURL}/${item.user_id}/${item.user_id}-0?${item.lastModified}`,
+              uri: `${picURL}/${item.user_id}/${item.user_id}-0-${item.lastModified}`,
             }}
           />
           <View style={styles.userInfo}>
@@ -208,9 +245,6 @@ const Home = ({ route }) => {
     );
   };
 
-
-
-  
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -258,6 +292,16 @@ const Home = ({ route }) => {
             onChangeText={handleSearch}
             value={searchQuery}
           />
+        </View>
+        <View style={styles.sortContainer}>
+          <Text style={styles.sortText}>Sort by:</Text>
+          <TouchableOpacity onPress={() => showSortMenu()}>
+            <Text
+              style={{ color: "#0061db", fontWeight: "bold", fontSize: "15" }}
+            >
+              {sortMethod}
+            </Text>
+          </TouchableOpacity>
         </View>
         <FlatList
           data={filteredUsers}
@@ -399,6 +443,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "grey",
     fontWeight: "bold",
+  },
+  sortContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingHorizontal: 6,
+    paddingVertical: 8,
+  },
+  sortText: {
+    marginHorizontal: 5,
+    fontSize: 15,
+    fontWeight: "bold",
+    textDecorationLine: "underline",
   },
 });
 
