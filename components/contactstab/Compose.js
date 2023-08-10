@@ -82,18 +82,27 @@ const ComposeMessageScreen = ({route}) => {
    
     // Check if a group with the same set of user IDs already exists
 // Check if a group with the same set of user IDs already exists
-        const { data: existingGroupData, error: existingGroupError } = await supabase
-        .from('Group Chats')
-        .select('Group_ID')
-        .eq('User_ID', session.user.id)
-        .in('User_ID', selectedUserIDs)
-        .single();
+const { data: matchingGroups, error: matchingGroupsError } = await supabase
+    .from('Group Chats')
+    .select('Group_ID')
+    .eq('Amount_Users', selectedUserIDs.length);
 
-        if (existingGroupData) {
-        // A group already exists, display an alert
-        alert('A group chat already exists for these users.');
-        return;
-        }
+// Check if any matching group has the same set of user IDs
+const groupExists = await Promise.all(matchingGroups.map(async group => {
+    const { data: groupData, error: groupDataError } = await supabase
+        .from('Group Chats')
+        .select('User_ID')
+        .eq('Group_ID', group.Group_ID);
+
+    const groupUserIDs = groupData.map(user => user.User_ID);
+    return groupUserIDs.length === selectedUserIDs.length && groupUserIDs.every(id => selectedUserIDs.includes(id));
+}));
+
+if (groupExists.some(exists => exists)) {
+    // A group with the same user IDs and amount already exists, display an alert
+    alert('A group chat already exists with the same users and the same number of users.');
+    return;
+}
       
       // Insert the new record with User_ID, Group_ID, and Group_Name
       const { data: insertData, error: insertError } = await supabase
@@ -102,6 +111,7 @@ const ComposeMessageScreen = ({route}) => {
           {
             User_ID: session.user.id,
             Group_Name: selectedUserNames.join(', '), // Join selected user names with commas
+            Ammount_Users: selectedUserIDs.length,
           },
         ])
         .select();
@@ -131,6 +141,7 @@ const ComposeMessageScreen = ({route}) => {
         User_ID: user.id,
         Group_ID: groupid,
         Group_Name: selectedUserNames.join(', '),
+        Ammount_Users: selectedUserIDs.length,
       }));
       
       const { data: insertSelectedUsersData, error: insertSelectedUsersError } = await supabase
