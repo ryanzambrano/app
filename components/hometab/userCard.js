@@ -55,18 +55,20 @@ const UserCard = ({ navigation, route }) => {
     class_year,
     hometown,
     bookmarked_profiles,
+    lastModified,
   } = route.params.user;
 
   // current user is session.user.id
   // other user is user_id
 
-  const [photos, setPhotos] = useState([]);
+  const [photos, setPhotos] = useState([
+    `${picURL}/${user_id}/${user_id}-0-${lastModified}`,
+  ]);
   const [isFriendAdded, setIsFriendAdded] = useState(false);
   const buttonColor = isFriendAdded ? "green" : "black";
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
   const [prompts, setPrompts] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [lastModified, setLastModified] = useState(null);
 
   const promptQuestions = {
     greek_life: "Are you participating in Greek Life?",
@@ -192,50 +194,35 @@ const UserCard = ({ navigation, route }) => {
     getProfilePictures();
   }, [user_id, picURL]);
 
-  const getLastModifiedFromSupabase = async (user_id) => {
+  const getProfilePictures = async () => {
     try {
+      let lastModifiedList = [];
+
       const { data, error } = await supabase
-        .from("images") // Assuming 'images' is the table name
-        .select("last_modified") // Assuming 'last_modified' is the column name for the timestamp
-        .eq("user_id", user_id) // Assuming 'user_id' is the column to filter by
-        .single(); // Get a single record
+        .from("images")
+        .select("*")
+        .eq("user_id", user_id);
 
       if (error) {
         alert(error.message);
-        return null;
       }
 
-      return data.last_modified; // Return the last modified timestamp
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  };
-
-  const getProfilePictures = async () => {
-    try {
-      // List all files in the user_id folder
-      const { data, error } = await supabase.storage
-        .from(`user_pictures`)
-        .list(`${user_id}/`);
-
-      if (error) {
-        throw error;
+      if (data) {
+        // alert(`Image data fetched: ${JSON.stringify(data)}`);
+        data.forEach((item) => {
+          // Use the image_index as the position for the last_modified value
+          lastModifiedList[item.image_index] = item.last_modified;
+        });
       }
-
-      // Map over the files to get their public URLs
-      const imageUrlsPromises = data.map(async (entry) => {
-        const fullPath = `${user_id}/${entry.name}`;
-        const response = await supabase.storage
-          .from("user_pictures")
-          .getPublicUrl(fullPath);
-        return response.data.publicUrl; // extract the actual URL string
-      });
-
-      const imageUrls = await Promise.all(imageUrlsPromises);
-      // Update state with these URLs
-      console.log(imageUrls);
-      setPhotos(imageUrls);
+      let newPhotos = [];
+      for (let i = 1; i < MAX_IMAGES; i++) {
+        const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}-${lastModifiedList[i]}`;
+        const response = await fetch(profilePictureURL);
+        if (response.ok) {
+          newPhotos.push(profilePictureURL);
+        }
+      }
+      setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
     } catch (error) {
       console.error(error);
     }
