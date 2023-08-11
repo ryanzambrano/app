@@ -7,6 +7,7 @@ import Questionaire2 from "./questionaire2.js";
 import Questionaire3 from "./questionaire3.js";
 import Username from "./username.js";
 import Name from "./fullName.js";
+import MatchingData from "./matchingData.js";
 import TagSelectionScreen from "./tagSelectionScreen.js";
 import Colleges from "./college.js";
 
@@ -45,6 +46,11 @@ const Questionaire = ({ navigation, route }) => {
       <Stack.Screen
         name="Questionaire3"
         component={Questionaire3}
+        initialParams={{ session }}
+      />
+      <Stack.Screen
+        name="MatchingData"
+        component={MatchingData}
         initialParams={{ session }}
       />
       <Stack.Screen

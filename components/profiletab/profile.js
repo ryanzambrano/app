@@ -39,10 +39,6 @@ export const Profile = ({ navigation, route }) => {
 
   const scrollY = new Animated.Value(0);
 
-  /*scrollY.addListener(({ value }) => {
-    setIsProfileVisible(value < DISABLE_TOUCHABLE_SCROLL_POINT);
-  });*/
-
   const profileOpacity = scrollY.interpolate({
     inputRange: [0, 100],
     outputRange: [1, 0],
@@ -245,7 +241,7 @@ export const Profile = ({ navigation, route }) => {
             <View style={styles.bio}>
               <View>
                 <Text style={styles.bioHeader}>About me</Text>
-                <Text style={styles.text}>{editedUser.bio}</Text>
+                <Text style={styles.bioText}>{editedUser.bio}</Text>
               </View>
             </View>
 
@@ -342,10 +338,11 @@ const styles = StyleSheet.create({
   bio: {
     fontSize: 18,
     fontWeight: "600",
-    paddingLeft: 16,
+    //paddingLeft: 25,
     paddingBottom: 25,
     paddingTop: 25,
     marginBottom: 0,
+
     borderBottomColor: "lightgrey",
     borderBottomWidth: 1,
     borderBottomEndRadius: 20,
@@ -356,9 +353,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontWeight: "600",
     marginBottom: 10,
-
     fontSize: 20,
-    marginLeft: -20,
   },
 
   promptsHeader: {
@@ -366,7 +361,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontWeight: "600",
     fontSize: 20,
-    marginLeft: -20,
   },
 
   editButton: {
@@ -434,6 +428,11 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
 
+    color: "black",
+  },
+  bioText: {
+    fontSize: 16,
+    marginLeft: 25,
     color: "black",
   },
   input: {

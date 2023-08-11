@@ -17,7 +17,6 @@ import FiltersUI from "./filters.js";
 import { supabase } from "../auth/supabase.js"; // we have our client here!!! no need to worry about creating it again
 import { picURL } from "../auth/supabase.js"; // This is the base url of the photos bucket that is in our Supabase project. It makes referencing user pictures easier
 import { useNavigation } from "@react-navigation/native";
-import { createClient } from "@supabase/supabase-js"; // Create client is responsible for drawing profile data from each user in the database
 
 const isBookmarkedURI =
   "https://th.bing.com/th/id/OIP.Pzc03rRYlwOdKsolfgcwogHaJQ?pid=ImgDet&rs=1";
@@ -140,7 +139,8 @@ const Home = ({ route }) => {
 
         const { data: imageData, error: imageError } = await supabase
           .from("images")
-          .select("*");
+          .select("*")
+          .eq("image_index", 0);
 
         if (ugcError || profileError || imageError) {
           console.error(ugcError || profileError || imageError);

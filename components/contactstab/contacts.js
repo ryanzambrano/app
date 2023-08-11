@@ -19,6 +19,7 @@ import { picURL } from "../auth/supabase.js";
 import { gestureHandlerRootHOC } from "react-native-gesture-handler"; //install
 import { Swipeable } from "react-native-gesture-handler";
 import { supabase } from "../auth/supabase.js";
+import { useIsFocused } from "@react-navigation/native";
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
@@ -26,6 +27,7 @@ const ContactsUI = ({ route }) => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const isFocused = useIsFocused();
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -123,6 +125,9 @@ const ContactsUI = ({ route }) => {
 
   useEffect(() => {
     fetchUsers();
+    if (isFocused) {
+      fetchUsers();
+    }
     const channel = supabase
       .channel("custom-all-channel")
       .on(
@@ -141,7 +146,7 @@ const ContactsUI = ({ route }) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [isFocused]);
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);

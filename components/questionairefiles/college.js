@@ -113,9 +113,7 @@ export const Colleges = ({ navigation, route }) => {
         )}
         {selectedCollege && (
           <View style={styles.sItem}>
-            <Text style={styles.continueText}>
-              Selected College: {selectedCollege}
-            </Text>
+            <Text style={styles.continueText}>{selectedCollege}</Text>
           </View>
         )}
         <View style={styles.formAction}>
@@ -216,10 +214,10 @@ const styles = StyleSheet.create({
     padding: 20,
     marginVertical: 8,
     marginHorizontal: 16,
-    borderRadius: 5,
+    borderRadius: 15,
     backgroundColor: "#fff",
     borderColor: "#ccc",
-    borderWidth: 1,
+    //borderWidth: 1,
   },
 
   sItem: {

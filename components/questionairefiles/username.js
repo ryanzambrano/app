@@ -32,13 +32,13 @@ export const Username = ({ navigation, route }) => {
     if (session?.user) {
       if (!!userData.username) {
         // Check if the name is longer than 30 characters
-        if (userData.username.length > 30) {
+        if (userData.username.length > 20) {
           setIsError("Too many characters");
           return; // Stop the function execution
         }
 
         // Check if the name contains non-alphabetic characters
-        if (!/^[a-z0-9]+$/i.test(userData.username)) {
+        if (!/^[a-z0-9_]+$/i.test(userData.username)) {
           setIsError("Invalid characters");
           return; // Stop the function execution
         }

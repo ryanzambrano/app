@@ -1,6 +1,5 @@
 import { supabase } from "./supabase";
 import { Animated, Easing } from "react-native";
-import { picURL } from "./supabase";
 
 export async function startShakeAnimation(shakeAnimationValue) {
   shakeAnimationValue.setValue(0);

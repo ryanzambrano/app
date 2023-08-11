@@ -176,7 +176,6 @@ const UserCard = ({ navigation, route }) => {
             updateError.message
           );
         } else {
-          console.log("Bookmark removed successfully!");
           setIsFriendAdded(false);
         }
       }
@@ -215,19 +214,28 @@ const UserCard = ({ navigation, route }) => {
 
   const getProfilePictures = async () => {
     try {
-      for (let i = 0; i < MAX_IMAGES; i++) {
-        const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}`;
-        const response = await fetch(profilePictureURL, { method: "HEAD" });
+      // List all files in the user_id folder
+      const { data, error } = await supabase.storage
+        .from(`user_pictures`)
+        .list(`${user_id}/`);
 
-        if (response.ok) {
-          const imageResponse = await fetch(profilePictureURL, {
-            cache: "no-store",
-          });
-          if (imageResponse.ok) {
-            setPhotos((prevPhotos) => [...prevPhotos, profilePictureURL]);
-          }
-        }
+      if (error) {
+        throw error;
       }
+
+      // Map over the files to get their public URLs
+      const imageUrlsPromises = data.map(async (entry) => {
+        const fullPath = `${user_id}/${entry.name}`;
+        const response = await supabase.storage
+          .from("user_pictures")
+          .getPublicUrl(fullPath);
+        return response.data.publicUrl; // extract the actual URL string
+      });
+
+      const imageUrls = await Promise.all(imageUrlsPromises);
+      // Update state with these URLs
+      console.log(imageUrls);
+      setPhotos(imageUrls);
     } catch (error) {
       console.error(error);
     }
