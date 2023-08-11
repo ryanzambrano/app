@@ -69,7 +69,7 @@ const Home = ({ route }) => {
 
   const calculateCompatibility = (sessionUser, otherUser) => {
     let score = 0;
-    console.log(sessionUser.for_fun, otherUser.for_fun);
+    //console.log(sessionUser.for_fun, otherUser.for_fun);
     if (Array.isArray(sessionUser.tags) && Array.isArray(otherUser.tags)) {
       sessionUser.tags.forEach((tag) => {
         if (otherUser.tags.includes(tag)) score += 12;
@@ -86,7 +86,7 @@ const Home = ({ route }) => {
   };
 
   const sortedUsers = users.sort((a, b) => {
-    console.log(a, b);
+    //console.log(a, b);
     switch (sortMethod) {
       case "Alphabetical Order":
         return a.name.localeCompare(b.name);
