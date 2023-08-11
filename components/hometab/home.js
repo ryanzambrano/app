@@ -299,7 +299,7 @@ const Home = ({ route }) => {
           <Text style={styles.sortText}>Sort by:</Text>
           <TouchableOpacity onPress={() => showSortMenu()}>
             <Text
-              style={{ color: "#0061db", fontWeight: "bold", fontSize: "15" }}
+              style={{ color: "#0061db", fontWeight: "bold", fontSize: 15 }}
             >
               {sortMethod}
             </Text>

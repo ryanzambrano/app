@@ -115,7 +115,7 @@ const UserCard = ({ navigation, route }) => {
       const { data: promptsData, error: promptsError } = await supabase
         .from("prompts")
         .select("*")
-        .eq("user_id", session.user.id);
+        .eq("user_id", user_id);
       if (promptsData) {
         const answeredPrompts = Object.entries(promptsData[0])
           .filter(
