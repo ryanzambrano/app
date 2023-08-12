@@ -92,61 +92,15 @@ const ComposeMessageScreen = ({ route }) => {
       // Get the IDs of the selected users
       const selectedUserIDs = selectedUsers.map((user) => user.id);
       selectedUserIDs.push(session.user.id);
-  
-      const { data: matchingGroups, error: matchingGroupsError } =
-        await supabase
-          .from("Group Chats")
-          .select("Group_ID")
-          .eq('User_ID', session.user.id)
-          .eq('Ammount_Users', selectedUserNames.length);
-      
-      if (matchingGroupsError) {
-        console.error("Error fetching matching groups:", matchingGroupsError);
-        return;
-      }
-      
-      const groupIDs = matchingGroups.map((group) => group.Group_ID);
-  
-      let commonGroupExists = false;
-  
-      for (const groupID of groupIDs) {
-        // Retrieve User_IDs associated with the current Group_ID
-        const { data: groupUsers, error: groupUsersError } = await supabase
-          .from("Group Chats")
-          .select("User_ID")
-          .eq('Group_ID', groupID);
-  
-        if (groupUsersError) {
-          console.error("Error fetching group users:", groupUsersError);
-          return;
-        }
-  
-        // Extract User_IDs from the fetched data
-        const groupUserIDs = groupUsers.map((user) => user.User_ID);
-  
-        // Check if groupUserIDs and selectedUserIDs contain the same values
-        if (
-          groupUserIDs.length === selectedUserIDs.length &&
-          groupUserIDs.every((id) => selectedUserIDs.includes(id))
-        ) {
-          // The same users exist in the group
-          commonGroupExists = true;
-          break; // Exit the loop
-        }
-      }
-  
-      if (commonGroupExists) {
-        // A common group exists for the specified users
-        alert("Group chat already exists with the same users.");
-        return;
-      }
+      selectedUserIDs.sort();
+
   
       // Insert the new record with User_ID, Group_ID, and Group_Name
       const { data: insertData, error: insertError } = await supabase
         .from("Group Chats")
         .insert([
           {
-            User_ID: session.user.id,
+            User_ID: selectedUserIDs,
             Group_Name: selectedUserNames, // Join selected user names with commas
             Ammount_Users: selectedUserIDs.length,
           },
@@ -154,51 +108,12 @@ const ComposeMessageScreen = ({ route }) => {
         .select();
   
       if (insertError) {
-        console.error("Error inserting into Group Chats:", insertError);
+        alert('A group chat/Message already exists for these users.');
         return;
       }
   
-      // Retrieve the most recent Group_ID
-      const { data: recentGroupData, error: recentGroupError } = await supabase
-        .from("Group Chats")
-        .select("Group_ID")
-        .order("Group_ID", { ascending: false })
-        .limit(1);
-  
-      if (recentGroupError) {
-        console.error("Error retrieving recent Group_ID:", recentGroupError);
-        return;
-      }
-  
-      // Extract and assign the Group_ID to the variable
-      const groupid = recentGroupData[0].Group_ID;
-  
-      // Insert selected user IDs into User_ID column
-      const insertSelectedUsers = selectedUsers.map((user) => ({
-        User_ID: user.id,
-        Group_ID: groupid,
-        Group_Name: selectedUserNames,
-        Ammount_Users: selectedUserIDs.length,
-      }));
-  
-      const {
-        data: insertSelectedUsersData,
-        error: insertSelectedUsersError,
-      } = await supabase
-        .from("Group Chats")
-        .insert(insertSelectedUsers)
-        .select();
-  
-      if (insertSelectedUsersError) {
-        console.error(
-          "Error inserting selected users into Group Chats:",
-          insertSelectedUsersError
-        );
-        return;
-      }
   
       // Log the Group_ID
-      //console.log('Most recent Group_ID:', groupid);
     } catch (err) {
       console.error("An error occurred:", err);
     }
