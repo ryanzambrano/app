@@ -70,7 +70,7 @@ export default function Questionaire3({ navigation, route }) {
 
         if (ugcError) throw ugcError;
 
-        navigation.navigate("TagSelectionScreen");
+        navigation.navigate("MatchingData");
       } catch (error) {
         startShakeAnimation(shakeAnimationValue);
         setIsError(error.message);

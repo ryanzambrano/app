@@ -285,9 +285,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
                 <Image source={{ uri: image2 }} style={styles.image} />
               ) : null}
             </TouchableOpacity>
-          </View>
 
-          <View style={styles.column}>
             {renderItem(1)}
             <TouchableOpacity
               style={styles.profilePictureContainer}
@@ -295,15 +293,6 @@ const ImagePickerScreen = ({ navigation, route }) => {
             >
               {image1 ? (
                 <Image source={{ uri: image1 }} style={styles.image} />
-              ) : null}
-            </TouchableOpacity>
-            {renderItem(3)}
-            <TouchableOpacity
-              style={styles.profilePictureContainer}
-              onPress={() => handleImageUpload1(3)}
-            >
-              {image3 ? (
-                <Image source={{ uri: image3 }} style={styles.image} />
               ) : null}
             </TouchableOpacity>
           </View>
@@ -358,11 +347,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 10,
     alignItems: "center",
+    alignSelf: "center",
   },
 
   column: {
-    flex: 1,
-    flexDirection: "column",
+    //flexDirection: "column",
+    //alignItems: "center",
   },
   button: {
     flexDirection: "row",
@@ -378,8 +368,8 @@ const styles = StyleSheet.create({
     margin: 12.5,
   },
   profilePictureContainer: {
-    width: 171,
-    height: 171,
+    width: 271,
+    height: 271,
     backgroundColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
