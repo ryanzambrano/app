@@ -90,7 +90,7 @@ const ComposeMessageScreen = ({ route }) => {
       selectedUserNames.sort();
   
       // Get the IDs of the selected users
-      const selectedUserIDs = selectedUsers.map((user) => user.id);
+      const selectedUserIDs = selectedUsers.map((user) => user.user_id);
       selectedUserIDs.push(session.user.id);
       selectedUserIDs.sort();
 
