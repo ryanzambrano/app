@@ -140,7 +140,8 @@ const Home = ({ route }) => {
 
         const { data: imageData, error: imageError } = await supabase
           .from("images")
-          .select("*");
+          .select("*")
+          .eq("image_index", 0);
 
         if (ugcError || profileError || imageError) {
           console.error(ugcError || profileError || imageError);
