@@ -95,7 +95,7 @@ const ContactsUI = ({ route }) => {
           event: "*",
           schema: "public",
           table:
-            "Message" /*filter: `.or(Sent_From.eq.${session.user.id}, Contact_ID.eq.${session.user.id})`, */,
+            "Group Chats" /*filter: `.or(Sent_From.eq.${session.user.id}, Contact_ID.eq.${session.user.id})`, */,
         },
         (payload) => {
           fetchUsers();
