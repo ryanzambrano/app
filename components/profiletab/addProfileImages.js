@@ -295,15 +295,6 @@ const ImagePickerScreen = ({ navigation, route }) => {
                 <Image source={{ uri: image1 }} style={styles.image} />
               ) : null}
             </TouchableOpacity>
-            {renderItem(3)}
-            <TouchableOpacity
-              style={styles.profilePictureContainer}
-              onPress={() => handleImageUpload1(3)}
-            >
-              {image3 ? (
-                <Image source={{ uri: image3 }} style={styles.image} />
-              ) : null}
-            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
