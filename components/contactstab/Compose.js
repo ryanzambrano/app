@@ -107,10 +107,24 @@ const ComposeMessageScreen = ({ route }) => {
         ])
         .select();
   
-      if (insertError) {
-        alert('A group chat/Message already exists for these users.');
-        return;
-      }
+        if (insertError) {
+          if (insertError.code === "23505") {
+            /*console.log(selectedUserIDs);
+            const { data, error } = await supabase
+            .from("Group Chats") // Check that the table name is correct and matches your database
+            .select('*')
+            .eq("User_ID", selectedUserIDs); // Make sure selectedUserIDs is defined and contains valid data
+            console.log(data);
+            console.log(error);*/
+            alert('A group chat/Message already exists for these users.');
+            return;
+            // The duplicate key violation occurred, no need to handle the conflicting row
+          } else {
+            alert('Failed to insert.');
+            // Handle other insert errors
+          }
+          return;
+        }
   
   
       // Log the Group_ID
