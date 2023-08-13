@@ -13,7 +13,7 @@ import {
 } from "react-native";
 
 import FiltersUI from "./filters.js";
-
+import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase.js"; // we have our client here!!! no need to worry about creating it again
 import { picURL } from "../auth/supabase.js"; // This is the base url of the photos bucket that is in our Supabase project. It makes referencing user pictures easier
 import { useNavigation } from "@react-navigation/native";
@@ -32,6 +32,7 @@ const Home = ({ route }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkedProfiles, setBookmarkedProfiles] = useState([]);
+  const isFocused = useIsFocused();
 
   const handleFiltersPress = () => {
     navigation.navigate("Filters");
@@ -198,6 +199,9 @@ const Home = ({ route }) => {
     };
 
     fetchUsers();
+    if (isFocused) {
+      fetchUsers();
+    }
 
     const channel = supabase
       .channel("custom-all-channel")
@@ -212,7 +216,7 @@ const Home = ({ route }) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [isFocused]);
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
