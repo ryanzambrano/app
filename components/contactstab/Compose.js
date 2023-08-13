@@ -85,101 +85,49 @@ const ComposeMessageScreen = ({ route }) => {
   };
   const handleCreateMessage = async () => {
     try {
-      // Create an array of selected user names
       const selectedUserNames = selectedUsers.map((user) => user.name);
       selectedUserNames.push(sessionusername);
-
+      selectedUserNames.sort();
+  
       // Get the IDs of the selected users
-      const selectedUserIDs = selectedUsers.map((user) => user.id);
+      const selectedUserIDs = selectedUsers.map((user) => user.user_id);
       selectedUserIDs.push(session.user.id);
+      selectedUserIDs.sort();
 
-      // Check if a group with the same set of user IDs already exists
-      // Check if a group with the same set of user IDs already exists
-      const { data: matchingGroups, error: matchingGroupsError } =
-        await supabase
-          .from("Group Chats")
-          .select("Group_ID")
-          .eq("Amount_Users", selectedUserIDs.length);
-
-      // Check if any matching group has the same set of user IDs
-      const groupExists = await Promise.all(
-        matchingGroups.map(async (group) => {
-          const { data: groupData, error: groupDataError } = await supabase
-            .from("Group Chats")
-            .select("User_ID")
-            .eq("Group_ID", group.Group_ID);
-
-          const groupUserIDs = groupData.map((user) => user.User_ID);
-          return (
-            groupUserIDs.length === selectedUserIDs.length &&
-            groupUserIDs.every((id) => selectedUserIDs.includes(id))
-          );
-        })
-      );
-
-      if (groupExists.some((exists) => exists)) {
-        // A group with the same user IDs and amount already exists, display an alert
-        alert(
-          "A group chat already exists with the same users and the same number of users."
-        );
-        return;
-      }
-
+  
       // Insert the new record with User_ID, Group_ID, and Group_Name
       const { data: insertData, error: insertError } = await supabase
         .from("Group Chats")
         .insert([
           {
-            User_ID: session.user.id,
-
-            Group_Name: selectedUserNames.join(", "), // Join selected user names with commas
+            User_ID: selectedUserIDs,
+            Group_Name: selectedUserNames, // Join selected user names with commas
             Ammount_Users: selectedUserIDs.length,
           },
         ])
         .select();
-
-      if (insertError) {
-        console.error("Error inserting into Group Chats:", insertError);
-        return;
-      }
-
-      // Retrieve the most recent Group_ID
-      const { data: recentGroupData, error: recentGroupError } = await supabase
-        .from("Group Chats")
-        .select("Group_ID")
-        .order("Group_ID", { ascending: false })
-        .limit(1);
-
-      if (recentGroupError) {
-        console.error("Error retrieving recent Group_ID:", recentGroupError);
-        return;
-      }
-
-      // Extract and assign the Group_ID to the variable
-      const groupid = recentGroupData[0].Group_ID;
-
-      // Insert selected user IDs into User_ID column
-      const insertSelectedUsers = selectedUsers.map((user) => ({
-        User_ID: user.id,
-        Group_ID: groupid,
-
-        Group_Name: selectedUserNames.join(", "),
-        Ammount_Users: selectedUserIDs.length,
-      }));
-
-      const { data: insertSelectedUsersData, error: insertSelectedUsersError } =
-        await supabase.from("Group Chats").insert(insertSelectedUsers).select();
-
-      if (insertSelectedUsersError) {
-        console.error(
-          "Error inserting selected users into Group Chats:",
-          insertSelectedUsersError
-        );
-        return;
-      }
-
+  
+        if (insertError) {
+          if (insertError.code === "23505") {
+            /*console.log(selectedUserIDs);
+            const { data, error } = await supabase
+            .from("Group Chats") // Check that the table name is correct and matches your database
+            .select('*')
+            .eq("User_ID", selectedUserIDs); // Make sure selectedUserIDs is defined and contains valid data
+            console.log(data);
+            console.log(error);*/
+            alert('A group chat/Message already exists for these users.');
+            return;
+            // The duplicate key violation occurred, no need to handle the conflicting row
+          } else {
+            alert('Failed to insert.');
+            // Handle other insert errors
+          }
+          return;
+        }
+  
+  
       // Log the Group_ID
-      //console.log('Most recent Group_ID:', groupid);
     } catch (err) {
       console.error("An error occurred:", err);
     }

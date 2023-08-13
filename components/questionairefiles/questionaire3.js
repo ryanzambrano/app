@@ -70,13 +70,6 @@ export default function Questionaire3({ navigation, route }) {
 
         if (ugcError) throw ugcError;
 
-        const { error: profileError } = await supabase
-          .from("profile")
-          .update({ profile_complete: true })
-          .eq("user_id", session.user.id);
-
-        if (profileError) throw profileError;
-
         navigation.navigate("TagSelectionScreen");
       } catch (error) {
         startShakeAnimation(shakeAnimationValue);

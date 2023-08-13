@@ -17,7 +17,6 @@ import FiltersUI from "./filters.js";
 import { supabase } from "../auth/supabase.js"; // we have our client here!!! no need to worry about creating it again
 import { picURL } from "../auth/supabase.js"; // This is the base url of the photos bucket that is in our Supabase project. It makes referencing user pictures easier
 import { useNavigation } from "@react-navigation/native";
-import { createClient } from "@supabase/supabase-js"; // Create client is responsible for drawing profile data from each user in the database
 
 const isBookmarkedURI =
   "https://th.bing.com/th/id/OIP.Pzc03rRYlwOdKsolfgcwogHaJQ?pid=ImgDet&rs=1";
@@ -70,7 +69,7 @@ const Home = ({ route }) => {
 
   const calculateCompatibility = (sessionUser, otherUser) => {
     let score = 0;
-    console.log(sessionUser.for_fun, otherUser.for_fun);
+    //console.log(sessionUser.for_fun, otherUser.for_fun);
     if (Array.isArray(sessionUser.tags) && Array.isArray(otherUser.tags)) {
       sessionUser.tags.forEach((tag) => {
         if (otherUser.tags.includes(tag)) score += 12;
@@ -87,7 +86,7 @@ const Home = ({ route }) => {
   };
 
   const sortedUsers = users.sort((a, b) => {
-    console.log(a, b);
+    //console.log(a, b);
     switch (sortMethod) {
       case "Alphabetical Order":
         return a.name.localeCompare(b.name);

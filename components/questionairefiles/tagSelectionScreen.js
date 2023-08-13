@@ -10,7 +10,7 @@ import {
   SafeAreaView,
   Animated,
 } from "react-native";
-
+import { availableTags } from "../auth/profileUtils.js";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
 
@@ -20,35 +20,6 @@ const TagSelectionScreen = ({ navigation, route }) => {
 
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
-
-  const availableTags = [
-    "Technology",
-    "Art",
-    "Sports",
-    "Music",
-    "Fashion",
-    "Food",
-    "Travel",
-    "Fitness",
-    "Gaming",
-    "Books",
-    "Movies",
-    "Nature",
-    "Photography",
-    "Cooking",
-    "History",
-    "Science",
-    "Animals",
-    "DIY",
-    "Health",
-    "Politics",
-    "Education",
-    "Design",
-    "Business",
-    "Writing",
-    "Cars",
-    "Beauty",
-  ];
 
   const handleTagSelection = (tag) => {
     const isTagSelected = selectedTags.includes(tag);
@@ -109,6 +80,12 @@ const TagSelectionScreen = ({ navigation, route }) => {
           .from("UGC")
           .update({
             tags: userData.tags,
+          })
+          .eq("user_id", session.user.id);
+        const { data: profileData, profileError } = await supabase
+          .from("profile")
+          .update({
+            profile_complete: true,
           })
           .eq("user_id", session.user.id);
 
@@ -192,7 +169,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: "10%",
+    marginBottom: 10,
     marginTop: "5%",
   },
   tagContainer: {
@@ -225,21 +202,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: "10%",
+    marginTop: "10%",
   },
   formAction: {
-    flex: 1,
-    marginBottom: "20%",
+    marginBottom: 20,
   },
 
   continue: {
-    marginBottom: "100%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderWidth: 1,
     backgroundColor: "#14999999",
     borderColor: "#14999999",
   },

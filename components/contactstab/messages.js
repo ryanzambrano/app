@@ -48,11 +48,11 @@ const MessagingUI = () => {
   const sendMessage = async () => {
     if (message.trim() !== "") {
       const { data, error } = await supabase
-        .from("Message")
+        .from("Group Chat Messages")
         .insert([
           {
-            Content: message,
-            Contact_ID: user_id,
+            Message_Content: message,
+            Group_ID_Sent_To: user.Group_ID,
             Sent_From: session.user.id,
           },
         ])
@@ -83,12 +83,10 @@ const MessagingUI = () => {
 
   const fetchMessages = async () => {
     const { data, error } = await supabase
-      .from("Message")
+      .from("Group Chat Messages")
       .select("*")
-      .or(
-        `and(Sent_From.eq.${session.user.id},Contact_ID.eq.${user_id}),and(Contact_ID.eq.${session.user.id},Sent_From.eq.${user_id})`
-      )
-      .order("createdat", { ascending: false })
+      .eq("Group_ID_Sent_To",user.Group_ID)
+      .order("created_at", { ascending: false })
       .limit(250);
 
     if (error) {
@@ -173,7 +171,7 @@ const MessagingUI = () => {
         >
           <AntDesign name="arrowleft" size={24} color="#007AFF" />
         </TouchableOpacity>
-        <Text style={styles.contactName}>{name}</Text>
+        <Text style={styles.contactName}>{user.Group_Name}</Text>
         <TouchableOpacity
           style={styles.profileContainer}
           onPress={navigateToProfile}
@@ -206,7 +204,7 @@ const MessagingUI = () => {
             : null, // Use default text color for messages from other user
         ]}
       >
-        {item.Content}
+        {item.Message_Content}
       </Text>
     </View>
   )}

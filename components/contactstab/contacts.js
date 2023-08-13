@@ -19,6 +19,7 @@ import { picURL } from "../auth/supabase.js";
 import { gestureHandlerRootHOC } from "react-native-gesture-handler"; //install
 import { Swipeable } from "react-native-gesture-handler";
 import { supabase } from "../auth/supabase.js";
+import { useIsFocused } from "@react-navigation/native";
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
@@ -26,65 +27,25 @@ const ContactsUI = ({ route }) => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const isFocused = useIsFocused();
 
   const handleSearch = (text) => {
     setSearchQuery(text);
   };
 
-  const filteredUsers = users.filter((user) => {
-    const nameMatch = user.name
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    return nameMatch;
-  });
-
   const fetchUsers = async () => {
     const { data: users, error } = await supabase
-      .from("UGC")
-      .select("*")
-      .neq("user_id", session.user.id);
+    .from('Group Chats')
+    .select('*')
+    .contains('User_ID', [session.user.id]);
     if (error) {
       console.error(error);
       return;
     }
 
     const combinedPromises = users.map(async (user) => {
-      const [
-        { data: images, error: imageError },
-        { data: messages, error: messageError },
-      ] = await Promise.all([
-        supabase
-          .from("images")
-          .select("last_modified, user_id")
-          .eq("user_id", user.user_id)
-          .eq("image_index", 0)
-          .order("last_modified", { ascending: false })
-          .limit(1),
-        supabase
-          .from("Message")
-          .select("Content, createdat")
-          .or(
-            `and(Sent_From.eq.${session.user.id},Contact_ID.eq.${user.user_id}),and(Contact_ID.eq.${session.user.id},Sent_From.eq.${user.user_id})`
-          )
-          .order("createdat", { ascending: false })
-          .limit(1),
-      ]);
-
-      if (imageError) throw imageError;
-      if (messageError) throw messageError;
-
-      const recentMessage =
-        messages && messages.length > 0
-          ? messages[0].Content
-          : "No recent messages";
-      const RTime =
-        messages && messages.length > 0 ? messages[0].createdat : null;
-      const recentTime = formatRecentTime(RTime);
       return {
         ...user,
-        lastModified: images && images[0] ? images[0].last_modified : null,
-        recentMessage,
-        recentTime,
       };
     });
 
@@ -123,6 +84,9 @@ const ContactsUI = ({ route }) => {
 
   useEffect(() => {
     fetchUsers();
+    if (isFocused) {
+      fetchUsers();
+    }
     const channel = supabase
       .channel("custom-all-channel")
       .on(
@@ -141,7 +105,7 @@ const ContactsUI = ({ route }) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [isFocused]);
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
@@ -223,7 +187,7 @@ const ContactsUI = ({ route }) => {
             />
             <View style={styles.contactInfo}>
               <View style={styles.contactNameContainer}>
-                <Text style={styles.contactName}>{item.name}</Text>
+                <Text style={styles.contactName}>{item.Group_Name}</Text>
                 <Text style={styles.MessageTime}>{item.recentTime}</Text>
               </View>
               <Text style={styles.RecentMessage}>{item.recentMessage}</Text>
@@ -260,9 +224,9 @@ const ContactsUI = ({ route }) => {
           />
         </View>
         <FlatList
-          data={filteredUsers}
+          data={users}
           renderItem={renderContact}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.Group_ID.toString()}
         />
       </View>
     </SafeAreaView>
