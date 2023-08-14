@@ -40,13 +40,13 @@ export const Profile = ({ navigation, route }) => {
   const scrollY = new Animated.Value(0);
 
   const profileOpacity = scrollY.interpolate({
-    inputRange: [0, 100],
+    inputRange: [0, 240],
     outputRange: [1, 0],
     extrapolate: "clamp",
   });
 
   const profileZIndex = scrollY.interpolate({
-    inputRange: [0, 100],
+    inputRange: [0, 240],
     outputRange: [1, -1],
     extrapolate: "clamp",
   });
@@ -228,9 +228,9 @@ export const Profile = ({ navigation, route }) => {
 
               <View style={styles.major}>
                 <View style={styles.icons}>
-                  <Icon name="graduation-cap" size={30} color="#264959" />
-                  <Icon name="book" size={30} color="#264959" />
-                  <Icon name="home" size={30} color="#264959" />
+                  <Icon name="graduation-cap" size={30} color="white" />
+                  <Icon name="book" size={30} color="white" />
+                  <Icon name="home" size={30} color="white" />
                 </View>
                 <View style={styles.details}>
                   <Text style={styles.text}>{editedUser.class_year}</Text>
@@ -283,7 +283,7 @@ export const Profile = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "black",
+    backgroundColor: "#1D1D20",
   },
 
   scrollView: {
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
 
   viewContainer: {
     flex: 1,
-    backgroundColor: "#1c1436",
+    backgroundColor: "#1D1D20",
   },
   topBar: {
     flexDirection: "row",
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10,
-    backgroundColor: "black",
+    backgroundColor: "#1D1D20",
   },
   username: {
     fontSize: 18,
@@ -432,7 +432,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-
     color: "white",
   },
   bioText: {
@@ -490,8 +489,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 23,
   },
-  tab: {
-    backgroundColor: "black",
+  tab: { // 1D1D20
+    backgroundColor: "#111111", //101010
     flex: 1,
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,

@@ -17,7 +17,7 @@ const TabNavigator = ({ route }) => {
         tabBarStyle: {
           paddingHorizontal: 5,
           paddingTop: 0,
-          backgroundColor: "black",
+          backgroundColor: "#111111",
           //position: "absolute",
           borderTopWidth: 0,
         },

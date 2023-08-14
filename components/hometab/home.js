@@ -323,12 +323,12 @@ const Home = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#232329",
   },
 
   viewContainer: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#232329",
   },
 
   header: {
