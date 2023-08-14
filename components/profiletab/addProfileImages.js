@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     alignContent: "center",
-
+    backgroundColor: "#111111",
     padding: 10, // You can adjust this value
   },
   left: {
@@ -336,9 +336,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     alignItems: "center",
+    color: "white",
   },
 
   container: {
+    backgroundColor: "#111111",
     flex: 1,
     padding: 10,
   },
@@ -348,6 +350,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center",
     alignSelf: "center",
+    backgroundColor: "#111111",
   },
 
   column: {
@@ -368,8 +371,8 @@ const styles = StyleSheet.create({
     margin: 12.5,
   },
   profilePictureContainer: {
-    width: 271,
-    height: 271,
+    width: 350,
+    height: 350,
     backgroundColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
