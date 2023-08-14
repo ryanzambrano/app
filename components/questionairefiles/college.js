@@ -73,7 +73,7 @@ export const Colleges = ({ navigation, route }) => {
     return () => clearTimeout(timerId);
   }, [searchQuery]);
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#111111" }}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.titleText}>Select your College</Text>
@@ -81,7 +81,8 @@ export const Colleges = ({ navigation, route }) => {
 
         <TextInput
           style={styles.inputControl}
-          placeholder="Search for a College"
+          placeholder="Enter your college..."
+          placeholderTextColor={'grey'}
           onChangeText={(text) => setSearchQuery(text)}
           value={searchQuery}
         />
@@ -113,7 +114,7 @@ export const Colleges = ({ navigation, route }) => {
         )}
         {selectedCollege && (
           <View style={styles.sItem}>
-            <Text style={styles.continueText}>{selectedCollege}</Text>
+            <Text style={styles.collegeText}>{selectedCollege}</Text>
           </View>
         )}
         <View style={styles.formAction}>
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
   container: {
     margin: 24,
     flex: 1,
-    backgroundColor: "#eBecf4",
+    backgroundColor: "#111111",
   },
 
   header: {
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 12,
-    color: "#1e1e1e",
+    color: "white",
   },
 
   input: {
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
   inputHeader: {
     fontSize: 17,
     fontWeight: "500",
-    color: "#222",
+    color: "white",
     marginBottom: 10,
   },
 
@@ -176,8 +177,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     fontSize: 15,
     //marginBottom: 20,
-    backgroundColor: "#fff",
-    color: "#6b7280",
+    backgroundColor: "#1D1D20",
+    color: "white",
     borderColor: "#fff",
   },
 
@@ -205,7 +206,7 @@ const styles = StyleSheet.create({
   },
 
   collegeText: {
-    color: "black",
+    color: "white",
     textAlign: "center",
     fontSize: 15,
     //fontWeight: "600",
@@ -215,19 +216,19 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     marginHorizontal: 16,
     borderRadius: 15,
-    backgroundColor: "#fff",
+    backgroundColor: "#1D1D20",
     borderColor: "#ccc",
     //borderWidth: 1,
   },
 
   sItem: {
-    padding: 10,
+    padding: 20,
     marginTop: 16,
     //marginHorizontal: 16,
     borderRadius: 10,
-    backgroundColor: "darkgrey",
-    borderColor: "#ccc",
-    borderWidth: 1,
+    backgroundColor: "#2B2D2F",
+    //borderColor: "#ccc",
+    //borderWidth: 1,
   },
   errorText: {
     color: "red",

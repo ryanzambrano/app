@@ -123,7 +123,7 @@ export const Questionaire1 = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#111111" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
@@ -145,7 +145,7 @@ export const Questionaire1 = ({ navigation, route }) => {
                   <Text
                     style={styles.inputText}
                     placeholder="Select your Gender"
-                    placeholderTextColor="#6b7280"
+                    placeholderTextColor="white"
                     value={`${selectedAge}`}
                   >
                     {selectedAge}
@@ -190,7 +190,7 @@ export const Questionaire1 = ({ navigation, route }) => {
                   <Text
                     style={styles.inputText}
                     placeholder="Select your Gender"
-                    placeholderTextColor="#6b7280"
+                    placeholderTextColor="white"
                     value={`${selectedGender}`}
                   >
                     {selectedGender}
@@ -243,7 +243,7 @@ export const Questionaire1 = ({ navigation, route }) => {
                   <Text
                     style={styles.inputText}
                     placeholder="Select your Gender"
-                    placeholderTextColor="#6b7280"
+                    placeholderTextColor="white"
                     value={`${selectedGender}`}
                   >
                     {selectedWho}
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 12,
-    color: "#1e1e1e",
+    color: "white",
   },
 
   input: {
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   inputHeader: {
     fontSize: 17,
     fontWeight: "500",
-    color: "#222",
+    color: "white",
     marginBottom: 10,
   },
 
@@ -351,8 +351,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     fontSize: 15,
     marginBottom: 20,
-    backgroundColor: "#fff",
-    color: "#6b7280",
+    backgroundColor: "#1D1D20",
+    color: "white",
     borderColor: "#fff",
   },
 
@@ -368,6 +368,7 @@ const styles = StyleSheet.create({
 
   formAction: {
     marginVertical: 24,
+    backgroundColor: "#1D1D20",
   },
 
   continue: {
@@ -397,7 +398,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     marginTop: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: "#111111",
     justifyContent: "space-around",
     gap: "50%",
   },
@@ -405,7 +406,7 @@ const styles = StyleSheet.create({
   modalContainerGender: {
     flex: 1,
     marginTop: "130%",
-    backgroundColor: "#fff",
+    backgroundColor: "#111111",
     justifyContent: "space-around",
     gap: "50%",
   },
@@ -423,6 +424,7 @@ const styles = StyleSheet.create({
   },
   picker: {
     flex: 1,
+    color: "white",
   },
 
   pickerDate: {

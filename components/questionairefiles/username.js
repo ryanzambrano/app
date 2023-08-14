@@ -100,7 +100,7 @@ export const Username = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#111111" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
@@ -111,8 +111,8 @@ export const Username = ({ navigation, route }) => {
 
             <TextInput
               style={styles.inputControl}
-              //placeholder=""
-              placeholderTextColor="#6b7280"
+              placeholder="Enter a username..."
+              placeholderTextColor="grey"
               value={selectedUsername}
               onChangeText={(selectedUsername) =>
                 setSelectedUsername(selectedUsername)
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 12,
-    color: "#1e1e1e",
+    color: "white",
   },
 
   input: {
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   inputHeader: {
     fontSize: 17,
     fontWeight: "500",
-    color: "#222",
+    color: "white",
     marginBottom: 10,
   },
 
@@ -187,13 +187,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     fontSize: 15,
     marginBottom: 20,
-    backgroundColor: "#fff",
-    color: "#6b7280",
+    backgroundColor: "#1D1D20",
+    color: "white",
     borderColor: "#fff",
   },
 
   inputText: {
-    color: "#6b7280",
+    color: "white",
     fontWeight: "500",
   },
 

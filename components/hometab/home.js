@@ -295,14 +295,7 @@ const Home = ({ route }) => {
       </View>
 
       <View style={styles.viewContainer}>
-        <FlatList
-          data={filteredUsers}
-          extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
-          renderItem={renderUserCard}
-          keyExtractor={(item) => item.user_id.toString()}
-          ListHeaderComponent={() => (
-            <>
-              <View style={styles.searchContainer}>
+      <View style={styles.searchContainer}>
                 <TextInput
                   style={styles.searchInput}
                   placeholder="Search by name or tag"
@@ -311,6 +304,14 @@ const Home = ({ route }) => {
                   value={searchQuery}
                 />
               </View>
+        <FlatList
+          data={filteredUsers}
+          extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
+          renderItem={renderUserCard}
+          keyExtractor={(item) => item.user_id.toString()}
+          ListHeaderComponent={() => (
+            <>
+            
               <View style={styles.sortContainer}>
                 <Text style={styles.sortText}>Sort by:</Text>
                 <TouchableOpacity onPress={() => showSortMenu()}>
