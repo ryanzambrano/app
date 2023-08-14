@@ -327,6 +327,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#1D1D20",
+    
   },
 
   viewContainer: {
@@ -345,7 +346,8 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
     paddingLeft: 15,
     paddingRight: 15,
-    //marginBottom: 8,
+  
+    marginBottom: 8,
   },
 
   headerText: {
@@ -410,7 +412,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 7,
     paddingHorizontal: 16,
     // paddingVertical: 10,
-    height: 155,
+    height: 165,
     marginTop: 3,
     marginBottom: 7,
     borderWidth: 0.2,
@@ -430,11 +432,11 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: "600",
-    position: "absolute",
+    paddingTop: 10,
     color: "white",
     zIndex: 1,
-    top: -50,
-   // marginTop: 10,
+    top: -60,
+    marginTop: 30,
     textAlign: "justify",
   },
 
@@ -453,7 +455,7 @@ const styles = StyleSheet.create({
     maxHeight: 85,
     position: 'absolute',
     overflow: "hidden",
-    marginTop: -30,
+    marginTop: 0,
     justifyContent: "left",
   },
   tag: {
