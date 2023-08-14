@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
     gap: 23,
   },
   tab: { // 1D1D20
-    backgroundColor: "#111111", //101010
+    backgroundColor: "#111111",
     flex: 1,
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,

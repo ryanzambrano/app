@@ -96,7 +96,7 @@ const TagSelectionEdit = ({ navigation, route }) => {
     ],
   };
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#111111" }}>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.bbuttonContainer}
@@ -147,12 +147,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#111111", // 111111
     justifyContent: "center",
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
+    color: 'white',
     marginBottom: "10%",
     marginTop: "5%",
   },
@@ -160,12 +162,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
+    
     //color: "#fff",
   },
   tag: {
-    backgroundColor: "#fff",
+    backgroundColor: "#1D1D20",
 
     borderRadius: 20,
+   
+    borderColor: "white",
     paddingVertical: 8,
     paddingHorizontal: 16,
     marginHorizontal: 8,
@@ -176,20 +181,24 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 16,
+    color: 'white',
   },
   selectedTagText: {
     fontSize: 16,
-    color: "white",
+    color: "lightgrey",
     marginBottom: 0,
   },
   selectedTagsText: {
+    marginTop: 15,
     fontSize: 18,
     fontWeight: "bold",
+    color: 'lightgrey',
     marginBottom: "10%",
   },
   formAction: {
     flex: 1,
     marginBottom: "20%",
+    color: "#111111",
   },
 
   continue: {
@@ -223,7 +232,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     padding: 5,
 
-    //backgroundColor: "transparent",
+    backgroundColor: "#111111",
   },
   bbuttonContainer: {
     padding: 7,

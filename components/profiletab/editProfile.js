@@ -176,7 +176,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
               style={styles.promptItem}
               onPress={() => navigation.navigate("AddPrompts")}
             >
-              <Text style={styles.prompt}>{promptQuestions[item.prompt]}</Text>
+              <Text style={{ color: 'white'}}>{promptQuestions[item.prompt]}</Text>
               <Text style={styles.answer}>{item.answer}</Text>
             </TouchableOpacity>
           ) : null
@@ -282,7 +282,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
                         navigation.navigate("TagSelectionEdit", { editedUser })
                       }
                     >
-                      <Text style={styles.tagText}>{tag}</Text>
+                      <Text style={{ color: 'white',}}>{tag}</Text>
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -298,7 +298,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
               style={styles.promptAdd}
               onPress={() => navigation.navigate("AddPrompts")}
             >
-              <Text style={styles.prompt}>Edit prompts</Text>
+              <Text style={{ color: 'white'}}>Edit prompts</Text>
             </TouchableOpacity>
           </>
         }
@@ -311,15 +311,17 @@ const styles = StyleSheet.create({
   contain: {
     flex: 1,
     padding: 16,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
   },
   label: {
     fontSize: 16,
+    color: 'white',
     fontWeight: "bold",
   },
   input: {
     flex: 0,
     fontSize: 16,
+    color: 'white',
     marginBottom: 10,
   },
   inputContainer: {
@@ -349,7 +351,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
 
     fontSize: 16,
-    color: "black",
+    color: "white",
     fontWeight: "bold",
   },
   bbuttonContainer: {
@@ -373,9 +375,9 @@ const styles = StyleSheet.create({
   },
 
   tag: {
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
     borderRadius: 20,
-    borderColor: "grey",
+    borderColor: "white",
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -393,7 +395,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   profilePictureContainer: {
-    margin: 30,
+    margin: 50,
     width: 150,
     height: 150,
     backgroundColor: "#ccc",
@@ -403,10 +405,10 @@ const styles = StyleSheet.create({
     borderRadius: 200,
   },
   profilePicture: {
-    borderWidth: 3,
+    //borderWidth: 3,
     borderColor: "darkblue",
-    width: 150,
-    height: 150,
+    width: 200,
+    height: 200,
     borderRadius: 200,
   },
   profilePictureText: {
@@ -419,6 +421,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderRadius: 40,
     gap: 10,
+    color: 'white',
     borderColor: "grey",
     borderWidth: 1,
   },
@@ -428,13 +431,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderRadius: 40,
     gap: 10,
-    borderColor: "black",
+    borderColor: "white",
     borderWidth: 1,
     borderStyle: "dashed",
   },
   answer: {
     fontSize: 16,
-    color: "black",
+    color: "white",
     fontFamily: "Helvetica",
     fontWeight: "bold",
   },
@@ -443,6 +446,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 16,
     fontWeight: "bold",
+    color: 'white',
     margin: 10,
   },
 });

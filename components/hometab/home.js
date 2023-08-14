@@ -291,7 +291,14 @@ const Home = ({ route }) => {
       </View>
 
       <View style={styles.viewContainer}>
-      
+      <View style={styles.searchContainer}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search by name or tag"
+                placeholderTextColor={'#575D61'}
+                onChangeText={handleSearch}
+                value={searchQuery} />
+            </View>
         <FlatList
       
           data={filteredUsers}
@@ -299,14 +306,7 @@ const Home = ({ route }) => {
           renderItem={renderUserCard}
           keyExtractor={(item) => item.user_id.toString()}
           ListHeaderComponent={() => (
-            <><View style={styles.searchContainer}>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search by name or tag"
-                placeholderTextColor={'#575D61'}
-                onChangeText={handleSearch}
-                value={searchQuery} />
-            </View><View style={styles.sortContainer}>
+            <><View style={styles.sortContainer}>
                 <Text style={styles.sortText}>Sort by:</Text>
                 <TouchableOpacity onPress={() => showSortMenu()}>
                   <Text
@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 15,
     marginTop: 5,
-    marginBottom: 1,
+    marginBottom: 5,
     elevation: 3,
     marginHorizontal:10,
     // borderWidth: 0.20,
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginRight: 18,
     borderRadius: 60,
-    borderWidth: 0.6,
+    //borderWidth: 0.6,
     borderColor: "grey",
   },
 
@@ -482,8 +482,8 @@ const styles = StyleSheet.create({
   sortText: {
     marginHorizontal: 5,
     fontSize: 15,
-    color: "white",
-    fontWeight: "bold",
+    color: "lightgrey",
+    fontWeight: "500",
     // textDecorationLine: "underline",
   },
 });
