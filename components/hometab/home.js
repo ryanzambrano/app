@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "relative",
     marginHorizontal: 7,
-    paddingHorizontal: 16,
+    paddingLeft: 10,
     // paddingVertical: 10,
     height: 165,
     marginTop: 3,
