@@ -179,13 +179,13 @@ const ComposeMessageScreen = ({ route }) => {
     <View style={styles.container}>
       <SafeAreaView style={styles.headerSafeArea}>
         <View style={styles.header}>
-          <Text style={styles.composeHeader}>{"Compose Message"}</Text>
-          <TouchableOpacity
+        <TouchableOpacity
             style={styles.cancelButton}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.cancelButtonText}>{"Cancel"}</Text>
+            <Text style={styles.cancelButtonText}>{"<"}</Text>
           </TouchableOpacity>
+          <Text style={styles.composeHeader}>{"Compose Message"}</Text>
         </View>
       </SafeAreaView>
 
@@ -333,14 +333,14 @@ const styles = StyleSheet.create({
   toLabel: {
     fontSize: 16,
     fontWeight: "bold",
-    marginRight: 10,
+    marginRight: 5,
   },
   toInput: {
     flex: 1,
     height: 40,
     color: "#333",
     fontSize: 15,
-    marginRight: 10,
+    marginRight: 5,
   },
   button: {
     padding: 10,
@@ -412,26 +412,27 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 0,
-    paddingHorizontal: 100,
     paddingVertical: 10,
     width: "100%",
+    marginLeft: 10,
   },
   composeHeader: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#000",
-    justifyContent: "center",
+    paddingRight: 120,
+    //justifyContent: "center",
   },
   cancelButton: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 0,
     paddingVertical: 5,
     borderRadius: 5,
   },
   cancelButtonText: {
-    fontSize: 16,
-    fontWeight: "light",
-    color: "blue",
-    paddingLeft: 50,
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "black",
+    paddingLeft: 1,
   },
 });
 export default ComposeMessageScreen;

@@ -100,19 +100,27 @@ const MessagingUI = () => {
     fetchMessages();
 
     const channel = supabase
-      .channel("custom-all-channel")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "Message", filter: `.or(and(Sent_From.eq.${session.user.id}, Contact_ID.eq.${user_id}), and(Contact_ID.eq.${session.user.id}, Sent_From.eq.${user_id}))`},
-        (payload) => {
-          fetchMessages();
-        }
-      )
-      .subscribe();
-      return () => {
-        supabase.removeChannel(channel);
-      }
-  }, [session.user.id, user_id, messages]);
+  .channel("custom-all-channel")
+  .on(
+    "postgres_changes",
+    {
+      event: "*",
+      schema: "public",
+      table: "Group Chat Messages",
+      filter: {
+        "Group_ID_Sent_To": user.Group_ID,
+      },
+    },
+    (payload) => {
+      fetchMessages();
+    }
+  )
+  .subscribe();
+
+return () => {
+  supabase.removeChannel(channel);
+};
+  }, [session.user.id, messages]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -169,7 +177,7 @@ const MessagingUI = () => {
           style={styles.button}
           onPress={() => navigation.goBack()}
         >
-          <AntDesign name="arrowleft" size={24} color="#007AFF" />
+          <AntDesign name="arrowleft" size={24} color="#14999999" />
         </TouchableOpacity>
         <Text style={styles.contactName}>{user.Group_Name}</Text>
         <TouchableOpacity
@@ -225,7 +233,7 @@ const MessagingUI = () => {
             setInputHeight(e.nativeEvent.contentSize.height)
           }
         />
-        <Button title="Send" onPress={sendMessage} color="#007AFF" />
+        <Button title="Send" onPress={sendMessage} color="#14999999" text = "bold" />
       </View>
     </KeyboardAvoidingView>
   );
@@ -236,7 +244,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     backgroundColor: "#F9F9F9",
-    marginBottom: 10,
+    marginBottom: 1,
   },
   header: {
     flexDirection: "row",
@@ -280,7 +288,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 10,
     alignSelf: "flex-end",
-    backgroundColor: "#037cff",
+    backgroundColor: "#14999999",
   },
   messageContainerLeft: {
     borderRadius: 20,
