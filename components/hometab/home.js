@@ -295,15 +295,15 @@ const Home = ({ route }) => {
       </View>
 
       <View style={styles.viewContainer}>
-      <View style={styles.searchContainer}>
-                <TextInput
-                  style={styles.searchInput}
-                  placeholder="Search by name or tag"
-                  placeholderTextColor={"#575D61"}
-                  onChangeText={handleSearch}
-                  value={searchQuery}
-                />
-              </View>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by name or tag"
+            placeholderTextColor={"#575D61"}
+            onChangeText={handleSearch}
+            value={searchQuery}
+          />
+        </View>
         <FlatList
           data={filteredUsers}
           extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
@@ -311,7 +311,6 @@ const Home = ({ route }) => {
           keyExtractor={(item) => item.user_id.toString()}
           ListHeaderComponent={() => (
             <>
-            
               <View style={styles.sortContainer}>
                 <Text style={styles.sortText}>Sort by:</Text>
                 <TouchableOpacity onPress={() => showSortMenu()}>

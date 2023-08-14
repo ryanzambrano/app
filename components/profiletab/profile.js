@@ -160,12 +160,7 @@ export const Profile = ({ navigation, route }) => {
                 navigation.navigate("SettingsScreen");
               }}
             >
-              <Image
-                style={styles.settingsIcon}
-                source={{
-                  uri: "https://th.bing.com/th/id/OIP.nEKx7qYL-7aettL7yMDiOgHaHv?pid=ImgDet&rs=1",
-                }}
-              />
+              <Icon name="gear" size={30} color="white" />
             </TouchableOpacity>
           </View>
         </View>

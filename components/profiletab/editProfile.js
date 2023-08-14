@@ -176,7 +176,9 @@ export const EditProfileScreen = ({ navigation, route }) => {
               style={styles.promptItem}
               onPress={() => navigation.navigate("AddPrompts")}
             >
-              <Text style={{ color: 'white'}}>{promptQuestions[item.prompt]}</Text>
+              <Text style={{ color: "white" }}>
+                {promptQuestions[item.prompt]}
+              </Text>
               <Text style={styles.answer}>{item.answer}</Text>
             </TouchableOpacity>
           ) : null
@@ -282,7 +284,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
                         navigation.navigate("TagSelectionEdit", { editedUser })
                       }
                     >
-                      <Text style={{ color: 'white',}}>{tag}</Text>
+                      <Text style={{ color: "white" }}>{tag}</Text>
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -298,7 +300,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
               style={styles.promptAdd}
               onPress={() => navigation.navigate("AddPrompts")}
             >
-              <Text style={{ color: 'white'}}>Edit prompts</Text>
+              <Text style={{ color: "white" }}>Edit prompts</Text>
             </TouchableOpacity>
           </>
         }
@@ -315,19 +317,19 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    color: 'white',
+    color: "white",
     fontWeight: "bold",
   },
   input: {
     flex: 0,
     fontSize: 16,
-    color: 'white',
+    color: "white",
     marginBottom: 10,
   },
   inputContainer: {
     flexDirection: "column",
-    borderBottomColor: "lightgrey",
-    borderBottomWidth: 1,
+    borderBottomColor: "grey",
+    borderBottomWidth: 0.3,
     marginLeft: 20,
     marginBottom: 10,
     gap: 5,
@@ -375,10 +377,9 @@ const styles = StyleSheet.create({
   },
 
   tag: {
-    backgroundColor: "#1D1D20",
+    backgroundColor: "#2B2D2F",
     borderRadius: 20,
     borderColor: "white",
-    borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 5,
     margin: 5,
@@ -421,9 +422,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderRadius: 40,
     gap: 10,
-    color: 'white',
-    borderColor: "grey",
-    borderWidth: 1,
+    backgroundColor: "#2B2D2F",
   },
   promptAdd: {
     padding: 30,
@@ -446,7 +445,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 16,
     fontWeight: "bold",
-    color: 'white',
+    color: "white",
     margin: 10,
   },
 });
