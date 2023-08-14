@@ -31,19 +31,7 @@ const MessagingUI = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const { session } = route.params;
-  const {user} = route.params;
-  const {
-    name,
-    tags,
-    bio,
-    major,
-    user_id,
-    age,
-    gender,
-    living_preferences,
-    for_fun,
-    bookmarked_profiles,
-  } = route.params.user;
+  const { user} = route.params;
 
   const sendMessage = async () => {
     if (message.trim() !== "") {
@@ -78,7 +66,7 @@ const MessagingUI = () => {
 
   };
   useEffect(() => {
-    //setContactImage(`${picURL}/${user_id}/${user_id}-0?${new Date().getTime()}`);
+    //console.log(user.joinedGroups);
   }, );
 
   const fetchMessages = async () => {
@@ -179,14 +167,14 @@ return () => {
         >
           <AntDesign name="arrowleft" size={24} color="#14999999" />
         </TouchableOpacity>
-        <Text style={styles.contactName}>{user.Group_Name}</Text>
+        <Text style={styles.contactName}>{user.joinedGroups}</Text>
         <TouchableOpacity
           style={styles.profileContainer}
           onPress={navigateToProfile}
         >
           {(
             <Image
-              source={{ uri: `${picURL}/${user_id}/${user_id}-0?${new Date().getTime()}` }}
+              //source={{ uri: `${picURL}/${user_id}/${user_id}-0?${new Date().getTime()}` }}
               style={styles.profilePicture}
             />
           )}
@@ -244,7 +232,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     backgroundColor: "#F9F9F9",
-    marginBottom: 1,
+    marginBottom: 5,
   },
   header: {
     flexDirection: "row",

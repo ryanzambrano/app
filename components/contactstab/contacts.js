@@ -33,24 +33,43 @@ const ContactsUI = ({ route }) => {
     setSearchQuery(text);
   };
 
+
   const fetchUsers = async () => {
     const { data: users, error } = await supabase
-    .from('Group Chats')
-    .select('*')
-    .contains('User_ID', [session.user.id]);
+      .from('Group Chats')
+      .select('*')
+      .contains('User_ID', [session.user.id]);
+  
     if (error) {
       console.error(error);
       return;
     }
-
-    const combinedPromises = users.map(async (user) => {
+  
+    const { data, error: sessionError } = await supabase
+      .from("UGC")
+      .select("name")
+      .eq("user_id", session.user.id)
+      .single();
+  
+    if (sessionError) {
+      console.error(sessionError);
+      return;
+    }
+  
+    const sessionusername = data.name;
+  
+    const modifiedUsers = users.map(user => {
+      const groupNames = user.Group_Name.split(',').map(name => name.trim());
+      const filteredGroupNames = groupNames.filter(name => name !== sessionusername);
+      const joinedGroups = filteredGroupNames.join(', ');
+  
       return {
         ...user,
+        joinedGroups,
       };
     });
-
-    const combinedResults = await Promise.all(combinedPromises);
-    setUsers(combinedResults);
+  
+    setUsers(modifiedUsers);
   };
 
   const formatRecentTime = (timestamp) => {
@@ -109,7 +128,8 @@ const ContactsUI = ({ route }) => {
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
-
+    //console.log(user.joinedGroups);
+  
     navigation.navigate("Message", { user });
   };
 
@@ -187,7 +207,7 @@ const ContactsUI = ({ route }) => {
             />
             <View style={styles.contactInfo}>
               <View style={styles.contactNameContainer}>
-                <Text style={styles.contactName}>{item.Group_Name}</Text>
+                <Text style={styles.contactName}>{item.joinedGroups}</Text>
                 <Text style={styles.MessageTime}>{item.recentTime}</Text>
               </View>
               <Text style={styles.RecentMessage}>{item.recentMessage}</Text>

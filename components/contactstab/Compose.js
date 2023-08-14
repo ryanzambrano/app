@@ -88,6 +88,7 @@ const ComposeMessageScreen = ({ route }) => {
       const selectedUserNames = selectedUsers.map((user) => user.name);
       selectedUserNames.push(sessionusername);
       selectedUserNames.sort();
+      const usernames = selectedUserNames.join(', ');
   
       // Get the IDs of the selected users
       const selectedUserIDs = selectedUsers.map((user) => user.user_id);
@@ -101,7 +102,7 @@ const ComposeMessageScreen = ({ route }) => {
         .insert([
           {
             User_ID: selectedUserIDs,
-            Group_Name: selectedUserNames, // Join selected user names with commas
+            Group_Name: usernames, // Join selected user names with commas
             Ammount_Users: selectedUserIDs.length,
           },
         ])
