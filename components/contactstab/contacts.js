@@ -33,42 +33,44 @@ const ContactsUI = ({ route }) => {
     setSearchQuery(text);
   };
 
-
   const fetchUsers = async () => {
     const { data: users, error } = await supabase
-      .from('Group Chats')
-      .select('*')
-      .contains('User_ID', [session.user.id]);
-  
+
+      .from("Group Chats")
+      .select("*")
+      .contains("User_ID", [session.user.id]);
+
     if (error) {
       console.error(error);
       return;
     }
-  
+
     const { data, error: sessionError } = await supabase
       .from("UGC")
       .select("name")
       .eq("user_id", session.user.id)
       .single();
-  
+
     if (sessionError) {
       console.error(sessionError);
       return;
     }
-  
+
     const sessionusername = data.name;
-  
-    const modifiedUsers = users.map(user => {
-      const groupNames = user.Group_Name.split(',').map(name => name.trim());
-      const filteredGroupNames = groupNames.filter(name => name !== sessionusername);
-      const joinedGroups = filteredGroupNames.join(', ');
-  
+
+    const modifiedUsers = users.map((user) => {
+      const groupNames = user.Group_Name.split(",").map((name) => name.trim());
+      const filteredGroupNames = groupNames.filter(
+        (name) => name !== sessionusername
+      );
+      const joinedGroups = filteredGroupNames.join(", ");
+
       return {
         ...user,
         joinedGroups,
       };
     });
-  
+
     setUsers(modifiedUsers);
   };
 
@@ -129,7 +131,7 @@ const ContactsUI = ({ route }) => {
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
     //console.log(user.joinedGroups);
-  
+
     navigation.navigate("Message", { user });
   };
 
@@ -226,7 +228,7 @@ const ContactsUI = ({ route }) => {
             uri: "https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg",
           }}
         />
-        <Text style={styles.headerText}>Cabana</Text>
+        <Text style={styles.headerText}>Messages</Text>
         <TouchableOpacity
           onPress={handlePlusIconPress}
           style={{ position: "absolute", top: 10, right: 13 }}
@@ -238,11 +240,13 @@ const ContactsUI = ({ route }) => {
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
-            placeholder="🔎 Search by name"
+            placeholder="Search Messages"
+            placeholderTextColor="grey"
             onChangeText={handleSearch}
             value={searchQuery}
           />
         </View>
+
         <FlatList
           data={users}
           renderItem={renderContact}
@@ -256,7 +260,7 @@ const ContactsUI = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#1D1D20",
   },
   header: {
     flexDirection: "row",
@@ -274,31 +278,33 @@ const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: "bold",
     marginTop: -10,
+    color: "white",
   },
   logo: {
-    width: 30,
-    height: 30,
+    //width: 30,
+    //height: 30,
     marginRight: 5,
     marginTop: -10,
   },
   viewContainer: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#2B2D2F",
     borderRadius: 10,
     paddingHorizontal: 15,
-    marginTop: 5,
-    marginBottom: 1,
+    marginTop: 15,
+    marginBottom: 20,
     elevation: 3,
-    marginHorizontal: 5,
-    borderWidth: 0.3,
+    marginHorizontal: 10,
+    // borderWidth: 0.20,
+    // borderTopWidth: 0.20,
+    //borderBottomWidth: 0.2,
     borderColor: "grey",
   },
-
   searchInput: {
     flex: 1,
     paddingVertical: 10,
@@ -309,8 +315,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-start", // Align elements at the top of the container
     paddingHorizontal: 15,
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#DDD",
+    borderBottomWidth: 0.3,
+    borderBottomColor: "grey",
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     width: "100%", // Set the width to 100% to fill the container
@@ -326,12 +332,13 @@ const styles = StyleSheet.create({
   },
   contactName: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 400,
+    color: "white",
   },
   MessageTime: {
     fontSize: 14,
     fontWeight: "light",
-    color: "gray", // Add the color for the recent time (optional)
+    color: "white", // Add the color for the recent time (optional)
   },
   RecentMessage: {
     fontSize: 14,

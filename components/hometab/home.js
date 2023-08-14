@@ -203,7 +203,7 @@ const Home = ({ route }) => {
       fetchUsers();
     }
 
-    const channel = supabase
+    /*const channel = supabase
       .channel("custom-all-channel")
       .on(
         "postgres_changes",
@@ -215,7 +215,11 @@ const Home = ({ route }) => {
       .subscribe();
     return () => {
       supabase.removeChannel(channel);
-    };
+    };*/
+
+    if (isBookmarked) {
+      fetchUsers();
+    }
   }, [isFocused]);
 
   const handleUserCardPress = (user) => {
@@ -291,31 +295,37 @@ const Home = ({ route }) => {
       </View>
 
       <View style={styles.viewContainer}>
-      <View style={styles.searchContainer}>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search by name or tag"
-                placeholderTextColor={'#575D61'}
-                onChangeText={handleSearch}
-                value={searchQuery} />
-            </View>
         <FlatList
-      
           data={filteredUsers}
           extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
           renderItem={renderUserCard}
           keyExtractor={(item) => item.user_id.toString()}
           ListHeaderComponent={() => (
-            <><View style={styles.sortContainer}>
+            <>
+              <View style={styles.searchContainer}>
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="Search by name or tag"
+                  placeholderTextColor={"#575D61"}
+                  onChangeText={handleSearch}
+                  value={searchQuery}
+                />
+              </View>
+              <View style={styles.sortContainer}>
                 <Text style={styles.sortText}>Sort by:</Text>
                 <TouchableOpacity onPress={() => showSortMenu()}>
                   <Text
-                    style={{ color: "dodgerblue", fontWeight: "bold", fontSize: 15 }}
+                    style={{
+                      color: "dodgerblue",
+                      fontWeight: "bold",
+                      fontSize: 15,
+                    }}
                   >
                     {sortMethod}
                   </Text>
                 </TouchableOpacity>
-              </View></>      
+              </View>
+            </>
           )}
         />
       </View>
@@ -327,7 +337,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#1D1D20",
-    
   },
 
   viewContainer: {
@@ -346,13 +355,13 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
     paddingLeft: 15,
     paddingRight: 15,
-  
+
     marginBottom: 8,
   },
 
   headerText: {
     fontSize: 25,
-    color: 'white',
+    color: "white",
     fontWeight: 600,
     marginTop: -10,
     marginRight: -5,
@@ -374,7 +383,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 5,
     elevation: 3,
-    marginHorizontal:10,
+    marginHorizontal: 10,
     // borderWidth: 0.20,
     // borderTopWidth: 0.20,
     //borderBottomWidth: 0.2,
@@ -430,8 +439,8 @@ const styles = StyleSheet.create({
   },
 
   name: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 18,
+    fontWeight: 600,
     paddingTop: 10,
     color: "white",
     zIndex: 1,
@@ -453,24 +462,25 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 15,
     maxHeight: 85,
-    position: 'absolute',
+    position: "absolute",
     overflow: "hidden",
     marginTop: 0,
     justifyContent: "left",
   },
   tag: {
-    backgroundColor: "#111111",
-    borderRadius: 20,
-    paddingVertical: 3,
-    paddingHorizontal: 6,
+    backgroundColor: "#2B2D2F",
+    borderRadius: 15,
+    //paddingVertical: 3,
+    paddingHorizontal: 7,
+    padding: 4,
     margin: 2,
     borderWidth: 1,
-    borderColor: "lightgrey",
+    borderColor: "#2B2D2F",
   },
   tagText: {
     fontSize: 12,
-    color: "lightgrey",
-    fontWeight: "500",
+    color: "white",
+    fontWeight: 400,
   },
   sortContainer: {
     flexDirection: "row",
