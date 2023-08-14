@@ -65,7 +65,7 @@ const UserCard = ({ navigation, route }) => {
     `${picURL}/${user_id}/${user_id}-0-${lastModified}`,
   ]);
   const [isFriendAdded, setIsFriendAdded] = useState(false);
-  const buttonColor = isFriendAdded ? "green" : "black";
+  const buttonColor = isFriendAdded ? "#14999999" : "#1D1D20";
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
   const [prompts, setPrompts] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -327,13 +327,7 @@ const UserCard = ({ navigation, route }) => {
             <Text style={styles.bio}>Hometown: {hometown}</Text>
           </View>
 
-          <View style={styles.tagsContainer}>
-            {tags.map((tag, index) => (
-              <View key={index} style={styles.tag}>
-                <Text style={styles.tagText}>{tag}</Text>
-              </View>
-            ))}
-          </View>
+        
 
           <View style={styles.ageMajorGradeContainer}>
             <Text style={styles.bio}>
@@ -363,6 +357,13 @@ const UserCard = ({ navigation, route }) => {
               ) : null
             )}
           </ScrollView>
+          <View style={styles.tagsContainer}>
+            {tags.map((tag, index) => (
+              <View key={index} style={styles.tag}>
+                <Text style={styles.tagText}>{tag}</Text>
+              </View>
+            ))}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -374,12 +375,13 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     marginHorizontal: 0,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
+    backgroundColor: "#1D1D20",
     justifyContent: "flex-start",
     paddingVertical: 5,
   },
@@ -400,12 +402,13 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    color: "#000",
+    color: "white",
   },
   name: {
     flex: 1,
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 600,
+    color: 'white',
     textAlign: "center",
   },
   photoContainer: {
@@ -416,7 +419,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
     borderRadius: 15,
     borderWidth: 0.7,
-    borderColor: "grey",
+   // borderColor: "grey",
   },
   photo: {
     width: Dimensions.get("window").width - 12,
@@ -429,7 +432,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.95)",
   },
   tab: {
-    backgroundColor: "white",
+    backgroundColor: "#111111",
     flex: 1,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -464,7 +467,7 @@ const styles = StyleSheet.create({
     marginRight: 3,
     borderWidth: 0.4,
     marginLeft: 10,
-    borderColor: "grey",
+   // borderColor: "grey",
   },
   friendButtonText: {
     color: "white",
@@ -472,7 +475,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   chatButton: {
-    backgroundColor: "black",
+    backgroundColor: "#1D1D20",
     borderRadius: 10,
     marginRight: 10,
     padding: 13,
@@ -480,7 +483,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     width: Dimensions.get("window").width * 0.36,
     borderWidth: 0.4,
-    borderColor: "grey",
+    //borderColor: "grey",
   },
   chatButtonText: {
     color: "white",
@@ -490,21 +493,21 @@ const styles = StyleSheet.create({
   bioContainer: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
     borderRadius: 15,
     marginRight: 10,
     marginLeft: 10,
     marginBottom: 10,
     borderWidth: 0.4,
-    borderColor: "grey",
+    //borderColor: "grey",
   },
   roundedContainer: {
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
     borderRadius: 50,
     padding: 1,
   },
   bio: {
-    color: "black",
+    color: "white",
     fontSize: 16,
     textAlign: "justify",
   },
@@ -513,61 +516,62 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "stretch",
     justifyContent: "center",
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
     borderRadius: 15,
     marginBottom: 10,
     paddingVertical: 15,
     borderWidth: 0.4,
     marginRight: 10,
     marginLeft: 10,
-    borderColor: "grey",
+    //borderColor: "grey",
   },
   divider: {
-    height: 1,
-    backgroundColor: "lightgrey",
-    marginVertical: 8,
+    height: 0.3,
+    backgroundColor: "grey",
+    marginVertical: 12,
     marginHorizontal: -10,
   },
   tagsContainer: {
-    backgroundColor: "white",
+    backgroundColor: "#111111",
     flexDirection: "row",
     flexWrap: "wrap",
     paddingVertical: 10,
-    marginBottom: 10,
+    marginBottom: 40,
     borderRadius: 15,
     justifyContent: "center",
-    borderWidth: 0.4,
-    borderColor: "grey",
+   // borderWidth: 0.4,
+    //borderColor: "grey",
     marginRight: 10,
     marginLeft: 10,
   },
   tag: {
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,
     margin: 5,
     borderWidth: 1,
-    borderColor: "grey",
+    borderColor: "white",
   },
   tagText: {
     fontSize: 14,
-    color: "grey",
-    fontWeight: "bold",
+    color: "white",
+    fontWeight: "500",
   },
   horizontalScrollView: {
     paddingTop: 20,
     marginBottom: 5,
-    borderBottomColor: "lightgrey",
+   // borderBottomColor: "lightgrey",
     paddingBottom: 20,
-    borderBottomWidth: 1,
+    //borderBottomWidth: 1,
     borderBottomEndRadius: 20,
     borderBottomStartRadius: 20,
   },
   itemContainer: {
     marginHorizontal: 15,
+    backgroundColor: '#1D1D20',
     borderWidth: 0.5,
-    borderColor: "lightgrey",
+    //borderColor: "lightgrey",
     borderRadius: 50,
     padding: 30,
     width: 300,
@@ -577,10 +581,12 @@ const styles = StyleSheet.create({
   },
   itemPrompt: {
     fontSize: 15,
+    color: 'white',
     marginBottom: 5,
   },
   itemAnswer: {
     fontWeight: "bold",
+    color: 'white',
     fontSize: 20,
   },
 });

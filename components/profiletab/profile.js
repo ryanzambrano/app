@@ -40,13 +40,13 @@ export const Profile = ({ navigation, route }) => {
   const scrollY = new Animated.Value(0);
 
   const profileOpacity = scrollY.interpolate({
-    inputRange: [0, 100],
+    inputRange: [0, 240],
     outputRange: [1, 0],
     extrapolate: "clamp",
   });
 
   const profileZIndex = scrollY.interpolate({
-    inputRange: [0, 100],
+    inputRange: [0, 240],
     outputRange: [1, -1],
     extrapolate: "clamp",
   });
@@ -149,6 +149,7 @@ export const Profile = ({ navigation, route }) => {
                 navigation.navigate("EditProfileScreen", {
                   editedUser,
                   prompts,
+                  profilePicture,
                 });
               }}
             >
@@ -227,9 +228,9 @@ export const Profile = ({ navigation, route }) => {
 
               <View style={styles.major}>
                 <View style={styles.icons}>
-                  <Icon name="graduation-cap" size={30} color="darkblue" />
-                  <Icon name="book" size={30} color="darkblue" />
-                  <Icon name="home" size={30} color="darkblue" />
+                  <Icon name="graduation-cap" size={30} color="white" />
+                  <Icon name="book" size={30} color="white" />
+                  <Icon name="home" size={30} color="white" />
                 </View>
                 <View style={styles.details}>
                   <Text style={styles.text}>{editedUser.class_year}</Text>
@@ -282,7 +283,7 @@ export const Profile = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
   },
 
   scrollView: {
@@ -306,7 +307,7 @@ const styles = StyleSheet.create({
 
   viewContainer: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#1D1D20",
   },
   topBar: {
     flexDirection: "row",
@@ -321,16 +322,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
   },
   username: {
     fontSize: 18,
     fontWeight: "600",
+    color: "white",
   },
   name: {
     fontSize: 20,
     fontWeight: "600",
-    color: "black",
+    color: "white",
     textAlign: "center",
     marginBottom: 10,
   },
@@ -342,7 +344,7 @@ const styles = StyleSheet.create({
     paddingBottom: 25,
     paddingTop: 25,
     marginBottom: 0,
-
+    //color: "white",
     borderBottomColor: "lightgrey",
     borderBottomWidth: 1,
     borderBottomEndRadius: 20,
@@ -354,6 +356,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 10,
     fontSize: 20,
+    color: "white",
   },
 
   promptsHeader: {
@@ -361,6 +364,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontWeight: "600",
     fontSize: 20,
+    color: "white",
   },
 
   editButton: {
@@ -424,16 +428,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 8,
+    //color: "white",
   },
   text: {
     fontSize: 16,
-
-    color: "black",
+    color: "white",
   },
   bioText: {
     fontSize: 16,
     marginLeft: 25,
-    color: "black",
+    color: "white",
   },
   input: {
     fontSize: 16,
@@ -448,15 +452,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     paddingVertical: 20,
+    backgroundColor: "#111111",
     borderRadius: 15,
     justifyContent: "center",
     marginTop: 0,
     marginBottom: 20,
   },
   tag: {
-    backgroundColor: "white",
+    backgroundColor: "#111111",
     borderRadius: 20,
-    borderColor: "grey",
+    borderColor: "white",
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -464,8 +469,8 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 14,
-    color: "grey",
-    fontWeight: "bold",
+    color: "white",
+    fontWeight: 400,
   },
   major: {
     flex: 1,
@@ -485,8 +490,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 23,
   },
-  tab: {
-    backgroundColor: "white",
+  tab: { // 1D1D20
+    backgroundColor: "#111111", //101010
     flex: 1,
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
@@ -523,14 +528,17 @@ const styles = StyleSheet.create({
     marginRight: 10,
     minWidth: 150,
     gap: 10,
+    marginBottom: 20,
   },
   itemPrompt: {
     fontSize: 15,
     marginBottom: 5,
+    color: "white",
   },
   itemAnswer: {
     fontWeight: "bold",
     fontSize: 20,
+    color: "white",
   },
 });
 
