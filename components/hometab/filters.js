@@ -74,13 +74,14 @@ const FiltersUI = ({ route }) => {
           data={roomOptions}
           maxHeight={300}
           labelField="label"
+
           valueField="value"
           placeholder="Select Housing Preference"
           searchPlaceholder="Search..."
           value={housingPreference}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onChange={(item) => {
+          onChange={(item) => {d
             setHousingPreference(item.value);
             setIsFocus(false);
           }}
@@ -176,13 +177,14 @@ const FiltersUI = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
   },
   headerText: {
     fontSize: 25,
     fontWeight: "bold",
     marginTop: 10,
     padding: 15,
+    color: 'white',
     alignSelf: "center",
   },
   filterContainer: {
@@ -193,6 +195,7 @@ const styles = StyleSheet.create({
   },
   filterLabel: {
     fontSize: 16,
+    color: "white",
     marginRight: 8,
   },
   dropdown: {
@@ -200,14 +203,15 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     borderWidth: 0.5,
     borderRadius: 8,
+    color: "white",
     paddingHorizontal: 8,
     borderRadius: 8,
   },
   divider: {
-    height: 1,
+    height: 0.5,
     marginRight: 20,
     marginLeft: 20,
-    backgroundColor: "lightgrey",
+    backgroundColor: "grey",
     marginVertical: 8,
     marginHorizontal: -10,
   },
@@ -215,7 +219,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontSize: 15,
     fontWeight: "bold",
-    backgroundColor: "#007AFF",
+    backgroundColor: "#149999",
     color: "white",
     paddingHorizontal: 16,
     paddingVertical: 8,

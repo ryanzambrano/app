@@ -130,10 +130,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20", //1D1D20
   },
   card: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#111111",
     gap: 40,
     paddingTop: 50,
     paddingBottom: 40,
@@ -150,14 +150,16 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   question: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 300,
+    color: 'white',
     marginBottom: 10,
     fontFamily: "Helvetica",
   },
   input: {
-    //color: "gray",
+    color: "white",
     borderBottomWidth: 1,
+    borderBottomColor: "white",
     borderRadius: 5,
     padding: 10,
     height: 40,
@@ -174,7 +176,7 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: "#ffffff",
-    fontWeight: "bold",
+    fontWeight: 500,
     textAlign: "center",
     fontSize: 15,
   },
