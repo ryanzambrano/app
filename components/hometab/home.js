@@ -291,29 +291,32 @@ const Home = ({ route }) => {
       </View>
 
       <View style={styles.viewContainer}>
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="🔎 Search by name or tag"
-            onChangeText={handleSearch}
-            value={searchQuery}
-          />
-        </View>
-        <View style={styles.sortContainer}>
-          <Text style={styles.sortText}>Sort by:</Text>
-          <TouchableOpacity onPress={() => showSortMenu()}>
-            <Text
-              style={{ color: "#0061db", fontWeight: "bold", fontSize: 15 }}
-            >
-              {sortMethod}
-            </Text>
-          </TouchableOpacity>
-        </View>
+      
         <FlatList
+      
           data={filteredUsers}
           extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
           renderItem={renderUserCard}
           keyExtractor={(item) => item.user_id.toString()}
+          ListHeaderComponent={() => (
+            <><View style={styles.searchContainer}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search by name or tag"
+                placeholderTextColor={'#575D61'}
+                onChangeText={handleSearch}
+                value={searchQuery} />
+            </View><View style={styles.sortContainer}>
+                <Text style={styles.sortText}>Sort by:</Text>
+                <TouchableOpacity onPress={() => showSortMenu()}>
+                  <Text
+                    style={{ color: "dodgerblue", fontWeight: "bold", fontSize: 15 }}
+                  >
+                    {sortMethod}
+                  </Text>
+                </TouchableOpacity>
+              </View></>      
+          )}
         />
       </View>
     </SafeAreaView>
@@ -323,12 +326,12 @@ const Home = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#232329",
+    backgroundColor: "#1D1D20",
   },
 
   viewContainer: {
     flex: 1,
-    backgroundColor: "#232329",
+    backgroundColor: "#1D1D20",
   },
 
   header: {
@@ -347,28 +350,32 @@ const styles = StyleSheet.create({
 
   headerText: {
     fontSize: 25,
-    fontWeight: "bold",
+    color: 'white',
+    fontWeight: 600,
     marginTop: -10,
+    marginRight: -5,
   },
 
   logo: {
     width: 30,
     height: 30,
-    marginRight: 0,
+    marginRight: 5,
     marginTop: -10,
   },
 
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#2B2D2F",
     borderRadius: 10,
     paddingHorizontal: 15,
     marginTop: 5,
     marginBottom: 1,
     elevation: 3,
-    marginHorizontal: 5,
-    borderWidth: 0.3,
+    marginHorizontal:10,
+    // borderWidth: 0.20,
+    // borderTopWidth: 0.20,
+    //borderBottomWidth: 0.2,
     borderColor: "grey",
   },
 
@@ -376,6 +383,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     fontSize: 16,
+    color: "white",
   },
 
   userInfo: {
@@ -387,7 +395,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 16,
     //marginBottom: 30,
-    backgroundColor: "#F4F4F4",
+    backgroundColor: "#1D1D20",
     borderRadius: 8,
   },
 
@@ -395,31 +403,38 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 20,
-    backgroundColor: "white",
+    backgroundColor: "#111111",
     marginVertical: 1,
+    justifyContent: "center",
+    position: "relative",
     marginHorizontal: 7,
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    // paddingVertical: 10,
+    height: 155,
     marginTop: 3,
-    borderWidth: 0.3,
-    borderColor: "grey",
+    marginBottom: 7,
+    borderWidth: 0.2,
+    //borderColor: "grey",
   },
 
   profileImage: {
-    width: 80,
-    height: 80,
+    width: 110,
+    height: 110,
     borderRadius: 3,
-    marginRight: 12,
-    borderRadius: 40,
+    marginRight: 18,
+    borderRadius: 60,
     borderWidth: 0.6,
     borderColor: "grey",
   },
 
   name: {
     fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 10,
-    marginBottom: 0,
+    fontWeight: "600",
+    position: "absolute",
+    color: "white",
+    zIndex: 1,
+    top: -50,
+   // marginTop: 10,
     textAlign: "justify",
   },
 
@@ -429,26 +444,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3,
   },
   tagsContainer: {
-    backgroundColor: "white",
+    backgroundColor: "#111111",
     flexDirection: "row",
     flexWrap: "wrap",
+    justifyContent: "flex-start",
     paddingVertical: 10,
     borderRadius: 15,
+    maxHeight: 85,
+    position: 'absolute',
+    overflow: "hidden",
+    marginTop: -30,
     justifyContent: "left",
   },
   tag: {
-    backgroundColor: "white",
+    backgroundColor: "#111111",
     borderRadius: 20,
     paddingVertical: 3,
     paddingHorizontal: 6,
     margin: 2,
     borderWidth: 1,
-    borderColor: "grey",
+    borderColor: "lightgrey",
   },
   tagText: {
     fontSize: 12,
-    color: "grey",
-    fontWeight: "bold",
+    color: "lightgrey",
+    fontWeight: "500",
   },
   sortContainer: {
     flexDirection: "row",
@@ -460,8 +480,9 @@ const styles = StyleSheet.create({
   sortText: {
     marginHorizontal: 5,
     fontSize: 15,
+    color: "white",
     fontWeight: "bold",
-    textDecorationLine: "underline",
+    // textDecorationLine: "underline",
   },
 });
 
