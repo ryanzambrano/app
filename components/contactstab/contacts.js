@@ -35,44 +35,58 @@ const ContactsUI = ({ route }) => {
 
   const fetchUsers = async () => {
     const { data: users, error } = await supabase
+    .from("Group Chats")
+    .select("*")
+    .contains("User_ID", [session.user.id]);
 
-      .from("Group Chats")
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const { data, error: sessionError } = await supabase
+    .from("UGC")
+    .select("name")
+    .eq("user_id", session.user.id)
+    .single();
+
+  if (sessionError) {
+    console.error(sessionError);
+    return;
+  }
+
+  const sessionusername = data.name;
+
+  const modifiedUsers = await Promise.all(users.map(async (user) => {
+    const groupNames = user.Group_Name.split(",").map((name) => name.trim());
+    const filteredGroupNames = groupNames.filter(
+      (name) => name !== sessionusername
+    );
+    const joinedGroups = filteredGroupNames.join(", ");
+
+    // Fetch the most recent group chat message
+    const { data: recentMessageData, error: messageError } = await supabase
+      .from("Group Chat Messages")
       .select("*")
-      .contains("User_ID", [session.user.id]);
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    const { data, error: sessionError } = await supabase
-      .from("UGC")
-      .select("name")
-      .eq("user_id", session.user.id)
+      .eq("Group_ID_Sent_To", user.Group_ID)
+      .order("created_at", { ascending: false })
+      .limit(1)
       .single();
 
-    if (sessionError) {
-      console.error(sessionError);
-      return;
+    if (messageError) {
+      console.error(messageError);
+      return { ...user, joinedGroups, recentMessage: null };
     }
 
-    const sessionusername = data.name;
+    return {
+      ...user,
+      joinedGroups,
+      recentMessage: recentMessageData,
+    };
+  }));
 
-    const modifiedUsers = users.map((user) => {
-      const groupNames = user.Group_Name.split(",").map((name) => name.trim());
-      const filteredGroupNames = groupNames.filter(
-        (name) => name !== sessionusername
-      );
-      const joinedGroups = filteredGroupNames.join(", ");
-
-      return {
-        ...user,
-        joinedGroups,
-      };
-    });
-
-    setUsers(modifiedUsers);
-  };
+  setUsers(modifiedUsers);
+};
 
   const formatRecentTime = (timestamp) => {
     if (!timestamp) return "";
@@ -210,9 +224,9 @@ const ContactsUI = ({ route }) => {
             <View style={styles.contactInfo}>
               <View style={styles.contactNameContainer}>
                 <Text style={styles.contactName}>{item.joinedGroups}</Text>
-                <Text style={styles.MessageTime}>{item.recentTime}</Text>
+                <Text style={styles.MessageTime}>{formatRecentTime(item.recentMessage.created_at)}</Text>
               </View>
-              <Text style={styles.RecentMessage}>{item.recentMessage}</Text>
+              <Text style={styles.RecentMessage}>{item.recentMessage.Message_Content}</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -233,7 +247,7 @@ const ContactsUI = ({ route }) => {
           onPress={handlePlusIconPress}
           style={{ position: "absolute", top: 10, right: 13 }}
         >
-          <AntDesign name="plus" size={25} color="#14999999" />
+          <AntDesign name="plus" size={25} color="#1de2e2" />
         </TouchableOpacity>
       </View>
       <View style={styles.viewContainer}>
@@ -343,6 +357,7 @@ const styles = StyleSheet.create({
   RecentMessage: {
     fontSize: 14,
     fontWeight: "light",
+    color: "#cbcace",
   },
   contactStatus: {
     fontSize: 14,
