@@ -22,30 +22,26 @@ const GroupChatScreen = ({ }) => {
   return (
     <View style={{ flex: 1, marginTop: 10, }}>
       {/* Top Bar */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 10, }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 14, }}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.button}>
           <AntDesign name="arrowleft" size={24} />
         </TouchableOpacity>
-        <Text>Group Chat</Text>
         <View />
       </View>
       
       {/* Profile Picture and Group Name */}
       <View style={{ alignItems: 'center', padding: 0 }}>
         <View style={{ width: 100, height: 100, backgroundColor: 'lightgray', borderRadius: 50 }} />
-        <Text style={{ marginTop: 10 }}>Group Name</Text>
-        <TouchableOpacity style={{ marginTop: 10 }}>
-          <Text>Change Name</Text>
-        </TouchableOpacity>
+        <Text style={{ marginTop: 10, marginBottom: 20, }}>Group Name</Text>
       </View>
       
       {/* Buttons */}
       <View style={{ flexDirection: 'row', justifyContent: 'center', padding: 10 }}>
-        <TouchableOpacity style={{ alignItems: 'center', marginRight: 20 }}>
+        <TouchableOpacity style={{ alignItems: 'center', marginRight: 40 }}>
           <AntDesign name="addusergroup" size={24} />
           <Text>Add</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={{ alignItems: 'center', marginRight: 20 }}>
+        <TouchableOpacity style={{ alignItems: 'center', marginRight: 40, marginBottom: 20, }}>
           <AntDesign name="search1" size={24} />
           <Text>Search</Text>
         </TouchableOpacity>

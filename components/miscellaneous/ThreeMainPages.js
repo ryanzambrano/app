@@ -90,7 +90,6 @@ const ThreeMainPages = ({ route }) => {
           <Stack.Screen
           name="GroupChatScreen"
           component={GroupChatScreen}
-          initialParams={{ session }}
         />
       </Stack.Navigator>
     </NavigationContainer>
