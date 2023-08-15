@@ -139,13 +139,13 @@ return () => {
         {
           flatListRef?.current?.scrollToIndex({ animated: true, index: messages.length - 1 });
         }
-    }, 100);
+    }, 100);Fg
   }, [messages]);*/
 
   const flatListRef = React.useRef();
 
   const navigateToProfile = () => {
-    navigation.navigate("userCard", { user });
+    navigation.navigate("GroupChatScreen");
   };
 
   return (

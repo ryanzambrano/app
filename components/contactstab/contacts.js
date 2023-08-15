@@ -146,7 +146,7 @@ const ContactsUI = ({ route }) => {
     setSelectedUser(user);
     //console.log(user.joinedGroups);
 
-    navigation.navigate("Message", { user });
+    navigation.navigate("Message", {user});
   };
 
   const handlePlusIconPress = () => {

@@ -14,6 +14,7 @@ import EditProfileScreen from "../profiletab/editProfile";
 import { AddPrompts } from "../profiletab/addPrompts";
 import TagSelectionEdit from "../profiletab/TagSelectionEdit";
 import FiltersUI from "../hometab/filters.js";
+import GroupChatScreen from "../contactstab/otherprofile";
 
 const Stack = createStackNavigator(); // Initialize stack navigator
 
@@ -85,6 +86,11 @@ const ThreeMainPages = ({ route }) => {
           component={FiltersUI}
           initialParams={{ session }}
           options={{ presentation: "modal" }}
+        />
+          <Stack.Screen
+          name="GroupChatScreen"
+          component={GroupChatScreen}
+          initialParams={{ session }}
         />
       </Stack.Navigator>
     </NavigationContainer>
