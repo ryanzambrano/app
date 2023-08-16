@@ -31,7 +31,7 @@ const MessagingUI = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const { session } = route.params;
-  const { user} = route.params;
+  const { user } = route.params;
 
   const sendMessage = async () => {
     if (message.trim() !== "") {

@@ -33,6 +33,13 @@ const ContactsUI = ({ route }) => {
     setSearchQuery(text);
   };
 
+    const filteredUsers = users.filter((user) => {
+    const nameMatch = user.joinedGroups
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    return nameMatch;
+  });
+
   const fetchUsers = async () => {
     const { data: users, error } = await supabase
     .from("Group Chats")
@@ -84,6 +91,12 @@ const ContactsUI = ({ route }) => {
       recentMessage: recentMessageData,
     };
   }));
+  
+  modifiedUsers.sort((a, b) => {
+    if (!a.recentMessage) return 1; // Move contacts with no recent message to the end
+    if (!b.recentMessage) return -1; // Move contacts with no recent message to the end
+    return new Date(b.recentMessage.created_at) - new Date(a.recentMessage.created_at);
+  });
 
   setUsers(modifiedUsers);
 };
@@ -157,13 +170,32 @@ const ContactsUI = ({ route }) => {
 
   const renderContact = ({ item }) => {
     const handleDelete = async () => {
-      const { error } = await supabase
-        .from("Message")
-        .delete()
-        .or(
-          `and(Sent_From.eq.${session.user.id},Contact_ID.eq.${item.user_id}),and(Contact_ID.eq.${session.user.id},Sent_From.eq.${item.user_id})`
-        );
-      fetchUsers();
+      try {
+        const { error } = await supabase
+          .from("Group Chat Messages")
+          .delete()
+          .eq("Group_ID_Sent_To", item.Group_ID);
+    
+        if (error) {
+          console.error(error);
+          return;
+        }
+    
+        // Now delete from the "Group Chats" table
+        const { error: groupChatsError } = await supabase
+          .from("Group Chats")
+          .delete()
+          .eq("Group_ID", item.Group_ID);
+    
+        if (groupChatsError) {
+          console.error(groupChatsError);
+        }
+    
+        // Fetch users again to update the UI
+        fetchUsers();
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     const renderRightActions = (progress, dragX) => {
@@ -213,23 +245,31 @@ const ContactsUI = ({ route }) => {
         overshootRight={false} // Disable the bounce effect
         useNativeDriver={true} // Use native driver to prevent bounce effect
       >
-        <TouchableOpacity onPress={() => handleUserCardPress(item)}>
-          <View style={styles.contactItem}>
-            <Image
-              style={styles.profilePicture}
-              source={{
-                uri: `${picURL}/${item.user_id}/${item.user_id}-0-${item.lastModified}`,
-              }}
-            />
-            <View style={styles.contactInfo}>
-              <View style={styles.contactNameContainer}>
-                <Text style={styles.contactName}>{item.joinedGroups}</Text>
-                <Text style={styles.MessageTime}>{formatRecentTime(item.recentMessage.created_at)}</Text>
-              </View>
-              <Text style={styles.RecentMessage}>{item.recentMessage.Message_Content}</Text>
+           <TouchableOpacity onPress={() => handleUserCardPress(item)}>
+        <View style={styles.contactItem}>
+          <Image
+            style={styles.profilePicture}
+            source={{
+              uri: `${picURL}/${item.user_id}/${item.user_id}-0-${item.lastModified}`,
+            }}
+          />
+          <View style={styles.contactInfo}>
+            <View style={styles.contactNameContainer}>
+              <Text style={styles.contactName}>{item.joinedGroups}</Text>
+              {item.recentMessage && item.recentMessage.created_at ? (
+                <Text style={styles.MessageTime}>
+                  {formatRecentTime(item.recentMessage.created_at)}
+                </Text>
+              ) : null}
             </View>
+            {item.recentMessage ? (
+              <Text style={styles.RecentMessage}>
+                {item.recentMessage.Message_Content}
+              </Text>
+            ) : null}
           </View>
-        </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
       </Swipeable>
     );
   };
