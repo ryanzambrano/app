@@ -15,7 +15,7 @@ import {
 import { picURL } from "../auth/supabase.js";
 import { AntDesign } from "@expo/vector-icons";
 import { ScrollView } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute,useFocusEffect } from "@react-navigation/native";
 import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
 import { createClient } from "@supabase/supabase-js";
 /*const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
@@ -32,6 +32,8 @@ const MessagingUI = () => {
   const [messages, setMessages] = useState([]);
   const { session } = route.params;
   const { user } = route.params;
+  const {editedJoinedGroups} = route.params;
+  const [joinedGroups, setJoinedGroups] = useState(user.joinedGroups);
 
   const sendMessage = async () => {
     if (message.trim() !== "") {
@@ -66,8 +68,12 @@ const MessagingUI = () => {
 
   };
   useEffect(() => {
-    //console.log(user.joinedGroups);
-  }, );
+
+    if (editedJoinedGroups !== undefined) {
+      setJoinedGroups(editedJoinedGroups);
+    }
+  });
+
 
   const fetchMessages = async () => {
     const { data, error } = await supabase
@@ -145,7 +151,7 @@ return () => {
   const flatListRef = React.useRef();
 
   const navigateToProfile = () => {
-    navigation.navigate("GroupChatScreen");
+    navigation.navigate("GroupChatScreen", {user});
   };
 
   return (
@@ -167,7 +173,7 @@ return () => {
         >
           <AntDesign name="arrowleft" size={24} color="#14999999" />
         </TouchableOpacity>
-        <Text style={styles.contactName}>{user.joinedGroups}</Text>
+        <Text style={styles.contactName}>{joinedGroups}</Text>
         <TouchableOpacity
           style={styles.profileContainer}
           onPress={navigateToProfile}
