@@ -284,7 +284,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
                         navigation.navigate("TagSelectionEdit", { editedUser })
                       }
                     >
-                      <Text style={{ color: "white" }}>{tag}</Text>
+                      <Text style={{ color: "white", fontWeight: 500 }}>{tag}</Text>
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   },
 
   tag: {
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#14999999",
     borderRadius: 20,
     borderColor: "white",
     paddingHorizontal: 10,

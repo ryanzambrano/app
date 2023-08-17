@@ -223,9 +223,9 @@ export const Profile = ({ navigation, route }) => {
 
               <View style={styles.major}>
                 <View style={styles.icons}>
-                  <Icon name="graduation-cap" size={30} color="white" />
-                  <Icon name="book" size={30} color="white" />
-                  <Icon name="home" size={30} color="white" />
+                  <Icon name="graduation-cap" size={30} color="#14999999" />
+                  <Icon name="book" size={30} color="#14999999" />
+                  <Icon name="home" size={30} color="#14999999" />
                 </View>
                 <View style={styles.details}>
                   <Text style={styles.text}>{editedUser.class_year}</Text>
@@ -447,6 +447,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     paddingVertical: 20,
+    paddingHorizontal: 15,
     backgroundColor: "#111111",
     borderRadius: 15,
     justifyContent: "center",
@@ -454,7 +455,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   tag: {
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#14999999",
     borderRadius: 20,
     borderColor: "#2B2D2F",
     borderWidth: 0.5,
@@ -465,7 +466,7 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 14,
     color: "white",
-    fontWeight: 400,
+    fontWeight: 600,
   },
   major: {
     flex: 1,

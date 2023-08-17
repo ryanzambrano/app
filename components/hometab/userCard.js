@@ -545,18 +545,18 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   tag: {
-    backgroundColor: "#1D1D20",
+    backgroundColor: "#14999999",
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,
     margin: 5,
-    borderWidth: 1,
+    //borderWidth: 1,
     borderColor: "white",
   },
   tagText: {
     fontSize: 14,
     color: "white",
-    fontWeight: "500",
+    fontWeight: "600",
   },
   horizontalScrollView: {
     paddingTop: 20,

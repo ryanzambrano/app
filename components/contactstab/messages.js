@@ -238,10 +238,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     backgroundColor: "#1D1D20",
-    marginBottom: 5,
+    marginBottom: 0,
   },
   header: {
     flexDirection: "row",
+    backgroundColor: "#1D1D20",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,

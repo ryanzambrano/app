@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 12,
     color: "white",
-    fontWeight: 500,
+    fontWeight: 600,
   },
   sortContainer: {
     flexDirection: "row",

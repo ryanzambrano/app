@@ -182,11 +182,13 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 16,
     color: 'white',
+    fontWeight: 500,
   },
   selectedTagText: {
     fontSize: 16,
     color: "lightgrey",
     marginBottom: 0,
+    fontWeight: 500,
   },
   selectedTagsText: {
     marginTop: 15,
