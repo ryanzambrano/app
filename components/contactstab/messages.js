@@ -171,7 +171,7 @@ return () => {
           style={styles.button}
           onPress={() => navigation.goBack()}
         >
-          <AntDesign name="arrowleft" size={24} color="#14999999" />
+          <AntDesign name="arrowleft" size={24} color="#159e9e" />
         </TouchableOpacity>
         <Text style={styles.contactName}>{joinedGroups}</Text>
         <TouchableOpacity
@@ -227,7 +227,7 @@ return () => {
             setInputHeight(e.nativeEvent.contentSize.height)
           }
         />
-        <Button title="Send" onPress={sendMessage} color="#14999999" text = "bold" />
+        <Button title="Send" onPress={sendMessage} color="#159e9e" text = "bold" />
       </View>
     </KeyboardAvoidingView>
   );
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: "#F9F9F9",
+    backgroundColor: "#1D1D20",
     marginBottom: 5,
   },
   header: {
@@ -257,6 +257,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginLeft: 10,
+    color: 'white',
     paddingVertical: 20,
   },
   profileContainer: {
@@ -273,6 +274,7 @@ const styles = StyleSheet.create({
   },
   messagesContainer: {
     flex: 1,
+
   },
   messagesContent: {
     paddingTop: 10,
@@ -299,21 +301,21 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFF",
+    backgroundColor: "#111111",
     borderRadius: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     paddingVertical: 5,
-    marginBottom: 10,
+    marginBottom: 25,
     paddingTop: 0,
   },
   input: {
     flex: 1,
     height: 40,
     marginRight: 0,
-    color: "#333",
+    color: "white",
     borderRadius: 20,
     paddingHorizontal: 0,
-    backgroundColor: "#FFF",
+    backgroundColor: "#111111",
     fontSize: 20,
     paddingTop: 10,
   },

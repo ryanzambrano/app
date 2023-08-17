@@ -316,7 +316,7 @@ const Home = ({ route }) => {
                 <TouchableOpacity onPress={() => showSortMenu()}>
                   <Text
                     style={{
-                      color: "dodgerblue",
+                      color: "#159e9e",
                       fontWeight: "bold",
                       fontSize: 15,
                     }}
@@ -461,14 +461,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     paddingVertical: 10,
     borderRadius: 15,
-    maxHeight: 85,
+    maxHeight: 90,
     position: "absolute",
     overflow: "hidden",
     marginTop: 0,
     justifyContent: "left",
   },
   tag: {
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#14999999",
     borderRadius: 15,
     //paddingVertical: 3,
     paddingHorizontal: 7,
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
   tagText: {
     fontSize: 12,
     color: "white",
-    fontWeight: 400,
+    fontWeight: 500,
   },
   sortContainer: {
     flexDirection: "row",
