@@ -15,6 +15,7 @@ import { AddPrompts } from "../profiletab/addPrompts";
 import TagSelectionEdit from "../profiletab/TagSelectionEdit";
 import FiltersUI from "../hometab/filters.js";
 import GroupChatScreen from "../contactstab/otherprofile";
+import { QuestionaireAnswers } from "../hometab/questionaireAnswers";
 
 const Stack = createStackNavigator(); // Initialize stack navigator
 
@@ -91,6 +92,11 @@ const ThreeMainPages = ({ route }) => {
           name="GroupChatScreen"
           component={GroupChatScreen}
         />
+        <Stack.Screen
+          name="QuestionaireAnswers"
+          component={QuestionaireAnswers}
+          initialParams={{ session }}
+          />
       </Stack.Navigator>
     </NavigationContainer>
   );

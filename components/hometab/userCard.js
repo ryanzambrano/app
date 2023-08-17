@@ -90,6 +90,25 @@ const UserCard = ({ navigation, route }) => {
       setSelectedPhotoIndex(null);
     }
   };
+  
+  const handleQuestionaireButtonPress = () => {
+    const currentUser = {
+        name,
+        tags,
+        bio,
+        major,
+        user_id,
+        age,
+        gender,
+        living_preferences,
+        for_fun,
+        class_year,
+        hometown,
+        bookmarked_profiles,
+        lastModified,
+    };
+    navigation.navigate('QuestionaireAnswers', { currentUser });
+};
 
   useEffect(() => {
     const fetchBookmarkedProfiles = async () => {
@@ -291,6 +310,10 @@ const UserCard = ({ navigation, route }) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.tab}>
+          <TouchableOpacity style={styles.questionaireButtonContainer} onPress={() => handleQuestionaireButtonPress()}>
+            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 17, }}> View Questionaire Responses</Text>
+          </TouchableOpacity>
+
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
               style={[styles.friendButton, { backgroundColor: buttonColor }]}
@@ -308,7 +331,7 @@ const UserCard = ({ navigation, route }) => {
               <Text style={styles.chatButtonText}>Message</Text>
             </TouchableOpacity>
           </View>
-
+          
           <View style={styles.bioContainer}>
             <Text style={styles.bio}>Graduating Class: {class_year}</Text>
           </View>
@@ -326,18 +349,10 @@ const UserCard = ({ navigation, route }) => {
             <View style={styles.divider} />
             <Text style={styles.bio}>Hometown: {hometown}</Text>
           </View>
-
-        
-
           <View style={styles.ageMajorGradeContainer}>
             <Text style={styles.bio}>
-              Do you plan on living in an apartment or dorm?: {"\n"}
+              Do you plan on living in an apartment or dorm?: {"\n\n"}
               {living_preferences}
-            </Text>
-            <View style={styles.divider} />
-            <Text style={styles.bio}>
-              Would you rather stay in or go out for fun?: {"\n"}
-              {for_fun}
             </Text>
           </View>
           <ScrollView
@@ -384,6 +399,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#1D1D20",
     justifyContent: "flex-start",
     paddingVertical: 5,
+  },
+  questionaireButtonContainer: {
+    flex: 1,
+    marginHorizontal: 10,
+    backgroundColor: "#14999999",
+    paddingVertical: 10,
+    borderRadius: 15,
+    marginBottom: 10,
+    borderWidth: 0.4,
+    alignItems: "center",
   },
   scrollView: {
     flex: 1,
