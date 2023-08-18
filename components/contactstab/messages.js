@@ -20,7 +20,8 @@ import {
   useRoute,
   useFocusEffect,
 } from "@react-navigation/native";
-import { supabase } from "../auth/supabase";
+import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
+import { createClient } from "@supabase/supabase-js";
 
 const MessagingUI = () => {
   const [selectedPerson, setSelectedPerson] = useState(null);
@@ -157,17 +158,6 @@ const MessagingUI = () => {
     }
   }, [messages]);
 
-  /*useEffect(() => {
-    // Scroll to the bottom of the messages when a new message is added
-    setTimeout(() => {
-      //flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
-      if(message.length > 0)
-        {
-          flatListRef?.current?.scrollToIndex({ animated: true, index: messages.length - 1 });
-        }
-    }, 100);Fg
-  }, [messages]);*/
-
   const flatListRef = React.useRef();
 
   const navigateToProfile = () => {
@@ -193,11 +183,11 @@ const MessagingUI = () => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.navigate("Contacts")}
         >
           <AntDesign name="arrowleft" size={24} color="#159e9e" />
         </TouchableOpacity>
-        <Text style={styles.contactName}>{joinedGroups}</Text>
+        <Text style={styles.contactName}>{user.Group_Name}</Text>
         <TouchableOpacity
           style={styles.profileContainer}
           onPress={navigateToProfile}

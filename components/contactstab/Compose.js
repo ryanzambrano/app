@@ -20,6 +20,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from '@expo/vector-icons';
 
 const ComposeMessageScreen = ({ route }) => {
+  const [persons, setPersons] = useState([]);
   const navigation = useNavigation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const { session } = route.params;
@@ -108,18 +109,32 @@ const ComposeMessageScreen = ({ route }) => {
           },
         ])
         .select();
+
   
         if (insertError) {
           if (insertError.code === "23505") {
-            /*console.log(selectedUserIDs);
-            const { data, error } = await supabase
-            .from("Group Chats") // Check that the table name is correct and matches your database
+            const { data: navigationdata, error: navigationError } = await supabase
+            .from("Group Chats")
             .select('*')
-            .eq("User_ID", selectedUserIDs); // Make sure selectedUserIDs is defined and contains valid data
-            console.log(data);
-            console.log(error);*/
-            alert('A group chat/Message already exists for these users.');
-            return;
+            .contains('User_ID', selectedUserIDs)
+            .eq('Ammount_Users', selectedUserIDs.length);
+            if(navigationError)
+            {
+              console.log(navigationError);
+              return;
+            }
+            else
+            {
+              //console.log(navigationdata);
+              const fetchedPersons = navigationdata.map((person) => person);
+              setPersons(fetchedPersons);
+              if (fetchedPersons.length > 0) {
+
+                navigation.navigate('Message', { user: fetchedPersons[0]});
+              }
+            
+              return;
+            }
             // The duplicate key violation occurred, no need to handle the conflicting row
           } else {
             alert('Failed to insert.');
