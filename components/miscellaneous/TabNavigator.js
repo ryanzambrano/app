@@ -25,14 +25,20 @@ const TabNavigator = ({ route }) => {
           let iconName;
           if (route.name === "Contacts") {
             // Based on where the user clicks, it highlights the icon to clarify what page they are on
-            iconName = focused ? "comment" : "comment-o"; // Set the icons for the 'Messages
+            iconName = focused ? "comment" : "comment"; // Set the icons for the 'Messages
           } else if (route.name === "Home") {
             iconName = focused ? "home" : "home"; // Set the icons for the 'Home' screen
           } else if (route.name === "Profile") {
             iconName = focused ? "user" : "user"; // Set the icons for the 'Profile' screen
           }
 
-          return <Icon name={iconName} size={size} color={"white"} />;
+          return (
+            <Icon
+              name={iconName}
+              size={size}
+              color={focused ? "white" : "grey"}
+            />
+          );
         },
         tabBarLabel: () => null, // Removes the labels
       })}

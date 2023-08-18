@@ -68,29 +68,27 @@ const MessagingUI = () => {
       }
     }
   };
-  const extractedIds = user.User_ID.filter(item => item !== session.user.id);
+  const extractedIds = user.User_ID.filter((item) => item !== session.user.id);
+
   async function fetchUsers() {
     try {
       const { data, error } = await supabase
-        .from('UGC')
-        .select('*')
-        .in('user_id', extractedIds);
+        .from("UGC")
+        .select("*")
+        .in("user_id", extractedIds);
 
       if (error) {
-        console.error('Error fetching users:', error);
+        console.error("Error fetching users:", error);
       } else {
-        const fetchedPersons = data.map(person => person);
+        const fetchedPersons = data.map((person) => person);
         setPersons(fetchedPersons);
-        
-    }
-  
+      }
     } catch (error) {
-      console.error('An error occurred:', error.message);
+      console.error("An error occurred:", error.message);
     }
   }
   useEffect(() => {
-    if(user.Ammount_Users <= 2)
-    {
+    if (user.Ammount_Users <= 2) {
       fetchUsers();
     }
     if (editedJoinedGroups !== undefined) {
@@ -174,13 +172,10 @@ const MessagingUI = () => {
   const flatListRef = React.useRef();
 
   const navigateToProfile = () => {
-    if(user.Ammount_Users > 2)
-    {
-      navigation.navigate("GroupChatScreen", {user});
-    }
-    else
-    {
-      navigation.navigate("userCard", {user: persons[0]});
+    if (user.Ammount_Users > 2) {
+      navigation.navigate("GroupChatScreen", { user });
+    } else {
+      navigation.navigate("userCard", { user: persons[0] });
     }
   };
 
@@ -210,9 +205,9 @@ const MessagingUI = () => {
         >
           {
             <Image
-            source={{
-              uri: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Andrew_Tate_on_%27Anything_Goes_With_James_English%27_in_2021.jpg"  // Use the actual field for the profile picture},
-            }}
+              source={{
+                uri: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Andrew_Tate_on_%27Anything_Goes_With_James_English%27_in_2021.jpg", // Use the actual field for the profile picture},
+              }}
               style={styles.profilePicture}
             />
           }
@@ -235,7 +230,7 @@ const MessagingUI = () => {
                   styles.message,
                   item.Sent_From === session.user.id
                     ? { color: "white" } // Change text color for messages from current user
-                    : {color: "white"}, // Use default text color for messages from other user
+                    : { color: "white" }, // Use default text color for messages from other user
                 ]}
               >
                 {item.Message_Content}

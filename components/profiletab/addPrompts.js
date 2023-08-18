@@ -88,13 +88,13 @@ export const AddPrompts = ({ navigation, route }) => {
           if (updateError) {
             alert(updateError.message);
           } else {
-            navigation.navigate("EditProfileScreen", { updated: true });
+            navigation.goBack();
           }
         } else {
           alert(error.message);
         }
       } else {
-        navigation.navigate("EditProfileScreen", { updated: true });
+        navigation.goBack();
       }
     }
   };
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     color: "white",
   },
   card: {
-    backgroundColor: "#111111",
+    backgroundColor: "#2B2D2F",
     gap: 40,
     paddingTop: 50,
     paddingBottom: 40,

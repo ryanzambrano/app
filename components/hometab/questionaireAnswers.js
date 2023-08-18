@@ -27,16 +27,14 @@ export const QuestionaireAnswers = ({ navigation, route }) => {
 
   useEffect(() => {
     const fetchAnswers = async () => {
-      const { data: questionaireData, error: questionaireError } = await supabase
-        .from("profile")
-        .select("*")
-        .eq("user_id", user_id);
+      const { data: questionaireData, error: questionaireError } =
+        await supabase.from("profile").select("*").eq("user_id", user_id);
 
       if (questionaireData) {
         const answeredQuestions = Object.entries(questionaireQuestions)
           .map(([key, question]) => ({
             question,
-            answer: questionaireData[0][key]
+            answer: questionaireData[0][key],
           }))
           .filter(({ answer }) => answer !== null);
 
@@ -59,7 +57,10 @@ export const QuestionaireAnswers = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerText}>Answers</Text>
@@ -73,7 +74,6 @@ export const QuestionaireAnswers = ({ navigation, route }) => {
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -81,8 +81,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#1D1D20",
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 15,
   },
   backButton: {
@@ -92,12 +92,12 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 30,
-    color: 'white',
+    color: "#149999",
   },
   headerText: {
     fontSize: 25,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
   },
   card: {
     backgroundColor: "#111111",
@@ -119,12 +119,12 @@ const styles = StyleSheet.create({
   question: {
     fontSize: 25,
     fontWeight: 300,
-    color: 'white',
+    color: "white",
     marginBottom: 10,
     fontFamily: "Helvetica",
   },
   input: {
-    color: "white",
+    color: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "white",
     borderRadius: 5,
@@ -133,7 +133,6 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontFamily: "Helvetica",
   },
-
 });
 
 export default QuestionaireAnswers;

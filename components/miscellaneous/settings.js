@@ -24,6 +24,24 @@ const SettingsScreen = ({ navigation, route }) => {
         <Button title="Back" onPress={handleBackPress} />
       </View>
       <View style={styles.settingRow}>
+        <Text style={styles.text}>About Us</Text>
+      </View>
+      <View style={styles.settingRow}>
+        <Text style={styles.text}>User Agreement</Text>
+      </View>
+      <View style={styles.settingRow}>
+        <Text style={styles.text}>Privacy Policy</Text>
+      </View>
+      <View style={styles.settingRow}>
+        <Text style={styles.text}>Content Policy</Text>
+      </View>
+      <View style={styles.settingRow}>
+        <Text style={styles.text}>Help Center</Text>
+      </View>
+      <View style={styles.settingRow}>
+        <Text style={styles.text}>Report an Issue</Text>
+      </View>
+      <View style={styles.settingRow}>
         <Button title="logout" color="red" onPress={signOut} />
       </View>
     </SafeAreaView>
@@ -33,15 +51,15 @@ const SettingsScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#111111",
     padding: 10,
   },
   settingRow: {
-    flexDirection: "row",
+    flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: 10,
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.3,
     borderBottomColor: "#ccc",
   },
   settingLabel: {
@@ -49,6 +67,12 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   button: { color: "red" },
+  text: {
+    color: "#fff",
+    fontSize: 16,
+    marginLeft: 10,
+    paddingVertical: 10,
+  },
 });
 
 export default SettingsScreen;

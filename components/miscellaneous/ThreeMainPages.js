@@ -84,19 +84,20 @@ const ThreeMainPages = ({ route }) => {
           initialParams={{ session }}
           options={{ presentation: "modal" }}
         />
-          <Stack.Screen
-          name="GroupChatScreen"
-          component={GroupChatScreen}
-          initialParams={{ session }}
-        />
-          <Stack.Screen
+
+        <Stack.Screen
           name="QuestionaireAnswers"
           component={QuestionaireAnswers}
           initialParams={{ session }}
-          />
+        />
         <Stack.Screen
           name="questionaire"
           component={Questionaire}
+          initialParams={{ session }}
+        />
+        <Stack.Screen
+          name="GroupChatScreen"
+          component={GroupChatScreen}
           initialParams={{ session }}
         />
       </Stack.Navigator>
