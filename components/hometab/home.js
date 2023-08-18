@@ -243,22 +243,19 @@ const Home = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.logoContainer}>
+        <View style={styles.logoTitleContainer}>
           <Image
             style={styles.logo}
             source={{
-              uri: "https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg",
+              uri: "https://cdn3.iconfinder.com/data/icons/miscellaneous-331-color-shadow/128/roommates_lodger_resident_roomer_habitant_denizen_friend_hostel_dorm_dormitory-256.png",
             }}
           />
-        </View>
-        <View style={styles.titleContainer}>
           <Text style={styles.headerText}> Cabana </Text>
         </View>
-        <View style={styles.thing}>
+        <View style={styles.buttonContainer}>
           <TouchableOpacity onPress={handleFiltersPress}>
             <Icon name="sliders" size={30} color="#fff" />
           </TouchableOpacity>
-
           <TouchableOpacity onPress={toggleBookmarkButton}>
             <Icon
               name="bookmark"
@@ -268,6 +265,7 @@ const Home = ({ route }) => {
           </TouchableOpacity>
         </View>
       </View>
+
 
       <View style={styles.viewContainer}>
         <View style={styles.searchContainer}>
@@ -319,9 +317,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#1D1D20",
   },
   titleContainer: {
-    alignItems: "center",
-    textAlign: "center",
-    marginRight: -20,
+    alignItems: "right",
+    textAlign: "right",
+    //marginRight: -20,
   },
 
   logoContainer: {
@@ -337,30 +335,35 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    //alignContent: "center",
     justifyContent: "space-between",
-    //borderBottomWidth: 1,
-    borderColor: "gray",
     paddingTop: 13,
     paddingBottom: 6,
     paddingLeft: 15,
     paddingRight: 15,
-
     marginBottom: 8,
   },
-
-  headerText: {
-    fontSize: 25,
-    color: "white",
-    fontWeight: 600,
-    textAlign: "center",
+  
+  logoTitleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
   },
-
+  
+  headerText: {
+    fontSize: 29,
+    color: "white",
+    fontWeight: '600',
+  },
+  
   logo: {
     width: 30,
     height: 30,
-    //marginRight: 5,
-    //marginTop: 10,
+  },
+  
+  buttonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
 
   searchContainer: {
