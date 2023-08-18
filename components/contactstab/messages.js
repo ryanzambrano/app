@@ -68,9 +68,6 @@ const MessagingUI = () => {
       }
     }
   };
-<<<<<<< Updated upstream
-  useEffect(() => {
-=======
   const extractedIds = user.User_ID.filter(item => item !== session.user.id);
   async function fetchUsers() {
     try {
@@ -96,7 +93,6 @@ const MessagingUI = () => {
     {
       fetchUsers();
     }
->>>>>>> Stashed changes
     if (editedJoinedGroups !== undefined) {
       setJoinedGroups(editedJoinedGroups);
     }
@@ -178,9 +174,6 @@ const MessagingUI = () => {
   const flatListRef = React.useRef();
 
   const navigateToProfile = () => {
-<<<<<<< Updated upstream
-    navigation.navigate("GroupChatScreen", { user });
-=======
     if(user.Ammount_Users > 2)
     {
       navigation.navigate("GroupChatScreen", {user});
@@ -189,14 +182,13 @@ const MessagingUI = () => {
     {
       navigation.navigate("userCard", {user: persons[0]});
     }
->>>>>>> Stashed changes
   };
 
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : null}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 2 : 0}
+      keyboardVerticalOffset={Platform.OS === "ios" ? -5 : 0}
     >
       <View style={{ flex: 0.01 }}>
         <ScrollView
@@ -243,7 +235,7 @@ const MessagingUI = () => {
                   styles.message,
                   item.Sent_From === session.user.id
                     ? { color: "white" } // Change text color for messages from current user
-                    : null, // Use default text color for messages from other user
+                    : {color: "white"}, // Use default text color for messages from other user
                 ]}
               >
                 {item.Message_Content}
@@ -290,7 +282,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#1D1D20",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
     paddingHorizontal: 0,
     paddingVertical: 20,
   },
@@ -334,7 +325,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 10,
     alignSelf: "flex-start",
-    backgroundColor: "#e8e8ea",
+    backgroundColor: "#2B2D2F",
   },
   message: {
     fontSize: 16,
@@ -345,11 +336,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#111111",
+    backgroundColor: "#2B2D2F",
     borderRadius: 20,
     paddingHorizontal: 20,
     paddingVertical: 5,
-    marginBottom: 25,
+    marginBottom: 20,
     paddingTop: 0,
   },
   input: {
@@ -359,7 +350,7 @@ const styles = StyleSheet.create({
     color: "white",
     borderRadius: 20,
     paddingHorizontal: 0,
-    backgroundColor: "#111111",
+    backgroundColor: "#2B2D2F",
     fontSize: 20,
     paddingTop: 10,
   },

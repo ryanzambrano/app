@@ -16,7 +16,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons"; // Import Feather icons
 import { supabase } from "../auth/supabase";
 import { picURL } from "../auth/supabase.js";
-import { v4 as uuidv4 } from "react-native-uuid-generator";
+import { AntDesign } from "@expo/vector-icons";
+import { FontAwesome } from '@expo/vector-icons';
 
 const ComposeMessageScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -152,9 +153,7 @@ const ComposeMessageScreen = ({ route }) => {
           <Image
             style={styles.profilePicture}
             source={{
-              uri: `${picURL}/${item.user_id}/${
-                item.user_id
-              }-0?${new Date().getTime()}`,
+              uri: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Andrew_Tate_on_%27Anything_Goes_With_James_English%27_in_2021.jpg"
             }}
           />
         </View>
@@ -166,11 +165,11 @@ const ComposeMessageScreen = ({ route }) => {
           <Text style={styles.RecentMessage}>{item.recentMessage}</Text>
         </View>
         <View style={styles.buttonContainer}>
-          <Feather
-            name={selectedUsers.includes(item) ? "check-circle" : "circle"}
-            size={24}
-            color={selectedUsers.includes(item) ? "green" : "gray"}
-          />
+        <FontAwesome
+  name={selectedUsers.includes(item) ? "circle" : "circle-o"}
+  size={24}
+  color="#159e9e"
+/>
         </View>
       </View>
     </TouchableOpacity>
@@ -184,7 +183,7 @@ const ComposeMessageScreen = ({ route }) => {
             style={styles.cancelButton}
             onPress={() => navigation.goBack()}
           >
-            <Text style={styles.cancelButtonText}>{"<"}</Text>
+            <AntDesign name="arrowleft" size={24} color="#159e9e" />
           </TouchableOpacity>
           <Text style={styles.composeHeader}>{"Compose Message"}</Text>
         </View>
@@ -238,8 +237,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#DDD",
+    borderBottomWidth: .3,
+    borderBottomColor: "grey",
     width: "100%",
   },
   selectedUserNamesWrapper: {
@@ -303,7 +302,6 @@ const styles = StyleSheet.create({
   },
   contactName: {
     fontSize: 18,
-    fontWeight: "bold",
   },
   profileContainer: {
     width: 100,
@@ -325,7 +323,7 @@ const styles = StyleSheet.create({
   toInputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFF",
+    backgroundColor: "#2B2D2F",
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -333,13 +331,13 @@ const styles = StyleSheet.create({
   },
   toLabel: {
     fontSize: 16,
-    fontWeight: "bold",
     marginRight: 5,
+    color: "grey",
   },
   toInput: {
     flex: 1,
     height: 40,
-    color: "#333",
+    color: "#2B2D2F",
     fontSize: 15,
     marginRight: 5,
   },
@@ -349,10 +347,10 @@ const styles = StyleSheet.create({
   },
   contactName: {
     fontSize: 18,
-    fontWeight: "bold",
     marginLeft: 10,
     paddingVertical: 20,
     justifyContent: "center",
+    color: "white",
   },
   profileContainer: {
     width: 50,
@@ -366,44 +364,24 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  messagesContainer: {
-    flex: 1,
-  },
-  messagesContent: {
-    paddingTop: 10,
-    paddingBottom: 20,
-  },
-  messageContainer: {
-    borderRadius: 20,
-    marginBottom: 10,
-    alignSelf: "flex-end",
-    backgroundColor: "#dedede",
-  },
-  message: {
-    fontSize: 16,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    color: "#000",
-  },
   input: {
     flex: 1,
     height: 40,
     marginRight: 10,
-    color: "#333",
+    color: "white",
     borderRadius: 20,
     paddingHorizontal: 10,
-    backgroundColor: "#FFF",
+    backgroundColor: "white",
     fontSize: 20,
     paddingTop: 10,
   },
   container: {
     flex: 1,
     padding: 0,
-    backgroundColor: "#F9F9F9",
-    marginBottom: 5,
+    backgroundColor: "#1D1D20",
   },
   headerSafeArea: {
-    backgroundColor: "#e8e8ea",
+    backgroundColor: "#2B2D2F",
     paddingTop: Platform.OS === "ios" ? -50 : 0,
     paddingBottom: Platform.OS === "ios" ? -25 : 0,
     marginBottom: 5,
@@ -420,7 +398,7 @@ const styles = StyleSheet.create({
   composeHeader: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#000",
+    color: "white",
     paddingRight: 120,
     //justifyContent: "center",
   },

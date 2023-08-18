@@ -84,21 +84,19 @@ const ThreeMainPages = ({ route }) => {
           initialParams={{ session }}
           options={{ presentation: "modal" }}
         />
-<<<<<<< Updated upstream
-        <Stack.Screen name="GroupChatScreen" component={GroupChatScreen} />
-        <Stack.Screen
-          name="QuestionaireAnswers"
-          component={QuestionaireAnswers}
-          initialParams={{ session }}
-        />
-        <Stack.Screen
-          name="questionaire"
-          component={Questionaire}
-=======
           <Stack.Screen
           name="GroupChatScreen"
           component={GroupChatScreen}
->>>>>>> Stashed changes
+          initialParams={{ session }}
+        />
+          <Stack.Screen
+          name="QuestionaireAnswers"
+          component={QuestionaireAnswers}
+          initialParams={{ session }}
+          />
+        <Stack.Screen
+          name="questionaire"
+          component={Questionaire}
           initialParams={{ session }}
         />
       </Stack.Navigator>

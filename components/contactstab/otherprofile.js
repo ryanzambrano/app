@@ -89,11 +89,11 @@ const GroupChatScreen = ({ }) => {
   };
 
   return (
-    <View style={{ flex: 1, marginTop: 10 }}>
+    <View style={{ flex: 1, backgroundColor: "#1D1D20", }}>
       {/* Top Bar */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 14 }}>
         <TouchableOpacity onPress={navigatetomessages} style={styles.button}>
-          <AntDesign name="arrowleft" size={24} />
+          <AntDesign name="arrowleft" size={24} color = "#159e9e"/>
         </TouchableOpacity>
         <View />
       </View>
@@ -106,7 +106,7 @@ const GroupChatScreen = ({ }) => {
         />
         <TouchableOpacity onPress={updateJoinedGroups}>
   <TextInput
-    style={{ marginTop: 15, marginBottom: 15, fontSize: 20, fontWeight: 'bold',}}
+    style={{ marginTop: 15, marginBottom: 15, fontSize: 20, fontWeight: 'bold', color: 'white',}}
     value={editedJoinedGroups}
     onChangeText={setEditedJoinedGroups}
     onBlur={updateJoinedGroups} // Update when input is blurred
@@ -117,16 +117,16 @@ const GroupChatScreen = ({ }) => {
       {/* Buttons */}
       <View style={{ flexDirection: 'row', justifyContent: 'center', padding: 10 }}>
         <TouchableOpacity style={{ alignItems: 'center', marginRight: 50 }}>
-          <AntDesign name="addusergroup" size={24} />
-          <Text>Add</Text>
+          <AntDesign name="addusergroup" size={24} color="white"/>
+          <Text style={{ color: 'white' }}>Add</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{ alignItems: 'center', marginRight: 50, marginBottom: 20 }}>
-          <AntDesign name="search1" size={24} />
-          <Text>Search</Text>
+          <AntDesign name="search1" size={24} color="white" />
+          <Text style={{ color: 'white' }}>Search</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{ alignItems: 'center' }}>
-          <Icon name="meeting-room" size={24} color="black" />
-          <Text>Leave</Text>
+          <Icon name="meeting-room" size={24} color="white" />
+          <Text style={{ color: 'white' }}>Leave</Text>
         </TouchableOpacity>
       </View>
 
@@ -141,7 +141,7 @@ const GroupChatScreen = ({ }) => {
 };
 const styles = StyleSheet.create({
   button: {
-    paddingVertical: 20,
+    marginTop: 30,
   },
   contactContainer: {
     flexDirection: 'row',
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   },
   contactName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    color: 'white'
   },
   groupInfo: {
     alignItems: 'center',
