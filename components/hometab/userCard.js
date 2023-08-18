@@ -179,7 +179,7 @@ const UserCard = ({ navigation, route }) => {
             updateError.message
           );
         } else {
-          console.log("Bookmark added successfully!");
+          //console.log("Bookmark added successfully!");
           setIsFriendAdded(true);
         }
       } else {

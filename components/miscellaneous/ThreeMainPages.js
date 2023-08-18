@@ -45,11 +45,6 @@ const ThreeMainPages = ({ route }) => {
           initialParams={{ session }}
         />
         <Stack.Screen
-          name="OtherProfile"
-          component={ProfileUI}
-          initialParams={{ session }}
-        />
-        <Stack.Screen
           name="AddProfileImages"
           component={AddProfileImages}
           initialParams={{ session }}
@@ -89,6 +84,7 @@ const ThreeMainPages = ({ route }) => {
           initialParams={{ session }}
           options={{ presentation: "modal" }}
         />
+<<<<<<< Updated upstream
         <Stack.Screen name="GroupChatScreen" component={GroupChatScreen} />
         <Stack.Screen
           name="QuestionaireAnswers"
@@ -98,6 +94,11 @@ const ThreeMainPages = ({ route }) => {
         <Stack.Screen
           name="questionaire"
           component={Questionaire}
+=======
+          <Stack.Screen
+          name="GroupChatScreen"
+          component={GroupChatScreen}
+>>>>>>> Stashed changes
           initialParams={{ session }}
         />
       </Stack.Navigator>

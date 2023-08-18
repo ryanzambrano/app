@@ -81,7 +81,7 @@ const ContactsUI = ({ route }) => {
       .single();
 
     if (messageError) {
-      console.error(messageError);
+      //console.error(messageError);
       return { ...user, joinedGroups, recentMessage: null };
     }
 
@@ -250,7 +250,7 @@ const ContactsUI = ({ route }) => {
           <Image
             style={styles.profilePicture}
             source={{
-              uri: `${picURL}/${item.user_id}/${item.user_id}-0-${item.lastModified}`,
+              uri: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Andrew_Tate_on_%27Anything_Goes_With_James_English%27_in_2021.jpg"  // Use the actual field for the profile picture},
             }}
           />
           <View style={styles.contactInfo}>

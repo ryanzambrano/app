@@ -24,6 +24,7 @@ import { supabase } from "../auth/supabase"; // we have our client here no need 
 import { createClient } from "@supabase/supabase-js";
 
 const MessagingUI = () => {
+  const [selectedPerson, setSelectedPerson] = useState(null);
   const scrollViewRef = useRef();
   const [inputHeight, setInputHeight] = useState(40);
   const navigation = useNavigation();
@@ -34,6 +35,7 @@ const MessagingUI = () => {
   const { user } = route.params;
   const { editedJoinedGroups } = route.params;
   const [joinedGroups, setJoinedGroups] = useState(user.joinedGroups);
+  const [persons, setPersons] = useState([]);
 
   const sendMessage = async () => {
     if (message.trim() !== "") {
@@ -66,11 +68,39 @@ const MessagingUI = () => {
       }
     }
   };
+<<<<<<< Updated upstream
   useEffect(() => {
+=======
+  const extractedIds = user.User_ID.filter(item => item !== session.user.id);
+  async function fetchUsers() {
+    try {
+      const { data, error } = await supabase
+        .from('UGC')
+        .select('*')
+        .in('user_id', extractedIds);
+
+      if (error) {
+        console.error('Error fetching users:', error);
+      } else {
+        const fetchedPersons = data.map(person => person);
+        setPersons(fetchedPersons);
+        
+    }
+  
+    } catch (error) {
+      console.error('An error occurred:', error.message);
+    }
+  }
+  useEffect(() => {
+    if(user.Ammount_Users <= 2)
+    {
+      fetchUsers();
+    }
+>>>>>>> Stashed changes
     if (editedJoinedGroups !== undefined) {
       setJoinedGroups(editedJoinedGroups);
     }
-  });
+  }, [user.User_ID, session.user.id]);
 
   const fetchMessages = async () => {
     const { data, error } = await supabase
@@ -148,7 +178,18 @@ const MessagingUI = () => {
   const flatListRef = React.useRef();
 
   const navigateToProfile = () => {
+<<<<<<< Updated upstream
     navigation.navigate("GroupChatScreen", { user });
+=======
+    if(user.Ammount_Users > 2)
+    {
+      navigation.navigate("GroupChatScreen", {user});
+    }
+    else
+    {
+      navigation.navigate("userCard", {user: persons[0]});
+    }
+>>>>>>> Stashed changes
   };
 
   return (
@@ -177,7 +218,9 @@ const MessagingUI = () => {
         >
           {
             <Image
-              //source={{ uri: `${picURL}/${user_id}/${user_id}-0?${new Date().getTime()}` }}
+            source={{
+              uri: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Andrew_Tate_on_%27Anything_Goes_With_James_English%27_in_2021.jpg"  // Use the actual field for the profile picture},
+            }}
               style={styles.profilePicture}
             />
           }

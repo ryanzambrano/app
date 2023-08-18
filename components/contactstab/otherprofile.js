@@ -1,29 +1,72 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, TextInput, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, FlatList, TextInput, StyleSheet, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { supabase } from "../auth/supabase";
 
 const GroupChatScreen = ({ }) => {
+  const [persons, setPersons] = useState([]);
+  const [selectedPerson, setSelectedPerson] = useState(null);
   const route = useRoute();
   const { session } = route.params;
   const { user } = route.params;
   const navigation = useNavigation();
   const [editedJoinedGroups, setEditedJoinedGroups] = useState(user.joinedGroups);
-  const userList = [
-    { id: 1, name: 'User 1' },
-    { id: 2, name: 'User 2' },
-    { id: 3, name: 'User 3' },
-    // Add more users as needed
-  ];
+  const [userIds, setUserIds] = useState([]);
+  
+  useEffect(() => {
+    // Extract session.user.id values from user.User_ID array
+    const extractedIds = user.User_ID.filter(item => item !== session.user.id);
+  
+    // Fetch users based on extractedIds
+    async function fetchUsers() {
+      try {
+        const { data, error } = await supabase
+          .from('UGC')
+          .select('*')
+          .in('user_id', extractedIds);
+  
+        if (error) {
+          console.error('Error fetching users:', error);
+        } else {
+          
+      if (data && data.length > 0) {
+        const fetchedPersons = data.map(person => person);
+        setPersons(fetchedPersons); // Update the persons state with fetched data
+      } else {
+        console.log('No users found for the extracted IDs');
+      }
+        }
+      } catch (error) {
+        console.error('An error occurred:', error.message);
+      }
+    }
+  
+    // Call the fetchUsers function
+    fetchUsers();
+  }, [user.User_ID, session.user.id]);
+
+  
+  const handleUserPress = (person) => {
+    // Set the selected person in state
+    setSelectedPerson(person);
+
+    // Navigate to Message page and pass selected person data
+    navigation.navigate('userCard', { user: person });
+  };
 
   const renderUserItem = ({ item }) => (
-    <View style={{ padding: 10 }}>
-      <Text>{item.name}</Text>
-    </View>
+    <TouchableOpacity onPress={() => handleUserPress(item)}>
+      <View style={styles.contactContainer}>
+        <Image
+          source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Andrew_Tate_on_%27Anything_Goes_With_James_English%27_in_2021.jpg" }} // Use the actual field for the profile picture
+          style={styles.profilePicture}
+        />
+        <Text style={styles.contactName}>{item.name}</Text>
+      </View>
+    </TouchableOpacity>
   );
-
   const updateJoinedGroups = async () => {
     try {
       // Update the joined groups in Supabase
@@ -56,8 +99,11 @@ const GroupChatScreen = ({ }) => {
       </View>
 
       {/* Profile Picture and Group Name */}
-      <View style={{ alignItems: 'center', padding: 0 }}>
-        <View style={{ width: 100, height: 100, backgroundColor: 'lightgray', borderRadius: 50 }} />
+      <View style={styles.groupInfo}>
+        <Image
+          source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Andrew_Tate_on_%27Anything_Goes_With_James_English%27_in_2021.jpg" }} // Replace with your group picture URL
+          style={styles.groupPicture}
+        />
         <TouchableOpacity onPress={updateJoinedGroups}>
   <TextInput
     style={{ marginTop: 15, marginBottom: 15, fontSize: 20, fontWeight: 'bold',}}
@@ -86,7 +132,7 @@ const GroupChatScreen = ({ }) => {
 
       {/* User List */}
       <FlatList
-        data={userList}
+        data={persons}
         keyExtractor={item => item.id.toString()}
         renderItem={renderUserItem}
       />
@@ -96,6 +142,33 @@ const GroupChatScreen = ({ }) => {
 const styles = StyleSheet.create({
   button: {
     paddingVertical: 20,
+  },
+  contactContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderBottomWidth: 0.3,
+    borderBottomColor: "grey",
+  },
+  profilePicture: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  contactName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  groupInfo: {
+    alignItems: 'center',
+    padding: 20,
+  },
+  groupPicture: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'lightgray',
   },
 });
 
