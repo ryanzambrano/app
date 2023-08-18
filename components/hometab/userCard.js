@@ -87,6 +87,10 @@ const UserCard = ({ navigation, route }) => {
     }
   };
 
+  const handlePhotoPress = (index) => {
+    setSelectedPhotoIndex(index);
+  };
+
   const handleQuestionaireButtonPress = () => {
     const currentUser = {
       name,
@@ -202,6 +206,7 @@ const UserCard = ({ navigation, route }) => {
   };
 
   const goBack = () => {
+    console.log("Pressed");
     navigation.goBack();
   };
 
@@ -250,12 +255,15 @@ const UserCard = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={goBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>{"< Back"}</Text>
-        </TouchableOpacity>
+        <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Text style={styles.backButtonText}>←</Text>
+          </TouchableOpacity>
         <Text style={styles.name}>{name}</Text>
+        <View style={styles.backButton}></View>
       </View>
-
       <Animated.View
         style={{
           ...styles.profileContainer,
@@ -269,9 +277,15 @@ const UserCard = ({ navigation, route }) => {
           pagingEnabled={true}
         >
           {photos.map((photo, index) => (
+            <TouchableWithoutFeedback
+            key={index}
+            onPress={() => handlePhotoPress(index)}
+            >
             <View key={index}>
               <Image source={{ uri: photo }} style={styles.photo} />
+              
             </View>
+            </TouchableWithoutFeedback>
           ))}
         </ScrollView>
 
@@ -395,8 +409,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 10,
     backgroundColor: "#1D1D20",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     paddingVertical: 5,
+    zIndex: 1,
+  },
+  
+  backButton: {
+    marginRight: 15,
+    paddingLeft: 15,
+    paddingRight: 15,
+  },
+  
+  name: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: 'white',
+    textAlign: 'center',
   },
   questionaireButtonContainer: {
     flex: 1,
@@ -419,21 +447,13 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     paddingTop: 537,
   },
-  backButton: {
-    marginRight: -57,
-    marginLeft: 8,
-  },
+  
   backButtonText: {
-    fontSize: 16,
-    color: "white",
+    fontSize: 30,
+    color: "#149999",
+    zIndex: 1,
   },
-  name: {
-    flex: 1,
-    fontSize: 20,
-    fontWeight: 600,
-    color: "white",
-    textAlign: "center",
-  },
+  
   photoContainer: {
     height: 440,
     marginLeft: 6,
