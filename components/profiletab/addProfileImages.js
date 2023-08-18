@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
   profilePictureContainer: {
     width: 350,
     height: 350,
-    backgroundColor: "#ccc",
+    backgroundColor: "#2B2D2F",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 20,

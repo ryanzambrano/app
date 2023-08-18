@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
   },
 
   inputText: {
-    color: "#6b7280",
+    color: "#fff",
     fontWeight: "500",
   },
 
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     marginTop: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: "lightgrey",
     justifyContent: "space-around",
     gap: "50%",
   },
@@ -401,16 +401,6 @@ const styles = StyleSheet.create({
   },
   picker: {
     flex: 1,
-  },
-
-  pickerDate: {
-    flex: 0,
-    width: "28%",
-  },
-
-  pickerYear: {
-    flex: 0,
-    width: "28%",
   },
 
   bbuttons: {

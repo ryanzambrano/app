@@ -107,12 +107,22 @@ export const AddPrompts = ({ navigation, route }) => {
         value={answers[index]}
         onChangeText={(text) => handleAnswerChange(text, index)}
         placeholder="Answer here..."
+        placeholderTextColor="grey"
       />
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Text style={styles.backButtonText}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerText}>Prompts</Text>
+      </View>
       <FlatList
         data={presetQuestions}
         renderItem={renderItems}
@@ -131,6 +141,25 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#1D1D20", //1D1D20
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  backButton: {
+    marginRight: 15,
+    paddingLeft: 15,
+    paddingRight: 85,
+  },
+  backButtonText: {
+    fontSize: 30,
+    color: "white",
+  },
+  headerText: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "white",
   },
   card: {
     backgroundColor: "#111111",
@@ -152,7 +181,7 @@ const styles = StyleSheet.create({
   question: {
     fontSize: 25,
     fontWeight: 300,
-    color: 'white',
+    color: "white",
     marginBottom: 10,
     fontFamily: "Helvetica",
   },

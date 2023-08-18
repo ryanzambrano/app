@@ -15,13 +15,13 @@ import {
 import { picURL } from "../auth/supabase.js";
 import { AntDesign } from "@expo/vector-icons";
 import { ScrollView } from "react-native";
-import { useNavigation, useRoute,useFocusEffect } from "@react-navigation/native";
+import {
+  useNavigation,
+  useRoute,
+  useFocusEffect,
+} from "@react-navigation/native";
 import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
 import { createClient } from "@supabase/supabase-js";
-/*const supabaseUrl = "https://jaupbyhwvfulpvkfxmgm.supabase.co";
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXBieWh3dmZ1bHB2a2Z4bWdtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY4NDYwMzgzNSwiZXhwIjoyMDAwMTc5ODM1fQ.Jr5Q7WBvMDpFgZ9FOJ1vw71P8gEeVqNaN2S8AfqTRrM";
-const supabase = createClient(supabaseUrl, supabaseKey);*/
 
 const MessagingUI = () => {
   const scrollViewRef = useRef();
@@ -32,7 +32,7 @@ const MessagingUI = () => {
   const [messages, setMessages] = useState([]);
   const { session } = route.params;
   const { user } = route.params;
-  const {editedJoinedGroups} = route.params;
+  const { editedJoinedGroups } = route.params;
   const [joinedGroups, setJoinedGroups] = useState(user.joinedGroups);
 
   const sendMessage = async () => {
@@ -56,30 +56,27 @@ const MessagingUI = () => {
         setMessage("");
       }
       if (messages.length > 1) {
-      setTimeout(() => {
-        //flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
-        flatListRef?.current?.scrollToIndex({
-          animated: true,
-          index: messages.length - 1,
-        });
-      }, 100);
+        setTimeout(() => {
+          //flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
+          flatListRef?.current?.scrollToIndex({
+            animated: true,
+            index: messages.length - 1,
+          });
+        }, 100);
+      }
     }
-    }
-
   };
   useEffect(() => {
-
     if (editedJoinedGroups !== undefined) {
       setJoinedGroups(editedJoinedGroups);
     }
   });
 
-
   const fetchMessages = async () => {
     const { data, error } = await supabase
       .from("Group Chat Messages")
       .select("*")
-      .eq("Group_ID_Sent_To",user.Group_ID)
+      .eq("Group_ID_Sent_To", user.Group_ID)
       .order("created_at", { ascending: false })
       .limit(250);
 
@@ -94,26 +91,26 @@ const MessagingUI = () => {
     fetchMessages();
 
     const channel = supabase
-  .channel("custom-all-channel")
-  .on(
-    "postgres_changes",
-    {
-      event: "*",
-      schema: "public",
-      table: "Group Chat Messages",
-      filter: {
-        "Group_ID_Sent_To": user.Group_ID,
-      },
-    },
-    (payload) => {
-      fetchMessages();
-    }
-  )
-  .subscribe();
+      .channel("custom-all-channel")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "Group Chat Messages",
+          filter: {
+            Group_ID_Sent_To: user.Group_ID,
+          },
+        },
+        (payload) => {
+          fetchMessages();
+        }
+      )
+      .subscribe();
 
-return () => {
-  supabase.removeChannel(channel);
-};
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [session.user.id, messages]);
 
   useEffect(() => {
@@ -151,7 +148,7 @@ return () => {
   const flatListRef = React.useRef();
 
   const navigateToProfile = () => {
-    navigation.navigate("GroupChatScreen", {user});
+    navigation.navigate("GroupChatScreen", { user });
   };
 
   return (
@@ -178,41 +175,41 @@ return () => {
           style={styles.profileContainer}
           onPress={navigateToProfile}
         >
-          {(
+          {
             <Image
               //source={{ uri: `${picURL}/${user_id}/${user_id}-0?${new Date().getTime()}` }}
               style={styles.profilePicture}
             />
-          )}
+          }
         </TouchableOpacity>
       </View>
       <View style={styles.messagesContainer}>
-      <FlatList
-  ref={flatListRef}
-  data={messages}
-  renderItem={({ item }) => (
-    <View
-      style={
-        item.Sent_From === session.user.id
-          ? styles.messageContainerRight
-          : styles.messageContainerLeft
-      }
-    >
-      <Text
-        style={[
-          styles.message,
-          item.Sent_From === session.user.id
-            ? { color: "white" } // Change text color for messages from current user
-            : null, // Use default text color for messages from other user
-        ]}
-      >
-        {item.Message_Content}
-      </Text>
-    </View>
-  )}
-  keyExtractor={(_, index) => index.toString()}
-  contentContainerStyle={styles.messagesContent}
-/>
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          renderItem={({ item }) => (
+            <View
+              style={
+                item.Sent_From === session.user.id
+                  ? styles.messageContainerRight
+                  : styles.messageContainerLeft
+              }
+            >
+              <Text
+                style={[
+                  styles.message,
+                  item.Sent_From === session.user.id
+                    ? { color: "white" } // Change text color for messages from current user
+                    : null, // Use default text color for messages from other user
+                ]}
+              >
+                {item.Message_Content}
+              </Text>
+            </View>
+          )}
+          keyExtractor={(_, index) => index.toString()}
+          contentContainerStyle={styles.messagesContent}
+        />
       </View>
       <View style={styles.inputContainer}>
         <TextInput
@@ -227,7 +224,12 @@ return () => {
             setInputHeight(e.nativeEvent.contentSize.height)
           }
         />
-        <Button title="Send" onPress={sendMessage} color="#159e9e" text = "bold" />
+        <Button
+          title="Send"
+          onPress={sendMessage}
+          color="#159e9e"
+          text="bold"
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -248,7 +250,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 0,
     paddingVertical: 20,
-    
   },
   button: {
     padding: 10,
@@ -258,7 +259,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginLeft: 10,
-    color: 'white',
+    color: "white",
     paddingVertical: 20,
   },
   profileContainer: {
@@ -275,7 +276,6 @@ const styles = StyleSheet.create({
   },
   messagesContainer: {
     flex: 1,
-
   },
   messagesContent: {
     paddingTop: 10,

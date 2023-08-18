@@ -110,7 +110,7 @@ export const Profile = ({ navigation, route }) => {
         .single();
 
       if (error) {
-        alert(error.message);
+        //alert(error.message);
       }
 
       if (data) {
@@ -132,7 +132,9 @@ export const Profile = ({ navigation, route }) => {
 
   handleEditPictures = async () => {
     if (scrollY._value < DISABLE_TOUCHABLE_SCROLL_POINT) {
-      navigation.navigate("AddProfileImages");
+      navigation.navigate("AddProfileImages", {
+        profilePicture: profilePicture,
+      });
     }
   };
 
@@ -195,7 +197,7 @@ export const Profile = ({ navigation, route }) => {
                 onPress={handleEditPictures}
                 disabled={uploading}
               >
-                <Icon name={"plus"} size={40} color={"darkgrey"} />
+                <Icon name={"plus"} size={40} color={"grey"} />
                 {uploading && (
                   <View style={styles.uploadingIndicatorContainer}>
                     <ActivityIndicator size="small" color="#fff" />
@@ -270,7 +272,7 @@ export const Profile = ({ navigation, route }) => {
           </View>
         </ScrollView>
       </View>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 };
@@ -389,7 +391,7 @@ const styles = StyleSheet.create({
     marginTop: "25%",
     width: 250,
     height: 250,
-    backgroundColor: "#ccc",
+    backgroundColor: "#2B2D2D",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 150,

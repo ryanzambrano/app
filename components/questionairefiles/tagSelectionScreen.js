@@ -118,7 +118,7 @@ const TagSelectionScreen = ({ navigation, route }) => {
     ],
   };
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#111111" }}>
       <View style={styles.container}>
         <Text style={styles.title}>Select Your Interests</Text>
         <ScrollView
@@ -127,9 +127,7 @@ const TagSelectionScreen = ({ navigation, route }) => {
         >
           {availableTags.map((tag) => renderTag(tag))}
         </ScrollView>
-        <Text style={styles.selectedTagsText}>
-          Your Interests: {selectedTags.join(", ")}
-        </Text>
+        <Text style={styles.selectedTagsText}>{selectedTags.join(", ")}</Text>
 
         {isError && (
           <Animated.Text
@@ -153,7 +151,7 @@ const TagSelectionScreen = ({ navigation, route }) => {
             </View>
           </TouchableOpacity>
         </View>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
       </View>
     </SafeAreaView>
   );
@@ -171,6 +169,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
     marginTop: "5%",
+    color: "#fff",
   },
   tagContainer: {
     flexDirection: "row",
@@ -179,7 +178,7 @@ const styles = StyleSheet.create({
     //color: "#fff",
   },
   tag: {
-    backgroundColor: "#fff",
+    backgroundColor: "#2B2D2F",
 
     borderRadius: 20,
     paddingVertical: 8,
@@ -192,6 +191,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 16,
+    color: "#fff",
   },
   selectedTagText: {
     fontSize: 16,
@@ -203,6 +203,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: "10%",
     marginTop: "10%",
+    color: "#fff",
   },
   formAction: {
     marginBottom: 20,

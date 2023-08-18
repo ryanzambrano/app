@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   },
 
   inputText: {
-    color: "#6b7280",
+    color: "#fff",
   },
 
   form: {
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     marginTop: "130%",
-    backgroundColor: "#fff",
+    backgroundColor: "lightgrey",
     justifyContent: "space-around",
     gap: "50%",
   },

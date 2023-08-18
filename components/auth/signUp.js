@@ -206,7 +206,7 @@ export const SignUp = ({ navigation }) => {
           </View>
         )}
       </TouchableWithoutFeedback>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 };

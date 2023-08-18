@@ -1,6 +1,6 @@
 import "react-native-url-polyfill/auto";
 import React, { useState, useRef } from "react";
-
+import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
@@ -56,7 +56,7 @@ export const Name = ({ navigation, route }) => {
         } else {
           navigation.navigate("Username");
         }
-      } else setIsError("Enter a Username");
+      } else setIsError("Enter a valid name");
     }
   };
 
@@ -141,6 +141,7 @@ export const Name = ({ navigation, route }) => {
           </View>
         </View>
       </TouchableWithoutFeedback>
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 };
@@ -149,11 +150,11 @@ const styles = StyleSheet.create({
   container: {
     padding: 24,
     flex: 1,
-    backgroundColor: '#111111',
+    backgroundColor: "#111111",
   },
 
   header: {
-    backgroundColor: '#111111',
+    backgroundColor: "#111111",
     marginVertical: 36,
   },
 

@@ -16,6 +16,7 @@ import TagSelectionEdit from "../profiletab/TagSelectionEdit";
 import FiltersUI from "../hometab/filters.js";
 import GroupChatScreen from "../contactstab/otherprofile";
 import { QuestionaireAnswers } from "../hometab/questionaireAnswers";
+import Questionaire from "../questionairefiles/questionaire";
 
 const Stack = createStackNavigator(); // Initialize stack navigator
 
@@ -88,15 +89,17 @@ const ThreeMainPages = ({ route }) => {
           initialParams={{ session }}
           options={{ presentation: "modal" }}
         />
-          <Stack.Screen
-          name="GroupChatScreen"
-          component={GroupChatScreen}
-        />
+        <Stack.Screen name="GroupChatScreen" component={GroupChatScreen} />
         <Stack.Screen
           name="QuestionaireAnswers"
           component={QuestionaireAnswers}
           initialParams={{ session }}
-          />
+        />
+        <Stack.Screen
+          name="questionaire"
+          component={Questionaire}
+          initialParams={{ session }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

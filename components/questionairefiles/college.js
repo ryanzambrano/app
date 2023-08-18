@@ -12,6 +12,7 @@ import {
 import { colleges } from "../auth/collegesList.js";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
+import { StatusBar } from "expo-status-bar";
 
 export const Colleges = ({ navigation, route }) => {
   const { session } = route.params;
@@ -82,7 +83,7 @@ export const Colleges = ({ navigation, route }) => {
         <TextInput
           style={styles.inputControl}
           placeholder="Enter your college..."
-          placeholderTextColor={'grey'}
+          placeholderTextColor={"grey"}
           onChangeText={(text) => setSearchQuery(text)}
           value={searchQuery}
         />

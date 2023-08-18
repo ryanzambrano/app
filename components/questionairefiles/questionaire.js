@@ -1,7 +1,7 @@
 import "react-native-url-polyfill/auto";
 import React, { useEffect, useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-
+import { StatusBar } from "expo-status-bar";
 import Questionaire1 from "./questionaire1.js";
 import Questionaire2 from "./questionaire2.js";
 import Questionaire3 from "./questionaire3.js";

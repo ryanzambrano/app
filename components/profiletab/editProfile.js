@@ -26,7 +26,9 @@ export const EditProfileScreen = ({ navigation, route }) => {
   const { updated } = route.params;
   const selectedTags = route.params.selectedTags;
   //alert(updated);
-  const [profilePicture, setProfilePicture] = useState(null);
+  const [profilePicture, setProfilePicture] = useState(
+    route.params.profilePicture
+  );
   const [uploading, setUploading] = useState(false);
   const [prompts, setPrompts] = useState(route.params.prompts);
   const isFocused = useIsFocused();
@@ -78,7 +80,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
         .single();
 
       if (error) {
-        alert(error.message);
+        //alert(error.message);
       }
 
       if (data) {
@@ -284,7 +286,9 @@ export const EditProfileScreen = ({ navigation, route }) => {
                         navigation.navigate("TagSelectionEdit", { editedUser })
                       }
                     >
-                      <Text style={{ color: "white", fontWeight: 500 }}>{tag}</Text>
+                      <Text style={{ color: "white", fontWeight: 500 }}>
+                        {tag}
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -302,6 +306,22 @@ export const EditProfileScreen = ({ navigation, route }) => {
             >
               <Text style={{ color: "white" }}>Edit prompts</Text>
             </TouchableOpacity>
+
+            <View style={styles.questionaireInputContainer}>
+              <Text style={styles.more}>Questionaire Answers</Text>
+              <TouchableOpacity
+                style={styles.questionaireButton}
+                onPress={() =>
+                  navigation.navigate("questionaire", {
+                    screen: "Questionaire1",
+                  })
+                }
+              >
+                <Text style={{ color: "white", fontSize: 16, fontWeight: 500 }}>
+                  Edit your Answers
+                </Text>
+              </TouchableOpacity>
+            </View>
           </>
         }
       />
@@ -326,7 +346,38 @@ const styles = StyleSheet.create({
     color: "white",
     marginBottom: 10,
   },
+
   inputContainer: {
+    flexDirection: "column",
+    borderBottomColor: "grey",
+    borderBottomWidth: 0.3,
+    marginLeft: 20,
+    marginBottom: 10,
+    gap: 5,
+  },
+
+  questionaireInputContainer: {
+    flexDirection: "column",
+    borderTopColor: "grey",
+    borderTopWidth: 0.3,
+    marginHorizontal: 10,
+    marginTop: 10,
+    paddingTop: 10,
+    marginBottom: 10,
+    gap: 5,
+  },
+
+  questionaireButton: {
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 15,
+    gap: 10,
+    borderWidth: 1,
+    backgroundColor: "#14999999",
+    alignItems: "center",
+  },
+  Container: {
     flexDirection: "column",
     borderBottomColor: "grey",
     borderBottomWidth: 0.3,
@@ -379,7 +430,7 @@ const styles = StyleSheet.create({
   tag: {
     backgroundColor: "#14999999",
     borderRadius: 20,
-    borderColor: "white",
+
     paddingHorizontal: 10,
     paddingVertical: 5,
     margin: 5,
@@ -388,12 +439,12 @@ const styles = StyleSheet.create({
   tagsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    borderBottomColor: "lightgrey",
+    borderBottomColor: "grey",
     borderRadius: 15,
     justifyContent: "center",
     paddingBottom: 10,
     marginBottom: 10,
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.4,
   },
   profilePictureContainer: {
     margin: 50,

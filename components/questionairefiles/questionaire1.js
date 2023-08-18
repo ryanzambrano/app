@@ -306,7 +306,7 @@ export const Questionaire1 = ({ navigation, route }) => {
           </View>
         </View>
       </TouchableWithoutFeedback>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 };
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
   },
 
   inputText: {
-    color: "#6b7280",
+    color: "white",
     fontWeight: "500",
   },
 
@@ -406,7 +406,8 @@ const styles = StyleSheet.create({
   modalContainerGender: {
     flex: 1,
     marginTop: "130%",
-    backgroundColor: "#111111",
+    backgroundColor: "lightgrey",
+
     justifyContent: "space-around",
     gap: "50%",
   },

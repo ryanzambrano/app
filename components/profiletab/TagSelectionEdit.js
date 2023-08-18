@@ -124,9 +124,7 @@ const TagSelectionEdit = ({ navigation, route }) => {
         >
           {availableTags.map((tag) => renderTag(tag))}
         </ScrollView>
-        <Text style={styles.selectedTagsText}>
-          Your Interests: {selectedTags.join(", ")}
-        </Text>
+        <Text style={styles.selectedTagsText}>{selectedTags.join(",   ")}</Text>
 
         {isError && (
           <Animated.Text
@@ -154,7 +152,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: 'white',
+    color: "white",
     marginBottom: "10%",
     marginTop: "5%",
   },
@@ -162,14 +160,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
-    
+
     //color: "#fff",
   },
   tag: {
     backgroundColor: "#1D1D20",
 
     borderRadius: 20,
-   
+
     borderColor: "white",
     paddingVertical: 8,
     paddingHorizontal: 16,
@@ -181,7 +179,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 16,
-    color: 'white',
+    color: "white",
     fontWeight: 500,
   },
   selectedTagText: {
@@ -194,7 +192,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     fontSize: 18,
     fontWeight: "bold",
-    color: 'lightgrey',
+    color: "#14999999",
     marginBottom: "10%",
   },
   formAction: {

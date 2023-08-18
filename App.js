@@ -115,6 +115,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     justifySelf: "center",
+    backgroundColor: "#111111",
+    width: "100%",
   },
   headerImage: {
     width: 90,

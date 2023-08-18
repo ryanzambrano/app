@@ -11,16 +11,14 @@ import {
   SafeAreaView,
   Alert,
 } from "react-native";
-
-import FiltersUI from "./filters.js";
 import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase.js"; // we have our client here!!! no need to worry about creating it again
 import { picURL } from "../auth/supabase.js"; // This is the base url of the photos bucket that is in our Supabase project. It makes referencing user pictures easier
 import { useNavigation } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/FontAwesome";
 
-const isBookmarkedURI =
-  "https://th.bing.com/th/id/OIP.Pzc03rRYlwOdKsolfgcwogHaJQ?pid=ImgDet&rs=1";
-const notBookmarkedURI = "https://i.pngimg.me/thumb/f/720/m2H7m2K9Z5i8Z5d3.jpg";
+const isBookmarkedColor = "#14999999";
+const notBookmarkedColor = "#fff";
 
 const Home = ({ route }) => {
   const { session, housingPreference } = route.params;
@@ -203,20 +201,6 @@ const Home = ({ route }) => {
       fetchUsers();
     }
 
-    /*const channel = supabase
-      .channel("custom-all-channel")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "UGC" },
-        (payload) => {
-          fetchUsers();
-        }
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
-    };*/
-
     if (isBookmarked) {
       fetchUsers();
     }
@@ -242,6 +226,7 @@ const Home = ({ route }) => {
               {" "}
               {item.name}, {item.age}{" "}
             </Text>
+            <Text style={styles.major}> {item.major}</Text>
             <View style={styles.tagsContainer}>
               {item.tags.map((tag, index) => (
                 <View key={index} style={styles.tag}>
@@ -258,40 +243,30 @@ const Home = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Image
-          style={styles.logo}
-          source={{
-            uri: "https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg",
-          }}
-        />
-        <Text style={styles.headerText}> Cabana </Text>
-
-        <TouchableOpacity onPress={handleFiltersPress}>
+        <View style={styles.logoContainer}>
           <Image
-            style={{
-              marginLeft: 167,
-              marginTop: -14,
-              marginBottom: -7,
-              height: 40,
-              width: 40,
-            }}
+            style={styles.logo}
             source={{
-              uri: "https://icon-library.com/images/filter-icon-png/filter-icon-png-17.jpg",
+              uri: "https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg",
             }}
-          ></Image>
-        </TouchableOpacity>
+          />
+        </View>
+        <View style={styles.titleContainer}>
+          <Text style={styles.headerText}> Cabana </Text>
+        </View>
+        <View style={styles.thing}>
+          <TouchableOpacity onPress={handleFiltersPress}>
+            <Icon name="sliders" size={30} color="#fff" />
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={toggleBookmarkButton}>
-          <Image
-            style={{
-              marginLeft: isBookmarked ? 4 : 5,
-              marginTop: -10,
-              height: isBookmarked ? 26 : 28,
-              width: isBookmarked ? 22.5 : 21,
-            }}
-            source={{ uri: isBookmarked ? isBookmarkedURI : notBookmarkedURI }}
-          ></Image>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={toggleBookmarkButton}>
+            <Icon
+              name="bookmark"
+              size={30}
+              color={isBookmarked ? isBookmarkedColor : notBookmarkedColor}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.viewContainer}>
@@ -343,6 +318,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1D1D20",
   },
+  titleContainer: {
+    alignItems: "center",
+    textAlign: "center",
+    marginRight: -20,
+  },
+
+  logoContainer: {
+    alignItems: "flex-start",
+  },
+
+  thing: {
+    gap: 10,
+    flexDirection: "row",
+    alignItems: "flex-end",
+  },
 
   header: {
     flexDirection: "row",
@@ -363,15 +353,14 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: "white",
     fontWeight: 600,
-    marginTop: -10,
-    marginRight: -5,
+    textAlign: "center",
   },
 
   logo: {
     width: 30,
     height: 30,
-    marginRight: 5,
-    marginTop: -10,
+    //marginRight: 5,
+    //marginTop: 10,
   },
 
   searchContainer: {
@@ -421,7 +410,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 7,
     paddingLeft: 10,
     // paddingVertical: 10,
-    height: 165,
+    height: 185,
     marginTop: 3,
     marginBottom: 7,
     borderWidth: 0.2,
@@ -438,15 +427,23 @@ const styles = StyleSheet.create({
     borderColor: "grey",
   },
 
+  major: {
+    fontSize: 16,
+    fontWeight: 500,
+    paddingTop: 5,
+    color: "grey",
+    //textAlign: "justify",
+  },
+
   name: {
     fontSize: 18,
     fontWeight: 600,
     paddingTop: 10,
     color: "white",
     zIndex: 1,
-    top: -60,
-    marginTop: 30,
-    textAlign: "justify",
+    //top: 60,
+    //marginTop: 30,
+    //textAlign: "justify",
   },
 
   bio: {
@@ -462,9 +459,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 15,
     maxHeight: 90,
-    position: "absolute",
+    //position: "absolute",
     overflow: "hidden",
-    marginTop: 0,
+    marginBottom: 10,
     justifyContent: "left",
   },
   tag: {
@@ -474,8 +471,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 7,
     padding: 4,
     margin: 2,
-    borderWidth: 1,
-    borderColor: "#2B2D2F",
   },
   tagText: {
     fontSize: 12,
