@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   settingRow: {
     flexDirection: "column",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingVertical: 10,
     borderBottomWidth: 0.3,
     borderBottomColor: "#ccc",

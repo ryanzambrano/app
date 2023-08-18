@@ -12,6 +12,7 @@ const TabNavigator = ({ route }) => {
   const { session } = route.params;
   return (
     <Tab.Navigator
+      initialRouteName="Home"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
@@ -23,6 +24,7 @@ const TabNavigator = ({ route }) => {
         },
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
+
           if (route.name === "Contacts") {
             // Based on where the user clicks, it highlights the icon to clarify what page they are on
             iconName = focused ? "comment" : "comment"; // Set the icons for the 'Messages

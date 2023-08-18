@@ -37,6 +37,8 @@ export const Profile = ({ navigation, route }) => {
     favorite_movies: "What are your favorite movies?",
   };
 
+  const hasValidItems = prompts.some((item) => item.answer);
+
   const scrollY = new Animated.Value(0);
 
   const profileOpacity = scrollY.interpolate({
@@ -242,23 +244,29 @@ export const Profile = ({ navigation, route }) => {
                 <Text style={styles.bioText}>{editedUser.bio}</Text>
               </View>
             </View>
+            <View
+              style={{
+                borderBottomWidth: hasValidItems ? 0.3 : 0,
+                borderBottomColor: "grey",
 
-            <ScrollView
-              horizontal
-              style={styles.horizontalScrollView}
-              showsHorizontalScrollIndicator={false}
+                borderBottomEndRadius: 20,
+                borderBottomStartRadius: 20,
+              }}
             >
-              {prompts.map((item, index) =>
-                item.answer ? (
-                  <View key={index} style={styles.itemContainer}>
-                    <Text style={styles.itemPrompt}>
-                      {promptQuestions[item.prompt]}
-                    </Text>
-                    <Text style={styles.itemAnswer}>{item.answer}</Text>
-                  </View>
-                ) : null
-              )}
-            </ScrollView>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {prompts.map((item, index) =>
+                  item.answer ? (
+                    <View key={index} style={styles.itemContainer}>
+                      <Text style={styles.itemPrompt}>
+                        {promptQuestions[item.prompt]}
+                      </Text>
+                      <Text style={styles.itemAnswer}>{item.answer}</Text>
+                    </View>
+                  ) : null
+                )}
+              </ScrollView>
+            </View>
+
             <Text style={styles.promptsHeader}>Interests</Text>
             {editedUser.tags && editedUser.tags.length > 0 && (
               <View style={styles.tagsContainer}>
@@ -509,16 +517,8 @@ const styles = StyleSheet.create({
     backgroundColor: "lightblue",
   },
 
-  horizontalScrollView: {
-    paddingTop: 20,
-    marginBottom: 5,
-    borderBottomColor: "grey",
-    paddingBottom: 20,
-    borderBottomWidth: 0.3,
-    borderBottomEndRadius: 20,
-    borderBottomStartRadius: 20,
-  },
   itemContainer: {
+    borderBottomWidth: 0.3,
     marginHorizontal: 15,
     borderWidth: 0.5,
     //borderColor: "grey",
@@ -529,7 +529,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
     minWidth: 150,
     gap: 10,
-    marginBottom: 20,
+    marginTop: 30,
+    marginBottom: 30,
   },
   itemPrompt: {
     fontSize: 15,

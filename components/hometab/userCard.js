@@ -77,10 +77,6 @@ const UserCard = ({ navigation, route }) => {
     favorite_movies: "What are your favorite movies?",
   };
 
-  const handlePhotoPress = (index) => {
-    setSelectedPhotoIndex(index);
-  };
-
   const handleModalClose = () => {
     setSelectedPhotoIndex(null);
   };
@@ -90,25 +86,25 @@ const UserCard = ({ navigation, route }) => {
       setSelectedPhotoIndex(null);
     }
   };
-  
+
   const handleQuestionaireButtonPress = () => {
     const currentUser = {
-        name,
-        tags,
-        bio,
-        major,
-        user_id,
-        age,
-        gender,
-        living_preferences,
-        for_fun,
-        class_year,
-        hometown,
-        bookmarked_profiles,
-        lastModified,
+      name,
+      tags,
+      bio,
+      major,
+      user_id,
+      age,
+      gender,
+      living_preferences,
+      for_fun,
+      class_year,
+      hometown,
+      bookmarked_profiles,
+      lastModified,
     };
-    navigation.navigate('QuestionaireAnswers', { currentUser });
-};
+    navigation.navigate("QuestionaireAnswers", { currentUser });
+  };
 
   useEffect(() => {
     const fetchBookmarkedProfiles = async () => {
@@ -273,12 +269,9 @@ const UserCard = ({ navigation, route }) => {
           pagingEnabled={true}
         >
           {photos.map((photo, index) => (
-            <TouchableWithoutFeedback
-              key={index}
-              onPress={() => handlePhotoPress(index)}
-            >
+            <View key={index}>
               <Image source={{ uri: photo }} style={styles.photo} />
-            </TouchableWithoutFeedback>
+            </View>
           ))}
         </ScrollView>
 
@@ -310,10 +303,6 @@ const UserCard = ({ navigation, route }) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.tab}>
-          <TouchableOpacity style={styles.questionaireButtonContainer} onPress={() => handleQuestionaireButtonPress()}>
-            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 17, }}> View Questionaire Responses</Text>
-          </TouchableOpacity>
-
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
               style={[styles.friendButton, { backgroundColor: buttonColor }]}
@@ -331,7 +320,7 @@ const UserCard = ({ navigation, route }) => {
               <Text style={styles.chatButtonText}>Message</Text>
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.bioContainer}>
             <Text style={styles.bio}>Graduating Class: {class_year}</Text>
           </View>
@@ -355,6 +344,15 @@ const UserCard = ({ navigation, route }) => {
               {living_preferences}
             </Text>
           </View>
+          <TouchableOpacity
+            style={styles.questionaireButtonContainer}
+            onPress={() => handleQuestionaireButtonPress()}
+          >
+            <Text style={{ color: "white", fontWeight: "bold", fontSize: 17 }}>
+              {" "}
+              View Questionaire Responses
+            </Text>
+          </TouchableOpacity>
           <ScrollView
             horizontal
             style={styles.horizontalScrollView}
@@ -403,10 +401,10 @@ const styles = StyleSheet.create({
   questionaireButtonContainer: {
     flex: 1,
     marginHorizontal: 10,
-    backgroundColor: "#14999999",
+    backgroundColor: "#2B2D2F",
     paddingVertical: 10,
     borderRadius: 15,
-    marginBottom: 10,
+    //marginBottom: 10,
     borderWidth: 0.4,
     alignItems: "center",
   },
@@ -433,7 +431,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 20,
     fontWeight: 600,
-    color: 'white',
+    color: "white",
     textAlign: "center",
   },
   photoContainer: {
@@ -444,7 +442,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
     borderRadius: 15,
     borderWidth: 0.7,
-   // borderColor: "grey",
+    // borderColor: "grey",
   },
   photo: {
     width: Dimensions.get("window").width - 12,
@@ -492,7 +490,7 @@ const styles = StyleSheet.create({
     marginRight: 3,
     borderWidth: 0.4,
     marginLeft: 10,
-   // borderColor: "grey",
+    // borderColor: "grey",
   },
   friendButtonText: {
     color: "white",
@@ -564,7 +562,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     borderRadius: 15,
     justifyContent: "center",
-   // borderWidth: 0.4,
+    // borderWidth: 0.4,
     //borderColor: "grey",
     marginRight: 10,
     marginLeft: 10,
@@ -584,34 +582,29 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   horizontalScrollView: {
-    paddingTop: 20,
-    marginBottom: 5,
-   // borderBottomColor: "lightgrey",
-    paddingBottom: 20,
-    //borderBottomWidth: 1,
     borderBottomEndRadius: 20,
     borderBottomStartRadius: 20,
   },
   itemContainer: {
     marginHorizontal: 15,
-    backgroundColor: '#1D1D20',
+    backgroundColor: "#1D1D20",
     borderWidth: 0.5,
     //borderColor: "lightgrey",
     borderRadius: 50,
     padding: 30,
     width: 300,
-    marginRight: 10,
+    marginVertical: 15,
     minWidth: 150,
     gap: 10,
   },
   itemPrompt: {
     fontSize: 15,
-    color: 'white',
+    color: "white",
     marginBottom: 5,
   },
   itemAnswer: {
     fontWeight: "bold",
-    color: 'white',
+    color: "white",
     fontSize: 20,
   },
 });

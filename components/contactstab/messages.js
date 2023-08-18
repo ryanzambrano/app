@@ -20,8 +20,7 @@ import {
   useRoute,
   useFocusEffect,
 } from "@react-navigation/native";
-import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../auth/supabase";
 
 const MessagingUI = () => {
   const [selectedPerson, setSelectedPerson] = useState(null);
