@@ -17,6 +17,7 @@ import { supabase } from "../auth/supabase.js";
 import { StatusBar } from "expo-status-bar";
 import { picURL } from "../auth/supabase.js";
 import Icon from "react-native-vector-icons/FontAwesome";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 export const Profile = ({ navigation, route }) => {
   const { updated, session } = route.params;
@@ -227,9 +228,9 @@ export const Profile = ({ navigation, route }) => {
 
               <View style={styles.major}>
                 <View style={styles.icons}>
-                  <Icon name="graduation-cap" size={30} color="#14999999" />
-                  <Icon name="book" size={30} color="#14999999" />
-                  <Icon name="home" size={30} color="#14999999" />
+                  <Ionicons name="calendar" color="grey" size={22}></Ionicons>
+                  <Ionicons name="book" color="grey" size={22}></Ionicons>
+                  <Ionicons name="home" color="grey" size={22}></Ionicons>
                 </View>
                 <View style={styles.details}>
                   <Text style={styles.text}>{editedUser.class_year}</Text>
@@ -489,7 +490,7 @@ const styles = StyleSheet.create({
   icons: {
     alignContent: "center",
     alignItems: "center",
-    gap: 10,
+    gap: 17,
   },
   details: {
     alignItems: "left",

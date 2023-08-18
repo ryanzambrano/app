@@ -1,6 +1,7 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"; // Package that allows for a bottom tab navigator
-import Icon from "react-native-vector-icons/FontAwesome"; // Package that introduces icons
+import FontAwesome from "react-native-vector-icons/FontAwesome"; 
+import Ionicons from "react-native-vector-icons/Ionicons";
 import View from "react-native";
 import ContactsUI from "../contactstab/contacts"; // Imports for use in Tab Navigator
 import Home from "../hometab/home";
@@ -23,24 +24,13 @@ const TabNavigator = ({ route }) => {
           borderTopWidth: 0,
         },
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
           if (route.name === "Contacts") {
-            // Based on where the user clicks, it highlights the icon to clarify what page they are on
-            iconName = focused ? "comment" : "comment"; // Set the icons for the 'Messages
+            return <Ionicons name="mail-unread-outline" size={size} color={focused ? "white" : "grey"} />;
           } else if (route.name === "Home") {
-            iconName = focused ? "home" : "home"; // Set the icons for the 'Home' screen
+            return <Ionicons name="home-outline" size={size} color={focused ? "white" : "grey"} />;
           } else if (route.name === "Profile") {
-            iconName = focused ? "user" : "user"; // Set the icons for the 'Profile' screen
+            return <Ionicons name="person-circle-sharp" size={size} color={focused ? "white" : "grey"} />;
           }
-
-          return (
-            <Icon
-              name={iconName}
-              size={size}
-              color={focused ? "white" : "grey"}
-            />
-          );
         },
         tabBarLabel: () => null, // Removes the labels
       })}

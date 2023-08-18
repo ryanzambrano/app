@@ -462,6 +462,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 15,
     maxHeight: 90,
+    paddingRight: 5,
     //position: "absolute",
     overflow: "hidden",
     marginBottom: 10,
