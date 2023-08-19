@@ -147,7 +147,10 @@ const Home = ({ route }) => {
   
     if (isBookmarked) {
       return (
-        bookmarkedProfiles.includes(user.user_id) && (nameMatch || tagMatch)
+        bookmarkedProfiles.includes(user.user_id) && ((nameMatch || tagMatch) && 
+        (isHousingMatch || housingPreference === "Any") &&
+        (isGenderMatch || genderPreference === "Any") &&
+        (isAgeMatch || (youngestAgePreference === "Any" && oldestAgePreference === "Any")))
       );
     }
     
