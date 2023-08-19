@@ -40,7 +40,12 @@ const Home = ({ route }) => {
   
 
   const handleFiltersPress = () => {
-    navigation.navigate("Filters");
+    navigation.navigate("Filters", {
+      currentHousingPreference: housingPreference,
+      currentGenderPreference: genderPreference,
+      currentYoungestAgePreference: youngestAgePreference,
+      currentOldestAgePreference: oldestAgePreference,
+    });
   };
 
   const toggleBookmarkButton = () => {

@@ -12,13 +12,20 @@ import { supabase } from "../auth/supabase";
 
 const FiltersUI = ({ route }) => {
   const { session } = route.params;
-
   const navigation = useNavigation();
-  const [housingPreference, setHousingPreference] = useState("Any");
-  const [genderPreference, setGenderPreference] = useState("Any");
-  const [youngestAgePreference, setYoungestAgePreference] = useState("Any");
-  const [oldestAgePreference, setOldestAgePreference] = useState("Any");
-  const [studyPreference, setStudyPreference] = useState("Any");
+
+  const {
+    currentHousingPreference,
+    currentGenderPreference,
+    currentYoungestAgePreference,
+    currentOldestAgePreference,
+    currentStudyPreference
+  } = route.params;
+  const [housingPreference, setHousingPreference] = useState(currentHousingPreference || "Any");
+  const [genderPreference, setGenderPreference] = useState(currentGenderPreference || "Any");
+  const [youngestAgePreference, setYoungestAgePreference] = useState(currentYoungestAgePreference || "Any");
+  const [oldestAgePreference, setOldestAgePreference] = useState(currentOldestAgePreference || "Any");
+  const [studyPreference, setStudyPreference] = useState(currentStudyPreference || "Any");
   const [isFocus, setIsFocus] = useState(false);
 
   const roomOptions = [
@@ -54,13 +61,6 @@ const FiltersUI = ({ route }) => {
   ];
 
   const handleApplyFilters = () => {
-    console.log(
-      housingPreference,
-      genderPreference,
-      youngestAgePreference,
-      oldestAgePreference,
-      studyPreference
-    );
     navigation.navigate("Home", {
       housingPreference,
       genderPreference,
@@ -70,9 +70,23 @@ const FiltersUI = ({ route }) => {
     });
   };
 
+  const resetFilters = () => {
+    setHousingPreference("Any");
+    setGenderPreference("Any");
+    setYoungestAgePreference("Any");
+    setOldestAgePreference("Any");
+    setStudyPreference("Any");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.headerText}>Filters</Text>
+      <View style={styles.headerContainer}>
+        <View style={{ width: '33%' }}></View>
+        <Text style={styles.headerText}>Filters</Text>
+        <TouchableOpacity onPress={resetFilters} style={{ width: '33%', alignItems: 'flex-end' }}>
+          <Text style={styles.clearAllText}>Clear All</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.filterContainer}>
         <Text style={styles.filterLabel}>Housing Preference:</Text>
         <Dropdown
@@ -185,13 +199,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1D1D20",
   },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    //borderBottomWidth: 0.5,
+    borderColor: 'grey'
+  },
   headerText: {
     fontSize: 25,
-    fontWeight: "bold",
-    marginTop: 10,
-    padding: 15,
+    fontWeight: 'bold',
     color: 'white',
     alignSelf: "center",
+    width: '33%',
+    textAlign: 'center'
+  },
+  clearAllText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: 'grey' 
   },
   filterContainer: {
     flexDirection: "row",
@@ -216,7 +242,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     
   },
-  
   divider: {
     height: 0.5,
     marginRight: 20,
