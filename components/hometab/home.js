@@ -51,6 +51,12 @@ const Home = ({ route }) => {
     setSearchQuery(text);
   };
 
+  const renderEmptyComponent = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>No users found</Text>
+    </View>
+  );
+  
   const showSortMenu = () => {
     Alert.alert(
       "Sort Options",
@@ -328,6 +334,7 @@ const Home = ({ route }) => {
               </View>
             </>
           )}
+          ListEmptyComponent={renderEmptyComponent}
         />
       </View>
     </SafeAreaView>
@@ -522,6 +529,16 @@ const styles = StyleSheet.create({
     color: "lightgrey",
     fontWeight: "500",
     // textDecorationLine: "underline",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 140, 
+  },
+  emptyText: {
+    fontSize: 20,
+    color: 'grey',
   },
 });
 
