@@ -292,10 +292,11 @@ const ContactsUI = ({ route }) => {
       </View>
       <View style={styles.viewContainer}>
         <View style={styles.searchContainer}>
+          <AntDesign name="search1" size={15} color="#575D61" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search Messages"
-            placeholderTextColor="grey"
+            placeholder=" Search Messages"
+            placeholderTextColor="#575D61"
             onChangeText={handleSearch}
             value={searchQuery}
           />

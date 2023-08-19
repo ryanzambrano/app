@@ -444,6 +444,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingBottom: 10,
     marginBottom: 10,
+    paddingHorizontal: 15,
     borderBottomWidth: 0.4,
   },
   profilePictureContainer: {

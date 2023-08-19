@@ -459,6 +459,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     paddingVertical: 20,
     paddingHorizontal: 15,
+    marginHorizontal: 5,
     backgroundColor: "#111111",
     borderRadius: 15,
     justifyContent: "center",

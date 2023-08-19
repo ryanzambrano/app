@@ -12,6 +12,7 @@ import {
   Alert,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
+import { AntDesign } from "@expo/vector-icons";
 import { supabase } from "../auth/supabase.js"; // we have our client here!!! no need to worry about creating it again
 import { picURL } from "../auth/supabase.js"; // This is the base url of the photos bucket that is in our Supabase project. It makes referencing user pictures easier
 import { useNavigation } from "@react-navigation/native";
@@ -311,9 +312,10 @@ const Home = ({ route }) => {
 
       <View style={styles.viewContainer}>
         <View style={styles.searchContainer}>
+          <AntDesign name="search1" size={15} color="#575D61" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search by name or tag"
+            placeholder=" Search by name or tag"
             placeholderTextColor={"#575D61"}
             onChangeText={handleSearch}
             value={searchQuery}
