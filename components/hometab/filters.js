@@ -43,14 +43,14 @@ const FiltersUI = ({ route }) => {
   ];
 
   const studies = [
-    "Business",
-    "Natural Science",
-    "Social Science",
-    "Mathematics",
-    "Engineering",
-    "Art",
-    "Exploratory",
-    "Other",
+    { label: 'Any', value: 'Any' },
+    { label: "Business", value: "Business" }, 
+    { label: "Natural Science", value: "Natural Science" },
+    { label: "Mathematics", value: "Mathematics" },
+    { label: "Social Science", value: "Social Science" },
+    { label: "Engineering", value: "Engineering" },
+    { label: "Arts", value: "Art" },
+    { label: "Exploratory", value: "Exploratory" },
   ];
 
   const handleApplyFilters = () => {
@@ -61,7 +61,13 @@ const FiltersUI = ({ route }) => {
       oldestAgePreference,
       studyPreference
     );
-    navigation.navigate("Home", {});
+    navigation.navigate("Home", {
+      housingPreference,
+      genderPreference,
+      youngestAgePreference,
+      oldestAgePreference,
+      //studyPreference
+    });
   };
 
   return (
@@ -74,14 +80,14 @@ const FiltersUI = ({ route }) => {
           data={roomOptions}
           maxHeight={300}
           labelField="label"
-
+          placeholderStyle={{ backgroundColor: "white"}}
           valueField="value"
           placeholder="Select Housing Preference"
           searchPlaceholder="Search..."
           value={housingPreference}
           onFocus={() => setIsFocus(true)}
           onBlur={() => setIsFocus(false)}
-          onChange={(item) => {d
+          onChange={(item) => {
             setHousingPreference(item.value);
             setIsFocus(false);
           }}
@@ -152,7 +158,7 @@ const FiltersUI = ({ route }) => {
         <Text style={styles.filterLabel}>Area of Study:</Text>
         <Dropdown
           style={styles.dropdown}
-          data={ages}
+          data={studies}
           maxHeight={300}
           labelField="label"
           valueField="value"
@@ -195,18 +201,22 @@ const styles = StyleSheet.create({
   },
   filterLabel: {
     fontSize: 16,
+    fontWeight: "500",
     color: "white",
     marginRight: 8,
   },
   dropdown: {
     flex: 1,
     borderColor: "gray",
-    borderWidth: 0.5,
+    //borderWidth: 0.5,
     borderRadius: 8,
     color: "white",
     paddingHorizontal: 8,
     borderRadius: 8,
+    backgroundColor: "white",
+    
   },
+  
   divider: {
     height: 0.5,
     marginRight: 20,

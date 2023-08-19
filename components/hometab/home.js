@@ -21,7 +21,7 @@ const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
 
 const Home = ({ route }) => {
-  const { session, housingPreference } = route.params;
+  const { session  } = route.params;
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [sessionUser, setSessionuser] = useState(session.user);
@@ -31,6 +31,13 @@ const Home = ({ route }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkedProfiles, setBookmarkedProfiles] = useState([]);
   const isFocused = useIsFocused();
+  const { 
+    housingPreference = "Any",
+    genderPreference = "Any",
+    youngestAgePreference = "Any",
+    oldestAgePreference = "Any",
+  } = route.params || {};
+  
 
   const handleFiltersPress = () => {
     navigation.navigate("Filters");
@@ -71,15 +78,20 @@ const Home = ({ route }) => {
     //console.log(sessionUser.for_fun, otherUser.for_fun);
     if (Array.isArray(sessionUser.tags) && Array.isArray(otherUser.tags)) {
       sessionUser.tags.forEach((tag) => {
-        if (otherUser.tags.includes(tag)) score += 12;
+        if (otherUser.tags.includes(tag)) score += 4;
       });
     }
-    if (sessionUser.for_fun === otherUser.for_fun) score += 15;
-    if (sessionUser.living_preferences === otherUser.living_preferences)
-      score += 15;
-    if (sessionUser.gender === otherUser.gender) score += 1;
-    if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 1;
+    if (sessionUser.for_fun === otherUser.for_fun) score += 5;
+    if (sessionUser.living_preferences === otherUser.living_preferences) score += 5;
+    if (sessionUser.studies === otherUser.studies) score += 3;
+    //if (sessionUser.tidiness === otherUser.tidiness) score += 3;
+    //console.log(otherUser.tidiness);
+    //if (sessionUser.noise_preference === otherUser.noise_preference) score += 3;
+    //if (sessionUser.sleep_time === otherUser.sleep_time) score += 3;
+    if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 2;
     if (sessionUser.class_year === otherUser.class_year) score += 2;
+   // if (sessionUser.gender === otherUser.gender) score += 1;
+    
 
     return score;
   };
@@ -113,16 +125,32 @@ const Home = ({ route }) => {
     const tagMatch = user.tags.some((tag) =>
       tag.toLowerCase().includes(searchQuery.toLowerCase())
     );
+    console.log(user.living_preferences);
+   // console.log(housingPreference);
+    const isHousingMatch = housingPreference === "Any" || user.living_preferences === housingPreference;
+    //console.log(isHousingMatch);
+    const isGenderMatch = genderPreference === "Any" || user.gender === genderPreference;
+    const isAgeMatch =
+      (youngestAgePreference === "Any" || user.age >= youngestAgePreference) &&
+      (oldestAgePreference === "Any" || user.age <= oldestAgePreference);
+    //const isStudyMatch = studyPreference === "Any" || user.studies === studyPreference;
+  
     if (isSessionUser) {
       return false;
     }
-
+  
     if (isBookmarked) {
       return (
         bookmarkedProfiles.includes(user.user_id) && (nameMatch || tagMatch)
       );
     }
-    return nameMatch || tagMatch;
+    
+    return (
+      (nameMatch || tagMatch) && 
+      (isHousingMatch || housingPreference === "Any") &&
+      (isGenderMatch || genderPreference === "Any") &&
+      (isAgeMatch || (youngestAgePreference === "Any" && oldestAgePreference === "Any"))
+    );
   });
 
   useEffect(() => {
