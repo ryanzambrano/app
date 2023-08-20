@@ -66,7 +66,7 @@ const FiltersUI = ({ route }) => {
       genderPreference,
       youngestAgePreference,
       oldestAgePreference,
-      //studyPreference
+      studyPreference
     });
   };
 

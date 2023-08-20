@@ -38,6 +38,7 @@ const Home = ({ route }) => {
     genderPreference = "Any",
     youngestAgePreference = "Any",
     oldestAgePreference = "Any",
+    studyPreference = "Any",
   } = route.params || {};
   
 
@@ -47,6 +48,7 @@ const Home = ({ route }) => {
       currentGenderPreference: genderPreference,
       currentYoungestAgePreference: youngestAgePreference,
       currentOldestAgePreference: oldestAgePreference,
+      currentStudyPreference: studyPreference,
     });
   };
 
@@ -145,7 +147,7 @@ const Home = ({ route }) => {
     const isAgeMatch =
       (youngestAgePreference === "Any" || user.age >= youngestAgePreference) &&
       (oldestAgePreference === "Any" || user.age <= oldestAgePreference);
-    //const isStudyMatch = studyPreference === "Any" || user.studies === studyPreference;
+    const isStudyMatch = studyPreference === "Any" || user.profiles.studies === studyPreference;
   
     if (isSessionUser) {
       return false;
@@ -156,7 +158,8 @@ const Home = ({ route }) => {
         bookmarkedProfiles.includes(user.user_id) && ((nameMatch || tagMatch) && 
         (isHousingMatch || housingPreference === "Any") &&
         (isGenderMatch || genderPreference === "Any") &&
-        (isAgeMatch || (youngestAgePreference === "Any" && oldestAgePreference === "Any")))
+        (isAgeMatch || (youngestAgePreference === "Any" && oldestAgePreference === "Any"))) &&
+        (isStudyMatch || (studyPreference === "Any"))
       );
     }
     
@@ -164,7 +167,8 @@ const Home = ({ route }) => {
       (nameMatch || tagMatch) && 
       (isHousingMatch || housingPreference === "Any") &&
       (isGenderMatch || genderPreference === "Any") &&
-      (isAgeMatch || (youngestAgePreference === "Any" && oldestAgePreference === "Any"))
+      (isAgeMatch || (youngestAgePreference === "Any" && oldestAgePreference === "Any")) && 
+      (isStudyMatch || (studyPreference === "Any"))
     );
   });
 
