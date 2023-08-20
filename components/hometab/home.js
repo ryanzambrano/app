@@ -32,6 +32,7 @@ const Home = ({ route }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkedProfiles, setBookmarkedProfiles] = useState([]);
   const isFocused = useIsFocused();
+
   const { 
     housingPreference = "Any",
     genderPreference = "Any",
@@ -86,6 +87,8 @@ const Home = ({ route }) => {
   };
 
   const calculateCompatibility = (sessionUser, otherUser) => {
+    //console.log(otherUser.profiles.sleep_time);
+    console.log(sessionUser)
     let score = 0;
     //console.log(sessionUser.for_fun, otherUser.for_fun);
     if (Array.isArray(sessionUser.tags) && Array.isArray(otherUser.tags)) {
@@ -137,7 +140,7 @@ const Home = ({ route }) => {
     const tagMatch = user.tags.some((tag) =>
       tag.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    console.log(user.living_preferences);
+   
    // console.log(housingPreference);
     const isHousingMatch = housingPreference === "Any" || user.living_preferences === housingPreference;
     //console.log(isHousingMatch);
@@ -171,63 +174,40 @@ const Home = ({ route }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const { data: ugcData, error: ugcError } = await supabase
-          .from("UGC")
-          .select("*");
-
-        const { data: profileData, error: profileError } = await supabase
-          .from("profile")
-          .select("*");
-
-        const { data: imageData, error: imageError } = await supabase
-          .from("images")
-          .select("*")
-          .eq("image_index", 0);
-
+        const { data: ugcData, error: ugcError } = await supabase.from("UGC").select("*");
+        const { data: profileData, error: profileError } = await supabase.from("profile").select("*");
+        const { data: imageData, error: imageError } = await supabase.from("images").select("*").eq("image_index", 0);
+  
         if (ugcError || profileError || imageError) {
           console.error(ugcError || profileError || imageError);
         } else {
           const mergedData = ugcData.map((ugcUser) => {
-            const relatedProfileData = profileData.find(
-              (profileUser) => profileUser.user_id === ugcUser.user_id
-            );
-
-            const relatedImageData = imageData.find(
-              (img) => img.user_id === ugcUser.user_id
-            );
-
+            const relatedProfileData = profileData.find((profileUser) => profileUser.user_id === ugcUser.user_id);
+            const relatedImageData = imageData.find((img) => img.user_id === ugcUser.user_id);
             return {
               ...ugcUser,
               profiles: relatedProfileData,
               lastModified: relatedImageData?.last_modified || null,
             };
           });
-
+          
           const userId = session.user.id;
-
-          const { data, error } = await supabase
-            .from("UGC")
-            .select("name, bio, tags, major, class_year, hometown")
-            .eq("user_id", userId)
-            .single();
-
-          if (error) {
-            console.error(error.message);
+          const ugcResponse = await supabase.from("UGC").select("name, bio, tags, major, class_year, hometown").eq("user_id", userId).single();
+          const profileResponse = await supabase.from("profile").select("*").eq("user_id", userId).single(); 
+  
+          if (ugcResponse.error || profileResponse.error) {
+            console.error(ugcResponse.error?.message || profileResponse.error?.message);
           } else {
-            setSessionuser(data);
+            const mergedSessionUser = {
+              ...ugcResponse.data,
+              profiles: profileResponse.data, 
+            };
+            setSessionuser(mergedSessionUser);
           }
 
-          const { data: bookmarkedData, error: bookmarkedError } =
-            await supabase
-              .from("UGC")
-              .select("bookmarked_profiles")
-              .eq("user_id", userId);
-
+          const { data: bookmarkedData, error: bookmarkedError } = await supabase.from("UGC").select("bookmarked_profiles").eq("user_id", userId);
           if (bookmarkedError) {
-            console.error(
-              "Error fetching bookmarked profiles:",
-              bookmarkedError.message
-            );
+            console.error("Error fetching bookmarked profiles:", bookmarkedError.message);
           } else {
             const { bookmarked_profiles } = bookmarkedData[0];
             setBookmarkedProfiles(bookmarked_profiles);
@@ -238,16 +218,17 @@ const Home = ({ route }) => {
         console.error("An unexpected error occurred:", error);
       }
     };
-
+  
     fetchUsers();
     if (isFocused) {
       fetchUsers();
     }
-
+  
     if (isBookmarked) {
       fetchUsers();
     }
   }, [isFocused]);
+  
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
