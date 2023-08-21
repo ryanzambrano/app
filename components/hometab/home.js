@@ -22,7 +22,7 @@ const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
 
 const Home = ({ route }) => {
-  const { session  } = route.params;
+  const { session } = route.params;
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [sessionUser, setSessionuser] = useState(session.user);
@@ -33,14 +33,13 @@ const Home = ({ route }) => {
   const [bookmarkedProfiles, setBookmarkedProfiles] = useState([]);
   const isFocused = useIsFocused();
 
-  const { 
+  const {
     housingPreference = "Any",
     genderPreference = "Any",
     youngestAgePreference = "Any",
     oldestAgePreference = "Any",
     studyPreference = "Any",
   } = route.params || {};
-  
 
   const handleFiltersPress = () => {
     navigation.navigate("Filters", {
@@ -65,7 +64,7 @@ const Home = ({ route }) => {
       <Text style={styles.emptyText}>No users found</Text>
     </View>
   );
-  
+
   const showSortMenu = () => {
     Alert.alert(
       "Sort Options",
@@ -92,17 +91,24 @@ const Home = ({ route }) => {
     //console.log(otherUser.profiles.sleep_time);
     //console.log(sessionUser.profiles.sleep_time);
     let score = 0;
-    
+
     if (Array.isArray(sessionUser.tags) && Array.isArray(otherUser.tags)) {
       sessionUser.tags.forEach((tag) => {
         if (otherUser.tags.includes(tag)) score += 4;
       });
     }
     if (sessionUser.profiles.for_fun === otherUser.profiles.for_fun) score += 5;
-    if (sessionUser.profiles.tidiness === otherUser.profiles.tidiness) score += 5;
-    if (sessionUser.profiles.noise_preference === otherUser.profiles.noise_preference) score += 5;
-    if (sessionUser.profiles.sleep_time === otherUser.profiles.sleep_time) score += 5;
-    if (sessionUser.living_preferences === otherUser.living_preferences) score += 5;
+    if (sessionUser.profiles.tidiness === otherUser.profiles.tidiness)
+      score += 5;
+    if (
+      sessionUser.profiles.noise_preference ===
+      otherUser.profiles.noise_preference
+    )
+      score += 5;
+    if (sessionUser.profiles.sleep_time === otherUser.profiles.sleep_time)
+      score += 5;
+    if (sessionUser.living_preferences === otherUser.living_preferences)
+      score += 5;
     if (sessionUser.studies === otherUser.studies) score += 3;
     if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 2;
     if (sessionUser.class_year === otherUser.class_year) score += 2;
@@ -139,76 +145,111 @@ const Home = ({ route }) => {
     const tagMatch = user.tags.some((tag) =>
       tag.toLowerCase().includes(searchQuery.toLowerCase())
     );
-   
-   // console.log(housingPreference);
-    const isHousingMatch = housingPreference === "Any" || user.living_preferences === housingPreference;
+
+    // console.log(housingPreference);
+    const isHousingMatch =
+      housingPreference === "Any" ||
+      user.living_preferences === housingPreference;
     //console.log(isHousingMatch);
-    const isGenderMatch = genderPreference === "Any" || user.gender === genderPreference;
+    const isGenderMatch =
+      genderPreference === "Any" || user.gender === genderPreference;
     const isAgeMatch =
       (youngestAgePreference === "Any" || user.age >= youngestAgePreference) &&
       (oldestAgePreference === "Any" || user.age <= oldestAgePreference);
-    const isStudyMatch = studyPreference === "Any" || user.profiles.studies === studyPreference;
-  
+    const isStudyMatch =
+      studyPreference === "Any" || user.profiles.studies === studyPreference;
+
     if (isSessionUser) {
       return false;
     }
-  
+
     if (isBookmarked) {
       return (
-        bookmarkedProfiles.includes(user.user_id) && ((nameMatch || tagMatch) && 
+        bookmarkedProfiles.includes(user.user_id) &&
+        (nameMatch || tagMatch) &&
         (isHousingMatch || housingPreference === "Any") &&
         (isGenderMatch || genderPreference === "Any") &&
-        (isAgeMatch || (youngestAgePreference === "Any" && oldestAgePreference === "Any"))) &&
-        (isStudyMatch || (studyPreference === "Any"))
+        (isAgeMatch ||
+          (youngestAgePreference === "Any" && oldestAgePreference === "Any")) &&
+        (isStudyMatch || studyPreference === "Any")
       );
     }
-    
+
     return (
-      (nameMatch || tagMatch) && 
+      (nameMatch || tagMatch) &&
       (isHousingMatch || housingPreference === "Any") &&
       (isGenderMatch || genderPreference === "Any") &&
-      (isAgeMatch || (youngestAgePreference === "Any" && oldestAgePreference === "Any")) && 
-      (isStudyMatch || (studyPreference === "Any"))
+      (isAgeMatch ||
+        (youngestAgePreference === "Any" && oldestAgePreference === "Any")) &&
+      (isStudyMatch || studyPreference === "Any")
     );
   });
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const { data: ugcData, error: ugcError } = await supabase.from("UGC").select("*");
-        const { data: profileData, error: profileError } = await supabase.from("profile").select("*");
-        const { data: imageData, error: imageError } = await supabase.from("images").select("*").eq("image_index", 0);
-  
+        const { data: ugcData, error: ugcError } = await supabase
+          .from("UGC")
+          .select("*");
+        const { data: profileData, error: profileError } = await supabase
+          .from("profile")
+          .select("*");
+        const { data: imageData, error: imageError } = await supabase
+          .from("images")
+          .select("*")
+          .eq("image_index", 0);
+
         if (ugcError || profileError || imageError) {
           console.error(ugcError || profileError || imageError);
         } else {
           const mergedData = ugcData.map((ugcUser) => {
-            const relatedProfileData = profileData.find((profileUser) => profileUser.user_id === ugcUser.user_id);
-            const relatedImageData = imageData.find((img) => img.user_id === ugcUser.user_id);
+            const relatedProfileData = profileData.find(
+              (profileUser) => profileUser.user_id === ugcUser.user_id
+            );
+            const relatedImageData = imageData.find(
+              (img) => img.user_id === ugcUser.user_id
+            );
             return {
               ...ugcUser,
               profiles: relatedProfileData,
               lastModified: relatedImageData?.last_modified || null,
             };
           });
-          
+
           const userId = session.user.id;
-          const ugcResponse = await supabase.from("UGC").select("name, bio, tags, major, class_year, hometown").eq("user_id", userId).single();
-          const profileResponse = await supabase.from("profile").select("*").eq("user_id", userId).single(); 
-  
+          const ugcResponse = await supabase
+            .from("UGC")
+            .select("name, bio, tags, major, class_year, hometown")
+            .eq("user_id", userId)
+            .single();
+          const profileResponse = await supabase
+            .from("profile")
+            .select("*")
+            .eq("user_id", userId)
+            .single();
+
           if (ugcResponse.error || profileResponse.error) {
-            console.error(ugcResponse.error?.message || profileResponse.error?.message);
+            console.error(
+              ugcResponse.error?.message || profileResponse.error?.message
+            );
           } else {
             const mergedSessionUser = {
               ...ugcResponse.data,
-              profiles: profileResponse.data, 
+              profiles: profileResponse.data,
             };
             setSessionuser(mergedSessionUser);
           }
 
-          const { data: bookmarkedData, error: bookmarkedError } = await supabase.from("UGC").select("bookmarked_profiles").eq("user_id", userId);
+          const { data: bookmarkedData, error: bookmarkedError } =
+            await supabase
+              .from("UGC")
+              .select("bookmarked_profiles")
+              .eq("user_id", userId);
           if (bookmarkedError) {
-            console.error("Error fetching bookmarked profiles:", bookmarkedError.message);
+            console.error(
+              "Error fetching bookmarked profiles:",
+              bookmarkedError.message
+            );
           } else {
             const { bookmarked_profiles } = bookmarkedData[0];
             setBookmarkedProfiles(bookmarked_profiles);
@@ -219,17 +260,16 @@ const Home = ({ route }) => {
         console.error("An unexpected error occurred:", error);
       }
     };
-  
+
     fetchUsers();
     if (isFocused) {
       fetchUsers();
     }
-  
+
     if (isBookmarked) {
       fetchUsers();
     }
   }, [isFocused]);
-  
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
@@ -290,7 +330,6 @@ const Home = ({ route }) => {
           </TouchableOpacity>
         </View>
       </View>
-
 
       <View style={styles.viewContainer}>
         <View style={styles.searchContainer}>
@@ -369,24 +408,24 @@ const styles = StyleSheet.create({
     paddingRight: 15,
     marginBottom: 8,
   },
-  
+
   logoTitleContainer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
   },
-  
+
   headerText: {
     fontSize: 29,
     color: "white",
-    fontWeight: '600',
+    fontWeight: "600",
   },
-  
+
   logo: {
     width: 30,
     height: 30,
   },
-  
+
   buttonContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -524,13 +563,13 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 140, 
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 140,
   },
   emptyText: {
     fontSize: 20,
-    color: 'grey',
+    color: "grey",
   },
 });
 

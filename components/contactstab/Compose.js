@@ -17,7 +17,7 @@ import { Feather } from "@expo/vector-icons"; // Import Feather icons
 import { supabase } from "../auth/supabase";
 import { picURL } from "../auth/supabase.js";
 import { AntDesign } from "@expo/vector-icons";
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
 
 const ComposeMessageScreen = ({ route }) => {
   const [persons, setPersons] = useState([]);
@@ -90,14 +90,13 @@ const ComposeMessageScreen = ({ route }) => {
       const selectedUserNames = selectedUsers.map((user) => user.name);
       selectedUserNames.push(sessionusername);
       selectedUserNames.sort();
-      const usernames = selectedUserNames.join(', ');
-  
+      const usernames = selectedUserNames.join(", ");
+
       // Get the IDs of the selected users
       const selectedUserIDs = selectedUsers.map((user) => user.user_id);
       selectedUserIDs.push(session.user.id);
       selectedUserIDs.sort();
 
-  
       // Insert the new record with User_ID, Group_ID, and Group_Name
       const { data: insertData, error: insertError } = await supabase
         .from("Group Chats")
@@ -110,40 +109,35 @@ const ComposeMessageScreen = ({ route }) => {
         ])
         .select();
 
-  
-        if (insertError) {
-          if (insertError.code === "23505") {
-            const { data: navigationdata, error: navigationError } = await supabase
-            .from("Group Chats")
-            .select('*')
-            .contains('User_ID', selectedUserIDs)
-            .eq('Ammount_Users', selectedUserIDs.length);
-            if(navigationError)
-            {
-              console.log(navigationError);
-              return;
-            }
-            else
-            {
-              //console.log(navigationdata);
-              const fetchedPersons = navigationdata.map((person) => person);
-              setPersons(fetchedPersons);
-              if (fetchedPersons.length > 0) {
-
-                navigation.navigate('Message', { user: fetchedPersons[0]});
-              }
-            
-              return;
-            }
-            // The duplicate key violation occurred, no need to handle the conflicting row
+      if (insertError) {
+        if (insertError.code === "23505") {
+          const { data: navigationdata, error: navigationError } =
+            await supabase
+              .from("Group Chats")
+              .select("*")
+              .contains("User_ID", selectedUserIDs)
+              .eq("Ammount_Users", selectedUserIDs.length);
+          if (navigationError) {
+            console.log(navigationError);
+            return;
           } else {
-            alert('Failed to insert.');
-            // Handle other insert errors
+            //console.log(navigationdata);
+            const fetchedPersons = navigationdata.map((person) => person);
+            setPersons(fetchedPersons);
+            if (fetchedPersons.length > 0) {
+              navigation.navigate("Message", { user: fetchedPersons[0] });
+            }
+
+            return;
           }
-          return;
+          // The duplicate key violation occurred, no need to handle the conflicting row
+        } else {
+          alert("Failed to insert.");
+          // Handle other insert errors
         }
-  
-  
+        return;
+      }
+
       // Log the Group_ID
     } catch (err) {
       console.error("An error occurred:", err);
@@ -168,7 +162,7 @@ const ComposeMessageScreen = ({ route }) => {
           <Image
             style={styles.profilePicture}
             source={{
-              uri: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Andrew_Tate_on_%27Anything_Goes_With_James_English%27_in_2021.jpg"
+              uri: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Andrew_Tate_on_%27Anything_Goes_With_James_English%27_in_2021.jpg",
             }}
           />
         </View>
@@ -180,11 +174,11 @@ const ComposeMessageScreen = ({ route }) => {
           <Text style={styles.RecentMessage}>{item.recentMessage}</Text>
         </View>
         <View style={styles.buttonContainer}>
-        <FontAwesome
-  name={selectedUsers.includes(item) ? "circle" : "circle-o"}
-  size={24}
-  color="#159e9e"
-/>
+          <FontAwesome
+            name={selectedUsers.includes(item) ? "circle" : "circle-o"}
+            size={24}
+            color="#159e9e"
+          />
         </View>
       </View>
     </TouchableOpacity>
@@ -194,7 +188,7 @@ const ComposeMessageScreen = ({ route }) => {
     <View style={styles.container}>
       <SafeAreaView style={styles.headerSafeArea}>
         <View style={styles.header}>
-        <TouchableOpacity
+          <TouchableOpacity
             style={styles.cancelButton}
             onPress={() => navigation.goBack()}
           >
@@ -252,7 +246,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
-    borderBottomWidth: .3,
+    borderBottomWidth: 0.3,
     borderBottomColor: "grey",
     width: "100%",
   },

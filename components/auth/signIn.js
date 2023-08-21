@@ -82,7 +82,7 @@ export const SignIn = ({ navigation }) => {
               style={styles.headerImage}
               alt="Logo "
             />
-            <Text style={styles.titleText}>Sign into Casa</Text>
+            <Text style={styles.titleText}>Sign into Cabana</Text>
             <Text style={styles.sloganText}>
               Find and meet new roomates, for any situation!
             </Text>
