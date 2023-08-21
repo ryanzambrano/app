@@ -13,7 +13,12 @@ import {
   TouchableWithoutFeedback,
   Modal,
 } from "react-native";
-
+import { MaterialIcons } from '@expo/vector-icons'; 
+import { FontAwesome5 } from '@expo/vector-icons'; 
+import Icon from "react-native-vector-icons/FontAwesome";
+import { Entypo } from '@expo/vector-icons'; 
+import { Ionicons } from '@expo/vector-icons'; 
+import { Octicons } from '@expo/vector-icons'; 
 import { useIsFocused } from "@react-navigation/native";
 import { picURL } from "../auth/supabase";
 import { getLastModifiedFromSupabase } from "../auth/profileUtils.js";
@@ -334,23 +339,36 @@ const UserCard = ({ navigation, route }) => {
               <Text style={styles.chatButtonText}>Message</Text>
             </TouchableOpacity>
           </View>
-
           <View style={styles.bioContainer}>
-            <Text style={styles.bio}>Graduating Class: {class_year}</Text>
+          <Entypo name="graduation-cap" marginTop={-2}size={22} color="white" />
+            <Text style={styles.bio}>  Class Of: {class_year}</Text>
           </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalInfoScrollView}>
+            <View style={styles.infoContainer}>
+              <Entypo name="open-book" size={22} color="white" />
+              <Text style={styles.bio}>  {major}</Text>
+            </View>
+            <View style={styles.verticalDivider} />
+            <View style={styles.infoContainer}>
+              <MaterialIcons name="cake" size={22} color="white" />
+              <Text style={styles.bio}>  {age}</Text>
+            </View>
+            <View style={styles.verticalDivider} />
+            <View style={styles.infoContainer}>
+              <Ionicons name="md-person-sharp" size={22} color="white" />
+              <Text style={styles.bio}>  {gender}</Text>
+            </View>
+            <View style={styles.verticalDivider} />
+            <View style={styles.infoContainer} paddingRight={30}>
+              <MaterialIcons name="home-filled" size={26} color="white" />
+              <Text style={styles.bio}>  {hometown}</Text>
+            </View>
+          </ScrollView>
           <View style={styles.bioContainer}>
             <View style={styles.roundedContainer}>
+              
               <Text style={styles.bio}>{bio}</Text>
             </View>
-          </View>
-          <View style={styles.ageMajorGradeContainer}>
-            <Text style={styles.bio}>Major: {major}</Text>
-            <View style={styles.divider} />
-            <Text style={styles.bio}>Age: {age}</Text>
-            <View style={styles.divider} />
-            <Text style={styles.bio}>Gender: {gender}</Text>
-            <View style={styles.divider} />
-            <Text style={styles.bio}>Hometown: {hometown}</Text>
           </View>
           <View style={styles.ageMajorGradeContainer}>
             <Text style={styles.bio}>
@@ -541,6 +559,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginLeft: 10,
     marginBottom: 10,
+    flexDirection: "row",
     borderWidth: 0.4,
     //borderColor: "grey",
   },
@@ -626,6 +645,37 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     fontSize: 20,
+  },
+  horizontalInfoScrollView: {
+    marginBottom: 10,
+    backgroundColor: "#1D1D20",
+    borderRadius: 15,
+    flexDirection: "row",
+    marginBottom: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderWidth: 0.4,
+    marginRight: 10,
+    marginLeft: 10,
+    
+  },
+  
+  infoContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    flexDirection: "row",
+  },
+  
+  verticalDivider: {
+    width: 0.3,
+    backgroundColor: 'grey',
+    height: '100%',
+    alignSelf: 'center'
+  },
+  icon: {
+    width: 30,
+    height: 30,
   },
 });
 

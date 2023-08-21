@@ -6,7 +6,9 @@ import View from "react-native";
 import ContactsUI from "../contactstab/contacts"; // Imports for use in Tab Navigator
 import Home from "../hometab/home";
 import Profile from "../profiletab/profile";
-
+import { MaterialIcons } from '@expo/vector-icons';
+import { Foundation } from '@expo/vector-icons';  
+import { FontAwesome5 } from '@expo/vector-icons'; 
 const Tab = createBottomTabNavigator(); // Initializes bottom tab navigator
 
 const TabNavigator = ({ route }) => {
@@ -25,11 +27,11 @@ const TabNavigator = ({ route }) => {
         },
         tabBarIcon: ({ focused, color, size }) => {
           if (route.name === "Contacts") {
-            return <Ionicons name="mail-unread-outline" size={size} color={focused ? "white" : "grey"} />;
+            return <MaterialIcons name="chat-bubble-outline" size={24} color={focused ? "white" : "grey"} />
           } else if (route.name === "Home") {
-            return <Ionicons name="home-outline" size={size} color={focused ? "white" : "grey"} />;
+            return <Foundation name="home" size={24} color={focused ? "white" : "grey"} />
           } else if (route.name === "Profile") {
-            return <Ionicons name="person-circle-sharp" size={size} color={focused ? "white" : "grey"} />;
+            return <FontAwesome5 name="user" size={24} color={focused ? "white" : "grey"} />
           }
         },
         tabBarLabel: () => null, // Removes the labels
