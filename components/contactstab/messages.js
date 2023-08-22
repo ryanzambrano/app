@@ -34,8 +34,10 @@ const MessagingUI = () => {
   const { session } = route.params;
   const { user } = route.params;
   const { editedJoinedGroups } = route.params;
-  const [joinedGroups, setJoinedGroups] = useState(user.joinedGroups);
+  const [joinedGroups, setJoinedGroups] = useState('');
   const [persons, setPersons] = useState([]);
+
+  
 
   const sendMessage = async () => {
     if (message.trim() !== "") {
@@ -87,7 +89,37 @@ const MessagingUI = () => {
       console.error("An error occurred:", error.message);
     }
   }
+
+  async function getJoinedGroups() {
+    try {
+      const { data, error: sessionError } = await supabase
+        .from("UGC")
+        .select("name")
+        .eq("user_id", session.user.id)
+        .single();
+  
+      if (sessionError) {
+        console.error(sessionError);
+        return null;
+      }
+  
+      const sessionusername = data.name;
+  
+      const groupNames = user.Group_Name.split(",").map((name) => name.trim());
+      const filteredGroupNames = groupNames.filter(
+        (name) => name !== sessionusername
+      );
+      const joinedGroups = filteredGroupNames.join(", ");
+      
+      setJoinedGroups(joinedGroups);
+      return;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
   useEffect(() => {
+    getJoinedGroups();
     if (user.Ammount_Users <= 2) {
       fetchUsers();
     }
@@ -187,7 +219,7 @@ const MessagingUI = () => {
         >
           <AntDesign name="arrowleft" size={24} color="#159e9e" />
         </TouchableOpacity>
-        <Text style={styles.contactName}>{user.Group_Name}</Text>
+        <Text style={styles.contactName}>{joinedGroups}</Text>
         <TouchableOpacity
           style={styles.profileContainer}
           onPress={navigateToProfile}

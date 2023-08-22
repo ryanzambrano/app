@@ -253,9 +253,10 @@ const UserCard = ({ navigation, route }) => {
     }
   };
 
-  const handleUserCardPress = () => {
-    navigation.navigate("Message", { user: route.params.user });
-  };
+  const handleUserCardPress =  async () => { {
+    console.log("Balls");
+  }
+};
 
   return (
     <SafeAreaView style={styles.container}>
