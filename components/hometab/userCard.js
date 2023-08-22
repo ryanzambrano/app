@@ -65,7 +65,7 @@ const UserCard = ({ navigation, route }) => {
 
   // current user is session.user.id
   // other user is user_id
-
+  const [persons, setPersons] = useState([]);
   const [photos, setPhotos] = useState([
     `${picURL}/${user_id}/${user_id}-0-${lastModified}`,
   ]);
@@ -253,10 +253,72 @@ const UserCard = ({ navigation, route }) => {
     }
   };
 
-  const handleUserCardPress =  async () => { {
-    console.log("Balls");
+  const handleUserCardPress =  async () => { { //message navigation
+    const { data, error: sessionError } = await supabase
+    .from("UGC")
+    .select("name")
+    .eq("user_id", session.user.id)
+    .single();
+
+  if (sessionError) {
+    console.error(sessionError);
+    return;
   }
-};
+
+  const sessionusername = data.name;
+  const combinedArray = [sessionusername, name];
+  const FinalString = combinedArray.slice().sort();
+  const combinedString = FinalString.join(', ');
+  
+  const combinedIDs = [session.user.id, user_id];
+  const Finalarray = combinedIDs.slice().sort();
+  
+  const { data: insertData, error: insertError } = await supabase
+  .from("Group Chats")
+  .insert([
+    {
+      User_ID: Finalarray,
+      Group_Name: combinedString, // Join selected user names with commas
+      Ammount_Users: Finalarray.length,
+    },
+  ])
+  .select();
+
+if (insertError) {
+  if (insertError.code === "23505") {
+    const { data: navigationdata, error: navigationError } =
+      await supabase
+        .from("Group Chats")
+        .select("*")
+        .contains("User_ID", Finalarray)
+        .eq("Ammount_Users", Finalarray.length);
+    if (navigationError) {
+      console.log(navigationError);
+      return;
+    } else {
+      //console.log(navigationdata);
+      const fetchedPersons = navigationdata.map((person) => person);
+      setPersons(fetchedPersons);
+      if (fetchedPersons.length > 0) {
+        navigation.navigate("Message", { user: fetchedPersons[0] });
+      }
+
+      return;
+    }
+    // The duplicate key violation occurred, no need to handle the conflicting row
+  } else {
+    alert("Failed to insert.");
+    // Handle other insert errors
+  }
+  return;
+  
+  }
+  const fetchedPersons = insertData.map((person) => person);
+      setPersons(fetchedPersons);
+      if (fetchedPersons.length > 0) {
+        navigation.navigate("Message", { user: fetchedPersons[0] });
+      }
+}}
 
   return (
     <SafeAreaView style={styles.container}>
