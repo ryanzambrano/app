@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#2B2D2F",
     borderRadius: 20,
-    paddingHorizontal: 20,
+    paddingHorizontal: 1,
     paddingVertical: 5,
     marginBottom: 20,
     paddingTop: 0,
@@ -369,6 +369,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#2B2D2F",
     fontSize: 20,
     paddingTop: 10,
+    marginLeft: 10,
   },
 });
 

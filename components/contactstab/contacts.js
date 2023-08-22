@@ -303,7 +303,7 @@ const ContactsUI = ({ route }) => {
         </View>
 
         <FlatList
-          data={users}
+          data={filteredUsers}
           renderItem={renderContact}
           keyExtractor={(item) => item.Group_ID.toString()}
         />
@@ -364,6 +364,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     fontSize: 16,
+    color: "white",
+    marginLeft: 5,
   },
   contactItem: {
     flexDirection: "row",
