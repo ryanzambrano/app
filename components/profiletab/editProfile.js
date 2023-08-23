@@ -107,42 +107,26 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
   const updateProfile = async () => {
     if (session?.user) {
-      const { data, error } = await supabase.from("UGC").upsert([
-        {
-          user_id: session.user.id,
-          name: editedUser.name,
-          bio: editedUser.bio,
-          major: editedUser.major,
-          class_year: editedUser.class_year,
-          hometown: editedUser.hometown,
-        },
-      ]);
-
-      if (error) {
-        if (error.message.includes("UGC_user_id_key")) {
-          const { data, error: updateError } = await supabase
-            .from("UGC")
-            .update([
-              {
-                name: editedUser.name,
-                bio: editedUser.bio,
-                major: editedUser.major,
-                class_year: editedUser.class_year,
-                hometown: editedUser.hometown,
-              },
-            ])
-            .eq("user_id", session.user.id);
-
-          if (updateError) {
-            alert(updateError.message);
-          } else {
-            navigation.navigate("Tabs", { updated: true });
-          }
-        } else {
+      if (editedUser.bio.length < 200) {
+        const { data, error } = await supabase
+          .from("UGC")
+          .update([
+            {
+              name: editedUser.name,
+              bio: editedUser.bio,
+              major: editedUser.major,
+              class_year: editedUser.class_year,
+              hometown: editedUser.hometown,
+            },
+          ])
+          .eq("user_id", session.user.id);
+        if (error) {
           alert(error.message);
+        } else {
+          navigation.navigate("Tabs", { updated: true });
         }
       } else {
-        navigation.navigate("Tabs", { updated: true });
+        alert("Too many characters in Bio");
       }
     }
   };
@@ -226,6 +210,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
                 value={editedUser.name}
                 onChangeText={(name) => setEditedUser({ ...editedUser, name })}
                 placeholder="Name"
+                placeholderTextColor="#575D61"
               />
             </View>
 
@@ -234,10 +219,12 @@ export const EditProfileScreen = ({ navigation, route }) => {
               <TextInput
                 style={styles.input}
                 value={editedUser.class_year}
+                keyboardAppearance="dark"
                 onChangeText={(class_year) =>
                   setEditedUser({ ...editedUser, class_year })
                 }
-                placeholder="Select your Graduation Year"
+                placeholder="Graduation Year"
+                placeholderTextColor="#575D61"
               />
             </View>
 
@@ -250,6 +237,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
                   setEditedUser({ ...editedUser, major })
                 }
                 placeholder="Major"
+                placeholderTextColor="#575D61"
               />
             </View>
 
@@ -262,6 +250,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
                   setEditedUser({ ...editedUser, hometown })
                 }
                 placeholder="Hometown"
+                placeholderTextColor="#575D61"
               />
             </View>
 
@@ -273,6 +262,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
                 onChangeText={(bio) => setEditedUser({ ...editedUser, bio })}
                 multiline
                 placeholder="Bio"
+                placeholderTextColor="#575D61"
               />
             </View>
 

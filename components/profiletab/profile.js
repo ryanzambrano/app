@@ -16,12 +16,12 @@ import { fetchUsername } from "../auth/profileUtils.js";
 import { supabase } from "../auth/supabase.js";
 import { StatusBar } from "expo-status-bar";
 import { picURL } from "../auth/supabase.js";
-import { MaterialIcons } from '@expo/vector-icons'; 
-import { FontAwesome5 } from '@expo/vector-icons'; 
+import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Entypo } from '@expo/vector-icons'; 
-import { Ionicons } from '@expo/vector-icons'; 
-import { Octicons } from '@expo/vector-icons'; 
+import { Entypo } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { Octicons } from "@expo/vector-icons";
 
 export const Profile = ({ navigation, route }) => {
   const { updated, session } = route.params;
@@ -232,7 +232,12 @@ export const Profile = ({ navigation, route }) => {
 
               <View style={styles.major}>
                 <View style={styles.icons}>
-                  <Entypo name="graduation-cap" marginTop={-2}size={22} color="white" />
+                  <Entypo
+                    name="graduation-cap"
+                    marginTop={-2}
+                    size={22}
+                    color="white"
+                  />
                   <Entypo name="open-book" size={22} color="white" />
                   <MaterialIcons name="home-filled" size={26} color="white" />
                 </View>

@@ -70,7 +70,7 @@ export const SignUp = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#111111" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         {isSignedUp ? (
           <>
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "center",
     //AlignSelf: "center",
-    color: "#1e1e1e",
+    color: "#fff",
     paddingTop: 5,
   },
 
@@ -269,13 +269,13 @@ const styles = StyleSheet.create({
   inputHeader: {
     fontSize: 17,
     fontWeight: "500",
-    color: "#222",
+    color: "#fff",
     marginBottom: 10,
   },
 
   inputControl: {
-    backgroundColor: "#fff",
-    color: "#222",
+    backgroundColor: "#1D1D20",
+    color: "#fff",
     fontWeight: "500",
     height: 44,
     paddingVertical: 10,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   formFooter: {
     fontSize: 17,
     fontWeight: "600",
-    color: "#222",
+    color: "#fff",
     textAlign: "center",
     letterSpacing: 0.15,
   },

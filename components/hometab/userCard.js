@@ -13,12 +13,12 @@ import {
   TouchableWithoutFeedback,
   Modal,
 } from "react-native";
-import { MaterialIcons } from '@expo/vector-icons'; 
-import { FontAwesome5 } from '@expo/vector-icons'; 
+import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Entypo } from '@expo/vector-icons'; 
-import { Ionicons } from '@expo/vector-icons'; 
-import { Octicons } from '@expo/vector-icons'; 
+import { Entypo } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { Octicons } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import { picURL } from "../auth/supabase";
 import { getLastModifiedFromSupabase } from "../auth/profileUtils.js";
@@ -253,82 +253,84 @@ const UserCard = ({ navigation, route }) => {
     }
   };
 
-  const handleUserCardPress =  async () => { { //message navigation
-    const { data, error: sessionError } = await supabase
-    .from("UGC")
-    .select("name")
-    .eq("user_id", session.user.id)
-    .single();
-
-  if (sessionError) {
-    console.error(sessionError);
-    return;
-  }
-
-  const sessionusername = data.name;
-  const combinedArray = [sessionusername, name];
-  const FinalString = combinedArray.slice().sort();
-  const combinedString = FinalString.join(', ');
-  
-  const combinedIDs = [session.user.id, user_id];
-  const Finalarray = combinedIDs.slice().sort();
-  
-  const { data: insertData, error: insertError } = await supabase
-  .from("Group Chats")
-  .insert([
+  const handleUserCardPress = async () => {
     {
-      User_ID: Finalarray,
-      Group_Name: combinedString, // Join selected user names with commas
-      Ammount_Users: Finalarray.length,
-    },
-  ])
-  .select();
+      //message navigation
+      const { data, error: sessionError } = await supabase
+        .from("UGC")
+        .select("name")
+        .eq("user_id", session.user.id)
+        .single();
 
-if (insertError) {
-  if (insertError.code === "23505") {
-    const { data: navigationdata, error: navigationError } =
-      await supabase
+      if (sessionError) {
+        console.error(sessionError);
+        return;
+      }
+
+      const sessionusername = data.name;
+      const combinedArray = [sessionusername, name];
+      const FinalString = combinedArray.slice().sort();
+      const combinedString = FinalString.join(", ");
+
+      const combinedIDs = [session.user.id, user_id];
+      const Finalarray = combinedIDs.slice().sort();
+
+      const { data: insertData, error: insertError } = await supabase
         .from("Group Chats")
-        .select("*")
-        .contains("User_ID", Finalarray)
-        .eq("Ammount_Users", Finalarray.length);
-    if (navigationError) {
-      console.log(navigationError);
-      return;
-    } else {
-      //console.log(navigationdata);
-      const fetchedPersons = navigationdata.map((person) => person);
-      setPersons(fetchedPersons);
-      if (fetchedPersons.length > 0) {
-        navigation.navigate("Message", { user: fetchedPersons[0] });
-      }
+        .insert([
+          {
+            User_ID: Finalarray,
+            Group_Name: combinedString, // Join selected user names with commas
+            Ammount_Users: Finalarray.length,
+          },
+        ])
+        .select();
 
-      return;
-    }
-    // The duplicate key violation occurred, no need to handle the conflicting row
-  } else {
-    alert("Failed to insert.");
-    // Handle other insert errors
-  }
-  return;
-  
-  }
-  const fetchedPersons = insertData.map((person) => person);
+      if (insertError) {
+        if (insertError.code === "23505") {
+          const { data: navigationdata, error: navigationError } =
+            await supabase
+              .from("Group Chats")
+              .select("*")
+              .contains("User_ID", Finalarray)
+              .eq("Ammount_Users", Finalarray.length);
+          if (navigationError) {
+            console.log(navigationError);
+            return;
+          } else {
+            //console.log(navigationdata);
+            const fetchedPersons = navigationdata.map((person) => person);
+            setPersons(fetchedPersons);
+            if (fetchedPersons.length > 0) {
+              navigation.navigate("Message", { user: fetchedPersons[0] });
+            }
+
+            return;
+          }
+          // The duplicate key violation occurred, no need to handle the conflicting row
+        } else {
+          alert("Failed to insert.");
+          // Handle other insert errors
+        }
+        return;
+      }
+      const fetchedPersons = insertData.map((person) => person);
       setPersons(fetchedPersons);
       if (fetchedPersons.length > 0) {
         navigation.navigate("Message", { user: fetchedPersons[0] });
       }
-}}
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Text style={styles.backButtonText}>←</Text>
-          </TouchableOpacity>
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Text style={styles.backButtonText}>←</Text>
+        </TouchableOpacity>
         <Text style={styles.name}>{name}</Text>
         <View style={styles.backButton}></View>
       </View>
@@ -346,13 +348,12 @@ if (insertError) {
         >
           {photos.map((photo, index) => (
             <TouchableWithoutFeedback
-            key={index}
-            onPress={() => handlePhotoPress(index)}
+              key={index}
+              onPress={() => handlePhotoPress(index)}
             >
-            <View key={index}>
-              <Image source={{ uri: photo }} style={styles.photo} />
-              
-            </View>
+              <View key={index}>
+                <Image source={{ uri: photo }} style={styles.photo} />
+              </View>
             </TouchableWithoutFeedback>
           ))}
         </ScrollView>
@@ -403,33 +404,41 @@ if (insertError) {
             </TouchableOpacity>
           </View>
           <View style={styles.bioContainer}>
-          <Entypo name="graduation-cap" marginTop={-2}size={22} color="white" />
-            <Text style={styles.bio}>  Class Of: {class_year}</Text>
+            <Entypo
+              name="graduation-cap"
+              marginTop={-2}
+              size={22}
+              color="white"
+            />
+            <Text style={styles.bio}> Class Of: {class_year}</Text>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalInfoScrollView}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.horizontalInfoScrollView}
+          >
             <View style={styles.infoContainer}>
               <Entypo name="open-book" size={22} color="white" />
-              <Text style={styles.bio}>  {major}</Text>
+              <Text style={styles.bio}> {major}</Text>
             </View>
             <View style={styles.verticalDivider} />
             <View style={styles.infoContainer}>
               <MaterialIcons name="cake" size={22} color="white" />
-              <Text style={styles.bio}>  {age}</Text>
+              <Text style={styles.bio}> {age}</Text>
             </View>
             <View style={styles.verticalDivider} />
             <View style={styles.infoContainer}>
               <Ionicons name="md-person-sharp" size={22} color="white" />
-              <Text style={styles.bio}>  {gender}</Text>
+              <Text style={styles.bio}> {gender}</Text>
             </View>
             <View style={styles.verticalDivider} />
             <View style={styles.infoContainer} paddingRight={30}>
               <MaterialIcons name="home-filled" size={26} color="white" />
-              <Text style={styles.bio}>  {hometown}</Text>
+              <Text style={styles.bio}> {hometown}</Text>
             </View>
           </ScrollView>
           <View style={styles.bioContainer}>
             <View style={styles.roundedContainer}>
-              
               <Text style={styles.bio}>{bio}</Text>
             </View>
           </View>
@@ -492,20 +501,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#1D1D20",
     justifyContent: "space-between",
     paddingVertical: 5,
-    zIndex: 1,
+    zIndex: 3,
   },
-  
+
   backButton: {
     marginRight: 15,
     paddingLeft: 15,
     paddingRight: 15,
   },
-  
+
   name: {
     fontSize: 20,
-    fontWeight: '600',
-    color: 'white',
-    textAlign: 'center',
+    fontWeight: "600",
+    color: "white",
+    textAlign: "center",
   },
   questionaireButtonContainer: {
     flex: 1,
@@ -524,17 +533,18 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    zIndex: 2,
   },
   scrollViewContent: {
     paddingTop: 537,
   },
-  
+
   backButtonText: {
     fontSize: 30,
     color: "#149999",
     zIndex: 1,
   },
-  
+
   photoContainer: {
     height: 440,
     marginLeft: 6,
@@ -543,6 +553,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
     borderRadius: 15,
     borderWidth: 0.7,
+    zIndex: 1,
     // borderColor: "grey",
   },
   photo: {
@@ -720,21 +731,20 @@ const styles = StyleSheet.create({
     borderWidth: 0.4,
     marginRight: 10,
     marginLeft: 10,
-    
   },
-  
+
   infoContainer: {
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 10,
     flexDirection: "row",
   },
-  
+
   verticalDivider: {
     width: 0.3,
-    backgroundColor: 'grey',
-    height: '100%',
-    alignSelf: 'center'
+    backgroundColor: "grey",
+    height: "100%",
+    alignSelf: "center",
   },
   icon: {
     width: 30,

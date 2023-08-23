@@ -87,6 +87,9 @@ export const Name = ({ navigation, route }) => {
       }),
     ]).start();
   };
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+  };
 
   const shakeAnimationStyle = {
     transform: [
@@ -131,6 +134,7 @@ export const Name = ({ navigation, route }) => {
                 {
                   handleUpdate(userData, session);
                   //navigation.navigate("Questionaire1");
+                  //signOut();
                 }
               }}
             >

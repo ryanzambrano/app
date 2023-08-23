@@ -135,7 +135,7 @@ const TagSelectionEdit = ({ navigation, route }) => {
           </Animated.Text>
         )}
 
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
       </View>
     </SafeAreaView>
   );

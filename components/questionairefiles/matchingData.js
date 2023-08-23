@@ -282,7 +282,7 @@ export const MatchingData = ({ navigation, route }) => {
           </View>
         </View>
       </TouchableWithoutFeedback>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 };

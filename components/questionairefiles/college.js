@@ -133,6 +133,7 @@ export const Colleges = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
       </View>
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 };

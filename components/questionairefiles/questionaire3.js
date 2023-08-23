@@ -174,7 +174,7 @@ export default function Questionaire3({ navigation, route }) {
           </View>
         </View>
       </TouchableWithoutFeedback>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 }

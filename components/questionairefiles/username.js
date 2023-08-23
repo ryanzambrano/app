@@ -143,6 +143,7 @@ export const Username = ({ navigation, route }) => {
           </View>
         </View>
       </TouchableWithoutFeedback>
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 };

@@ -80,6 +80,7 @@ const TagSelectionScreen = ({ navigation, route }) => {
           .from("UGC")
           .update({
             tags: userData.tags,
+            has_ugc: true,
           })
           .eq("user_id", session.user.id);
         const { data: profileData, profileError } = await supabase
