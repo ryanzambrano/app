@@ -36,6 +36,7 @@ const MessagingUI = () => {
   const { editedJoinedGroups } = route.params;
   const [joinedGroups, setJoinedGroups] = useState('');
   const [persons, setPersons] = useState([]);
+  const [senderNames, setSenderNames] = useState({});
 
   
 
@@ -78,18 +79,20 @@ const MessagingUI = () => {
         .from("UGC")
         .select("*")
         .in("user_id", extractedIds);
-
+  
       if (error) {
         console.error("Error fetching users:", error);
       } else {
-        const fetchedPersons = data.map((person) => person);
-        setPersons(fetchedPersons);
+        const fetchedPersons = data.reduce((acc, person) => {
+          acc[person.user_id] = person.name;
+          return acc;
+        }, {});
+        setSenderNames(fetchedPersons);
       }
     } catch (error) {
       console.error("An error occurred:", error.message);
     }
   }
-
   async function getJoinedGroups() {
     try {
       const { data, error: sessionError } = await supabase
@@ -131,15 +134,18 @@ const MessagingUI = () => {
   const fetchMessages = async () => {
     const { data, error } = await supabase
       .from("Group Chat Messages")
-      .select("*")
+      .select(`*, UGC (name)`)
       .eq("Group_ID_Sent_To", user.Group_ID)
       .order("created_at", { ascending: false })
       .limit(250);
-
+  
     if (error) {
       console.error(error);
     } else {
       setMessages(data.reverse());
+    }
+    if (data.name && data.UGC.name) {
+      console.log(data.UGC.name);
     }
   };
 
@@ -171,6 +177,8 @@ const MessagingUI = () => {
 
   useEffect(() => {
     if (messages.length > 0) {
+        
+      
       const keyboardDidShowListener = Keyboard.addListener(
         "keyboardDidShow",
         () => {
@@ -235,32 +243,45 @@ const MessagingUI = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.messagesContainer}>
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={({ item }) => (
-            <View
-              style={
-                item.Sent_From === session.user.id
-                  ? styles.messageContainerRight
-                  : styles.messageContainerLeft
-              }
-            >
-              <Text
-                style={[
-                  styles.message,
-                  item.Sent_From === session.user.id
-                    ? { color: "white" } // Change text color for messages from current user
-                    : { color: "white" }, // Use default text color for messages from other user
-                ]}
-              >
-                {item.Message_Content}
-              </Text>
-            </View>
-          )}
-          keyExtractor={(_, index) => index.toString()}
-          contentContainerStyle={styles.messagesContent}
-        />
+      <FlatList
+  ref={flatListRef}
+  data={messages}
+  renderItem={({ item, index }) => {
+    const isOwnMessage = item.Sent_From === session.user.id;
+    const isFirstOwnMessage = isOwnMessage && (index === 0 || messages[index - 1].Sent_From !== session.user.id);
+    const isOtherMessage = item.Sent_From !== session.user.id;
+    const isFirstOtherMessage = isOtherMessage && (index === 0 || messages[index - 1].Sent_From === session.user.id);
+    const shouldDisplaySenderName = user.Ammount_Users >= 3 && isFirstOtherMessage;
+
+    return (
+      <View>
+        {/* Display sender name for the first consecutive message from the sender */}
+        {shouldDisplaySenderName &&(
+          <Text style={styles.senderName}>
+          {item.UGC.name}
+          </Text>
+        )}
+        <View
+          style={[
+            styles.messageContainer,
+            isOwnMessage ? styles.messageContainerRight : styles.messageContainerLeft,
+          ]}
+        >
+          <Text
+            style={[
+              styles.message,
+              isOwnMessage ? { color: "white" } : {color :"white"},
+            ]}
+          >
+            {item.Message_Content}
+          </Text>
+        </View>
+      </View>
+    );
+  }}
+  keyExtractor={(_, index) => index.toString()}
+  contentContainerStyle={styles.messagesContent}
+/>
       </View>
       <View style={styles.inputContainer}>
         <TextInput
@@ -287,6 +308,13 @@ const MessagingUI = () => {
 };
 
 const styles = StyleSheet.create({
+  senderName: {
+    marginVertical: 2,
+    color: "#afafb2",
+    fontWeight: "bold",
+    fontSize: 7,
+    marginLeft: 7,
+  },
   container: {
     flex: 1,
     padding: 10,

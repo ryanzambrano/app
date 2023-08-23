@@ -9,13 +9,14 @@ import Profile from "../profiletab/profile";
 import { MaterialIcons } from '@expo/vector-icons';
 import { Foundation } from '@expo/vector-icons';  
 import { FontAwesome5 } from '@expo/vector-icons'; 
+
 const Tab = createBottomTabNavigator(); // Initializes bottom tab navigator
 
 const TabNavigator = ({ route }) => {
   const { session } = route.params;
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName="Contacts"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
