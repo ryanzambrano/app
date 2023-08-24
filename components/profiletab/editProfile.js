@@ -107,7 +107,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
   const updateProfile = async () => {
     if (session?.user) {
-      if (editedUser.bio.length < 200) {
+      if (editedUser.bio.length < 500) {
         const { data, error } = await supabase
           .from("UGC")
           .update([

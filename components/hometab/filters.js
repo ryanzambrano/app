@@ -188,8 +188,10 @@ const FiltersUI = ({ route }) => {
         />
       </View>
       <TouchableOpacity onPress={handleApplyFilters}>
-        <Text style={styles.applyButton}>Apply Filters</Text>
-      </TouchableOpacity>
+      <View style={styles.applyButtonContainer}>
+        <Text style={styles.applyButtonText}>Apply Filters</Text>
+      </View>
+    </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -250,16 +252,18 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     marginHorizontal: -10,
   },
-  applyButton: {
+  applyButtonContainer: {
     alignSelf: "center",
+    backgroundColor: "#149999",
+    borderRadius: 10,  
+    marginTop: 20,
+  },
+  applyButtonText: {
     fontSize: 15,
     fontWeight: "bold",
-    backgroundColor: "#149999",
     color: "white",
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 10,
-    marginTop: 20,
   },
 });
 

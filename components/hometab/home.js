@@ -17,7 +17,6 @@ import { supabase } from "../auth/supabase.js"; // we have our client here!!! no
 import { picURL } from "../auth/supabase.js"; // This is the base url of the photos bucket that is in our Supabase project. It makes referencing user pictures easier
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { StatusBar } from "expo-status-bar";
 
 const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
@@ -172,7 +171,7 @@ const Home = ({ route }) => {
         (isGenderMatch || genderPreference === "Any") &&
         (isAgeMatch ||
           (youngestAgePreference === "Any" && oldestAgePreference === "Any")) &&
-        (isStudyMatch || studyPreference === "Any")
+        (isStudyMatch || studyPreference === "Any") 
       );
     }
 
@@ -278,6 +277,9 @@ const Home = ({ route }) => {
   };
 
   const renderUserCard = ({ item }) => {
+    if (!item.lastModified) {
+      return null;
+    }
     return (
       <TouchableOpacity onPress={() => handleUserCardPress(item)}>
         <View style={styles.card}>
@@ -369,7 +371,6 @@ const Home = ({ route }) => {
           ListEmptyComponent={renderEmptyComponent}
         />
       </View>
-      <StatusBar style="light" />
     </SafeAreaView>
   );
 };
