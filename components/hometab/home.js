@@ -31,6 +31,7 @@ const Home = ({ route }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkedProfiles, setBookmarkedProfiles] = useState([]);
+  const [blockedProfiles, setBlockedProfiles] = useState([]);
   const isFocused = useIsFocused();
 
   const {
@@ -139,6 +140,8 @@ const Home = ({ route }) => {
 
   const filteredUsers = sortedUsers.filter((user) => {
     const isSessionUser = user.user_id === session.user.id;
+    const isBlocked = blockedProfiles.includes(user.user_id);
+    
     const nameMatch = user.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -159,7 +162,7 @@ const Home = ({ route }) => {
     const isStudyMatch =
       studyPreference === "Any" || user.profiles.studies === studyPreference;
 
-    if (isSessionUser) {
+    if (isSessionUser || isBlocked) {
       return false;
     }
 
@@ -254,6 +257,23 @@ const Home = ({ route }) => {
             const { bookmarked_profiles } = bookmarkedData[0];
             setBookmarkedProfiles(bookmarked_profiles);
           }
+
+          const { data: blockedData, error: blockedError } =
+          await supabase
+            .from("UGC")
+            .select("blocked_profiles")
+            .eq("user_id", userId);
+        if (blockedError) {
+          console.error(
+            "Error fetching blocked profiles:",
+            blockedError.message
+          );
+        } else {
+          const { blocked_profiles } = blockedData[0];
+          setBlockedProfiles(blocked_profiles);
+        }
+
+
           setUsers(mergedData);
         }
       } catch (error) {

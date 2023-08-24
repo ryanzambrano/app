@@ -1,5 +1,6 @@
 import { React, useEffect, useState, useRef } from "react";
 import {
+  Alert,
   View,
   Text,
   ScrollView,
@@ -15,6 +16,7 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { AntDesign } from '@expo/vector-icons'; 
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
@@ -70,6 +72,7 @@ const UserCard = ({ navigation, route }) => {
     `${picURL}/${user_id}/${user_id}-0-${lastModified}`,
   ]);
   const [isFriendAdded, setIsFriendAdded] = useState(false);
+  const [isProfileBlocked, setIsProfileBlocked] = useState(false);
   const buttonColor = isFriendAdded ? "#14999999" : "#1D1D20";
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
   const [prompts, setPrompts] = useState([]);
@@ -159,6 +162,59 @@ const UserCard = ({ navigation, route }) => {
     fetchBookmarkedProfiles();
     fetchPrompts();
   }, []);
+
+  const handleBlockUser = async (user_id) => {
+    Alert.alert(
+    'Block User',
+    'Are you sure you want to block this user?',
+    [
+      {
+        text: 'Exit',
+        style: 'cancel',
+      },
+      {
+        text: 'Block User',
+        style: 'cancel',
+        onPress: async () => await actuallyBlockUser(user_id),
+      },
+    ]
+  );
+};
+
+const actuallyBlockUser = async (user_id) => {
+  console.log('blocking');
+  const userId = session.user.id;
+  try {
+    const { data, error } = await supabase
+      .from("UGC")
+      .select("blocked_profiles")
+      .eq("user_id", userId);
+
+    if (error) {
+      console.error("Error fetching blocked_profiles:", error.message);
+      return;
+    }
+
+    const { blocked_profiles } = data[0];
+    console.log(user_id);
+    if (!blocked_profiles.includes(user_id)) {
+      const updatedBlockedProfiles = [...blocked_profiles, user_id];
+      const { data: updateData, error: updateError } = await supabase
+        .from("UGC")
+        .update({ blocked_profiles: updatedBlockedProfiles })
+        .eq("user_id", userId);
+
+      if (updateError) {
+        console.error("Error updating blocked_profiles:", updateError.message);
+      } else {
+        setIsProfileBlocked(true);
+      }
+    }
+  } catch (error) {
+    console.error("Error blocking profile:", error.message);
+  }
+  navigation.goBack();
+};
 
   const handleAddFriend = async (user_id) => {
     const userId = session.user.id;
@@ -280,7 +336,7 @@ const UserCard = ({ navigation, route }) => {
         .insert([
           {
             User_ID: Finalarray,
-            Group_Name: combinedString, // Join selected user names with commas
+            Group_Name: combinedString, 
             Ammount_Users: Finalarray.length,
           },
         ])
@@ -307,10 +363,8 @@ const UserCard = ({ navigation, route }) => {
 
             return;
           }
-          // The duplicate key violation occurred, no need to handle the conflicting row
         } else {
           alert("Failed to insert.");
-          // Handle other insert errors
         }
         return;
       }
@@ -333,7 +387,14 @@ const UserCard = ({ navigation, route }) => {
         </TouchableOpacity>
         <Text style={styles.name}>{name}</Text>
         <View style={styles.backButton}></View>
+        <TouchableOpacity
+          onPress={() => handleBlockUser(user_id)}
+          style={styles.blockButton}
+        >
+          <AntDesign name="deleteuser" size={24} color="white" />
+        </TouchableOpacity>
       </View>
+      
       <Animated.View
         style={{
           ...styles.profileContainer,
@@ -507,11 +568,14 @@ const styles = StyleSheet.create({
   backButton: {
     marginRight: 15,
     paddingLeft: 15,
-    paddingRight: 15,
+    paddingRight: 40,
   },
-
+  blockButton: {
+    paddingRight: 10,
+  },
   name: {
     fontSize: 20,
+    marginRight: -50,
     fontWeight: "600",
     color: "white",
     textAlign: "center",
