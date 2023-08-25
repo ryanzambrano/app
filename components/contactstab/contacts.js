@@ -28,6 +28,7 @@ const ContactsUI = ({ route }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const isFocused = useIsFocused();
+  const [images, setImages] = useState([]);
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -65,6 +66,8 @@ const ContactsUI = ({ route }) => {
   const sessionusername = data.name;
 
   const modifiedUsers = await Promise.all(users.map(async (user) => {
+    const extractedIds = user.User_ID.filter((item) => item !== session.user.id);
+    console.log(extractedIds)
     const groupNames = user.Group_Name.split(",").map((name) => name.trim());
     const filteredGroupNames = groupNames.filter(
       (name) => name !== sessionusername
@@ -84,11 +87,29 @@ const ContactsUI = ({ route }) => {
       //console.error(messageError);
       return { ...user, joinedGroups, recentMessage: null };
     }
+    const { data: Imagedata, error: ImageError } = await supabase
+      .from("images")
+      .select('*')
+      .in("user_id", extractedIds)
+      .eq("image_index", 0)
+      .limit(2);
+      if(Imagedata)
+      {
+        //console.log(Imagedata.length);
+        const image = Imagedata.map(image => image);
+        setImages(image);
+      }
+      else
+      {
+
+      }
 
     return {
       ...user,
       joinedGroups,
       recentMessage: recentMessageData,
+      images,
+      //lastmodified: Imagedata.last_modified,
     };
   }));
   
@@ -132,9 +153,7 @@ const ContactsUI = ({ route }) => {
 
   useEffect(() => {
     fetchUsers();
-    if (isFocused) {
-      fetchUsers();
-    }
+   
     const channel = supabase
       .channel("custom-all-channel")
       .on(
@@ -212,7 +231,7 @@ const ContactsUI = ({ route }) => {
           [
             {
               text: "Yes",
-              onPress: handleDelete,
+              onPress: console.log(item.images),
             },
             {
               text: "No",
@@ -220,6 +239,7 @@ const ContactsUI = ({ route }) => {
           ]
         );
       };
+      
       return (
         <TouchableOpacity onPress={handleDeleteConfirmation}>
           <Animated.View
@@ -238,21 +258,46 @@ const ContactsUI = ({ route }) => {
         </TouchableOpacity>
       );
     };
-
-    return (
-      <Swipeable
-        renderRightActions={renderRightActions}
-        overshootRight={false} // Disable the bounce effect
-        useNativeDriver={true} // Use native driver to prevent bounce effect
-      >
-           <TouchableOpacity onPress={() => handleUserCardPress(item)}>
-        <View style={styles.contactItem}>
+const renderProfilePicture = () => {
+        if (item.Ammount_Users > 2) {
+          // Overlay two profile pictures
+          return (
+            <View style={{ position: "relative" }}>
           <Image
-            style={styles.profilePicture}
+            style={[styles.layeredImage, { zIndex: 1, bottom: 6, }]}
             source={{
-              uri: "https://upload.wikimedia.org/wikipedia/commons/f/f1/Andrew_Tate_on_%27Anything_Goes_With_James_English%27_in_2021.jpg"  // Use the actual field for the profile picture},
+              uri: `${picURL}/${images[0].user_id}/${images[0].user_id}-0-${images[0].last_modified}`, // Replace with actual URLs
             }}
           />
+          <Image
+            style={[styles.layeredImage, { zIndex: 2, position: "absolute", top: 7, left: 17, }]}
+            source={{
+              uri: `${picURL}/${images[0].user_id}/${images[0].user_id}-0-${images[0].last_modified}`, // Replace with actual URLs
+            }}
+          />
+        </View>
+          );
+        } else {
+          // Single profile picture
+          return (
+            <Image
+              style={styles.profilePicture}
+              source={{
+                uri: `${picURL}/${images[0].user_id}/${images[0].user_id}-0-${images[0].last_modified}`, // Replace with actual URL
+              }}
+            />
+          );
+        }
+      };
+    return (
+      <Swipeable
+      renderRightActions={renderRightActions}
+      overshootRight={false}
+      useNativeDriver={true}
+    >
+      <TouchableOpacity onPress={() => handleUserCardPress(item)}>
+        <View style={styles.contactItem}>
+          {renderProfilePicture()}
           <View style={styles.contactInfo}>
             <View style={styles.contactNameContainer}>
               <Text style={styles.contactName}>{item.joinedGroups}</Text>
@@ -270,7 +315,7 @@ const ContactsUI = ({ route }) => {
           </View>
         </View>
       </TouchableOpacity>
-      </Swipeable>
+    </Swipeable>
     );
   };
   return (
@@ -316,6 +361,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#1D1D20",
+  },
+  layeredImage: {
+    width: 40, // Set the width as needed
+    height: 40, // Set the height as needed
+    borderRadius: 20,
+    marginRight: 25,
   },
   header: {
     flexDirection: "row",

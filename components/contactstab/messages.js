@@ -88,6 +88,10 @@ const MessagingUI = () => {
           return acc;
         }, {});
         setSenderNames(fetchedPersons);
+        const people = data.map(person => person);
+        setPersons(people);
+        //console.log(persons[0].name);
+        
       }
     } catch (error) {
       console.error("An error occurred:", error.message);
@@ -145,7 +149,7 @@ const MessagingUI = () => {
       setMessages(data.reverse());
     }
     if (data.name && data.UGC.name) {
-      console.log(data.UGC.name);
+      //console.log(data.UGC.name);
     }
   };
 
@@ -361,13 +365,13 @@ const styles = StyleSheet.create({
   },
   messageContainerRight: {
     borderRadius: 20,
-    marginBottom: 10,
+    marginBottom: 2,
     alignSelf: "flex-end",
     backgroundColor: "#14999999",
   },
   messageContainerLeft: {
     borderRadius: 20,
-    marginBottom: 10,
+    marginBottom: 2,
     alignSelf: "flex-start",
     backgroundColor: "#2B2D2F",
   },
