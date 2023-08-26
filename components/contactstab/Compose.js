@@ -59,18 +59,24 @@ const ComposeMessageScreen = ({ route }) => {
   };
 
   const fetchUsers = async () => {
-    const { data: users, error } = await supabase.from("UGC").select("*");
+    const { data: users, error } = await supabase
+    .from("UGC")
+    .select("*")
+    .neq("user_id", session.user.id);
     if (error) {
       console.error(error);
       return;
     }
 
     // Filter out the current user using session.user.id
-    const filteredUsers = users.filter(
-      (user) => user.user_id !== session.user.id
-    );
+    //console.log(users[0].name);
+    /*const { data: Imagedata, error: ImageError } = await supabase
+    .from("images")
+    .select('last_modified, user_id')
+    .in("user_id", filteredUsers)
+    .eq("image_index", 0);*/
 
-    setUsers(filteredUsers);
+    setUsers(users);
   };
 
   const handleUserCardPress = (user) => {
