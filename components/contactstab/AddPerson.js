@@ -23,7 +23,7 @@ const AddPerson = ({ route }) => {
   const [persons, setPersons] = useState([]);
   const navigation = useNavigation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-  const { session, user } = route.params;
+  const { session, group } = route.params;
   const [users, setUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,12 +43,11 @@ const AddPerson = ({ route }) => {
   }, [selectedUsers]);
 
   const fetchUsers = async () => {
-    console.log(user.User_ID);
 
     const { data: users, error } = await supabase
     .from("UGC")
     .select("*")
-    .neq('user_id', session.user.id);
+    .not('user_id', 'in', `(${group.User_ID})`);
     if (error) {
       console.error(error);
       return;
@@ -93,12 +92,9 @@ const AddPerson = ({ route }) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
   const handleCreateMessage = async () => {
-    console.log(users.group_name);
-     
+    const selectedUserIDs = selectedUsers.map((user) => user.user_id);
   };
 
-  const selectedUserNames = selectedUsers.map((selected) => user.name).join(" ");
-  const isNamesSelected = selectedUserNames.length > 0;
 
   const createButtonLabel =
     selectedUsers.length <= 1 ? "Add" : "Add";

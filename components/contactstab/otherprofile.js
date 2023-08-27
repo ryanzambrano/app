@@ -158,7 +158,7 @@ const GroupChatScreen = ({ }) => {
 
     }
   };
-  const handleAddButtonPress = () => (navigation.navigate("AddPerson", {user}))
+  const handleAddButtonPress = () => (navigation.navigate("AddPerson", {group: user}))
 
   const renderUserItem = ({ item }) => (
     <TouchableOpacity onPress={() => handleUserPress(item)}>
