@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
-import { AntDesign } from '@expo/vector-icons'; 
+import { AntDesign } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
@@ -164,57 +164,56 @@ const UserCard = ({ navigation, route }) => {
   }, []);
 
   const handleBlockUser = async (user_id) => {
-    Alert.alert(
-    'Block User',
-    'Are you sure you want to block this user?',
-    [
+    Alert.alert("Block User", "Are you sure you want to block this user?", [
       {
-        text: 'Exit',
-        style: 'cancel',
+        text: "Exit",
+        style: "cancel",
       },
       {
-        text: 'Block User',
-        style: 'cancel',
+        text: "Block User",
+        style: "cancel",
         onPress: async () => await actuallyBlockUser(user_id),
       },
-    ]
-  );
-};
+    ]);
+  };
 
-const actuallyBlockUser = async (user_id) => {
-  console.log('blocking');
-  const userId = session.user.id;
-  try {
-    const { data, error } = await supabase
-      .from("UGC")
-      .select("blocked_profiles")
-      .eq("user_id", userId);
-
-    if (error) {
-      console.error("Error fetching blocked_profiles:", error.message);
-      return;
-    }
-
-    const { blocked_profiles } = data[0];
-    console.log(user_id);
-    if (!blocked_profiles.includes(user_id)) {
-      const updatedBlockedProfiles = [...blocked_profiles, user_id];
-      const { data: updateData, error: updateError } = await supabase
+  const actuallyBlockUser = async (user_id) => {
+    console.log("blocking");
+    const userId = session.user.id;
+    try {
+      const { data, error } = await supabase
         .from("UGC")
-        .update({ blocked_profiles: updatedBlockedProfiles })
+        .select("blocked_profiles")
         .eq("user_id", userId);
 
-      if (updateError) {
-        console.error("Error updating blocked_profiles:", updateError.message);
-      } else {
-        setIsProfileBlocked(true);
+      if (error) {
+        console.error("Error fetching blocked_profiles:", error.message);
+        return;
       }
+
+      const { blocked_profiles } = data[0];
+      console.log(user_id);
+      if (!blocked_profiles.includes(user_id)) {
+        const updatedBlockedProfiles = [...blocked_profiles, user_id];
+        const { data: updateData, error: updateError } = await supabase
+          .from("UGC")
+          .update({ blocked_profiles: updatedBlockedProfiles })
+          .eq("user_id", userId);
+
+        if (updateError) {
+          console.error(
+            "Error updating blocked_profiles:",
+            updateError.message
+          );
+        } else {
+          setIsProfileBlocked(true);
+        }
+      }
+    } catch (error) {
+      console.error("Error blocking profile:", error.message);
     }
-  } catch (error) {
-    console.error("Error blocking profile:", error.message);
-  }
-  navigation.goBack();
-};
+    navigation.goBack();
+  };
 
   const handleAddFriend = async (user_id) => {
     const userId = session.user.id;
@@ -336,7 +335,7 @@ const actuallyBlockUser = async (user_id) => {
         .insert([
           {
             User_ID: Finalarray,
-            Group_Name: combinedString, 
+            Group_Name: combinedString,
             Ammount_Users: Finalarray.length,
           },
         ])
@@ -394,7 +393,7 @@ const actuallyBlockUser = async (user_id) => {
           <AntDesign name="deleteuser" size={24} color="white" />
         </TouchableOpacity>
       </View>
-      
+
       <Animated.View
         style={{
           ...styles.profileContainer,
@@ -408,10 +407,7 @@ const actuallyBlockUser = async (user_id) => {
           pagingEnabled={true}
         >
           {photos.map((photo, index) => (
-            <TouchableWithoutFeedback
-              key={index}
-              onPress={() => handlePhotoPress(index)}
-            >
+            <TouchableWithoutFeedback key={index}>
               <View key={index}>
                 <Image source={{ uri: photo }} style={styles.photo} />
               </View>
@@ -471,7 +467,7 @@ const actuallyBlockUser = async (user_id) => {
               size={22}
               color="white"
             />
-            <Text style={styles.bio}> Class Of: {class_year}</Text>
+            <Text style={styles.bio}> {class_year}</Text>
           </View>
           <ScrollView
             horizontal
@@ -503,12 +499,7 @@ const actuallyBlockUser = async (user_id) => {
               <Text style={styles.bio}>{bio}</Text>
             </View>
           </View>
-          <View style={styles.ageMajorGradeContainer}>
-            <Text style={styles.bio}>
-              Do you plan on living in an apartment or dorm?: {"\n\n"}
-              {living_preferences}
-            </Text>
-          </View>
+
           <TouchableOpacity
             style={styles.questionaireButtonContainer}
             onPress={() => handleQuestionaireButtonPress()}
@@ -597,10 +588,11 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    zIndex: 2,
+    //zIndex: 1,
   },
   scrollViewContent: {
-    paddingTop: 537,
+    paddingTop: 550,
+    zIndex: 1,
   },
 
   backButtonText: {
@@ -644,6 +636,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.75,
     shadowRadius: 4.84,
+    zIndex: 2,
   },
   fullPhoto: {
     width: "100%",

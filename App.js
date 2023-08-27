@@ -29,7 +29,8 @@ const App = () => {
         setSession(session);
         checkUserProfile(session);
       } else {
-        setSession(false); // If there is no session, we stop loading and allow the Authentication component to render
+        setSession(false);
+        setIsLoading(false); // If there is no session, we stop loading and allow the Authentication component to render
       }
     });
 
@@ -38,7 +39,8 @@ const App = () => {
       if (session) {
         checkUserProfile(session);
       } else {
-        setSession(false); // If there is no session, we stop loading and allow the Authentication component to render
+        setSession(false);
+        setIsLoading(false); // If there is no session, we stop loading and allow the Authentication component to render
       }
     });
   }, []);
@@ -73,13 +75,13 @@ const App = () => {
         /*if (data == true && ugcData) {
           setHasProfile(hasProfile);
         }*/
-
-        if (error) {
-          setIsLoading(false);
-
-          throw new Error("error.message");
-        }
       }
+      if (error || ugcError) {
+        setIsLoading(false);
+
+        throw new Error("error.message");
+      }
+
       if (data.profile_complete == true && ugcData.has_ugc == true) {
         const hasProfile = !!data.profile_complete;
 

@@ -101,10 +101,6 @@ export const EditProfileScreen = ({ navigation, route }) => {
   };
   2;
 
-  handleEditPictures = async () => {
-    navigation.navigate("AddProfileImages");
-  };
-
   const updateProfile = async () => {
     if (session?.user) {
       if (editedUser.bio.length < 500) {

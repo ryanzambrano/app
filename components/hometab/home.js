@@ -17,7 +17,9 @@ import { supabase } from "../auth/supabase.js"; // we have our client here!!! no
 import { picURL } from "../auth/supabase.js"; // This is the base url of the photos bucket that is in our Supabase project. It makes referencing user pictures easier
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { StatusBar } from "expo-status-bar";
 
+const logo = require("../../assets/logo3.png");
 const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
 
@@ -141,7 +143,7 @@ const Home = ({ route }) => {
   const filteredUsers = sortedUsers.filter((user) => {
     const isSessionUser = user.user_id === session.user.id;
     const isBlocked = blockedProfiles.includes(user.user_id);
-    
+
     const nameMatch = user.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -174,7 +176,7 @@ const Home = ({ route }) => {
         (isGenderMatch || genderPreference === "Any") &&
         (isAgeMatch ||
           (youngestAgePreference === "Any" && oldestAgePreference === "Any")) &&
-        (isStudyMatch || studyPreference === "Any") 
+        (isStudyMatch || studyPreference === "Any")
       );
     }
 
@@ -258,21 +260,19 @@ const Home = ({ route }) => {
             setBookmarkedProfiles(bookmarked_profiles);
           }
 
-          const { data: blockedData, error: blockedError } =
-          await supabase
+          const { data: blockedData, error: blockedError } = await supabase
             .from("UGC")
             .select("blocked_profiles")
             .eq("user_id", userId);
-        if (blockedError) {
-          console.error(
-            "Error fetching blocked profiles:",
-            blockedError.message
-          );
-        } else {
-          const { blocked_profiles } = blockedData[0];
-          setBlockedProfiles(blocked_profiles);
-        }
-
+          if (blockedError) {
+            console.error(
+              "Error fetching blocked profiles:",
+              blockedError.message
+            );
+          } else {
+            const { blocked_profiles } = blockedData[0];
+            setBlockedProfiles(blocked_profiles);
+          }
 
           setUsers(mergedData);
         }
@@ -332,12 +332,7 @@ const Home = ({ route }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.logoTitleContainer}>
-          <Image
-            style={styles.logo}
-            source={{
-              uri: "https://cdn3.iconfinder.com/data/icons/miscellaneous-331-color-shadow/128/roommates_lodger_resident_roomer_habitant_denizen_friend_hostel_dorm_dormitory-256.png",
-            }}
-          />
+          <Image style={styles.logo} source={logo} />
           <Text style={styles.headerText}> Cabana </Text>
         </View>
         <View style={styles.buttonContainer}>
@@ -391,6 +386,7 @@ const Home = ({ route }) => {
           ListEmptyComponent={renderEmptyComponent}
         />
       </View>
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 };
