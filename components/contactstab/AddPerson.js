@@ -19,11 +19,11 @@ import { picURL } from "../auth/supabase.js";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 
-const ComposeMessageScreen = ({ route }) => {
+const AddPerson = ({ route }) => {
   const [persons, setPersons] = useState([]);
   const navigation = useNavigation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-  const { session } = route.params;
+  const { session, user } = route.params;
   const [users, setUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,7 +31,6 @@ const ComposeMessageScreen = ({ route }) => {
 
   useEffect(() => {
     fetchUsers();
-    fetchSessionUsername();
   }, []);
 
   useEffect(() => {
@@ -43,27 +42,13 @@ const ComposeMessageScreen = ({ route }) => {
     }
   }, [selectedUsers]);
 
-  const fetchSessionUsername = async () => {
-    const { data, error } = await supabase
-      .from("UGC")
-      .select("name")
-      .eq("user_id", session.user.id)
-      .single();
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    setSessionUsername(data.name);
-  };
-
   const fetchUsers = async () => {
+    console.log(user.User_ID);
 
     const { data: users, error } = await supabase
     .from("UGC")
     .select("*")
-    .neq("user_id", session.user.id);
+    .neq('user_id', session.user.id);
     if (error) {
       console.error(error);
       return;
@@ -108,70 +93,15 @@ const ComposeMessageScreen = ({ route }) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
   const handleCreateMessage = async () => {
-    try {
-      const selectedUserNames = selectedUsers.map((user) => user.name);
-      selectedUserNames.push(sessionusername);
-      selectedUserNames.sort();
-      const usernames = selectedUserNames.join(", ");
-
-      // Get the IDs of the selected users
-      const selectedUserIDs = selectedUsers.map((user) => user.user_id);
-      selectedUserIDs.push(session.user.id);
-      selectedUserIDs.sort();
-
-      // Insert the new record with User_ID, Group_ID, and Group_Name
-      const { data: insertData, error: insertError } = await supabase
-        .from("Group Chats")
-        .insert([
-          {
-            User_ID: selectedUserIDs,
-            Group_Name: usernames, // Join selected user names with commas
-            Ammount_Users: selectedUserIDs.length,
-          },
-        ])
-        .select();
-
-      if (insertError) {
-        if (insertError.code === "23505") {
-          const { data: navigationdata, error: navigationError } =
-            await supabase
-              .from("Group Chats")
-              .select("*")
-              .contains("User_ID", selectedUserIDs)
-              .eq("Ammount_Users", selectedUserIDs.length);
-          if (navigationError) {
-            console.log(navigationError);
-            return;
-          } else {
-            //console.log(navigationdata);
-            const fetchedPersons = navigationdata.map((person) => person);
-            setPersons(fetchedPersons);
-            if (fetchedPersons.length > 0) {
-              navigation.navigate("Message", { user: fetchedPersons[0] });
-            }
-
-            return;
-          }
-          // The duplicate key violation occurred, no need to handle the conflicting row
-        } else {
-          alert("Failed to insert.");
-          // Handle other insert errors
-        }
-        return;
-      }
-
-      // Log the Group_ID
-    } catch (err) {
-      console.error("An error occurred:", err);
-    }
-    navigation.goBack();
+    console.log(users.group_name);
+     
   };
 
-  const selectedUserNames = selectedUsers.map((user) => user.name).join(" ");
+  const selectedUserNames = selectedUsers.map((selected) => user.name).join(" ");
   const isNamesSelected = selectedUserNames.length > 0;
 
   const createButtonLabel =
-    selectedUsers.length <= 1 ? "Create Message" : "Create Group Chat";
+    selectedUsers.length <= 1 ? "Add" : "Add";
 
   const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -216,7 +146,7 @@ const ComposeMessageScreen = ({ route }) => {
           >
             <AntDesign name="arrowleft" size={24} color="#159e9e" />
           </TouchableOpacity>
-          <Text style={styles.composeHeader}>{"Compose Message"}</Text>
+          <Text style={styles.composeHeader}>{"Add to Group"}</Text>
         </View>
       </SafeAreaView>
 
@@ -430,7 +360,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "white",
-    paddingRight: 120,
+    paddingRight: 142,
     //justifyContent: "center",
   },
   cancelButton: {
@@ -445,4 +375,4 @@ const styles = StyleSheet.create({
     paddingLeft: 1,
   },
 });
-export default ComposeMessageScreen;
+export default AddPerson;

@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 // Page Imports
 import MessagingUI from "../contactstab/messages";
 import ComposeMessageScreen from "../contactstab/Compose";
+import AddPerson from "../contactstab/AddPerson";
 import TabNavigator from "./TabNavigator";
 import ProfileUI from "../contactstab/otherprofile";
 import UserCard from "../hometab/userCard.js";
@@ -99,6 +100,13 @@ const ThreeMainPages = ({ route }) => {
           name="GroupChatScreen"
           component={GroupChatScreen}
           initialParams={{ session }}
+        />
+          <Stack.Screen
+          name="AddPerson"
+          mode="modal"
+          component={AddPerson}
+          initialParams={{ session }}
+          options={{ presentation: "modal" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

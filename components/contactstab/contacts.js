@@ -515,7 +515,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 400,
     color: "white",
-    position: "relative",
   },
   MessageTime: {
     fontSize: 14,
