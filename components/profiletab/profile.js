@@ -12,6 +12,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
+import ConfettiCannon from 'react-native-confetti-cannon';
 import { fetchUsername } from "../auth/profileUtils.js";
 import { supabase } from "../auth/supabase.js";
 import { StatusBar } from "expo-status-bar";
@@ -146,11 +147,12 @@ export const Profile = ({ navigation, route }) => {
   };
 
   return (
+    
     <SafeAreaView style={styles.container}>
       <View style={styles.viewContainer}>
+         {/* <ConfettiCannon count={200} origin={{x: -10, y: 0}} /> */}
         <View style={styles.topBar}>
           <Text style={styles.username}>{isUsername}</Text>
-
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.editButton}
@@ -173,7 +175,7 @@ export const Profile = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
         </View>
-
+        
         <Animated.View
           style={{
             ...styles.profileContainer,

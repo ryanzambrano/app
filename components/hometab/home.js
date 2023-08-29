@@ -110,9 +110,9 @@ const Home = ({ route }) => {
       score += 5;
     if (sessionUser.profiles.sleep_time === otherUser.profiles.sleep_time)
       score += 5;
-    if (sessionUser.living_preferences === otherUser.living_preferences)
+    if (sessionUser.profiles.living_preferences === otherUser.profiles.living_preferences)
       score += 5;
-    if (sessionUser.studies === otherUser.studies) score += 3;
+    if (sessionUser.profiles.studies === otherUser.profiles.studies) score += 3;
     if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 2;
     if (sessionUser.class_year === otherUser.class_year) score += 2;
     if (sessionUser.profiles.gender === otherUser.profiles.gender) score += 1;
@@ -154,10 +154,10 @@ const Home = ({ route }) => {
     // console.log(housingPreference);
     const isHousingMatch =
       housingPreference === "Any" ||
-      user.living_preferences === housingPreference;
+      user.profiles.living_preferences === housingPreference;
     //console.log(isHousingMatch);
     const isGenderMatch =
-      genderPreference === "Any" || user.gender === genderPreference;
+      genderPreference === "Any" || user.profiles.gender === genderPreference;
     const isAgeMatch =
       (youngestAgePreference === "Any" || user.age >= youngestAgePreference) &&
       (oldestAgePreference === "Any" || user.age <= oldestAgePreference);
