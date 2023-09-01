@@ -93,7 +93,23 @@ const AddPerson = ({ route }) => {
   };
   const handleCreateMessage = async () => {
     const selectedUserIDs = selectedUsers.map((user) => user.user_id);
-  };
+    const groupids = group.User_ID;
+    
+    // Combine the arrays using the concat() method
+    const combinedArray = selectedUserIDs.concat(groupids);
+    const finalarray = combinedArray.sort();
+    const { data: insertData, error: insertError } = await supabase
+        .from("Group Chats")
+        .update({ User_ID: finalarray, Ammount_Users: finalarray.length })
+        .contains("User_ID", groupids)
+        .eq("Ammount_Users", groupids.length);
+        if(insertError) {
+           console.log(insertError);
+        }
+        navigation.goBack();
+   
+
+  }
 
 
   const createButtonLabel =

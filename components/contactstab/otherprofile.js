@@ -5,6 +5,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { supabase } from "../auth/supabase";
 import { picURL } from "../auth/supabase.js";
+import { Alert } from 'react-native';
 
 const GroupChatScreen = ({ }) => {
   const [persons, setPersons] = useState([]);
@@ -160,6 +161,63 @@ const GroupChatScreen = ({ }) => {
   };
   const handleAddButtonPress = () => (navigation.navigate("AddPerson", {group: user}))
 
+
+const handleLeaveButtonPress = async () => {
+  if (user.Ammount_Users === 3) {
+    // Display an alert when there are 3 users in the group chat
+    Alert.alert(
+      'Cannot Leave Group Chat',
+      'You cannot leave a group chat with only 3 people.',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            // User pressed 'OK', do nothing or show any other message if needed
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  } else {
+    // Create a confirmation dialog for leaving the group chat
+    Alert.alert(
+      'Leave Group Chat',
+      'This will remove you from this group chat. Are you sure you want to continue?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+          onPress: () => {
+            // User pressed 'No', do nothing
+          },
+        },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            const groupids = user.User_ID;
+            const filteredGroupIds = groupids.filter(groupId => groupId !== session.user.id);
+  
+            const { data: insertData, error: insertError } = await supabase
+              .from("Group Chats")
+              .update({ User_ID: filteredGroupIds, Ammount_Users: filteredGroupIds.length })
+              .contains("User_ID", groupids)
+              .eq("Ammount_Users", groupids.length);
+  
+            if (insertError) {
+              console.log(insertError);
+            }
+  
+            // Move the navigation statement here
+            navigation.navigate("Contacts");
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  }
+};
+
+
   const renderUserItem = ({ item }) => (
     <TouchableOpacity onPress={() => handleUserPress(item)}>
       <View style={styles.contactContainer}>
@@ -221,11 +279,8 @@ const GroupChatScreen = ({ }) => {
           <AntDesign name="addusergroup" size={24} color="white"/>
           <Text style={{ color: 'white' }}>Add</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={{ alignItems: 'center', marginRight: 50, marginBottom: 20 }}>
-          <AntDesign name="search1" size={24} color="white" />
-          <Text style={{ color: 'white' }}>Search</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{ alignItems: 'center' }}>
+        <TouchableOpacity style={{ alignItems: 'center' }}
+        onPress={handleLeaveButtonPress}>
           <Icon name="meeting-room" size={24} color="white" />
           <Text style={{ color: 'white' }}>Leave</Text>
         </TouchableOpacity>
