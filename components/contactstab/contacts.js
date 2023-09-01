@@ -90,7 +90,7 @@ const ContactsUI = ({ route }) => {
 
         const { data: Imagedata, error: ImageError } = await supabase
           .from("images")
-          .select("last_modified, user_id")
+          .select('*')
           .in("user_id", extractedIds)
           .eq("image_index", 0);
         if (ImageError && !messageError) {
