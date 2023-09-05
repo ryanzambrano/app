@@ -37,7 +37,7 @@ const profileZIndex = scrollY.interpolate({
   extrapolate: "clamp",
 });
 
-const UserCard = ({ navigation, route }) => {
+const MessageUserCard = ({ navigation, route }) => {
   const { session } = route.params;
   const {
     name,
@@ -57,9 +57,7 @@ const UserCard = ({ navigation, route }) => {
   const [living_preferences, setLivingPreference] = useState("");
   const [persons, setPersons] = useState([]);
 
-  const [photos, setPhotos] = useState([
-    `${picURL}/${user_id}/${user_id}-0-${lastModified}`,
-  ]);
+  const [photos, setPhotos] = useState([]);
   const [isFriendAdded, setIsFriendAdded] = useState(false);
   const [isProfileBlocked, setIsProfileBlocked] = useState(false);
   const buttonColor = isFriendAdded ? "#14999999" : "#1D1D20";
@@ -82,10 +80,6 @@ const UserCard = ({ navigation, route }) => {
     if (selectedPhotoIndex !== null) {
       setSelectedPhotoIndex(null);
     }
-  };
-
-  const handlePhotoPress = (index) => {
-    setSelectedPhotoIndex(index);
   };
 
   const handleQuestionaireButtonPress = () => {
@@ -165,7 +159,7 @@ const UserCard = ({ navigation, route }) => {
     fetchGenderAndAge();
     fetchBookmarkedProfiles();
     fetchPrompts();
-    console.log(`${picURL}/${user_id}/${user_id}-0-${lastModified}`);
+    //console.log(`${picURL}/${user_id}/${user_id}-0-${lastModified}`);
   }, []);
 
   const handleBlockUser = async (user_id) => {
@@ -300,7 +294,7 @@ const UserCard = ({ navigation, route }) => {
         });
       }
       let newPhotos = [];
-      for (let i = 1; i < MAX_IMAGES; i++) {
+      for (let i = 0; i < MAX_IMAGES; i++) {
         const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}-${lastModifiedList[i]}`;
         const response = await fetch(profilePictureURL);
         if (response.ok) {
@@ -813,4 +807,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserCard;
+export default MessageUserCard;

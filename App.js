@@ -25,13 +25,23 @@ const App = () => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      checkUserProfile(session);
+      if (session) {
+        setSession(session);
+        checkUserProfile(session);
+      } else {
+        setSession(false);
+        setIsLoading(false); // If there is no session, we stop loading and allow the Authentication component to render
+      }
     });
 
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
-      checkUserProfile(session);
+      if (session) {
+        checkUserProfile(session);
+      } else {
+        setSession(false);
+        setIsLoading(false); // If there is no session, we stop loading and allow the Authentication component to render
+      }
     });
   }, []);
 
@@ -44,22 +54,40 @@ const App = () => {
         .eq("user_id", session.user.id)
         .single();
 
+      const { data: ugcData, error: ugcError } = await supabase
+        .from("UGC")
+        .select("has_ugc")
+        .eq("user_id", session.user.id)
+        .single();
+
       if (data == null) {
         // User does not have a profile, insert a new profile
         const { data, error } = await supabase
           .from("profile")
           .insert([{ user_id: session.user.id, profile_complete: false }]);
+        //alert("profile data" + data);
+      }
+      if (ugcData == null) {
+        const { data: ugcData, error: ugcError } = await supabase
+          .from("UGC")
+          .insert([{ user_id: session.user.id }]);
 
-        if (data == true) {
+        /*if (data == true && ugcData) {
           setHasProfile(hasProfile);
-        }
+        }*/
+      }
+      if (error || ugcError) {
+        setIsLoading(false);
 
-        if (error) {
-          throw new Error("error.message");
-        }
-      } else {
+        throw new Error("error.message");
+      }
+
+      if (data.profile_complete == true && ugcData.has_ugc == true) {
         const hasProfile = !!data.profile_complete;
-        setHasProfile(hasProfile);
+
+        setHasProfile(true);
+      } else {
+        console.log("profile invalid");
       }
     }
     setIsLoading(false);
@@ -115,6 +143,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     justifyContent: "center",
     justifySelf: "center",
+    backgroundColor: "#111111",
+    width: "100%",
   },
   headerImage: {
     width: 90,

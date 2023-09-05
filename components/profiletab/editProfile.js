@@ -12,19 +12,32 @@ import {
   ScrollView,
   FlatList,
 } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { picURL } from "../auth/supabase";
 
 export const EditProfileScreen = ({ navigation, route }) => {
-  const { updated, session } = route.params;
+  const { session } = route.params;
+  const [editedUser, setEditedUser] = useState(route.params.editedUser);
+  //editedUser.tags = route.params.selectedTags;
 
-  const [editedUser, setEditedUser] = useState(session.user);
-  const [profilePicture, setProfilePicture] = useState(null);
+  const { updated } = route.params;
+  const selectedTags = route.params.selectedTags;
+  //alert(updated);
+  const [profilePicture, setProfilePicture] = useState(
+    route.params.profilePicture
+  );
   const [uploading, setUploading] = useState(false);
-  const [prompts, setPrompts] = useState([]);
+  const [prompts, setPrompts] = useState(route.params.prompts);
   const isFocused = useIsFocused();
+
+  if (updated == true) {
+    editedUser.tags = selectedTags;
+  }
+
+  //const { name, bio, major, class_year, hometown, tags } =
 
   const promptQuestions = {
     greek_life: "Are you participating in Greek Life?",
@@ -34,23 +47,11 @@ export const EditProfileScreen = ({ navigation, route }) => {
   };
 
   useEffect(() => {
-    fetchProfile();
     getProfilePicture();
+    fetchLists();
   }, [updated, isFocused]);
 
-  const fetchProfile = async () => {
-    const { data, error } = await supabase
-      .from("UGC")
-      .select("name, bio, major, class_year, hometown")
-      .eq("user_id", session.user.id)
-      .single();
-
-    if (data) {
-      setEditedUser(data);
-    } else {
-      console.log("Error fetching profile: ", error);
-    }
-
+  const fetchLists = async () => {
     const { data: promptsData, error: promptsError } = await supabase
       .from("prompts")
       .select("*")
@@ -64,20 +65,31 @@ export const EditProfileScreen = ({ navigation, route }) => {
         .map(([prompt, answer]) => ({ prompt, answer }));
 
       setPrompts(answeredPrompts);
-      console.log(answeredPrompts);
     } else {
       console.log("Error fetching prompts: ", promptsError);
     }
   };
   const getProfilePicture = async (navigation) => {
     try {
-      const profilePictureURL = `${picURL}/${session.user.id}/${
-        session.user.id
-      }-0?${new Date().getTime()}`;
+      let lastModified;
+      const { data, error } = await supabase
+        .from("images")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("image_index", 0)
+        .single();
 
-      const response = await fetch(profilePictureURL, {
-        cache: "no-store",
-      });
+      if (error) {
+        //alert(error.message);
+      }
+
+      if (data) {
+        // alert(`Image data fetched: ${JSON.stringify(data)}`);
+        lastModified = data.last_modified;
+      }
+      const profilePictureURL = `${picURL}/${session.user.id}/${session.user.id}-0-${lastModified}`;
+
+      const response = await fetch(profilePictureURL);
       if (response.ok) {
         setProfilePicture(profilePictureURL);
       } else {
@@ -87,49 +99,30 @@ export const EditProfileScreen = ({ navigation, route }) => {
       alert("Couldn't fetch profile picture");
     }
   };
-
-  handleEditPictures = async () => {
-    navigation.navigate("AddProfileImages");
-  };
+  2;
 
   const updateProfile = async () => {
     if (session?.user) {
-      const { data, error } = await supabase.from("UGC").upsert([
-        {
-          user_id: session.user.id,
-          name: editedUser.name,
-          bio: editedUser.bio,
-          major: editedUser.major,
-          class_year: editedUser.class_year,
-          hometown: editedUser.hometown,
-        },
-      ]);
-
-      if (error) {
-        if (error.message.includes("UGC_user_id_key")) {
-          const { data, error: updateError } = await supabase
-            .from("UGC")
-            .update([
-              {
-                name: editedUser.name,
-                bio: editedUser.bio,
-                major: editedUser.major,
-                class_year: editedUser.class_year,
-                hometown: editedUser.hometown,
-              },
-            ])
-            .eq("user_id", session.user.id);
-
-          if (updateError) {
-            alert(updateError.message);
-          } else {
-            navigation.navigate("Tabs", { updated: true });
-          }
-        } else {
+      if (editedUser.bio.length < 500) {
+        const { data, error } = await supabase
+          .from("UGC")
+          .update([
+            {
+              name: editedUser.name,
+              bio: editedUser.bio,
+              major: editedUser.major,
+              class_year: editedUser.class_year,
+              hometown: editedUser.hometown,
+            },
+          ])
+          .eq("user_id", session.user.id);
+        if (error) {
           alert(error.message);
+        } else {
+          navigation.navigate("Tabs", { updated: true });
         }
       } else {
-        navigation.navigate("Tabs", { updated: true });
+        alert("Too many characters in Bio");
       }
     }
   };
@@ -140,12 +133,23 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.contain}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Icon name="arrow-left" size={28} color="blue" />
-      </TouchableOpacity>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.bbuttonContainer}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.bbutton}>Cancel</Text>
+        </TouchableOpacity>
+        <View style={styles.centerContainer}>
+          <Text style={styles.center}>Edit Profile</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.dbuttonContainer}
+          onPress={updateProfile}
+        >
+          <Text style={styles.dbutton}>Done</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={prompts}
         renderItem={({ item }) =>
@@ -154,7 +158,9 @@ export const EditProfileScreen = ({ navigation, route }) => {
               style={styles.promptItem}
               onPress={() => navigation.navigate("AddPrompts")}
             >
-              <Text style={styles.prompt}>{promptQuestions[item.prompt]}</Text>
+              <Text style={{ color: "white" }}>
+                {promptQuestions[item.prompt]}
+              </Text>
               <Text style={styles.answer}>{item.answer}</Text>
             </TouchableOpacity>
           ) : null
@@ -200,6 +206,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
                 value={editedUser.name}
                 onChangeText={(name) => setEditedUser({ ...editedUser, name })}
                 placeholder="Name"
+                placeholderTextColor="#575D61"
               />
             </View>
 
@@ -208,10 +215,12 @@ export const EditProfileScreen = ({ navigation, route }) => {
               <TextInput
                 style={styles.input}
                 value={editedUser.class_year}
+                keyboardAppearance="dark"
                 onChangeText={(class_year) =>
                   setEditedUser({ ...editedUser, class_year })
                 }
-                placeholder="Select your Graduation Year"
+                placeholder="Graduation Year"
+                placeholderTextColor="#575D61"
               />
             </View>
 
@@ -224,6 +233,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
                   setEditedUser({ ...editedUser, major })
                 }
                 placeholder="Major"
+                placeholderTextColor="#575D61"
               />
             </View>
 
@@ -236,6 +246,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
                   setEditedUser({ ...editedUser, hometown })
                 }
                 placeholder="Hometown"
+                placeholderTextColor="#575D61"
               />
             </View>
 
@@ -247,8 +258,30 @@ export const EditProfileScreen = ({ navigation, route }) => {
                 onChangeText={(bio) => setEditedUser({ ...editedUser, bio })}
                 multiline
                 placeholder="Bio"
+                placeholderTextColor="#575D61"
               />
             </View>
+
+            <Text style={styles.more}>Interests</Text>
+            {editedUser.tags && editedUser.tags.length > 0 && (
+              <View style={styles.tagsContainer}>
+                {editedUser.tags.map((tag, index) => (
+                  <View key={index} style={styles.tag}>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate("TagSelectionEdit", { editedUser })
+                      }
+                    >
+                      <Text style={{ color: "white", fontWeight: 500 }}>
+                        {tag}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            <Text style={styles.more}>More about me:</Text>
           </>
         }
         ListFooterComponent={
@@ -257,10 +290,24 @@ export const EditProfileScreen = ({ navigation, route }) => {
               style={styles.promptAdd}
               onPress={() => navigation.navigate("AddPrompts")}
             >
-              <Text style={styles}>Add prompts</Text>
+              <Text style={{ color: "white" }}>Edit prompts</Text>
             </TouchableOpacity>
 
-            <Button title="Update Profile" onPress={updateProfile} />
+            <View style={styles.questionaireInputContainer}>
+              <Text style={styles.more}>Questionaire Answers</Text>
+              <TouchableOpacity
+                style={styles.questionaireButton}
+                onPress={() =>
+                  navigation.navigate("questionaire", {
+                    screen: "Questionaire1",
+                  })
+                }
+              >
+                <Text style={{ color: "white", fontSize: 16, fontWeight: 500 }}>
+                  Retake Questionaire
+                </Text>
+              </TouchableOpacity>
+            </View>
           </>
         }
       />
@@ -272,36 +319,124 @@ const styles = StyleSheet.create({
   contain: {
     flex: 1,
     padding: 16,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
   },
   label: {
     fontSize: 16,
+    color: "white",
     fontWeight: "bold",
-    textAlign: "start",
   },
   input: {
     flex: 0,
     fontSize: 16,
+    color: "white",
     marginBottom: 10,
   },
+
   inputContainer: {
     flexDirection: "column",
-    justifyContent: "start",
-    borderBottomColor: "lightgrey",
-    borderBottomWidth: 1,
+    borderBottomColor: "grey",
+    borderBottomWidth: 0.3,
     marginLeft: 20,
     marginBottom: 10,
     gap: 5,
   },
-  backButton: {
-    marginLeft: 10,
+
+  questionaireInputContainer: {
+    flexDirection: "column",
+    borderTopColor: "grey",
+    borderTopWidth: 0.3,
+    marginHorizontal: 10,
+    marginTop: 10,
+    paddingTop: 10,
+    marginBottom: 10,
+    gap: 5,
+  },
+
+  questionaireButton: {
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 15,
+    gap: 10,
+    borderWidth: 1,
+    backgroundColor: "#14999999",
+    alignItems: "center",
+  },
+  Container: {
+    flexDirection: "column",
+    borderBottomColor: "grey",
+    borderBottomWidth: 0.3,
+    marginLeft: 20,
+    marginBottom: 10,
+    gap: 5,
+  },
+
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 5,
+    //backgroundColor: "transparent",
+  },
+
+  centerContainer: {
+    padding: 7,
+    alignSelf: "center",
+    //backgroundColor: "transparent",
+    // Style for the 'cancel' button container if needed
+  },
+
+  center: {
+    alignSelf: "center",
+
+    fontSize: 16,
+    color: "white",
+    fontWeight: "bold",
+  },
+  bbuttonContainer: {
+    padding: 7,
+  },
+  bbutton: {
+    marginLeft: 15,
+    fontSize: 16,
+    color: "grey",
+    fontWeight: "bold",
+  },
+  dbuttonContainer: {
+    padding: 7,
+  },
+  dbutton: {
+    marginRight: 16,
+    fontSize: 17,
+    color: "#149999",
+    fontWeight: "bold",
+    // Add other styling as needed
+  },
+
+  tag: {
+    backgroundColor: "#14999999",
+    borderRadius: 20,
+
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    margin: 5,
+  },
+
+  tagsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    borderBottomColor: "grey",
+    borderRadius: 15,
+    justifyContent: "center",
+    paddingBottom: 10,
+    marginBottom: 10,
+    paddingHorizontal: 15,
+    borderBottomWidth: 0.4,
   },
   profilePictureContainer: {
-    margin: 30,
-    width: 250,
-    height: 250,
-    borderWidth: 5,
-    borderColor: "grey",
+    margin: 50,
+    width: 150,
+    height: 150,
     backgroundColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
@@ -309,10 +444,10 @@ const styles = StyleSheet.create({
     borderRadius: 200,
   },
   profilePicture: {
-    borderWidth: 3,
-    borderColor: "lightgrey",
-    width: 250,
-    height: 250,
+    //borderWidth: 3,
+    borderColor: "darkblue",
+    width: 200,
+    height: 200,
     borderRadius: 200,
   },
   profilePictureText: {
@@ -325,8 +460,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderRadius: 40,
     gap: 10,
-    borderColor: "grey",
-    borderWidth: 1,
+    backgroundColor: "#2B2D2F",
   },
   promptAdd: {
     padding: 30,
@@ -334,15 +468,23 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderRadius: 40,
     gap: 10,
-    borderColor: "black",
+    borderColor: "white",
     borderWidth: 1,
     borderStyle: "dashed",
   },
   answer: {
     fontSize: 16,
-    color: "#1",
+    color: "white",
     fontFamily: "Helvetica",
     fontWeight: "bold",
+  },
+
+  more: {
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "white",
+    margin: 10,
   },
 });
 

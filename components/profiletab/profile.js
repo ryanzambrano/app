@@ -12,11 +12,17 @@ import {
   ScrollView,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
+import ConfettiCannon from 'react-native-confetti-cannon';
 import { fetchUsername } from "../auth/profileUtils.js";
 import { supabase } from "../auth/supabase.js";
 import { StatusBar } from "expo-status-bar";
 import { picURL } from "../auth/supabase.js";
+import { MaterialIcons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { Entypo } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { Octicons } from "@expo/vector-icons";
 
 export const Profile = ({ navigation, route }) => {
   const { updated, session } = route.params;
@@ -28,6 +34,7 @@ export const Profile = ({ navigation, route }) => {
   const [isProfileVisible, setIsProfileVisible] = useState(true);
   const [prompts, setPrompts] = useState([]);
   const isFocused = useIsFocused();
+  const [lastModified, setLastModified] = useState([]);
 
   const promptQuestions = {
     greek_life: "Are you participating in Greek Life?",
@@ -36,20 +43,18 @@ export const Profile = ({ navigation, route }) => {
     favorite_movies: "What are your favorite movies?",
   };
 
+  const hasValidItems = prompts.some((item) => item.answer);
+
   const scrollY = new Animated.Value(0);
 
-  scrollY.addListener(({ value }) => {
-    setIsProfileVisible(value < DISABLE_TOUCHABLE_SCROLL_POINT);
-  });
-
   const profileOpacity = scrollY.interpolate({
-    inputRange: [0, 100],
+    inputRange: [0, 240],
     outputRange: [1, 0],
     extrapolate: "clamp",
   });
 
   const profileZIndex = scrollY.interpolate({
-    inputRange: [0, 100],
+    inputRange: [0, 240],
     outputRange: [1, -1],
     extrapolate: "clamp",
   });
@@ -96,7 +101,7 @@ export const Profile = ({ navigation, route }) => {
         .map(([prompt, answer]) => ({ prompt, answer }));
 
       setPrompts(answeredPrompts);
-      console.log(answeredPrompts);
+      //console.log(answeredPrompts);
     } else {
       console.log("Error fetching prompts: ", promptsError);
     }
@@ -104,13 +109,25 @@ export const Profile = ({ navigation, route }) => {
 
   const getProfilePicture = async (navigation) => {
     try {
-      const profilePictureURL = `${picURL}/${session.user.id}/${
-        session.user.id
-      }-0?${new Date().getTime()}`;
+      let lastModified;
+      const { data, error } = await supabase
+        .from("images")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("image_index", 0)
+        .single();
 
-      const response = await fetch(profilePictureURL, {
-        cache: "no-store",
-      });
+      if (error) {
+        //alert(error.message);
+      }
+
+      if (data) {
+        // alert(`Image data fetched: ${JSON.stringify(data)}`);
+        lastModified = data.last_modified;
+      }
+      const profilePictureURL = `${picURL}/${session.user.id}/${session.user.id}-0-${lastModified}`;
+
+      const response = await fetch(profilePictureURL);
       if (response.ok) {
         setProfilePicture(profilePictureURL);
       } else {
@@ -123,21 +140,28 @@ export const Profile = ({ navigation, route }) => {
 
   handleEditPictures = async () => {
     if (scrollY._value < DISABLE_TOUCHABLE_SCROLL_POINT) {
-      navigation.navigate("AddProfileImages");
+      navigation.navigate("AddProfileImages", {
+        profilePicture: profilePicture,
+      });
     }
   };
 
   return (
+    
     <SafeAreaView style={styles.container}>
       <View style={styles.viewContainer}>
+         {/* <ConfettiCannon count={200} origin={{x: -10, y: 0}} /> */}
         <View style={styles.topBar}>
           <Text style={styles.username}>{isUsername}</Text>
-
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.editButton}
               onPress={() => {
-                navigation.navigate("EditProfileScreen");
+                navigation.navigate("EditProfileScreen", {
+                  editedUser,
+                  prompts,
+                  profilePicture,
+                });
               }}
             >
               <Text style={styles.buttonText}>Edit</Text>
@@ -147,16 +171,11 @@ export const Profile = ({ navigation, route }) => {
                 navigation.navigate("SettingsScreen");
               }}
             >
-              <Image
-                style={styles.settingsIcon}
-                source={{
-                  uri: "https://th.bing.com/th/id/OIP.nEKx7qYL-7aettL7yMDiOgHaHv?pid=ImgDet&rs=1",
-                }}
-              />
+              <Icon name="gear" size={30} color="white" />
             </TouchableOpacity>
           </View>
         </View>
-
+        
         <Animated.View
           style={{
             ...styles.profileContainer,
@@ -187,7 +206,7 @@ export const Profile = ({ navigation, route }) => {
                 onPress={handleEditPictures}
                 disabled={uploading}
               >
-                <Icon name={"plus"} size={40} color={"darkgrey"} />
+                <Icon name={"plus"} size={40} color={"grey"} />
                 {uploading && (
                   <View style={styles.uploadingIndicatorContainer}>
                     <ActivityIndicator size="small" color="#fff" />
@@ -215,9 +234,14 @@ export const Profile = ({ navigation, route }) => {
 
               <View style={styles.major}>
                 <View style={styles.icons}>
-                  <Icon name="graduation-cap" size={30} color="darkblue" />
-                  <Icon name="book" size={30} color="darkblue" />
-                  <Icon name="home" size={30} color="darkblue" />
+                  <Entypo
+                    name="graduation-cap"
+                    marginTop={-2}
+                    size={22}
+                    color="white"
+                  />
+                  <Entypo name="open-book" size={22} color="white" />
+                  <MaterialIcons name="home-filled" size={26} color="white" />
                 </View>
                 <View style={styles.details}>
                   <Text style={styles.text}>{editedUser.class_year}</Text>
@@ -229,27 +253,33 @@ export const Profile = ({ navigation, route }) => {
             <View style={styles.bio}>
               <View>
                 <Text style={styles.bioHeader}>About me</Text>
-                <Text style={styles.text}>{editedUser.bio}</Text>
+                <Text style={styles.bioText}>{editedUser.bio}</Text>
               </View>
             </View>
-            <Text style={styles.promptsHeader}>Prompts</Text>
-            <ScrollView
-              horizontal
-              style={styles.horizontalScrollView}
-              showsHorizontalScrollIndicator={false}
+            <View
+              style={{
+                borderBottomWidth: hasValidItems ? 0.3 : 0,
+                borderBottomColor: "grey",
+
+                borderBottomEndRadius: 20,
+                borderBottomStartRadius: 20,
+              }}
             >
-              {prompts.map((item, index) =>
-                item.answer ? (
-                  <View key={index} style={styles.itemContainer}>
-                    <Text style={styles.itemPrompt}>
-                      {promptQuestions[item.prompt]}
-                    </Text>
-                    <Text style={styles.itemAnswer}>{item.answer}</Text>
-                  </View>
-                ) : null
-              )}
-            </ScrollView>
-            <Text style={styles.promptsHeader}>Tags</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {prompts.map((item, index) =>
+                  item.answer ? (
+                    <View key={index} style={styles.itemContainer}>
+                      <Text style={styles.itemPrompt}>
+                        {promptQuestions[item.prompt]}
+                      </Text>
+                      <Text style={styles.itemAnswer}>{item.answer}</Text>
+                    </View>
+                  ) : null
+                )}
+              </ScrollView>
+            </View>
+
+            <Text style={styles.promptsHeader}>Interests</Text>
             {editedUser.tags && editedUser.tags.length > 0 && (
               <View style={styles.tagsContainer}>
                 {editedUser.tags.map((tag, index) => (
@@ -262,7 +292,7 @@ export const Profile = ({ navigation, route }) => {
           </View>
         </ScrollView>
       </View>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 };
@@ -270,7 +300,7 @@ export const Profile = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
   },
 
   scrollView: {
@@ -294,7 +324,7 @@ const styles = StyleSheet.create({
 
   viewContainer: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
   },
   topBar: {
     flexDirection: "row",
@@ -309,16 +339,17 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 10,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
   },
   username: {
     fontSize: 18,
     fontWeight: "600",
+    color: "white",
   },
   name: {
     fontSize: 20,
     fontWeight: "600",
-    color: "black",
+    color: "white",
     textAlign: "center",
     marginBottom: 10,
   },
@@ -326,12 +357,13 @@ const styles = StyleSheet.create({
   bio: {
     fontSize: 18,
     fontWeight: "600",
-    paddingLeft: 16,
+    //paddingLeft: 25,
     paddingBottom: 25,
     paddingTop: 25,
     marginBottom: 0,
-    borderBottomColor: "lightgrey",
-    borderBottomWidth: 1,
+    //color: "white",
+    borderBottomColor: "grey",
+    borderBottomWidth: 0.3,
     borderBottomEndRadius: 20,
     borderBottomStartRadius: 20,
   },
@@ -340,25 +372,22 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontWeight: "600",
     marginBottom: 10,
-    marginTop: -7,
     fontSize: 20,
-    marginLeft: -20,
+    color: "white",
   },
 
   promptsHeader: {
     paddingTop: 20,
     alignSelf: "center",
     fontWeight: "600",
-    marginBottom: -5,
-    marginTop: -7,
     fontSize: 20,
-    marginLeft: -20,
+    color: "white",
   },
 
   editButton: {
     padding: 8,
     borderRadius: 4,
-    backgroundColor: "black",
+    backgroundColor: "#14999999",
   },
   buttonText: {
     color: "#fff",
@@ -382,7 +411,7 @@ const styles = StyleSheet.create({
     marginTop: "25%",
     width: 250,
     height: 250,
-    backgroundColor: "#ccc",
+    backgroundColor: "#2B2D2D",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 150,
@@ -407,8 +436,8 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 20,
     gap: 10,
-    borderBottomColor: "lightgrey",
-    borderBottomWidth: 1,
+    borderBottomColor: "grey",
+    borderBottomWidth: 0.3,
     borderBottomEndRadius: 20,
     borderBottomStartRadius: 20,
   },
@@ -416,11 +445,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 8,
+    //color: "white",
   },
   text: {
     fontSize: 16,
-
-    color: "black",
+    color: "white",
+  },
+  bioText: {
+    fontSize: 16,
+    marginLeft: 25,
+    color: "white",
   },
   input: {
     fontSize: 16,
@@ -435,24 +469,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     paddingVertical: 20,
+    paddingHorizontal: 15,
+    marginHorizontal: 5,
+    backgroundColor: "#111111",
     borderRadius: 15,
     justifyContent: "center",
     marginTop: 0,
-    marginBottom: 100,
+    marginBottom: 20,
   },
   tag: {
-    backgroundColor: "white",
+    backgroundColor: "#14999999",
     borderRadius: 20,
-    borderColor: "grey",
-    borderWidth: 1,
+    borderColor: "#2B2D2F",
+    borderWidth: 0.5,
     paddingHorizontal: 10,
     paddingVertical: 5,
     margin: 5,
   },
   tagText: {
     fontSize: 14,
-    color: "grey",
-    fontWeight: "bold",
+    color: "white",
+    fontWeight: 600,
   },
   major: {
     flex: 1,
@@ -465,18 +502,21 @@ const styles = StyleSheet.create({
   icons: {
     alignContent: "center",
     alignItems: "center",
-    gap: 10,
+    gap: 17,
   },
   details: {
     alignItems: "left",
     justifyContent: "center",
     gap: 23,
   },
+
   tab: {
-    backgroundColor: "white",
+    // 1D1D20
+    backgroundColor: "#111111", //101010
     flex: 1,
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
+    //shadow
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -490,33 +530,30 @@ const styles = StyleSheet.create({
     backgroundColor: "lightblue",
   },
 
-  horizontalScrollView: {
-    paddingTop: 20,
-    marginBottom: 5,
-    borderBottomColor: "lightgrey",
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomEndRadius: 20,
-    borderBottomStartRadius: 20,
-  },
   itemContainer: {
+    borderBottomWidth: 0.3,
     marginHorizontal: 15,
     borderWidth: 0.5,
-    borderColor: "lightgrey",
+    //borderColor: "grey",
+    backgroundColor: "#2B2D2F",
     borderRadius: 50,
     padding: 30,
     width: 300,
     marginRight: 10,
     minWidth: 150,
     gap: 10,
+    marginTop: 30,
+    marginBottom: 30,
   },
   itemPrompt: {
     fontSize: 15,
     marginBottom: 5,
+    color: "white",
   },
   itemAnswer: {
     fontWeight: "bold",
     fontSize: 20,
+    color: "white",
   },
 });
 

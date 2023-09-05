@@ -88,13 +88,13 @@ export const AddPrompts = ({ navigation, route }) => {
           if (updateError) {
             alert(updateError.message);
           } else {
-            navigation.navigate("EditProfileScreen", { updated: true });
+            navigation.goBack();
           }
         } else {
           alert(error.message);
         }
       } else {
-        navigation.navigate("EditProfileScreen", { updated: true });
+        navigation.goBack();
       }
     }
   };
@@ -107,12 +107,22 @@ export const AddPrompts = ({ navigation, route }) => {
         value={answers[index]}
         onChangeText={(text) => handleAnswerChange(text, index)}
         placeholder="Answer here..."
+        placeholderTextColor="grey"
       />
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Text style={styles.backButtonText}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerText}>Prompts</Text>
+      </View>
       <FlatList
         data={presetQuestions}
         renderItem={renderItems}
@@ -130,10 +140,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: "#1D1D20", //1D1D20
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  backButton: {
+    marginRight: 15,
+    paddingLeft: 15,
+    paddingRight: 85,
+  },
+  backButtonText: {
+    fontSize: 30,
+    color: "white",
+  },
+  headerText: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "white",
   },
   card: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#2B2D2F",
     gap: 40,
     paddingTop: 50,
     paddingBottom: 40,
@@ -150,14 +179,16 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   question: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 300,
+    color: "white",
     marginBottom: 10,
     fontFamily: "Helvetica",
   },
   input: {
-    //color: "gray",
+    color: "white",
     borderBottomWidth: 1,
+    borderBottomColor: "white",
     borderRadius: 5,
     padding: 10,
     height: 40,
@@ -165,7 +196,7 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
   },
   saveButton: {
-    backgroundColor: "#007BFF",
+    backgroundColor: "#14999999",
     padding: 20,
     borderRadius: 50,
     marginBottom: 20,
@@ -174,7 +205,7 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: "#ffffff",
-    fontWeight: 'bold',
+    fontWeight: 500,
     textAlign: "center",
     fontSize: 15,
   },

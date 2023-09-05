@@ -71,7 +71,7 @@ export const SignIn = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#111111" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
@@ -82,7 +82,7 @@ export const SignIn = ({ navigation }) => {
               style={styles.headerImage}
               alt="Logo "
             />
-            <Text style={styles.titleText}>Sign into Casa</Text>
+            <Text style={styles.titleText}>Sign into Cabana</Text>
             <Text style={styles.sloganText}>
               Find and meet new roomates, for any situation!
             </Text>
@@ -151,7 +151,7 @@ export const SignIn = ({ navigation }) => {
           </View>
         </View>
       </TouchableWithoutFeedback>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 };
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 12,
-    color: "#1e1e1e",
+    color: "#fff",
   },
 
   sloganText: {
@@ -197,13 +197,13 @@ const styles = StyleSheet.create({
   inputHeader: {
     fontSize: 17,
     fontWeight: "500",
-    color: "#222",
+    color: "#fff",
     marginBottom: 10,
   },
 
   inputControl: {
-    backgroundColor: "#fff",
-    color: "#222",
+    backgroundColor: "#1D1D20",
+    color: "#fff",
     fontWeight: "500",
     height: 44,
     paddingVertical: 10,
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   formFooter: {
     fontSize: 17,
     fontWeight: "600",
-    color: "#222",
+    color: "#fff",
     textAlign: "center",
     letterSpacing: 0.15,
   },

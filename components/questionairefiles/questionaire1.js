@@ -21,6 +21,7 @@ import { startShakeAnimation } from "../auth/profileUtils.js";
 
 export const Questionaire1 = ({ navigation, route }) => {
   const { session } = route.params;
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
@@ -29,14 +30,14 @@ export const Questionaire1 = ({ navigation, route }) => {
 
   const [isAgeModalVisible, setIsAgeModalVisible] = useState(false);
   const [isGenderModalVisible, setIsGenderModalVisible] = useState(false);
-  const [isRaceModalVisible, setIsRaceModalVisible] = useState(false);
+  const [isWhoModalVisible, setIsWhoModalVisible] = useState(false);
 
   const [selectedAge, setSelectedAge] = useState("");
   const [selectedGender, setSelectedGender] = useState("");
-  const [selectedRace, setSelectedRace] = useState("");
+  const [selectedWho, setSelectedWho] = useState("");
 
   const gender = ["Male", "Female", "Other"];
-  const race = ["White", "Black", "Brown", "Yellow"];
+  const race = ["White", "Black / African American", "American Indian/Alaska Native", "Asian", "Native Hawaiian/Pacific Islander"];
   const ages = Array.from(Array(31).keys()).map((age) => String(age + 1));
 
   const openAgeModal = () => {
@@ -51,11 +52,11 @@ export const Questionaire1 = ({ navigation, route }) => {
   const closeGenderModal = () => {
     setIsGenderModalVisible(false);
   };
-  const openRaceModal = () => {
-    setIsRaceModalVisible(true);
+  const openWhoModal = () => {
+    setIsWhoModalVisible(true);
   };
-  const closeRaceModal = () => {
-    setIsRaceModalVisible(false);
+  const closeWhoModal = () => {
+    setIsWhoModalVisible(false);
   };
 
   handleSaveAge = () => {
@@ -70,16 +71,16 @@ export const Questionaire1 = ({ navigation, route }) => {
     }
     closeGenderModal();
   };
-  handleSaveRace = () => {
-    if (!selectedRace) {
-      setSelectedRace("White");
+  handleSaveWho = () => {
+    if (!selectedWho) {
+      setSelectedWho("Male");
     }
-    closeRaceModal();
+    closeWhoModal();
   };
 
   const userData = {
     age: selectedAge,
-    race: selectedRace,
+    who: selectedWho,
     gender: selectedGender,
   };
 
@@ -87,12 +88,12 @@ export const Questionaire1 = ({ navigation, route }) => {
     setIsError(null);
 
     if (session?.user) {
-      if (!!userData.age && !!userData.gender) {
+      if (!!userData.age && !!userData.gender && !!userData.who) {
         const { data, error } = await supabase
           .from("profile")
           .update({
             age: userData.age,
-            race: userData.race,
+            who: userData.who,
             gender: userData.gender,
           })
           .eq("user_id", session.user.id);
@@ -122,7 +123,7 @@ export const Questionaire1 = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#111111" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
@@ -144,7 +145,7 @@ export const Questionaire1 = ({ navigation, route }) => {
                   <Text
                     style={styles.inputText}
                     placeholder="Select your Gender"
-                    placeholderTextColor="#6b7280"
+                    placeholderTextColor="white"
                     value={`${selectedAge}`}
                   >
                     {selectedAge}
@@ -189,7 +190,7 @@ export const Questionaire1 = ({ navigation, route }) => {
                   <Text
                     style={styles.inputText}
                     placeholder="Select your Gender"
-                    placeholderTextColor="#6b7280"
+                    placeholderTextColor="white"
                     value={`${selectedGender}`}
                   >
                     {selectedGender}
@@ -229,27 +230,29 @@ export const Questionaire1 = ({ navigation, route }) => {
             </View>
 
             <View style={styles.input}>
-              <Text style={styles.inputHeader}>Select your race</Text>
+              <Text style={styles.inputHeader}>
+                Who do you want to room with?
+              </Text>
 
               <TouchableOpacity
                 onPress={() => {
-                  openRaceModal();
+                  openWhoModal();
                 }}
               >
                 <View style={styles.inputControl}>
                   <Text
                     style={styles.inputText}
                     placeholder="Select your Gender"
-                    placeholderTextColor="#6b7280"
+                    placeholderTextColor="white"
                     value={`${selectedGender}`}
                   >
-                    {selectedRace}
+                    {selectedWho}
                   </Text>
                 </View>
               </TouchableOpacity>
 
               <Modal
-                visible={isRaceModalVisible}
+                visible={isWhoModalVisible}
                 animationType="slide"
                 transparent
               >
@@ -257,18 +260,22 @@ export const Questionaire1 = ({ navigation, route }) => {
                   <View style={styles.pickerContainerGender}>
                     <Picker
                       style={styles.picker}
-                      selectedValue={selectedRace}
-                      onValueChange={(itemValue) => setSelectedRace(itemValue)}
+                      selectedValue={selectedWho}
+                      onValueChange={(itemValue) => setSelectedWho(itemValue)}
                     >
-                      {race.map((race) => (
-                        <Picker.Item key={race} label={race} value={race} />
+                      {gender.map((gender) => (
+                        <Picker.Item
+                          key={gender}
+                          label={gender}
+                          value={gender}
+                        />
                       ))}
                     </Picker>
                   </View>
 
                   <View style={styles.bbuttons}>
-                    <Button title="Save" onPress={handleSaveRace} />
-                    <Button title="Cancel" onPress={closeRaceModal} />
+                    <Button title="Save" onPress={handleSaveWho} />
+                    <Button title="Cancel" onPress={closeWhoModal} />
                   </View>
                 </View>
               </Modal>
@@ -299,7 +306,7 @@ export const Questionaire1 = ({ navigation, route }) => {
           </View>
         </View>
       </TouchableWithoutFeedback>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 };
@@ -320,7 +327,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 12,
-    color: "#1e1e1e",
+    color: "white",
   },
 
   input: {
@@ -330,7 +337,7 @@ const styles = StyleSheet.create({
   inputHeader: {
     fontSize: 17,
     fontWeight: "500",
-    color: "#222",
+    color: "white",
     marginBottom: 10,
   },
 
@@ -344,13 +351,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     fontSize: 15,
     marginBottom: 20,
-    backgroundColor: "#fff",
-    color: "#6b7280",
+    backgroundColor: "#1D1D20",
+    color: "white",
     borderColor: "#fff",
   },
 
   inputText: {
-    color: "#6b7280",
+    color: "white",
     fontWeight: "500",
   },
 
@@ -361,6 +368,7 @@ const styles = StyleSheet.create({
 
   formAction: {
     marginVertical: 24,
+    backgroundColor: "#1D1D20",
   },
 
   continue: {
@@ -390,7 +398,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     marginTop: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: "#111111",
     justifyContent: "space-around",
     gap: "50%",
   },
@@ -398,7 +406,8 @@ const styles = StyleSheet.create({
   modalContainerGender: {
     flex: 1,
     marginTop: "130%",
-    backgroundColor: "#fff",
+    backgroundColor: "lightgrey",
+
     justifyContent: "space-around",
     gap: "50%",
   },
@@ -416,6 +425,7 @@ const styles = StyleSheet.create({
   },
   picker: {
     flex: 1,
+    color: "white",
   },
 
   pickerDate: {

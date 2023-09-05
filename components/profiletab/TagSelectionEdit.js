@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 
 import {
@@ -10,13 +10,16 @@ import {
   SafeAreaView,
   Animated,
 } from "react-native";
-import { availableTags } from "../auth/profileUtils.js";
+
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
+import { availableTags } from "../auth/profileUtils.js";
 
-const TagSelectionScreen = ({ navigation, route }) => {
+const TagSelectionEdit = ({ navigation, route }) => {
   const { session } = route.params;
-  const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState(
+    route.params.editedUser.tags
+  );
 
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
@@ -47,28 +50,8 @@ const TagSelectionScreen = ({ navigation, route }) => {
     );
   };
 
-  async function refreshSession() {
-    const { data, error } = await supabase.auth.refreshSession();
-    const { session, user } = data;
-  }
-
   const userData = {
     tags: selectedTags,
-  };
-
-  const updateProfile = async (userData, session) => {
-    if (session?.user) {
-      const { data, error } = await supabase
-        .from("profile")
-        .update({
-          tags: userData.tags,
-        })
-        .eq("user_id", session.user.id);
-
-      if (error) {
-        alert("Error updating profile:", error.message);
-      }
-    }
   };
 
   const handleUpdate = async (userData, session) => {
@@ -80,13 +63,6 @@ const TagSelectionScreen = ({ navigation, route }) => {
           .from("UGC")
           .update({
             tags: userData.tags,
-            has_ugc: true,
-          })
-          .eq("user_id", session.user.id);
-        const { data: profileData, profileError } = await supabase
-          .from("profile")
-          .update({
-            profile_complete: true,
           })
           .eq("user_id", session.user.id);
 
@@ -94,9 +70,10 @@ const TagSelectionScreen = ({ navigation, route }) => {
           startShakeAnimation();
           setIsError(error.message);
         } else {
-          //refreshSession();
-          navigation.navigate("Congrats");
-          //signOut();
+          navigation.navigate("EditProfileScreen", {
+            updated: true,
+            selectedTags,
+          });
         }
       } else if (userData.tags.length > 7) {
         setIsError("Less than 7 interests");
@@ -120,6 +97,25 @@ const TagSelectionScreen = ({ navigation, route }) => {
   };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#111111" }}>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.bbuttonContainer}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.bbutton}>Cancel</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.dbuttonContainer}
+          onPress={() => {
+            {
+              handleUpdate(userData, session);
+            }
+          }}
+        >
+          <Text style={styles.dbutton}>Done</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.container}>
         <Text style={styles.title}>Select Your Interests</Text>
         <ScrollView
@@ -128,7 +124,7 @@ const TagSelectionScreen = ({ navigation, route }) => {
         >
           {availableTags.map((tag) => renderTag(tag))}
         </ScrollView>
-        <Text style={styles.selectedTagsText}>{selectedTags.join(", ")}</Text>
+        <Text style={styles.selectedTagsText}>{selectedTags.join(",   ")}</Text>
 
         {isError && (
           <Animated.Text
@@ -139,19 +135,6 @@ const TagSelectionScreen = ({ navigation, route }) => {
           </Animated.Text>
         )}
 
-        <View style={styles.formAction}>
-          <TouchableOpacity
-            onPress={() => {
-              {
-                handleUpdate(userData, session);
-              }
-            }}
-          >
-            <View style={styles.continue}>
-              <Text style={styles.continueText}>Next</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
         <StatusBar style="light" />
       </View>
     </SafeAreaView>
@@ -162,26 +145,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
+    backgroundColor: "#111111", // 111111
     justifyContent: "center",
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
+    color: "white",
+    marginBottom: "10%",
     marginTop: "5%",
-    color: "#fff",
   },
   tagContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
+
     //color: "#fff",
   },
   tag: {
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#1D1D20",
 
     borderRadius: 20,
+
+    borderColor: "white",
     paddingVertical: 8,
     paddingHorizontal: 16,
     marginHorizontal: 8,
@@ -192,31 +179,37 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 16,
-    color: "#fff",
+    color: "white",
+    fontWeight: 500,
   },
   selectedTagText: {
     fontSize: 16,
-    color: "white",
+    color: "lightgrey",
     marginBottom: 0,
+    fontWeight: 500,
   },
   selectedTagsText: {
+    marginTop: 15,
     fontSize: 18,
     fontWeight: "bold",
+    color: "#14999999",
     marginBottom: "10%",
-    marginTop: "10%",
-    color: "#fff",
   },
   formAction: {
-    marginBottom: 20,
+    flex: 1,
+    marginBottom: "20%",
+    color: "#111111",
   },
 
   continue: {
+    marginBottom: "100%",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 20,
+    borderWidth: 1,
     backgroundColor: "#14999999",
     borderColor: "#14999999",
   },
@@ -233,6 +226,35 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 10,
   },
+
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 5,
+
+    backgroundColor: "#111111",
+  },
+  bbuttonContainer: {
+    padding: 7,
+    //backgroundColor: "transparent",
+    // Style for the 'cancel' button container if needed
+  },
+  bbutton: {
+    marginLeft: 15,
+    fontSize: 16,
+    color: "grey",
+    fontWeight: "bold",
+  },
+  dbuttonContainer: {
+    padding: 7,
+  },
+  dbutton: {
+    marginRight: 16,
+    fontSize: 17,
+    color: "#149999",
+    fontWeight: "bold",
+    // Add other styling as needed
+  },
 });
 
-export default TagSelectionScreen;
+export default TagSelectionEdit;

@@ -14,116 +14,76 @@ import {
   Keyboard,
   Animated,
 } from "react-native";
-
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
 
 export default function Questionaire3({ navigation, route }) {
   const { session } = route.params;
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
 
-  const [isStudiesModalVisible, setIsStudiesModalVisible] = useState(false);
-  const [isForFunModalVisible, setIsForFunModalVisible] = useState(false);
-  const [isLivingPreferencesModalVisible, setIsLivingPreferencesModalVisible] =
-    useState(false);
+  const [isGradYearModalVisible, setIsGradYearModalVisible] = useState(false);
 
-  const [selectedStudies, setSelectedStudies] = useState("");
-  const [selectedForFun, setSelectedForFun] = useState("");
-  const [selectedLivingPreferences, setSelectedLivingPreferences] =
-    useState("");
+  const [selectedGradYear, setSelectedGradYear] = useState("");
 
-  const livingPreferences = ["Apartment", "Dorm", "No Preferences", "Other"];
-  const forFun = ["Stay in", "Go out"];
-  const studies = [
-    "Science",
-    "Business",
-    "Engineering",
-    "Art",
-    "Exploratory",
-    "Other",
+  const gradYear = [
+    "2023",
+    "2024",
+    "2025",
+    "2026",
+    "2027",
+    "2028",
+    "2029",
+    "2030",
   ];
 
-  const openStudiesModal = () => {
-    setIsStudiesModalVisible(true);
+  const openGradYearModal = () => {
+    setIsGradYearModalVisible(true);
   };
-  const closeStudiesModal = () => {
-    setIsStudiesModalVisible(false);
-  };
-  const openForFunModal = () => {
-    setIsForFunModalVisible(true);
-  };
-  const closeForFunModal = () => {
-    setIsForFunModalVisible(false);
-  };
-  const openLivingPreferencesModal = () => {
-    setIsLivingPreferencesModalVisible(true);
-  };
-  const closeLivingPreferencesModal = () => {
-    setIsLivingPreferencesModalVisible(false);
+  const closeGradYearModal = () => {
+    setIsGradYearModalVisible(false);
   };
 
   const userData = {
-    livingPreferences: selectedLivingPreferences,
-    forFun: selectedForFun,
-    studies: selectedStudies,
+    gradYear: selectedGradYear,
   };
 
   const handleUpdate = async (userData, session) => {
     setIsError(null);
 
     if (session?.user) {
-      if (
-        !!userData.livingPreferences &&
-        !!userData.forFun &&
-        !!userData.studies
-      ) {
-        const { data, error } = await supabase
-          .from("profile")
-          .update({
-            living_preferences: userData.livingPreferences,
-            for_fun: userData.forFun,
-            studies: userData.studies,
-            profile_complete: true,
-          })
+      if (!userData.gradYear) {
+        startShakeAnimation(shakeAnimationValue);
+        return setIsError("All fields are required");
+      }
+
+      try {
+        const { error: ugcError } = await supabase
+          .from("UGC")
+          .update({ class_year: userData.gradYear })
           .eq("user_id", session.user.id);
 
-        if (error) {
-          startShakeAnimation(shakeAnimationValue);
-          setIsError(error.message);
-        } else {
-          navigation.navigate("TagSelectionScreen");
-        }
-      } else {
+        if (ugcError) throw ugcError;
+
+        navigation.navigate("MatchingData");
+      } catch (error) {
         startShakeAnimation(shakeAnimationValue);
-        setIsError("All fields are required");
+        setIsError(error.message);
       }
     }
   };
 
-  handleLivingPreferences = () => {
-    if (!selectedLivingPreferences) {
-      setSelectedLivingPreferences("Apartment");
+  handleGradYear = () => {
+    if (!selectedGradYear) {
+      setSelectedGradYear(2023);
     }
-    closeLivingPreferencesModal();
+    closeGradYearModal();
   };
-  handleForFun = () => {
-    if (!selectedForFun) {
-      setSelectedForFun("Stay in");
-    }
-    closeForFunModal();
-  };
-  handleStudies = () => {
-    if (!selectedStudies) {
-      setSelectedStudies("Science");
-    }
-    closeStudiesModal();
-  };
-
   const shakeAnimationStyle = {
     transform: [
       {
@@ -136,35 +96,29 @@ export default function Questionaire3({ navigation, route }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#111111" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.titleText}>
-              Answer some lifestyle questions!
-            </Text>
+            <Text style={styles.titleText}>What year do you graduate?</Text>
           </View>
 
           <View style={styles.form}>
             <View style={styles.input}>
-              <Text style={styles.inputHeader}>
-                Do you have living preferences?
-              </Text>
+              <Text style={styles.inputHeader}>Class Year</Text>
 
               <TouchableOpacity
                 onPress={() => {
-                  openLivingPreferencesModal();
+                  openGradYearModal();
                 }}
               >
                 <View style={styles.inputControl}>
-                  <Text style={styles.inputText}>
-                    {selectedLivingPreferences}
-                  </Text>
+                  <Text style={styles.inputText}>{selectedGradYear}</Text>
                 </View>
               </TouchableOpacity>
 
               <Modal
-                visible={isLivingPreferencesModalVisible}
+                visible={isGradYearModalVisible}
                 animationType="slide"
                 transparent
               >
@@ -172,121 +126,25 @@ export default function Questionaire3({ navigation, route }) {
                   <View style={styles.pickerContainer}>
                     <Picker
                       style={styles.picker}
-                      selectedValue={selectedLivingPreferences}
+                      selectedValue={selectedGradYear}
                       onValueChange={(itemValue) =>
-                        setSelectedLivingPreferences(itemValue)
+                        setSelectedGradYear(itemValue)
                       }
                     >
-                      {livingPreferences.map((livingPreferences) => (
+                      {gradYear.map((gradYear) => (
                         <Picker.Item
-                          key={livingPreferences}
-                          label={livingPreferences}
-                          value={livingPreferences}
+                          key={gradYear}
+                          label={gradYear}
+                          value={gradYear}
                         />
                       ))}
                     </Picker>
                   </View>
 
                   <View style={styles.bbuttons}>
-                    <Button title="Save" onPress={handleLivingPreferences} />
+                    <Button title="Save" onPress={handleGradYear} />
 
-                    <Button
-                      title="Cancel"
-                      onPress={closeLivingPreferencesModal}
-                    />
-                  </View>
-                </View>
-              </Modal>
-            </View>
-
-            <View style={styles.input}>
-              <Text style={styles.inputHeader}>
-                For fun, would you rather stay in or go out?
-              </Text>
-
-              <TouchableOpacity
-                onPress={() => {
-                  openForFunModal();
-                }}
-              >
-                <View style={styles.inputControl}>
-                  <Text style={styles.inputText}>{selectedForFun}</Text>
-                </View>
-              </TouchableOpacity>
-
-              <Modal
-                visible={isForFunModalVisible}
-                animationType="slide"
-                transparent
-              >
-                <View style={styles.modalContainer}>
-                  <View style={styles.pickerContainer}>
-                    <Picker
-                      style={styles.picker}
-                      selectedValue={selectedForFun}
-                      onValueChange={(itemValue) =>
-                        setSelectedForFun(itemValue)
-                      }
-                    >
-                      {forFun.map((Gender) => (
-                        <Picker.Item
-                          key={Gender}
-                          label={Gender}
-                          value={Gender}
-                        />
-                      ))}
-                    </Picker>
-                  </View>
-                  <View style={styles.bbuttons}>
-                    <Button title="Save" onPress={handleForFun} />
-                    <Button title="Cancel" onPress={closeForFunModal} />
-                  </View>
-                </View>
-              </Modal>
-            </View>
-
-            <View style={styles.input}>
-              <Text style={styles.inputHeader}>
-                What is your general area of study?
-              </Text>
-
-              <TouchableOpacity
-                onPress={() => {
-                  openStudiesModal();
-                }}
-              >
-                <View style={styles.inputControl}>
-                  <Text style={styles.inputText}>{selectedStudies}</Text>
-                </View>
-              </TouchableOpacity>
-
-              <Modal
-                visible={isStudiesModalVisible}
-                animationType="slide"
-                transparent
-              >
-                <View style={styles.modalContainer}>
-                  <View style={styles.pickerContainer}>
-                    <Picker
-                      style={styles.picker}
-                      selectedValue={selectedStudies}
-                      onValueChange={(itemValue) =>
-                        setSelectedStudies(itemValue)
-                      }
-                    >
-                      {studies.map((studies) => (
-                        <Picker.Item
-                          key={studies}
-                          label={studies}
-                          value={studies}
-                        />
-                      ))}
-                    </Picker>
-                  </View>
-
-                  <View style={styles.bbuttons}>
-                    <Button title="Save" onPress={handleStudies} />
-                    <Button title="Cancel" onPress={closeStudiesModal} />
+                    <Button title="Cancel" onPress={closeGradYearModal} />
                   </View>
                 </View>
               </Modal>
@@ -316,7 +174,7 @@ export default function Questionaire3({ navigation, route }) {
           </View>
         </View>
       </TouchableWithoutFeedback>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 }
@@ -337,7 +195,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 12,
-    color: "#1e1e1e",
+    color: "white",
   },
 
   input: {
@@ -347,7 +205,7 @@ const styles = StyleSheet.create({
   inputHeader: {
     fontSize: 17,
     fontWeight: "500",
-    color: "#222",
+    color: "white",
     marginBottom: 10,
   },
 
@@ -361,13 +219,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     fontSize: 15,
     marginBottom: 20,
-    backgroundColor: "#fff",
-    color: "#6b7280",
+    backgroundColor: "#1D1D20",
+    color: "white",
     borderColor: "#fff",
   },
 
   inputText: {
-    color: "#6b7280",
+    color: "#fff",
   },
 
   form: {
@@ -401,7 +259,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     marginTop: "130%",
-    backgroundColor: "#fff",
+    backgroundColor: "lightgrey",
     justifyContent: "space-around",
     gap: "50%",
   },

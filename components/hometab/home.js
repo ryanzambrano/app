@@ -9,98 +9,325 @@ import {
   TouchableOpacity,
   FlatList,
   SafeAreaView,
-  RefreshControl,
+  Alert,
 } from "react-native";
-
+import { useIsFocused } from "@react-navigation/native";
+import { AntDesign } from "@expo/vector-icons";
 import { supabase } from "../auth/supabase.js"; // we have our client here!!! no need to worry about creating it again
 import { picURL } from "../auth/supabase.js"; // This is the base url of the photos bucket that is in our Supabase project. It makes referencing user pictures easier
 import { useNavigation } from "@react-navigation/native";
-import { createClient } from "@supabase/supabase-js"; // Create client is responsible for drawing profile data from each user in the database
+import Icon from "react-native-vector-icons/FontAwesome";
+import { StatusBar } from "expo-status-bar";
+import { ActivityIndicator } from "react-native";
 
+const logo = require("../../assets/logo3.png");
+const isBookmarkedColor = "#14999999";
+const notBookmarkedColor = "#fff";
 
-const Home = ( route ) => {
+const Home = ({ route }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const { session } = route.params;
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
+  const [sessionUser, setSessionuser] = useState(session.user);
+  const [sortMethod, setSortMethod] = useState("Most Compatible");
   const [selectedUser, setSelectedUser] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const notBookmarkedURI = "https://th.bing.com/th/id/R.cecd7b5d152ec027d92ce420e7501628?rik=4KyY5UzmnBAdQw&riu=http%3a%2f%2fcdn.onlinewebfonts.com%2fsvg%2fimg_198285.png&ehk=w90yvbSPjeB5mEVLfPbIbZH632mVWZquCJG%2bo3yyous%3d&risl=&pid=ImgRaw&r=0";
-  const isBookmarkedURI = "https://cdn0.iconfinder.com/data/icons/glyph-set-two/32/glyph-set-two-75-512.png";
- 
-  const toggleBookmarkButton = () => {
-    setIsBookmarked((prev) => !prev);
+  const [bookmarkedProfiles, setBookmarkedProfiles] = useState([]);
+  const [blockedProfiles, setBlockedProfiles] = useState([]);
+  const isFocused = useIsFocused();
+
+  const {
+    housingPreference = "Any",
+    genderPreference = "Any",
+    youngestAgePreference = "Any",
+    oldestAgePreference = "Any",
+    studyPreference = "Any",
+  } = route.params || {};
+
+  const handleFiltersPress = () => {
+    navigation.navigate("Filters", {
+      currentHousingPreference: housingPreference,
+      currentGenderPreference: genderPreference,
+      currentYoungestAgePreference: youngestAgePreference,
+      currentOldestAgePreference: oldestAgePreference,
+      currentStudyPreference: studyPreference,
+    });
   };
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setUsers(users);
-      setRefreshing(false);
-    }, 500); 
+  const toggleBookmarkButton = () => {
+    setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
   };
 
   const handleSearch = (text) => {
     setSearchQuery(text);
   };
 
-  const filteredUsers = users.filter((user) => {
-    const nameMatch = user.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const tagMatch = user.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    return nameMatch || tagMatch;
+  const renderEmptyComponent = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>No users found</Text>
+    </View>
+  );
+
+  const showSortMenu = () => {
+    Alert.alert(
+      "Sort Options",
+      "Choose a sorting method:",
+      [
+        {
+          text: "Alphabetical Order",
+          onPress: () => setSortMethod("Alphabetical Order"),
+        },
+        {
+          text: "Shared Interests",
+          onPress: () => setSortMethod("Shared Interests"),
+        },
+        {
+          text: "Most Compatible",
+          onPress: () => setSortMethod("Most Compatible"),
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const calculateCompatibility = (sessionUser, otherUser) => {
+    //console.log(otherUser.profiles.sleep_time);
+    //console.log(sessionUser.profiles.sleep_time);
+    let score = 0;
+
+    if (Array.isArray(sessionUser.tags) && Array.isArray(otherUser.tags)) {
+      sessionUser.tags.forEach((tag) => {
+        if (otherUser.tags.includes(tag)) score += 4;
+      });
+    }
+    if (sessionUser.profiles.for_fun === otherUser.profiles.for_fun) score += 5;
+    if (sessionUser.profiles.tidiness === otherUser.profiles.tidiness)
+      score += 5;
+    if (
+      sessionUser.profiles.noise_preference ===
+      otherUser.profiles.noise_preference
+    )
+      score += 5;
+    if (sessionUser.profiles.sleep_time === otherUser.profiles.sleep_time)
+      score += 5;
+    if (
+      sessionUser.profiles.living_preferences ===
+      otherUser.profiles.living_preferences
+    )
+      score += 5;
+    if (sessionUser.profiles.studies === otherUser.profiles.studies) score += 3;
+    if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 2;
+    if (sessionUser.class_year === otherUser.class_year) score += 2;
+    if (sessionUser.profiles.gender === otherUser.profiles.gender) score += 1;
+    return score;
+  };
+
+  const sortedUsers = users.sort((a, b) => {
+    //console.log(a, b);
+    switch (sortMethod) {
+      case "Alphabetical Order":
+        return a.name.localeCompare(b.name);
+      case "Shared Interests":
+        const aTagsCount = a.tags.filter((tag) =>
+          sessionUser.tags.includes(tag)
+        ).length;
+        const bTagsCount = b.tags.filter((tag) =>
+          sessionUser.tags.includes(tag)
+        ).length;
+        return bTagsCount - aTagsCount;
+      case "Most Compatible":
+      default:
+        const aScore = calculateCompatibility(sessionUser, a);
+        const bScore = calculateCompatibility(sessionUser, b);
+        return bScore - aScore;
+    }
+  });
+
+  const filteredUsers = sortedUsers.filter((user) => {
+    const isSessionUser = user.user_id === session.user.id;
+    const isBlocked = blockedProfiles.includes(user.user_id);
+
+    const nameMatch = user.name
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    const tagMatch = user.tags.some((tag) =>
+      tag.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // console.log(housingPreference);
+    const isHousingMatch =
+      housingPreference === "Any" ||
+      user.profiles.living_preferences === housingPreference;
+    //console.log(isHousingMatch);
+    const isGenderMatch =
+      genderPreference === "Any" || user.profiles.gender === genderPreference;
+    const isAgeMatch =
+      (youngestAgePreference === "Any" || user.age >= youngestAgePreference) &&
+      (oldestAgePreference === "Any" || user.age <= oldestAgePreference);
+    const isStudyMatch =
+      studyPreference === "Any" || user.profiles.studies === studyPreference;
+
+    if (isSessionUser || isBlocked) {
+      return false;
+    }
+
+    if (isBookmarked) {
+      return (
+        bookmarkedProfiles.includes(user.user_id) &&
+        (nameMatch || tagMatch) &&
+        (isHousingMatch || housingPreference === "Any") &&
+        (isGenderMatch || genderPreference === "Any") &&
+        (isAgeMatch ||
+          (youngestAgePreference === "Any" && oldestAgePreference === "Any")) &&
+        (isStudyMatch || studyPreference === "Any")
+      );
+    }
+
+    return (
+      (nameMatch || tagMatch) &&
+      (isHousingMatch || housingPreference === "Any") &&
+      (isGenderMatch || genderPreference === "Any") &&
+      (isAgeMatch ||
+        (youngestAgePreference === "Any" && oldestAgePreference === "Any")) &&
+      (isStudyMatch || studyPreference === "Any")
+    );
   });
 
   useEffect(() => {
+    setIsLoading(true);
     const fetchUsers = async () => {
-      const { data: ugcData, error: ugcError } = await supabase
-        .from("UGC")
-        .select("*");
-      const { data: profileData, error: profileError } = await supabase
-        .from("profile")
-        .select("*");
+      try {
+        const { data: ugcData, error: ugcError } = await supabase
+          .from("UGC")
+          .select("*");
+        const { data: profileData, error: profileError } = await supabase
+          .from("profile")
+          .select("*");
+        const { data: imageData, error: imageError } = await supabase
+          .from("images")
+          .select("*")
+          .eq("image_index", 0);
 
-      if (ugcError || profileError) {
-        console.error(ugcError || profileError);
-      } else {
-        const mergedData = ugcData.map((ugcUser) => {
-          const relatedProfileData = profileData.filter(
-            (profileUser) => profileUser.user_id === ugcUser.user_id
-          );
-          return {
-            ...ugcUser,
-            profiles: relatedProfileData,
-          };
-        });
+        if (ugcError || profileError || imageError) {
+          console.error(ugcError || profileError || imageError);
+        } else {
+          const mergedData = ugcData.map((ugcUser) => {
+            const relatedProfileData = profileData.find(
+              (profileUser) => profileUser.user_id === ugcUser.user_id
+            );
+            const relatedImageData = imageData.find(
+              (img) => img.user_id === ugcUser.user_id
+            );
+            return {
+              ...ugcUser,
+              profiles: relatedProfileData,
+              lastModified: relatedImageData?.last_modified || null,
+            };
+          });
 
-        setUsers(mergedData);
+          const userId = session.user.id;
+          const ugcResponse = await supabase
+            .from("UGC")
+            .select("name, bio, tags, major, class_year, hometown")
+            .eq("user_id", userId)
+            .single();
+          const profileResponse = await supabase
+            .from("profile")
+            .select("*")
+            .eq("user_id", userId)
+            .single();
+
+          if (ugcResponse.error || profileResponse.error) {
+            console.error(
+              ugcResponse.error?.message || profileResponse.error?.message
+            );
+          } else {
+            const mergedSessionUser = {
+              ...ugcResponse.data,
+              profiles: profileResponse.data,
+            };
+            setSessionuser(mergedSessionUser);
+          }
+
+          const { data: bookmarkedData, error: bookmarkedError } =
+            await supabase
+              .from("UGC")
+              .select("bookmarked_profiles")
+              .eq("user_id", userId);
+          if (bookmarkedError) {
+            console.error(
+              "Error fetching bookmarked profiles:",
+              bookmarkedError.message
+            );
+          } else {
+            const { bookmarked_profiles } = bookmarkedData[0];
+            setBookmarkedProfiles(bookmarked_profiles);
+          }
+
+          const { data: blockedData, error: blockedError } = await supabase
+            .from("UGC")
+            .select("blocked_profiles")
+            .eq("user_id", userId);
+          if (blockedError) {
+            console.error(
+              "Error fetching blocked profiles:",
+              blockedError.message
+            );
+          } else {
+            const { blocked_profiles } = blockedData[0];
+            setBlockedProfiles(blocked_profiles);
+          }
+
+          setUsers(mergedData);
+        }
+      } catch (error) {
+        console.error("An unexpected error occurred:", error);
       }
     };
 
     fetchUsers();
-  }, []);
+    if (isFocused) {
+      fetchUsers();
+    }
+
+    if (isBookmarked) {
+      fetchUsers();
+    }
+
+    setIsLoading(false);
+  }, [isFocused]);
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
-    navigation.navigate("userCard", { user }); // Navigate to UserProfile component with selected user data
+    navigation.navigate("userCard", { user });
+  };
+
+  const renderLoading = () => {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
   };
 
   const renderUserCard = ({ item }) => {
+    if (!item.lastModified) {
+      return null;
+    }
     return (
       <TouchableOpacity onPress={() => handleUserCardPress(item)}>
         <View style={styles.card}>
           <Image
             style={styles.profileImage}
             source={{
-              uri: `${picURL}/${item.user_id}/${
-                item.user_id
-              }-0?${new Date().getTime()}`,
+              uri: `${picURL}/${item.user_id}/${item.user_id}-0-${item.lastModified}`,
             }}
           />
           <View style={styles.userInfo}>
-            <Text style={styles.name}>
-              {" "}
-              {item.name}, {item.age}{" "}
-            </Text>
+            <Text style={styles.name}> {item.name} </Text>
+            <Text style={styles.major}> {item.major}</Text>
             <View style={styles.tagsContainer}>
               {item.tags.map((tag, index) => (
                 <View key={index} style={styles.tag}>
@@ -117,42 +344,66 @@ const Home = ( route ) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Image
-          style={styles.logo}
-          source={{
-            uri: "https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg",
-          }}
-        />
-        <Text style={styles.headerText}> Cabana </Text>
-        <TouchableOpacity onPress={toggleBookmarkButton}>
-          <Image style={{marginLeft: isBookmarked? 197 : 203, marginTop: -10, height: isBookmarked ? 28 : 28, width: isBookmarked ? 32 : 21 }} 
-            source ={{ uri: isBookmarked ? isBookmarkedURI : notBookmarkedURI }} ></Image>
-        </TouchableOpacity>
+        <View style={styles.logoTitleContainer}>
+          <Image style={styles.logo} source={logo} />
+          <Text style={styles.headerText}> Cabana </Text>
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={handleFiltersPress}>
+            <Icon name="sliders" size={30} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={toggleBookmarkButton}>
+            <Icon
+              name="bookmark"
+              size={30}
+              color={isBookmarked ? isBookmarkedColor : notBookmarkedColor}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-
-      
 
       <View style={styles.viewContainer}>
         <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="🔎 Search by name or tag"
-          onChangeText={handleSearch}
-          value={searchQuery}
-        />
+          <AntDesign name="search1" size={15} color="#575D61" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder=" Search by name or tag"
+            placeholderTextColor={"#575D61"}
+            onChangeText={handleSearch}
+            value={searchQuery}
+          />
+        </View>
+        {isLoading ? ( // Step 3
+          renderLoading()
+        ) : (
+          <FlatList
+            data={filteredUsers}
+            extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
+            renderItem={renderUserCard}
+            keyExtractor={(item) => item.user_id.toString()}
+            ListHeaderComponent={() => (
+              <>
+                <View style={styles.sortContainer}>
+                  <Text style={styles.sortText}>Sort by:</Text>
+                  <TouchableOpacity onPress={() => showSortMenu()}>
+                    <Text
+                      style={{
+                        color: "#159e9e",
+                        fontWeight: "bold",
+                        fontSize: 15,
+                      }}
+                    >
+                      {sortMethod}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+            ListEmptyComponent={renderEmptyComponent}
+          />
+        )}
       </View>
-        <FlatList
-          data={filteredUsers}
-          renderItem={renderUserCard}
-          keyExtractor={(item) => item.user_id.toString()}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-            />
-          }
-        />
-      </View>
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 };
@@ -160,58 +411,84 @@ const Home = ( route ) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
   },
 
   viewContainer: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#1D1D20",
+  },
+  titleContainer: {
+    alignItems: "right",
+    textAlign: "right",
+    //marginRight: -20,
+  },
+
+  logoContainer: {
+    alignItems: "flex-start",
+  },
+
+  thing: {
+    gap: 10,
+    flexDirection: "row",
+    alignItems: "flex-end",
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
-    alignContent: "center",
-    //borderBottomWidth: 1,
-    borderColor: "gray",
+    justifyContent: "space-between",
     paddingTop: 13,
     paddingBottom: 6,
     paddingLeft: 15,
     paddingRight: 15,
-    //marginBottom: 8,
+    marginBottom: 8,
+  },
+
+  logoTitleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
   },
 
   headerText: {
-    fontSize: 25,
-    fontWeight: "bold",
-    marginTop: -10,
+    fontSize: 29,
+    color: "white",
+    fontWeight: "600",
   },
 
   logo: {
     width: 30,
     height: 30,
-    marginRight: 0,
-    marginTop: -10,
+  },
+
+  buttonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
   },
 
   searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#2B2D2F",
     borderRadius: 10,
     paddingHorizontal: 15,
     marginTop: 5,
-    marginBottom: 1,
+    marginBottom: 5,
     elevation: 3,
-    marginHorizontal: 5,
-    borderWidth: 0.3,
-    borderColor: 'grey',
+    marginHorizontal: 10,
+    // borderWidth: 0.20,
+    // borderTopWidth: 0.20,
+    //borderBottomWidth: 0.2,
+    borderColor: "grey",
   },
 
   searchInput: {
     flex: 1,
     paddingVertical: 10,
     fontSize: 16,
+    color: "white",
   },
 
   userInfo: {
@@ -220,10 +497,10 @@ const styles = StyleSheet.create({
 
   userContainer: {
     flex: 1,
-    //alignItems: "center",
+    alignItems: "center",
     padding: 16,
     //marginBottom: 30,
-    backgroundColor: "#F4F4F4",
+    backgroundColor: "#1D1D20",
     borderRadius: 8,
   },
 
@@ -231,32 +508,47 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 20,
-    backgroundColor: "white",
+    backgroundColor: "#111111",
     marginVertical: 1,
+    justifyContent: "center",
+    position: "relative",
     marginHorizontal: 7,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingLeft: 10,
+    // paddingVertical: 10,
+    height: 185,
     marginTop: 3,
-    borderWidth: 0.3,
-    borderColor: 'grey',
+    marginBottom: 7,
+    borderWidth: 0.2,
+    //borderColor: "grey",
   },
 
   profileImage: {
-    width: 80,
-    height: 80,
+    width: 110,
+    height: 110,
     borderRadius: 3,
-    marginRight: 12,
-    borderRadius: 40,
-    borderWidth: 0.6,
+    marginRight: 18,
+    borderRadius: 60,
+    //borderWidth: 0.6,
     borderColor: "grey",
   },
 
-  name: {
+  major: {
     fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 10,
-    marginBottom: 0,
-    textAlign: "justify",
+    fontWeight: 500,
+    paddingTop: 5,
+    color: "grey",
+    //textAlign: "justify",
+  },
+
+  name: {
+    fontSize: 18,
+    fontWeight: 600,
+    paddingTop: 10,
+    color: "white",
+    zIndex: 1,
+    //top: 60,
+    //marginTop: 30,
+    //textAlign: "justify",
   },
 
   bio: {
@@ -265,26 +557,55 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3,
   },
   tagsContainer: {
-    backgroundColor: "white",
+    backgroundColor: "#111111",
     flexDirection: "row",
     flexWrap: "wrap",
+    justifyContent: "flex-start",
     paddingVertical: 10,
     borderRadius: 15,
+    maxHeight: 90,
+    paddingRight: 5,
+    //position: "absolute",
+    overflow: "hidden",
+    marginBottom: 10,
     justifyContent: "left",
   },
   tag: {
-    backgroundColor: "white",
-    borderRadius: 20,
-    paddingVertical: 3,
-    paddingHorizontal: 6,
+    backgroundColor: "#14999999",
+    borderRadius: 15,
+    //paddingVertical: 3,
+    paddingHorizontal: 7,
+    padding: 4,
     margin: 2,
-    borderWidth: 1,
-    borderColor: "grey",
   },
   tagText: {
     fontSize: 12,
+    color: "white",
+    fontWeight: 600,
+  },
+  sortContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingHorizontal: 6,
+    paddingVertical: 8,
+  },
+  sortText: {
+    marginHorizontal: 5,
+    fontSize: 15,
+    color: "lightgrey",
+    fontWeight: "500",
+    // textDecorationLine: "underline",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 140,
+  },
+  emptyText: {
+    fontSize: 20,
     color: "grey",
-    fontWeight: "bold",
   },
 });
 

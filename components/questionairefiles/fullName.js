@@ -15,38 +15,38 @@ import {
 } from "react-native";
 import { supabase } from "../auth/supabase.js";
 
-export const Username = ({ navigation, route }) => {
+export const Name = ({ navigation, route }) => {
   const { session } = route.params;
-  const [selectedUsername, setSelectedUsername] = useState("");
+  const [selectedName, setSelectedName] = useState("");
   const [isError, setIsError] = useState("");
 
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
 
   const userData = {
-    username: selectedUsername,
+    name: selectedName,
   };
 
   const handleUpdate = async (userData, session) => {
     setIsError(null);
 
     if (session?.user) {
-      if (!!userData.username) {
+      if (!!userData.name) {
         // Check if the name is longer than 30 characters
-        if (userData.username.length > 20) {
+        if (userData.name.length > 30) {
           setIsError("Too many characters");
           return; // Stop the function execution
         }
 
         // Check if the name contains non-alphabetic characters
-        if (!/^[a-z0-9_]+$/i.test(userData.username)) {
+        if (!/^[a-z\s]+$/i.test(userData.name)) {
           setIsError("Invalid characters");
           return; // Stop the function execution
         }
 
         const { data, error } = await supabase
-          .from("profile")
+          .from("UGC")
           .update({
-            username: selectedUsername,
+            name: selectedName,
           })
           .eq("user_id", session.user.id);
 
@@ -54,9 +54,9 @@ export const Username = ({ navigation, route }) => {
           startShakeAnimation();
           setIsError(error.message);
         } else {
-          navigation.navigate("Colleges");
+          navigation.navigate("Username");
         }
-      } else setIsError("Enter a Username");
+      } else setIsError("Enter a valid name");
     }
   };
 
@@ -87,6 +87,9 @@ export const Username = ({ navigation, route }) => {
       }),
     ]).start();
   };
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+  };
 
   const shakeAnimationStyle = {
     transform: [
@@ -104,19 +107,17 @@ export const Username = ({ navigation, route }) => {
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.titleText}>Create a Username!</Text>
+            <Text style={styles.titleText}>What's your name?</Text>
           </View>
           <View style={styles.input}>
-            <Text style={styles.inputHeader}>Username</Text>
+            <Text style={styles.inputHeader}>Name</Text>
 
             <TextInput
               style={styles.inputControl}
-              placeholder="Enter a username..."
+              placeholder="Enter your name..."
               placeholderTextColor="grey"
-              value={selectedUsername}
-              onChangeText={(selectedUsername) =>
-                setSelectedUsername(selectedUsername)
-              }
+              value={selectedName}
+              onChangeText={(selectedName) => setSelectedName(selectedName)}
             ></TextInput>
           </View>
           {isError && (
@@ -133,6 +134,7 @@ export const Username = ({ navigation, route }) => {
                 {
                   handleUpdate(userData, session);
                   //navigation.navigate("Questionaire1");
+                  //signOut();
                 }
               }}
             >
@@ -152,9 +154,11 @@ const styles = StyleSheet.create({
   container: {
     padding: 24,
     flex: 1,
+    backgroundColor: "#111111",
   },
 
   header: {
+    backgroundColor: "#111111",
     marginVertical: 36,
   },
 
@@ -194,7 +198,7 @@ const styles = StyleSheet.create({
   },
 
   inputText: {
-    color: "white",
+    color: "#6b7280",
     fontWeight: "500",
   },
 
@@ -287,4 +291,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Username;
+export default Name;

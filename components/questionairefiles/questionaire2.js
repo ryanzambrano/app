@@ -39,8 +39,10 @@ export default function Questionaire2({ navigation, route }) {
   const livingPreferences = ["Apartment", "Dorm", "No Preferences", "Other"];
   const forFun = ["Stay in", "Go out"];
   const studies = [
-    "Science",
     "Business",
+    "Natural Science",
+    "Social Science",
+    "Mathematics",
     "Engineering",
     "Art",
     "Exploratory",
@@ -87,7 +89,6 @@ export default function Questionaire2({ navigation, route }) {
             living_preferences: userData.livingPreferences,
             for_fun: userData.forFun,
             studies: userData.studies,
-            profile_complete: true,
           })
           .eq("user_id", session.user.id);
 
@@ -96,7 +97,7 @@ export default function Questionaire2({ navigation, route }) {
           setIsError(error.message);
         } else {
           //navigation.navigate("Questionaire3");
-          navigation.navigate("TagSelectionScreen");
+          navigation.navigate("Questionaire3");
         }
       } else {
         startShakeAnimation(shakeAnimationValue);
@@ -136,7 +137,7 @@ export default function Questionaire2({ navigation, route }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#eBecf4" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#111111" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
@@ -148,7 +149,7 @@ export default function Questionaire2({ navigation, route }) {
           <View style={styles.form}>
             <View style={styles.input}>
               <Text style={styles.inputHeader}>
-                Do you have living preferences?
+                Where are you planning to live?
               </Text>
 
               <TouchableOpacity
@@ -316,7 +317,7 @@ export default function Questionaire2({ navigation, route }) {
           </View>
         </View>
       </TouchableWithoutFeedback>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
     </SafeAreaView>
   );
 }
@@ -337,7 +338,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 12,
-    color: "#1e1e1e",
+    color: "white",
   },
 
   input: {
@@ -347,7 +348,7 @@ const styles = StyleSheet.create({
   inputHeader: {
     fontSize: 17,
     fontWeight: "500",
-    color: "#222",
+    color: "white",
     marginBottom: 10,
   },
 
@@ -361,13 +362,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     fontSize: 15,
     marginBottom: 20,
-    backgroundColor: "#fff",
-    color: "#6b7280",
+    backgroundColor: "#1D1D20",
+    color: "white",
     borderColor: "#fff",
   },
 
   inputText: {
-    color: "#6b7280",
+    color: "#fff",
   },
 
   form: {
@@ -401,7 +402,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     marginTop: "130%",
-    backgroundColor: "#fff",
+    backgroundColor: "lightgrey",
     justifyContent: "space-around",
     gap: "50%",
   },

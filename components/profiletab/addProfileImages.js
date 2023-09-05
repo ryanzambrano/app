@@ -14,8 +14,10 @@ import { supabase } from "../auth/supabase";
 import { decode } from "base64-arraybuffer";
 import { picURL } from "../auth/supabase";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { manipulateAsync, FlipType, SaveFormat } from "expo-image-manipulator";
+import { createTimestamp } from "../auth/profileUtils.js";
 
-const MAX_IMAGES = 6;
+const MAX_IMAGES = 4;
 
 const ImagePickerScreen = ({ navigation, route }) => {
   const { session } = route.params;
@@ -27,19 +29,39 @@ const ImagePickerScreen = ({ navigation, route }) => {
   const [image4, setImage4] = useState();
   const [image5, setImage5] = useState();
 
+  const [lastModified, setLastModified] = useState([]);
+
   useEffect(() => {
     getProfilePicturs();
   }, []);
 
   const getProfilePicturs = async () => {
     try {
-      for (let i = 0; i < MAX_IMAGES; i++) {
-        const profilePictureURL = `${picURL}/${session.user.id}/${
-          session.user.id
-        }-${i}?${new Date().getTime()}`;
-        const response = await fetch(profilePictureURL, {
-          cache: "no-cache",
+      let lastModifiedList = [];
+      const { data, error } = await supabase
+        .from("images")
+        .select("*")
+        .eq("user_id", session.user.id);
+
+      if (error) {
+        alert(error.message);
+      }
+
+      if (data) {
+        // alert(`Image data fetched: ${JSON.stringify(data)}`);
+        data.forEach((item) => {
+          // Use the image_index as the position for the last_modified value
+          lastModifiedList[item.image_index] = item.last_modified;
         });
+
+        setLastModified(lastModifiedList);
+
+        // If you want just a single 'last_modified' value (assuming the first one), you can do:
+      }
+      for (let i = 0; i < MAX_IMAGES; i++) {
+        //alert(i + ":" + lastModifiedList[i]);
+        const profilePictureURL = `${picURL}/${session.user.id}/${session.user.id}-${i}-${lastModifiedList[i]}`;
+        const response = await fetch(profilePictureURL);
         if (response.ok) {
           const imageURI = profilePictureURL;
           switch (i) {
@@ -92,14 +114,27 @@ const ImagePickerScreen = ({ navigation, route }) => {
 
   const deletePictures = async (index) => {
     try {
-      const filename = `${session.user.id}/${session.user.id}-${index}`;
+      const filename = `${session.user.id}/${session.user.id}-${index}-${lastModified[index]}`;
+
       const { data: removeData, error: removeError } = await supabase.storage
         .from("user_pictures")
         .remove(filename);
 
-      if (removeData) {
-        //alert(`Successfully deleted image ${index + 1}`);
+      if (removeError) {
+        throw removeError;
+      }
 
+      const { data: removeRow, error: rowError } = await supabase
+        .from("images")
+        .delete()
+        .eq("user_id", session.user.id)
+        .eq("image_index", index);
+
+      if (rowError) {
+        throw rowError;
+      }
+
+      if (removeData && removeRow) {
         switch (index) {
           case 0:
             setImage0(null);
@@ -113,15 +148,11 @@ const ImagePickerScreen = ({ navigation, route }) => {
           case 3:
             setImage3(null);
             break;
-          case 4:
-            setImage4(null);
-            break;
-          case 5:
-            setImage5(null);
-            break;
+
           default:
             console.error("Invalid index for image deletion");
         }
+        getProfilePicturs();
       }
 
       if (removeError) {
@@ -146,21 +177,31 @@ const ImagePickerScreen = ({ navigation, route }) => {
         allowsEditing: true,
         base64: true,
         aspect: [1, 1],
-        quality: 0.2,
+        quality: 1,
       });
 
       if (!imagePickerResult.canceled) {
-        deletePictures(index);
-        const filename = `${session.user.id}/${session.user.id}-${index}`;
+        const timestamp = new Date().toISOString();
 
-        const base64Data = imagePickerResult.assets[0].base64;
-        const buffer = decode(base64Data);
+        deletePictures(index);
+        const filename = `${session.user.id}/${session.user.id}-${index}-${timestamp}`;
+
+        const compressedImage = await manipulateAsync(
+          imagePickerResult.assets[0].uri,
+          [], // No transforms
+          { compress: 0.2, format: "jpeg", base64: true }
+        );
+        //compressedUri = compressedImage.uri;
+        const buffer = decode(compressedImage.base64);
 
         const { data, error: uploadError } = await supabase.storage
           .from("user_pictures")
           .upload(filename, buffer, {
             contentType: "image/jpeg",
           });
+
+        createTimestamp(session.user.id, timestamp, index);
+
         if (uploadError) {
           alert(uploadError.message);
         } else {
@@ -177,16 +218,10 @@ const ImagePickerScreen = ({ navigation, route }) => {
             case 3:
               setImage3(imagePickerResult.assets[0].uri);
               break;
-            case 4:
-              setImage4(imagePickerResult.assets[0].uri);
-              break;
-            case 5:
-              setImage5(imagePickerResult.assets[0].uri);
-              break;
+
             default:
               break;
           }
-          //getProfilePicturs();
         }
       }
     } catch (error) {
@@ -209,7 +244,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
         style={styles.button}
         onPress={async () => {
           await deletePictures(index);
-          getProfilePicturs();
+          await getProfilePicturs();
         }}
       >
         <Icon name="times" size={25} color="grey" />
@@ -220,10 +255,13 @@ const ImagePickerScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.back}>
+        <View style={styles.left}>
           <Button title="back" onPress={handleBackPress} />
         </View>
-        <Text style={styles.title}>Edit Your Images</Text>
+        <View style={styles.center}>
+          <Text style={styles.title}>Add Images</Text>
+        </View>
+        <View style={styles.right} />
       </View>
 
       <ScrollView>
@@ -247,18 +285,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
                 <Image source={{ uri: image2 }} style={styles.image} />
               ) : null}
             </TouchableOpacity>
-            {renderItem(4)}
-            <TouchableOpacity
-              style={styles.profilePictureContainer}
-              onPress={() => handleImageUpload1(4)}
-            >
-              {image4 ? (
-                <Image source={{ uri: image4 }} style={styles.image} />
-              ) : null}
-            </TouchableOpacity>
-          </View>
 
-          <View style={styles.column}>
             {renderItem(1)}
             <TouchableOpacity
               style={styles.profilePictureContainer}
@@ -268,24 +295,6 @@ const ImagePickerScreen = ({ navigation, route }) => {
                 <Image source={{ uri: image1 }} style={styles.image} />
               ) : null}
             </TouchableOpacity>
-            {renderItem(3)}
-            <TouchableOpacity
-              style={styles.profilePictureContainer}
-              onPress={() => handleImageUpload1(3)}
-            >
-              {image3 ? (
-                <Image source={{ uri: image3 }} style={styles.image} />
-              ) : null}
-            </TouchableOpacity>
-            {renderItem(5)}
-            <TouchableOpacity
-              style={styles.profilePictureContainer}
-              onPress={() => handleImageUpload1(5)}
-            >
-              {image5 ? (
-                <Image source={{ uri: image5 }} style={styles.image} />
-              ) : null}
-            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -293,35 +302,45 @@ const ImagePickerScreen = ({ navigation, route }) => {
   );
 };
 const styles = StyleSheet.create({
-  title: {
-    fontFamily: "Helvetica Neue",
-    fontSize: 20,
-    textAlign: "center",
-    alignSelf: "center",
-  },
   header: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
-    justifyContent: "flex-start",
-    paddingVertical: 5,
+    alignItems: "center",
+    alignSelf: "center",
+    alignContent: "center",
+    backgroundColor: "#111111",
+    padding: 10, // You can adjust this value
+  },
+  left: {
+    flex: 1,
+    alignItems: "flex-start",
+  },
+  center: {
+    flex: 1,
+    alignItems: "center",
+    alignSelf: "center",
+    alignContent: "center",
+  },
+  right: {
+    flex: 1,
+    alignItems: "flex-end",
   },
   back: {
-    marginRight: -57,
-    marginLeft: 8,
+    //textAlign: "left",
+    //marginLeft: 8,
   },
-  backButtonText: {
-    fontSize: 16,
-    color: "#000",
-  },
+
   title: {
     flex: 1,
     fontSize: 20,
     fontWeight: "bold",
-    textAlign: "center",
+    alignItems: "center",
+    color: "white",
   },
 
   container: {
+    backgroundColor: "#111111",
     flex: 1,
     padding: 10,
   },
@@ -330,15 +349,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 10,
     alignItems: "center",
+    alignSelf: "center",
+    backgroundColor: "#111111",
   },
 
   column: {
-    flex: 1,
-    flexDirection: "column",
-    //gap: 10,
+    //flexDirection: "column",
+    //alignItems: "center",
   },
   button: {
-    //flex: 1,
     flexDirection: "row",
     justifyContent: "flex-end",
     marginRight: 15,
@@ -352,9 +371,9 @@ const styles = StyleSheet.create({
     margin: 12.5,
   },
   profilePictureContainer: {
-    width: 171,
-    height: 311,
-    backgroundColor: "#ccc",
+    width: 350,
+    height: 350,
+    backgroundColor: "#2B2D2F",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 20,

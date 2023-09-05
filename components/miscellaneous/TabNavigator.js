@@ -1,33 +1,60 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"; // Package that allows for a bottom tab navigator
-import Icon from "react-native-vector-icons/FontAwesome"; // Package that introduces icons 
-
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import View from "react-native";
 import ContactsUI from "../contactstab/contacts"; // Imports for use in Tab Navigator
 import Home from "../hometab/home";
 import Profile from "../profiletab/profile";
+import { MaterialIcons } from "@expo/vector-icons";
+import { Foundation } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 
-const Tab = createBottomTabNavigator(); // Initializes bottom tab navigator 
+const Tab = createBottomTabNavigator(); // Initializes bottom tab navigator
 
-const TabNavigator = ({ route }) => {     
+const TabNavigator = ({ route }) => {
   const { session } = route.params;
   return (
     <Tab.Navigator
+      initialRouteName="Contacts"
       screenOptions={({ route }) => ({
         headerShown: false,
+        tabBarStyle: {
+          paddingHorizontal: 5,
+          paddingTop: 0,
+          backgroundColor: "#111111",
+          //position: "absolute",
+          borderTopWidth: 1.5,
+          borderTopColor: "#1D1D20",
+        },
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-          if (route.name === "Contacts") { // Based on where the user clicks, it highlights the icon to clarify what page they are on
-            iconName = focused ? "comment" : "comment-o"; // Set the icons for the 'Messages
+          if (route.name === "Contacts") {
+            return (
+              <MaterialIcons
+                name="chat-bubble-outline"
+                size={24}
+                color={focused ? "white" : "grey"}
+              />
+            );
           } else if (route.name === "Home") {
-            iconName = focused ? "home" : "home"; // Set the icons for the 'Home' screen
+            return (
+              <Foundation
+                name="home"
+                size={24}
+                color={focused ? "white" : "grey"}
+              />
+            );
           } else if (route.name === "Profile") {
-            iconName = focused ? "user" : "user"; // Set the icons for the 'Profile' screen
+            return (
+              <FontAwesome5
+                name="user"
+                size={24}
+                color={focused ? "white" : "grey"}
+              />
+            );
           }
-
-          return <Icon name={iconName} size={size} color={color} />;
         },
         tabBarLabel: () => null, // Removes the labels
-        
       })}
     >
       <Tab.Screen
@@ -35,10 +62,7 @@ const TabNavigator = ({ route }) => {
         component={ContactsUI}
         initialParams={{ session }} // These three Tab.Screen blocks bring in the components from each of the files that allow the Tab navigator to access and change pages
       />
-      <Tab.Screen 
-        name="Home" 
-        component={Home} 
-        initialParams={{ session }}/>
+      <Tab.Screen name="Home" component={Home} initialParams={{ session }} />
       <Tab.Screen
         name="Profile"
         component={Profile}
