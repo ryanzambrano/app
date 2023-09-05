@@ -37,7 +37,7 @@ export const Questionaire1 = ({ navigation, route }) => {
   const [selectedWho, setSelectedWho] = useState("");
 
   const gender = ["Male", "Female", "Other"];
-  const race = ["White", "Black", "Brown", "Yellow"];
+  const race = ["White", "Black / African American", "American Indian/Alaska Native", "Asian", "Native Hawaiian/Pacific Islander"];
   const ages = Array.from(Array(31).keys()).map((age) => String(age + 1));
 
   const openAgeModal = () => {

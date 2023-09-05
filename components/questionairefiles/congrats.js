@@ -33,7 +33,7 @@ export const Congrats = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#111111" }}>
-        {showConfetti && <ConfettiCannon zIndex={1000} count={400} origin={{x: -10, y: 0}} />}
+        {showConfetti && <ConfettiCannon explosionSpeed={600} zIndex={10} count={400} origin={{x: -10, y: 1000}} />}
         <View style={styles.header}>
           <Text style={styles.titleText}>You're all Set!</Text>
         </View>
