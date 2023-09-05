@@ -94,8 +94,8 @@ const TagSelectionScreen = ({ navigation, route }) => {
           startShakeAnimation();
           setIsError(error.message);
         } else {
-          refreshSession();
-
+          //refreshSession();
+          navigation.navigate("Congrats");
           //signOut();
         }
       } else if (userData.tags.length > 7) {

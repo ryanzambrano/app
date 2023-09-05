@@ -9,6 +9,7 @@ import Username from "./username.js";
 import Name from "./fullName.js";
 import MatchingData from "./matchingData.js";
 import TagSelectionScreen from "./tagSelectionScreen.js";
+import Congrats from "./congrats.js";
 import Colleges from "./college.js";
 
 const Stack = createStackNavigator();
@@ -58,6 +59,11 @@ const Questionaire = ({ navigation, route }) => {
         component={TagSelectionScreen}
         initialParams={{ session }}
       />
+      <Stack.Screen
+        name="Congrats"
+        component={Congrats}
+        initialParams={session}
+        />
       {/*<Stack.Screen name="messages" component={MessagingUI} />*/}
     </Stack.Navigator>
   );
