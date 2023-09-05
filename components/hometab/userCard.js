@@ -54,6 +54,7 @@ const UserCard = ({ navigation, route }) => {
 
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
+  const [living_preferences, setLivingPreference] = useState("");
   const [persons, setPersons] = useState([]);
 
   const [photos, setPhotos] = useState([
@@ -150,11 +151,12 @@ const UserCard = ({ navigation, route }) => {
     const fetchGenderAndAge = async () => {
       const { data: genderData, error: genderError } = await supabase
         .from("profile")
-        .select("gender, age")
+        .select("gender, age, living_preferences")
         .eq("user_id", user_id);
       if (genderData) {
         setGender(genderData[0].gender);
         setAge(genderData[0].age);
+        setLivingPreference(genderData[0].living_preferences);
         console.log(genderData.age);
       } else {
         console.log("Error fetching prompts: ");
