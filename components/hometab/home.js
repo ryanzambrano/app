@@ -18,12 +18,14 @@ import { picURL } from "../auth/supabase.js"; // This is the base url of the pho
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { StatusBar } from "expo-status-bar";
+import { ActivityIndicator } from "react-native";
 
 const logo = require("../../assets/logo3.png");
 const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
 
 const Home = ({ route }) => {
+  const [isLoading, setIsLoading] = useState(true);
   const { session } = route.params;
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
@@ -110,7 +112,10 @@ const Home = ({ route }) => {
       score += 5;
     if (sessionUser.profiles.sleep_time === otherUser.profiles.sleep_time)
       score += 5;
-    if (sessionUser.profiles.living_preferences === otherUser.profiles.living_preferences)
+    if (
+      sessionUser.profiles.living_preferences ===
+      otherUser.profiles.living_preferences
+    )
       score += 5;
     if (sessionUser.profiles.studies === otherUser.profiles.studies) score += 3;
     if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 2;
@@ -191,6 +196,7 @@ const Home = ({ route }) => {
   });
 
   useEffect(() => {
+    setIsLoading(true);
     const fetchUsers = async () => {
       try {
         const { data: ugcData, error: ugcError } = await supabase
@@ -289,11 +295,21 @@ const Home = ({ route }) => {
     if (isBookmarked) {
       fetchUsers();
     }
+
+    setIsLoading(false);
   }, [isFocused]);
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
     navigation.navigate("userCard", { user });
+  };
+
+  const renderLoading = () => {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#fff" />
+      </View>
+    );
   };
 
   const renderUserCard = ({ item }) => {
@@ -310,10 +326,7 @@ const Home = ({ route }) => {
             }}
           />
           <View style={styles.userInfo}>
-            <Text style={styles.name}>
-              {" "}
-              {item.name}, {item.age}{" "}
-            </Text>
+            <Text style={styles.name}> {item.name} </Text>
             <Text style={styles.major}> {item.major}</Text>
             <View style={styles.tagsContainer}>
               {item.tags.map((tag, index) => (
@@ -360,31 +373,35 @@ const Home = ({ route }) => {
             value={searchQuery}
           />
         </View>
-        <FlatList
-          data={filteredUsers}
-          extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
-          renderItem={renderUserCard}
-          keyExtractor={(item) => item.user_id.toString()}
-          ListHeaderComponent={() => (
-            <>
-              <View style={styles.sortContainer}>
-                <Text style={styles.sortText}>Sort by:</Text>
-                <TouchableOpacity onPress={() => showSortMenu()}>
-                  <Text
-                    style={{
-                      color: "#159e9e",
-                      fontWeight: "bold",
-                      fontSize: 15,
-                    }}
-                  >
-                    {sortMethod}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
-          ListEmptyComponent={renderEmptyComponent}
-        />
+        {isLoading ? ( // Step 3
+          renderLoading()
+        ) : (
+          <FlatList
+            data={filteredUsers}
+            extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
+            renderItem={renderUserCard}
+            keyExtractor={(item) => item.user_id.toString()}
+            ListHeaderComponent={() => (
+              <>
+                <View style={styles.sortContainer}>
+                  <Text style={styles.sortText}>Sort by:</Text>
+                  <TouchableOpacity onPress={() => showSortMenu()}>
+                    <Text
+                      style={{
+                        color: "#159e9e",
+                        fontWeight: "bold",
+                        fontSize: 15,
+                      }}
+                    >
+                      {sortMethod}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+            ListEmptyComponent={renderEmptyComponent}
+          />
+        )}
       </View>
       <StatusBar style="light" />
     </SafeAreaView>

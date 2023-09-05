@@ -304,7 +304,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
                 }
               >
                 <Text style={{ color: "white", fontSize: 16, fontWeight: 500 }}>
-                  Edit your Answers
+                  Retake Questionaire
                 </Text>
               </TouchableOpacity>
             </View>

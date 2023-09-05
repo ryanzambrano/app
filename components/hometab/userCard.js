@@ -15,19 +15,11 @@ import {
   Modal,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
-import Icon from "react-native-vector-icons/FontAwesome";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
-import { Octicons } from "@expo/vector-icons";
-import { useIsFocused } from "@react-navigation/native";
 import { picURL } from "../auth/supabase";
-import { getLastModifiedFromSupabase } from "../auth/profileUtils.js";
 import { supabase } from "../auth/supabase.js";
-
-import Swiper from "react-native-swiper";
-// npm install react-native-swiper
 
 const MAX_IMAGES = 4;
 
@@ -45,8 +37,6 @@ const profileZIndex = scrollY.interpolate({
   extrapolate: "clamp",
 });
 
-const DISABLE_TOUCHABLE_SCROLL_POINT = 100;
-
 const UserCard = ({ navigation, route }) => {
   const { session } = route.params;
   const {
@@ -55,9 +45,6 @@ const UserCard = ({ navigation, route }) => {
     bio,
     major,
     user_id,
-    age,
-    gender,
-    living_preferences,
     for_fun,
     class_year,
     hometown,
@@ -65,9 +52,10 @@ const UserCard = ({ navigation, route }) => {
     lastModified,
   } = route.params.user;
 
-  // current user is session.user.id
-  // other user is user_id
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
   const [persons, setPersons] = useState([]);
+
   const [photos, setPhotos] = useState([
     `${picURL}/${user_id}/${user_id}-0-${lastModified}`,
   ]);
@@ -159,8 +147,23 @@ const UserCard = ({ navigation, route }) => {
         console.log("Error fetching prompts: ", promptsError);
       }
     };
+    const fetchGenderAndAge = async () => {
+      const { data: genderData, error: genderError } = await supabase
+        .from("profile")
+        .select("gender, age")
+        .eq("user_id", user_id);
+      if (genderData) {
+        setGender(genderData[0].gender);
+        setAge(genderData[0].age);
+        console.log(genderData.age);
+      } else {
+        console.log("Error fetching prompts: ");
+      }
+    };
+    fetchGenderAndAge();
     fetchBookmarkedProfiles();
     fetchPrompts();
+    console.log(`${picURL}/${user_id}/${user_id}-0-${lastModified}`);
   }, []);
 
   const handleBlockUser = async (user_id) => {
@@ -650,7 +653,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   friendButton: {
-    backgroundColor: "dodgerblue",
     borderRadius: 10,
     padding: 13,
     alignItems: "center",
