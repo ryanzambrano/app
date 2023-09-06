@@ -390,6 +390,7 @@ const MessagingUI = () => {
           onContentSizeChange={(e) =>
             setInputHeight(e.nativeEvent.contentSize.height)
           }
+          keyboardAppearance="dark"
         />
         <Button
           title="Send"
@@ -431,7 +432,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 0,
-    paddingVertical: 20,
+    paddingTop: 20,
+    paddingBottom: 5,
   },
   button: {
     padding: 10,
@@ -468,12 +470,14 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     alignSelf: "flex-end",
     backgroundColor: "#14999999",
+    marginBottom: 15,
   },
   messageContainerLeft: {
     borderRadius: 20,
     marginBottom: 2,
     alignSelf: "flex-start",
     backgroundColor: "#2B2D2F",
+    marginBottom: 15,
   },
   message: {
     fontSize: 16,

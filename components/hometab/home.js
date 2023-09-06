@@ -364,13 +364,15 @@ const Home = ({ route }) => {
 
       <View style={styles.viewContainer}>
         <View style={styles.searchContainer}>
-          <AntDesign name="search1" size={15} color="#575D61" />
+          <AntDesign name="search1" size={15} paddingRight={5} color="#575D61" />
           <TextInput
             style={styles.searchInput}
-            placeholder=" Search by name or tag"
+            placeholder="Search by name or tag"
             placeholderTextColor={"#575D61"}
             onChangeText={handleSearch}
             value={searchQuery}
+            keyboardAppearance="dark"
+            returnKeyType="done"
           />
         </View>
         {isLoading ? ( // Step 3
