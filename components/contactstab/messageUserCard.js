@@ -471,18 +471,19 @@ const MessageUserCard = ({ navigation, route }) => {
             >
               <Text style={styles.chatButtonText}>Message</Text>
             </TouchableOpacity>
-          </View>         
-          {class_year && (
-            <View style={styles.bioContainer}>
-              <Entypo name="graduation-cap" marginTop={-2} size={22} color="white" />
-              <Text style={styles.bio}>  {class_year}</Text>
-            </View>
-          )}         
+          </View>               
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.horizontalInfoScrollView}
           >
+            {class_year && (
+            <View style={styles.infoContainer}>
+              <Entypo name="graduation-cap" size={22} color="white" />
+              <Text style={styles.bio}>  {class_year}</Text>
+              <View style={styles.verticalDivider}/>
+            </View>
+          )}  
           {major && (
             <View style={styles.infoContainer}>
               <Entypo name="open-book" size={22} color="white" />
