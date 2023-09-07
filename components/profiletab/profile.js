@@ -241,12 +241,14 @@ export const Profile = ({ navigation, route }) => {
               </View>
             </View>
             </View>
+            {editedUser.bio && (
             <View style={styles.bio}>
               <View>
                 <Text style={styles.bioHeader}>About me</Text>
                 <Text style={styles.bioText}>{editedUser.bio}</Text>
               </View>
             </View>
+            )}
             <View
               style={{
                 borderBottomWidth: hasValidItems ? 0.3 : 0,
@@ -256,19 +258,21 @@ export const Profile = ({ navigation, route }) => {
                 borderBottomStartRadius: 20,
               }}
             >
-              <Text style={styles.promptsHeader}>Prompts</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>         
-                {prompts.map((item, index) =>
-                  item.answer ? (
-                    <View key={index} style={styles.itemContainer}>
-                      <Text style={styles.itemPrompt}>
-                        {promptQuestions[item.prompt]}
-                      </Text>
-                      <Text style={styles.itemAnswer}>{item.answer}</Text>
-                    </View>
-                  ) : null
-                )}
-              </ScrollView>
+            {prompts.some(item => item.answer) && (
+              <Text style={styles.promptsHeader}>Additional Info</Text>
+            )}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>         
+              {prompts.map((item, index) =>
+                item.answer ? (
+                  <View key={index} style={styles.itemContainer}>
+                    <Text style={styles.itemPrompt}>
+                      {promptQuestions[item.prompt]}
+                    </Text>
+                    <Text style={styles.itemAnswer}>{item.answer}</Text>
+                  </View>
+                ) : null
+              )}
+            </ScrollView>
             </View>
             <Text style={styles.promptsHeader}>Interests</Text>
             {editedUser.tags && editedUser.tags.length > 0 && (
