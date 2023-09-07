@@ -14,17 +14,43 @@ export const AddPrompts = ({ navigation, route }) => {
   const { session } = route.params;
   const presetQuestions = [
     "Are you participating in Greek Life?",
-    "Describe a good night out",
-    "What are some of your pet peeves?",
-    "What are your favorite movies?",
-  ]; // Replace with your questions
+    "A perfect night out for me looks like...",
+    "My biggest pet peeves are...",
+    "My favorite movies are...",
+    "My favorite artists / bands are...",
+    "The dorms halls / apartment complexes I'm considering are...",
+    "When it comes to sharing my amenities and personal property...",
+    "When it comes to sharing food and cooking...",
+    "When I'm burnt out, I relax by...",
+    "The organizations I'm involved in on campus are...",
+    "My opinion toward smoking in the dorm / apartment are...",
+    "My thoughts on having guests over are...",
+    "I like the temperature of the room to be...",
+    "My thoughts on having pets are...",
+    "My thoughts on throwing parties are...",
+    "My ideas for decorating the home involve...",
+    "When it comes to handling conflict, I am...",
+  ]; 
 
   const questionColumnMapping = {
     "Are you participating in Greek Life?": "greek_life",
-    "Describe a good night out": "night_out",
-    "What are some of your pet peeves?": "pet_peeves",
-    "What are your favorite movies?": "favorite_movies",
-  }; // Map your questions to the column names
+    "A perfect night out for me looks like...": "night_out",
+    "My biggest pet peeves are...": "pet_peeves",
+    "My favorite movies are...": "favorite_movies",
+    "My favorite artists / bands are...": "favorite_artists",
+    "The dorms halls / apartment complexes I'm considering are...": "living_considerations",
+    "When it comes to sharing my amenities and personal property...": "sharing",
+    "When it comes to sharing food and cooking...": "cooking",
+    "When I'm burnt out, I relax by...": "burnt_out",
+    "The organizations I'm involved in on campus are...": "involvement",
+    "My opinion toward smoking in the dorm / apartment are...": "smoking",
+    "My thoughts on having guests over are...": "other_people",
+    "I like the temperature of the room to be...": "temperature",
+    "My thoughts on having pets are...": "pets",
+    "My thoughts on throwing parties are...": "parties",
+    "My ideas for decorating the home involve...": "decorations",
+    "When it comes to handling conflict, I am...": "conflict",
+  }; 
 
   const [answers, setAnswers] = useState(
     Array(presetQuestions.length).fill("")

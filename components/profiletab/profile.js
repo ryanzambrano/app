@@ -38,9 +38,22 @@ export const Profile = ({ navigation, route }) => {
 
   const promptQuestions = {
     greek_life: "Are you participating in Greek Life?",
-    night_out: "What is your idea of a perfect night out?",
-    pet_peeves: "What are your biggest pet peeves?",
-    favorite_movies: "What are your favorite movies?",
+    night_out: "A perfect night out for me looks like...",
+    pet_peeves: "My biggest pet peeves are...",
+    favorite_movies: "My favorite movies are...",
+    favorite_artists: "My favorite artists / bands are...",
+    living_considerations: "The dorms halls / apartment complexes I'm considering are...",
+    sharing: "When it comes to sharing my amenities and personal property...",
+    cooking: "When it comes to sharing food and cooking...",
+    burnt_out: "When I'm burnt out, I relax by...",
+    involvement: "The organizations I'm involved in on campus are...",
+    smoking: "My opinion toward smoking in the dorm / apartment are...",
+    other_people: "My thoughts on having guests over are...",
+    temperature: "I like the temperature of the room to be...", 
+    pets: "My thoughts on having pets are...",
+    parties: "My thoughts on throwing parties are...",
+    decorations: "My ideas for decorating the home involve...",
+    conflict: "When it comes to handling conflict, I am...", 
   };
 
   const hasValidItems = prompts.some((item) => item.answer);
@@ -162,7 +175,7 @@ export const Profile = ({ navigation, route }) => {
                 });
               }}
             >
-              <Text style={styles.buttonText}>Edit</Text>
+            <Text style={styles.buttonText}>Edit</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
@@ -362,12 +375,13 @@ const styles = StyleSheet.create({
   bioHeader: {
     alignSelf: "center",
     fontWeight: "600",
-    marginBottom: 10,
+    paddingBottom: 20,
     fontSize: 20,
     color: "white",
   },
   promptsHeader: {
     paddingTop: 20,
+    marginBottom: -5,
     alignSelf: "center",
     fontWeight: "600",
     fontSize: 20,
