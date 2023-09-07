@@ -481,35 +481,35 @@ const MessageUserCard = ({ navigation, route }) => {
             {class_year && (
               <View style={styles.infoContainer}>
                 <Entypo name="graduation-cap" size={22} color="white" />
-                <Text style={styles.bio}> {class_year}</Text>
+                <Text style={styles.bio}>  {class_year}</Text>
                 <View style={styles.verticalDivider} />
               </View>
             )}
             {major && (
               <View style={styles.infoContainer}>
                 <Entypo name="open-book" size={22} color="white" />
-                <Text style={styles.bio}> {major}</Text>
+                <Text style={styles.bio}>  {major}</Text>
                 <View style={styles.verticalDivider} />
               </View>
             )}
             {age && (
               <View style={styles.infoContainer}>
                 <MaterialIcons name="cake" size={22} color="white" />
-                <Text style={styles.bio}> {age}</Text>
+                <Text style={styles.bio}>  {age}</Text>
                 <View style={styles.verticalDivider} />
               </View>
             )}
             {gender && (
               <View style={styles.infoContainer}>
                 <Ionicons name="md-person-sharp" size={22} color="white" />
-                <Text style={styles.bio}> {gender}</Text>
+                <Text style={styles.bio}>  {gender}</Text>
                 <View style={styles.verticalDivider} />
               </View>
             )}
             {hometown && (
               <View style={styles.infoContainer} paddingRight={30}>
                 <MaterialIcons name="home-filled" size={26} color="white" />
-                <Text style={styles.bio}> {hometown}</Text>
+                <Text style={styles.bio}>  {hometown}</Text>
               </View>
             )}
           </ScrollView>

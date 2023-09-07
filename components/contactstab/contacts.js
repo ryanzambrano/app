@@ -378,7 +378,7 @@ const ContactsUI = ({ route }) => {
             {renderProfilePicture()}
             <View style={styles.contactInfo}>
               <View style={styles.contactNameContainer}>
-                <Text numberOfLines={2}style={styles.contactName}>{item.joinedGroups}</Text>
+                <Text numberOfLines={1} ellipsizeMode='tail' style={styles.contactName}>{item.joinedGroups}</Text>
                 {item.recentMessage && item.recentMessage.created_at ? (
                   <Text style={styles.MessageTime}>
                     {formatRecentTime(item.recentMessage.created_at)}
@@ -386,10 +386,18 @@ const ContactsUI = ({ route }) => {
                 ) : null}
               </View>
               {item.recentMessage ? (
-                <Text style={styles.RecentMessage}>
+                <Text 
+                numberOfLines={1} 
+                ellipsizeMode='tail' 
+                style={styles.RecentMessage}
+                >
                   {item.recentMessage.Message_Content}
                 </Text>
-              ) : <Text style={styles.RecentMessage}>
+              ) : <Text 
+              numberOfLines={1}
+              ellipsizeMode='tail'
+              style={styles.RecentMessage}
+            >
               No messages yet
             </Text>}
             </View>
@@ -452,8 +460,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#1D1D20",
   },
   layeredImage: {
-    width: 40, // Set the width as needed
-    height: 40, // Set the height as needed
+    width: 40, 
+    height: 40, 
     borderRadius: 20,
     marginRight: 25,
   },
@@ -509,14 +517,14 @@ const styles = StyleSheet.create({
   },
   contactItem: {
     flexDirection: "row",
-    alignItems: "flex-start", // Align elements at the top of the container
+    alignItems: "flex-start", 
     paddingHorizontal: 15,
     paddingVertical: 15,
     borderBottomWidth: 0.3,
     borderBottomColor: "grey",
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-    width: "100%", // Set the width to 100% to fill the container
+    width: "100%",
   },
   profilePicture: {
     width: 50,
@@ -530,19 +538,23 @@ const styles = StyleSheet.create({
   },
   contactName: {
     fontSize: 18,
-    fontWeight: 400,
+    fontWeight: "400",
+    marginBottom: 5,
     color: "white",
+    flexShrink: 1,
   },
   MessageTime: {
     fontSize: 14,
-    
     fontWeight: "light",
-    color: "white", // Add the color for the recent time (optional)
+    color: "white", 
+    flexShrink: 0, 
+    marginLeft: 10 
   },
   RecentMessage: {
     fontSize: 14,
     fontWeight: "light",
     color: "#cbcace",
+    marginRight: 80,
   },
   contactStatus: {
     fontSize: 14,
@@ -550,7 +562,8 @@ const styles = StyleSheet.create({
   },
   contactNameContainer: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    paddingRight: 5,
+    //flex: 1, 
     justifyContent: "space-between",
   },
   rowBack: {
