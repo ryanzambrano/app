@@ -103,6 +103,10 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
   const updateProfile = async () => {
     if (session?.user) {
+      if (editedUser.name.trim() === "") {
+        alert("Must enter a name");
+        return;
+      }
       if (editedUser.bio.length < 500) {
         const { data, error } = await supabase
           .from("UGC")

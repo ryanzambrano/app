@@ -145,9 +145,7 @@ export const Profile = ({ navigation, route }) => {
       });
     }
   };
-
-  return (
-    
+  return (   
     <SafeAreaView style={styles.container}>
       <View style={styles.viewContainer}>
          {/* <ConfettiCannon count={200} origin={{x: -10, y: 0}} /> */}
@@ -216,7 +214,6 @@ export const Profile = ({ navigation, route }) => {
             )}
           </View>
         </Animated.View>
-
         <ScrollView
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -231,24 +228,18 @@ export const Profile = ({ navigation, route }) => {
           <View style={styles.tab}>
             <View style={styles.profileDetails}>
               <Text style={styles.name}>{editedUser.name}</Text>
-
               <View style={styles.major}>
-                <View style={styles.icons}>
-                  <Entypo
-                    name="graduation-cap"
-                    marginTop={-2}
-                    size={22}
-                    color="white"
-                  />
-                  <Entypo name="open-book" size={22} color="white" />
-                  <MaterialIcons name="home-filled" size={26} color="white" />
-                </View>
-                <View style={styles.details}>
-                  <Text style={styles.text}>{editedUser.class_year}</Text>
-                  <Text style={styles.text}>{editedUser.major}</Text>
-                  <Text style={styles.text}>{editedUser.hometown}</Text>
-                </View>
+              <View style={styles.icons}>
+                {editedUser.class_year && <Entypo name="graduation-cap" marginTop={-2} size={22} color="white" />}
+                {editedUser.major && <Entypo name="open-book" size={22} color="white" />}
+                {editedUser.hometown && <MaterialIcons name="home-filled" size={26} color="white" />}
               </View>
+              <View style={styles.details}>
+                {editedUser.class_year && <Text style={styles.text}>{editedUser.class_year}</Text>}
+                {editedUser.major && <Text style={styles.text}>{editedUser.major}</Text>}
+                {editedUser.hometown && <Text style={styles.text}>{editedUser.hometown}</Text>}
+              </View>
+            </View>
             </View>
             <View style={styles.bio}>
               <View>
@@ -265,7 +256,8 @@ export const Profile = ({ navigation, route }) => {
                 borderBottomStartRadius: 20,
               }}
             >
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <Text style={styles.promptsHeader}>Prompts</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>         
                 {prompts.map((item, index) =>
                   item.answer ? (
                     <View key={index} style={styles.itemContainer}>
@@ -278,7 +270,6 @@ export const Profile = ({ navigation, route }) => {
                 )}
               </ScrollView>
             </View>
-
             <Text style={styles.promptsHeader}>Interests</Text>
             {editedUser.tags && editedUser.tags.length > 0 && (
               <View style={styles.tagsContainer}>
@@ -302,7 +293,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1D1D20",
   },
-
   scrollView: {
     flex: 1,
     position: "absolute",
@@ -321,7 +311,6 @@ const styles = StyleSheet.create({
     height: 25,
     borderRadius: 4,
   },
-
   viewContainer: {
     flex: 1,
     backgroundColor: "#1D1D20",
@@ -353,7 +342,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 10,
   },
-
   bio: {
     fontSize: 18,
     fontWeight: "600",
@@ -367,7 +355,6 @@ const styles = StyleSheet.create({
     borderBottomEndRadius: 20,
     borderBottomStartRadius: 20,
   },
-
   bioHeader: {
     alignSelf: "center",
     fontWeight: "600",
@@ -375,7 +362,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "white",
   },
-
   promptsHeader: {
     paddingTop: 20,
     alignSelf: "center",
@@ -383,7 +369,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "white",
   },
-
   editButton: {
     padding: 8,
     borderRadius: 4,

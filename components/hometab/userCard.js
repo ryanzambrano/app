@@ -465,40 +465,52 @@ const UserCard = ({ navigation, route }) => {
               <Text style={styles.chatButtonText}>Message</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.bioContainer}>
-            <Entypo
-              name="graduation-cap"
-              marginTop={-2}
-              size={22}
-              color="white"
-            />
-            <Text style={styles.bio}> {class_year}</Text>
-          </View>
+          
+          {class_year && (
+            <View style={styles.bioContainer}>
+              <Entypo name="graduation-cap" marginTop={-2} size={22} color="white" />
+              <Text style={styles.bio}>  {class_year}</Text>
+            </View>
+          )}
+          
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.horizontalInfoScrollView}
           >
+          {major && (
             <View style={styles.infoContainer}>
               <Entypo name="open-book" size={22} color="white" />
-              <Text style={styles.bio}> {major}</Text>
+              <Text style={styles.bio}>  {major}</Text>
+              <View style={styles.verticalDivider}/>
             </View>
-            <View style={styles.verticalDivider} />
+            
+          )}
+          
+          
+          {age && (
             <View style={styles.infoContainer}>
               <MaterialIcons name="cake" size={22} color="white" />
-              <Text style={styles.bio}> {age}</Text>
+              <Text style={styles.bio}>  {age}</Text>
+              <View style={styles.verticalDivider}/>
             </View>
-            <View style={styles.verticalDivider} />
+          )}
+
+          {gender && (
             <View style={styles.infoContainer}>
               <Ionicons name="md-person-sharp" size={22} color="white" />
-              <Text style={styles.bio}> {gender}</Text>
+              <Text style={styles.bio}>  {gender}</Text>
+              <View style={styles.verticalDivider}/>
             </View>
-            <View style={styles.verticalDivider} />
+          )}
+
+          {hometown && (
             <View style={styles.infoContainer} paddingRight={30}>
               <MaterialIcons name="home-filled" size={26} color="white" />
-              <Text style={styles.bio}> {hometown}</Text>
+              <Text style={styles.bio}>  {hometown}</Text>
             </View>
-          </ScrollView>
+          )}
+        </ScrollView>
           <View style={styles.bioContainer}>
             <View style={styles.roundedContainer}>
               <Text style={styles.bio}>{bio}</Text>
@@ -579,7 +591,7 @@ const styles = StyleSheet.create({
   questionaireButtonContainer: {
     flex: 1,
     marginHorizontal: 10,
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#14999999", //#2B2D2F
     paddingVertical: 10,
     borderRadius: 15,
     //marginBottom: 10,
@@ -806,6 +818,8 @@ const styles = StyleSheet.create({
     backgroundColor: "grey",
     height: "100%",
     alignSelf: "center",
+    marginLeft: 15,
+    marginRight: -5,
   },
   icon: {
     width: 30,
