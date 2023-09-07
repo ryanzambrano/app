@@ -22,7 +22,7 @@ const App = () => {
   const [session, setSession] = useState(null);
   const [hasProfile, setHasProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const logo = require("./assets/logo3.png");
+  const logo = require("./assets/logo4.png");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {

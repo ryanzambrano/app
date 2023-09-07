@@ -71,18 +71,19 @@ const MessageUserCard = ({ navigation, route }) => {
     pet_peeves: "My biggest pet peeves are...",
     favorite_movies: "My favorite movies are...",
     favorite_artists: "My favorite artists / bands are...",
-    living_considerations: "The dorms halls / apartment complexes I'm considering are...",
+    living_considerations:
+      "The dorms halls / apartment complexes I'm considering are...",
     sharing: "When it comes to sharing my amenities and personal property...",
     cooking: "When it comes to sharing food and cooking...",
     burnt_out: "When I'm burnt out, I relax by...",
     involvement: "The organizations I'm involved in on campus are...",
     smoking: "My opinion toward smoking in the dorm / apartment are...",
     other_people: "My thoughts on having guests over are...",
-    temperature: "I like the temperature of the room to be...", 
+    temperature: "I like the temperature of the room to be...",
     pets: "My thoughts on having pets are...",
     parties: "My thoughts on throwing parties are...",
     decorations: "My ideas for decorating the home involve...",
-    conflict: "When it comes to handling conflict, I am...", 
+    conflict: "When it comes to handling conflict, I am...",
   };
 
   const handleModalClose = () => {
@@ -278,7 +279,7 @@ const MessageUserCard = ({ navigation, route }) => {
   };
 
   const goBack = () => {
-    console.log("Pressed");
+    //console.log("Pressed");
     navigation.goBack();
   };
 
@@ -382,7 +383,7 @@ const MessageUserCard = ({ navigation, route }) => {
       const fetchedPersons = insertData.map((person) => person);
       setPersons(fetchedPersons);
       if (fetchedPersons.length > 0) {
-        navigation.navigate("Message", { user: fetchedPersons[0] });
+        navigation.goBack();
       }
     }
   };
@@ -467,52 +468,51 @@ const MessageUserCard = ({ navigation, route }) => {
 
             <TouchableOpacity
               style={styles.chatButton}
-              onPress={handleUserCardPress}
+              onPress={() => navigation.goBack()}
             >
               <Text style={styles.chatButtonText}>Message</Text>
             </TouchableOpacity>
-          </View>               
+          </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.horizontalInfoScrollView}
           >
             {class_year && (
-            <View style={styles.infoContainer}>
-              <Entypo name="graduation-cap" size={22} color="white" />
-              <Text style={styles.bio}>  {class_year}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-          )}  
-          {major && (
-            <View style={styles.infoContainer}>
-              <Entypo name="open-book" size={22} color="white" />
-              <Text style={styles.bio}>  {major}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-            
-          )}
-          {age && (
-            <View style={styles.infoContainer}>
-              <MaterialIcons name="cake" size={22} color="white" />
-              <Text style={styles.bio}>  {age}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-          )}
-          {gender && (
-            <View style={styles.infoContainer}>
-              <Ionicons name="md-person-sharp" size={22} color="white" />
-              <Text style={styles.bio}>  {gender}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-          )}
-          {hometown && (
-            <View style={styles.infoContainer} paddingRight={30}>
-              <MaterialIcons name="home-filled" size={26} color="white" />
-              <Text style={styles.bio}>  {hometown}</Text>
-            </View>
-          )}
-        </ScrollView>
+              <View style={styles.infoContainer}>
+                <Entypo name="graduation-cap" size={22} color="white" />
+                <Text style={styles.bio}> {class_year}</Text>
+                <View style={styles.verticalDivider} />
+              </View>
+            )}
+            {major && (
+              <View style={styles.infoContainer}>
+                <Entypo name="open-book" size={22} color="white" />
+                <Text style={styles.bio}> {major}</Text>
+                <View style={styles.verticalDivider} />
+              </View>
+            )}
+            {age && (
+              <View style={styles.infoContainer}>
+                <MaterialIcons name="cake" size={22} color="white" />
+                <Text style={styles.bio}> {age}</Text>
+                <View style={styles.verticalDivider} />
+              </View>
+            )}
+            {gender && (
+              <View style={styles.infoContainer}>
+                <Ionicons name="md-person-sharp" size={22} color="white" />
+                <Text style={styles.bio}> {gender}</Text>
+                <View style={styles.verticalDivider} />
+              </View>
+            )}
+            {hometown && (
+              <View style={styles.infoContainer} paddingRight={30}>
+                <MaterialIcons name="home-filled" size={26} color="white" />
+                <Text style={styles.bio}> {hometown}</Text>
+              </View>
+            )}
+          </ScrollView>
           <View style={styles.bioContainer}>
             <View style={styles.roundedContainer}>
               <Text style={styles.bio}>{bio}</Text>

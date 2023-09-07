@@ -20,7 +20,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator } from "react-native";
 
-const logo = require("../../assets/logo3.png");
+const logo = require("../../assets/logo4.png");
 const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
 

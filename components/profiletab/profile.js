@@ -12,7 +12,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
-import ConfettiCannon from 'react-native-confetti-cannon';
+import ConfettiCannon from "react-native-confetti-cannon";
 import { fetchUsername } from "../auth/profileUtils.js";
 import { supabase } from "../auth/supabase.js";
 import { StatusBar } from "expo-status-bar";
@@ -29,7 +29,7 @@ export const Profile = ({ navigation, route }) => {
 
   const [editedUser, setEditedUser] = useState(session.user);
   const [profilePicture, setProfilePicture] = useState(null);
-  const [uploading, setUploading] = useState(false);
+  const [uploading, setUploading] = useState(true);
   const [isUsername, setUsername] = useState("");
   const [isProfileVisible, setIsProfileVisible] = useState(true);
   const [prompts, setPrompts] = useState([]);
@@ -42,18 +42,19 @@ export const Profile = ({ navigation, route }) => {
     pet_peeves: "My biggest pet peeves are...",
     favorite_movies: "My favorite movies are...",
     favorite_artists: "My favorite artists / bands are...",
-    living_considerations: "The dorms halls / apartment complexes I'm considering are...",
+    living_considerations:
+      "The dorms halls / apartment complexes I'm considering are...",
     sharing: "When it comes to sharing my amenities and personal property...",
     cooking: "When it comes to sharing food and cooking...",
     burnt_out: "When I'm burnt out, I relax by...",
     involvement: "The organizations I'm involved in on campus are...",
     smoking: "My opinion toward smoking in the dorm / apartment are...",
     other_people: "My thoughts on having guests over are...",
-    temperature: "I like the temperature of the room to be...", 
+    temperature: "I like the temperature of the room to be...",
     pets: "My thoughts on having pets are...",
     parties: "My thoughts on throwing parties are...",
     decorations: "My ideas for decorating the home involve...",
-    conflict: "When it comes to handling conflict, I am...", 
+    conflict: "When it comes to handling conflict, I am...",
   };
 
   const hasValidItems = prompts.some((item) => item.answer);
@@ -142,6 +143,7 @@ export const Profile = ({ navigation, route }) => {
 
       const response = await fetch(profilePictureURL);
       if (response.ok) {
+        setUploading(false);
         setProfilePicture(profilePictureURL);
       } else {
         setProfilePicture(null);
@@ -158,10 +160,10 @@ export const Profile = ({ navigation, route }) => {
       });
     }
   };
-  return (   
+  return (
     <SafeAreaView style={styles.container}>
       <View style={styles.viewContainer}>
-         {/* <ConfettiCannon count={200} origin={{x: -10, y: 0}} /> */}
+        {/* <ConfettiCannon count={200} origin={{x: -10, y: 0}} /> */}
         <View style={styles.topBar}>
           <Text style={styles.username}>{isUsername}</Text>
           <View style={styles.buttonContainer}>
@@ -175,7 +177,7 @@ export const Profile = ({ navigation, route }) => {
                 });
               }}
             >
-            <Text style={styles.buttonText}>Edit</Text>
+              <Text style={styles.buttonText}>Edit</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
@@ -186,7 +188,7 @@ export const Profile = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
         </View>
-        
+
         <Animated.View
           style={{
             ...styles.profileContainer,
@@ -195,47 +197,42 @@ export const Profile = ({ navigation, route }) => {
           }}
         >
           <View>
-            {profilePicture ? (
+            {/* Show loading indicator when uploading */}
+            {uploading ? (
+              <View style={styles.profilePictureContainer}>
+                <ActivityIndicator size="large" color="#fff" />
+              </View>
+            ) : profilePicture ? (
+              /* If uploading is done and profile picture exists */
               <TouchableOpacity
                 style={styles.profilePictureContainer}
                 onPress={handleEditPictures}
-                disabled={uploading}
               >
                 <Image
                   source={{ uri: profilePicture }}
                   style={styles.profilePicture}
                 />
-                {uploading && (
-                  <View style={styles.uploadingIndicatorContainer}>
-                    <ActivityIndicator size="small" color="#fff" />
-                  </View>
-                )}
               </TouchableOpacity>
             ) : (
+              /* If uploading is done but no profile picture exists */
               <TouchableOpacity
                 style={styles.profilePictureContainer}
                 onPress={handleEditPictures}
-                disabled={uploading}
               >
                 <Icon name={"plus"} size={40} color={"grey"} />
-                {uploading && (
-                  <View style={styles.uploadingIndicatorContainer}>
-                    <ActivityIndicator size="small" color="#fff" />
-                  </View>
-                )}
               </TouchableOpacity>
             )}
-        
+
+            {!profilePicture && !uploading && (
+              <View style={styles.uploadPromptContainer}>
+                <Text style={styles.uploadPrompt}>
+                  Upload a photo to make yourself visible to other people!
+                </Text>
+              </View>
+            )}
           </View>
-          {!profilePicture && (
-    <View style={styles.uploadPromptContainer}>
-      <Text style={styles.uploadPrompt}>
-        Upload a photo to make yourself visible to other people!
-      </Text>
-    </View>
-  )}
         </Animated.View>
-        
+
         <ScrollView
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -251,25 +248,42 @@ export const Profile = ({ navigation, route }) => {
             <View style={styles.profileDetails}>
               <Text style={styles.name}>{editedUser.name}</Text>
               <View style={styles.major}>
-              <View style={styles.icons}>
-                {editedUser.class_year && <Entypo name="graduation-cap" marginTop={-2} size={22} color="white" />}
-                {editedUser.major && <Entypo name="open-book" size={22} color="white" />}
-                {editedUser.hometown && <MaterialIcons name="home-filled" size={26} color="white" />}
+                <View style={styles.icons}>
+                  {editedUser.class_year && (
+                    <Entypo
+                      name="graduation-cap"
+                      marginTop={-2}
+                      size={22}
+                      color="white"
+                    />
+                  )}
+                  {editedUser.major && (
+                    <Entypo name="open-book" size={22} color="white" />
+                  )}
+                  {editedUser.hometown && (
+                    <MaterialIcons name="home-filled" size={26} color="white" />
+                  )}
+                </View>
+                <View style={styles.details}>
+                  {editedUser.class_year && (
+                    <Text style={styles.text}>{editedUser.class_year}</Text>
+                  )}
+                  {editedUser.major && (
+                    <Text style={styles.text}>{editedUser.major}</Text>
+                  )}
+                  {editedUser.hometown && (
+                    <Text style={styles.text}>{editedUser.hometown}</Text>
+                  )}
+                </View>
               </View>
-              <View style={styles.details}>
-                {editedUser.class_year && <Text style={styles.text}>{editedUser.class_year}</Text>}
-                {editedUser.major && <Text style={styles.text}>{editedUser.major}</Text>}
-                {editedUser.hometown && <Text style={styles.text}>{editedUser.hometown}</Text>}
-              </View>
-            </View>
             </View>
             {editedUser.bio && (
-            <View style={styles.bio}>
-              <View>
-                <Text style={styles.bioHeader}>About me</Text>
-                <Text style={styles.bioText}>{editedUser.bio}</Text>
+              <View style={styles.bio}>
+                <View>
+                  <Text style={styles.bioHeader}>About me</Text>
+                  <Text style={styles.bioText}>{editedUser.bio}</Text>
+                </View>
               </View>
-            </View>
             )}
             <View
               style={{
@@ -280,21 +294,21 @@ export const Profile = ({ navigation, route }) => {
                 borderBottomStartRadius: 20,
               }}
             >
-            {prompts.some(item => item.answer) && (
-              <Text style={styles.promptsHeader}>Additional Info</Text>
-            )}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>         
-              {prompts.map((item, index) =>
-                item.answer ? (
-                  <View key={index} style={styles.itemContainer}>
-                    <Text style={styles.itemPrompt}>
-                      {promptQuestions[item.prompt]}
-                    </Text>
-                    <Text style={styles.itemAnswer}>{item.answer}</Text>
-                  </View>
-                ) : null
+              {prompts.some((item) => item.answer) && (
+                <Text style={styles.promptsHeader}>Additional Info</Text>
               )}
-            </ScrollView>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {prompts.map((item, index) =>
+                  item.answer ? (
+                    <View key={index} style={styles.itemContainer}>
+                      <Text style={styles.itemPrompt}>
+                        {promptQuestions[item.prompt]}
+                      </Text>
+                      <Text style={styles.itemAnswer}>{item.answer}</Text>
+                    </View>
+                  ) : null
+                )}
+              </ScrollView>
             </View>
             <Text style={styles.promptsHeader}>Interests</Text>
             {editedUser.tags && editedUser.tags.length > 0 && (
@@ -438,10 +452,11 @@ const styles = StyleSheet.create({
 
   uploadingIndicatorContainer: {
     position: "absolute",
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    backgroundColor: "#1D1D20",
     width: 80,
     height: 80,
     borderRadius: 40,
+    justifyContent: "center",
   },
   profileDetails: {
     flex: 1,
@@ -568,18 +583,19 @@ const styles = StyleSheet.create({
     color: "white",
   },
   uploadPromptContainer: {
-    position: 'absolute',
-    bottom: -10,
+    position: "absolute",
+    bottom: -30,
     left: 0,
     right: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
+    //top: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
   uploadPrompt: {
-    color: 'red',
+    color: "red",
     fontSize: 11,
-    fontWeight: '400',
-  }
+    fontWeight: "400",
+  },
 });
 
 export default Profile;
