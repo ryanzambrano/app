@@ -196,7 +196,7 @@ const Home = ({ route }) => {
   });
 
   useEffect(() => {
-    setIsLoading(true);
+    //setIsLoading(true);
     const fetchUsers = async () => {
       try {
         const { data: ugcData, error: ugcError } = await supabase
@@ -288,6 +288,7 @@ const Home = ({ route }) => {
       } catch (error) {
         console.error("An unexpected error occurred:", error);
       }
+      setIsLoading(false);
     };
 
     fetchUsers();
@@ -299,7 +300,7 @@ const Home = ({ route }) => {
       fetchUsers();
     }
 
-    setIsLoading(false);
+    //setIsLoading(false);
   }, [isFocused]);
 
   const handleUserCardPress = (user) => {
@@ -449,7 +450,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingTop: 13,
-    paddingBottom: 6,
+    paddingBottom: 0,
     paddingLeft: 15,
     paddingRight: 15,
     marginBottom: 8,
@@ -458,7 +459,6 @@ const styles = StyleSheet.create({
   logoTitleContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
   },
 
   headerText: {

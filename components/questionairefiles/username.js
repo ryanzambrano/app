@@ -117,6 +117,7 @@ export const Username = ({ navigation, route }) => {
               onChangeText={(selectedUsername) =>
                 setSelectedUsername(selectedUsername)
               }
+              keyboardAppearance="dark"
             ></TextInput>
           </View>
           {isError && (

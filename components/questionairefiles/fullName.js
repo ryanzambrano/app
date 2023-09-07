@@ -118,6 +118,7 @@ export const Name = ({ navigation, route }) => {
               placeholderTextColor="grey"
               value={selectedName}
               onChangeText={(selectedName) => setSelectedName(selectedName)}
+              keyboardAppearance="dark"
             ></TextInput>
           </View>
           {isError && (
