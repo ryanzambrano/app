@@ -231,7 +231,7 @@ const MessagingUI = () => {
           <Image
             style={[
               styles.layeredImage,
-              { zIndex: 2, position: "absolute", top: 0, left: 17 },
+              { zIndex: 2, position: "absolute", top: 0, left: 14 },
             ]}
             source={{
               uri: `${picURL}/${user.images[1].user_id}/${user.images[1].user_id}-0-${user.images[1].last_modified}`, // Replace with actual URLs
@@ -340,42 +340,40 @@ const MessagingUI = () => {
             const isOwnMessage = item.Sent_From === session.user.id;
             const isFirstOwnMessage =
               isOwnMessage &&
-              (index === 0 ||
-                messages[index - 1].Sent_From !== session.user.id);
+              (index === 0 || messages[index - 1].Sent_From !== session.user.id);
             const isOtherMessage = item.Sent_From !== session.user.id;
             const isFirstOtherMessage =
               isOtherMessage &&
-              (index === 0 ||
-                messages[index - 1].Sent_From === session.user.id);
+              (index === 0 || messages[index - 1].Sent_From === session.user.id);
             const shouldDisplaySenderName =
               user.Ammount_Users >= 3 && isFirstOtherMessage;
-
-            return (
-              <View>
-                {/* Display sender name for the first consecutive message from the sender */}
-                {shouldDisplaySenderName && (
-                  <Text style={styles.senderName}>{item.UGC.name}</Text>
-                )}
-                <View
-                  style={[
-                    styles.messageContainer,
-                    isOwnMessage
-                      ? styles.messageContainerRight
-                      : styles.messageContainerLeft,
-                  ]}
-                >
-                  <Text
+          
+              return (
+                <View>
+                  {shouldDisplaySenderName && (
+                    <Text style={styles.senderName}>{item.UGC.name}</Text>
+                  )}
+                  <View
                     style={[
-                      styles.message,
-                      isOwnMessage ? { color: "white" } : { color: "white" },
+                      styles.messageContainer,
+                      isOwnMessage ? styles.messageContainerRight : styles.messageContainerLeft,
+                      // conditionally apply the smaller margin styles
+                      isFirstOwnMessage ? {} : styles.messageContainerRightSmallMargin,
+                      isFirstOtherMessage ? {} : styles.messageContainerLeftSmallMargin,
                     ]}
                   >
-                    {item.Message_Content}
-                  </Text>
+                    <Text
+                      style={[
+                        styles.message,
+                        isOwnMessage ? { color: "white" } : { color: "white" },
+                      ]}
+                    >
+                      {item.Message_Content}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            );
-          }}
+              );
+            }}
           keyExtractor={(_, index) => index.toString()}
           contentContainerStyle={styles.messagesContent}
         />
@@ -407,8 +405,8 @@ const MessagingUI = () => {
 
 const styles = StyleSheet.create({
   layeredImage: {
-    width: 40, // Set the width as needed
-    height: 40, // Set the height as needed
+    width: 40, 
+    height: 40, 
     borderRadius: 20,
     backgroundColor: "#dedede",
     overflow: "hidden",
@@ -416,9 +414,11 @@ const styles = StyleSheet.create({
   },
   senderName: {
     marginVertical: 2,
+    paddingBottom: 4,
     color: "#afafb2",
-    fontWeight: "bold",
-    fontSize: 7,
+    fontWeight: "500",
+    paddingLeft: 0,
+    fontSize: 12,
     marginLeft: 7,
   },
   container: {
@@ -478,6 +478,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     backgroundColor: "#14999999",
     marginBottom: 15,
+    maxWidth: '80%',
   },
   messageContainerLeft: {
     borderRadius: 20,
@@ -485,11 +486,19 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     backgroundColor: "#2B2D2F",
     marginBottom: 15,
+    maxWidth: '80%',
   },
+  messageContainerRightSmallMargin: {
+    marginBottom: 5, 
+  },
+  messageContainerLeftSmallMargin: {
+    marginBottom: 5, 
+  },
+
   message: {
     fontSize: 16,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: 9,
+    paddingHorizontal: 14,
     color: "#000",
   },
   inputContainer: {
@@ -509,10 +518,11 @@ const styles = StyleSheet.create({
     color: "white",
     borderRadius: 20,
     paddingHorizontal: 0,
+    paddingVertical: 10,
     backgroundColor: "#2B2D2F",
     fontSize: 20,
     paddingTop: 10,
-    marginLeft: 10,
+    marginLeft: 15,
   },
 });
 
