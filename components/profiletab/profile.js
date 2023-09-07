@@ -61,13 +61,13 @@ export const Profile = ({ navigation, route }) => {
   const scrollY = new Animated.Value(0);
 
   const profileOpacity = scrollY.interpolate({
-    inputRange: [0, 240],
+    inputRange: [0, 300],
     outputRange: [1, 0],
     extrapolate: "clamp",
   });
 
   const profileZIndex = scrollY.interpolate({
-    inputRange: [0, 240],
+    inputRange: [0, 300],
     outputRange: [1, -1],
     extrapolate: "clamp",
   });

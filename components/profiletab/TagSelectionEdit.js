@@ -124,7 +124,7 @@ const TagSelectionEdit = ({ navigation, route }) => {
         >
           {availableTags.map((tag) => renderTag(tag))}
         </ScrollView>
-        <Text style={styles.selectedTagsText}>{selectedTags.join(",   ")}</Text>
+        <Text style={styles.selectedTagsText}>Selected Tags: {selectedTags.join(",   ")}</Text>
 
         {isError && (
           <Animated.Text
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     fontSize: 18,
     fontWeight: "bold",
-    color: "#14999999",
+    color: "white",
     marginBottom: "10%",
   },
   formAction: {

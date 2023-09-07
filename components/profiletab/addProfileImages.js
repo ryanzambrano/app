@@ -255,13 +255,13 @@ const ImagePickerScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.left}>
-          <Button title="back" onPress={handleBackPress} />
-        </View>
-        <View style={styles.center}>
-          <Text style={styles.title}>Add Images</Text>
-        </View>
-        <View style={styles.right} />
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Text style={styles.backButtonText}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerText}>Add Images</Text>
       </View>
 
       <ScrollView>
@@ -304,13 +304,22 @@ const ImagePickerScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    alignItems: "center",
-    alignSelf: "center",
-    alignContent: "center",
-    backgroundColor: "#111111",
-    padding: 10, // You can adjust this value
+    marginBottom: 10,
+  },
+  backButton: {
+    marginRight: 0,
+    paddingLeft: 15,
+    paddingRight: 85,
+  },
+  backButtonText: {
+    fontSize: 30,
+    color: "#14999999",
+  },
+  headerText: {
+    fontSize: 25,
+    fontWeight: "bold",
+    color: "white",
   },
   left: {
     flex: 1,
@@ -340,7 +349,7 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    backgroundColor: "#111111",
+    backgroundColor: "#1D1D20",
     flex: 1,
     padding: 10,
   },
@@ -350,7 +359,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center",
     alignSelf: "center",
-    backgroundColor: "#111111",
+    backgroundColor: "#1D1D20",
   },
 
   column: {
@@ -386,6 +395,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     margin: 10,
   },
+ 
 });
 
 export default ImagePickerScreen;

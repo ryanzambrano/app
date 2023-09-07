@@ -22,6 +22,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
   const { session } = route.params;
   const [editedUser, setEditedUser] = useState(route.params.editedUser);
   //editedUser.tags = route.params.selectedTags;
+  const [bioCharCount, setBioCharCount] = useState(0);
 
   const { updated } = route.params;
   const selectedTags = route.params.selectedTags;
@@ -120,13 +121,19 @@ export const EditProfileScreen = ({ navigation, route }) => {
         alert("Must enter a name");
         return;
       }
-      if (editedUser.bio.length < 500) {
+      const classYear = Number(editedUser.class_year);
+      if (isNaN(classYear) || classYear < 2023 || classYear > 2030) {
+        alert("Enter a valid class year");
+        return;
+      }
+      if (editedUser.bio.length <= 700) {
+        const trimmedBio = editedUser.bio.trimEnd();  // Remove trailing white spaces
         const { data, error } = await supabase
           .from("UGC")
           .update([
             {
               name: editedUser.name,
-              bio: editedUser.bio,
+              bio: trimmedBio,  // Use the trimmed version of bio
               major: editedUser.major,
               class_year: editedUser.class_year,
               hometown: editedUser.hometown,
@@ -272,11 +279,17 @@ export const EditProfileScreen = ({ navigation, route }) => {
               <TextInput
                 style={styles.input}
                 value={editedUser.bio}
-                onChangeText={(bio) => setEditedUser({ ...editedUser, bio })}
+                onChangeText={(bio) => {
+                  setEditedUser({ ...editedUser, bio });
+                  setBioCharCount(bio.length);
+                }}
                 multiline
                 placeholder="Bio"
                 placeholderTextColor="#575D61"
               />
+              <Text style={{ color: 'lightgrey', textAlign: 'right', marginRight: 10, marginBottom: 10, fontSize: 12 }}>
+                {bioCharCount}/700
+              </Text>
             </View>
 
             <Text style={styles.more}>Interests</Text>

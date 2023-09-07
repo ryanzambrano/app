@@ -91,14 +91,10 @@ export const AddPrompts = ({ navigation, route }) => {
     const answersObj = presetQuestions.reduce((obj, question, index) => {
       const columnName = questionColumnMapping[question];
       obj[columnName] = answers[index];
-
       return obj;
     }, {});
 
     console.log(answersObj);
-
-    // Uncomment when ready to send data to your database
-
     if (session?.user) {
       const { data, error } = await supabase
         .from("prompts")
@@ -134,6 +130,7 @@ export const AddPrompts = ({ navigation, route }) => {
         onChangeText={(text) => handleAnswerChange(text, index)}
         placeholder="Answer here..."
         placeholderTextColor="grey"
+        maxLength={60}
       />
     </View>
   );
@@ -180,7 +177,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 30,
-    color: "white",
+    color: "#14999999",
   },
   headerText: {
     fontSize: 25,
