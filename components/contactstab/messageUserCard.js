@@ -67,9 +67,22 @@ const MessageUserCard = ({ navigation, route }) => {
 
   const promptQuestions = {
     greek_life: "Are you participating in Greek Life?",
-    night_out: "What is your idea of a perfect night out?",
-    pet_peeves: "What are your biggest pet peeves?",
-    favorite_movies: "What are your favorite movies?",
+    night_out: "A perfect night out for me looks like...",
+    pet_peeves: "My biggest pet peeves are...",
+    favorite_movies: "My favorite movies are...",
+    favorite_artists: "My favorite artists / bands are...",
+    living_considerations: "The dorms halls / apartment complexes I'm considering are...",
+    sharing: "When it comes to sharing my amenities and personal property...",
+    cooking: "When it comes to sharing food and cooking...",
+    burnt_out: "When I'm burnt out, I relax by...",
+    involvement: "The organizations I'm involved in on campus are...",
+    smoking: "My opinion toward smoking in the dorm / apartment are...",
+    other_people: "My thoughts on having guests over are...",
+    temperature: "I like the temperature of the room to be...", 
+    pets: "My thoughts on having pets are...",
+    parties: "My thoughts on throwing parties are...",
+    decorations: "My ideas for decorating the home involve...",
+    conflict: "When it comes to handling conflict, I am...", 
   };
 
   const handleModalClose = () => {
@@ -458,47 +471,52 @@ const MessageUserCard = ({ navigation, route }) => {
             >
               <Text style={styles.chatButtonText}>Message</Text>
             </TouchableOpacity>
-          </View>
-          <View style={styles.bioContainer}>
-            <Entypo
-              name="graduation-cap"
-              marginTop={-2}
-              size={22}
-              color="white"
-            />
-            <Text style={styles.bio}> {class_year}</Text>
-          </View>
+          </View>         
+          {class_year && (
+            <View style={styles.bioContainer}>
+              <Entypo name="graduation-cap" marginTop={-2} size={22} color="white" />
+              <Text style={styles.bio}>  {class_year}</Text>
+            </View>
+          )}         
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.horizontalInfoScrollView}
           >
+          {major && (
             <View style={styles.infoContainer}>
               <Entypo name="open-book" size={22} color="white" />
-              <Text style={styles.bio}> {major}</Text>
+              <Text style={styles.bio}>  {major}</Text>
+              <View style={styles.verticalDivider}/>
             </View>
-            <View style={styles.verticalDivider} />
+            
+          )}
+          {age && (
             <View style={styles.infoContainer}>
               <MaterialIcons name="cake" size={22} color="white" />
-              <Text style={styles.bio}> {age}</Text>
+              <Text style={styles.bio}>  {age}</Text>
+              <View style={styles.verticalDivider}/>
             </View>
-            <View style={styles.verticalDivider} />
+          )}
+          {gender && (
             <View style={styles.infoContainer}>
               <Ionicons name="md-person-sharp" size={22} color="white" />
-              <Text style={styles.bio}> {gender}</Text>
+              <Text style={styles.bio}>  {gender}</Text>
+              <View style={styles.verticalDivider}/>
             </View>
-            <View style={styles.verticalDivider} />
+          )}
+          {hometown && (
             <View style={styles.infoContainer} paddingRight={30}>
               <MaterialIcons name="home-filled" size={26} color="white" />
-              <Text style={styles.bio}> {hometown}</Text>
+              <Text style={styles.bio}>  {hometown}</Text>
             </View>
-          </ScrollView>
+          )}
+        </ScrollView>
           <View style={styles.bioContainer}>
             <View style={styles.roundedContainer}>
               <Text style={styles.bio}>{bio}</Text>
             </View>
           </View>
-
           <TouchableOpacity
             style={styles.questionaireButtonContainer}
             onPress={() => handleQuestionaireButtonPress()}
@@ -541,6 +559,7 @@ const MessageUserCard = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    zIndex: 300,
     padding: 16,
     marginHorizontal: 0,
     backgroundColor: "#1D1D20",
@@ -549,9 +568,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
+    marginTop: -80,
+    paddingTop: 80,
     backgroundColor: "#1D1D20",
     justifyContent: "space-between",
-    paddingVertical: 5,
+    paddingVertical: 10,
     zIndex: 3,
   },
 
@@ -573,7 +594,7 @@ const styles = StyleSheet.create({
   questionaireButtonContainer: {
     flex: 1,
     marginHorizontal: 10,
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#14999999", //#2B2D2F
     paddingVertical: 10,
     borderRadius: 15,
     //marginBottom: 10,
@@ -604,7 +625,8 @@ const styles = StyleSheet.create({
     height: 440,
     marginLeft: 6,
     width: Dimensions.get("window").width - 12,
-    marginBottom: 10,
+    marginBottom: 5,
+    marginTop: -5,
     marginHorizontal: 0,
     borderRadius: 15,
     borderWidth: 0.7,
@@ -627,6 +649,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingTop: 10,
+    marginTop: -8,
     //shadow
     shadowColor: "#000",
     shadowOffset: {
@@ -800,6 +823,8 @@ const styles = StyleSheet.create({
     backgroundColor: "grey",
     height: "100%",
     alignSelf: "center",
+    marginLeft: 15,
+    marginRight: -5,
   },
   icon: {
     width: 30,

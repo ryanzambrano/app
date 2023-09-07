@@ -287,7 +287,13 @@ export const EditProfileScreen = ({ navigation, route }) => {
                 placeholder="Bio"
                 placeholderTextColor="#575D61"
               />
-              <Text style={{ color: 'lightgrey', textAlign: 'right', marginRight: 10, marginBottom: 10, fontSize: 12 }}>
+              <Text style={{ 
+                color: bioCharCount > 700 ? 'red' : 'lightgrey', 
+                textAlign: 'right', 
+                marginRight: 10, 
+                marginBottom: 10, 
+                fontSize: 12 
+              }}>
                 {bioCharCount}/700
               </Text>
             </View>

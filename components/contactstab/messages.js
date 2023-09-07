@@ -325,7 +325,7 @@ const MessagingUI = () => {
         >
           <AntDesign name="arrowleft" size={24} color="#159e9e" />
         </TouchableOpacity>
-        <Text style={styles.contactName}>{joinedGroups}</Text>
+        <Text style={styles.contactName} numberOfLines={1}>{joinedGroups}</Text>
         <TouchableOpacity onPress={navigateToProfile}>
           {renderProfilePicture()}
         </TouchableOpacity>
@@ -408,7 +408,6 @@ const styles = StyleSheet.create({
     width: 40, // Set the width as needed
     height: 40, // Set the height as needed
     borderRadius: 20,
-    marginRight: 25,
     backgroundColor: "#dedede",
     overflow: "hidden",
     marginRight: 10,
@@ -434,6 +433,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingTop: 20,
     paddingBottom: 5,
+    borderBottomColor: 'grey',
+    borderBottomWidth: 0.2,
+    // borderBottomRightRadius: 10,
+    // borderBottomLeftRadius: 10,
   },
   button: {
     padding: 10,
@@ -442,9 +445,11 @@ const styles = StyleSheet.create({
   contactName: {
     fontSize: 18,
     fontWeight: "bold",
-    marginLeft: 10,
+    marginLeft: 5,
     color: "white",
     paddingVertical: 20,
+    maxWidth: 260,
+    paddingHorizontal: 10,
   },
   profileContainer: {
     width: 40,

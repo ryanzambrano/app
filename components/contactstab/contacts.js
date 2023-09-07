@@ -378,7 +378,7 @@ const ContactsUI = ({ route }) => {
             {renderProfilePicture()}
             <View style={styles.contactInfo}>
               <View style={styles.contactNameContainer}>
-                <Text style={styles.contactName}>{item.joinedGroups}</Text>
+                <Text numberOfLines={2}style={styles.contactName}>{item.joinedGroups}</Text>
                 {item.recentMessage && item.recentMessage.created_at ? (
                   <Text style={styles.MessageTime}>
                     {formatRecentTime(item.recentMessage.created_at)}
@@ -389,7 +389,9 @@ const ContactsUI = ({ route }) => {
                 <Text style={styles.RecentMessage}>
                   {item.recentMessage.Message_Content}
                 </Text>
-              ) : null}
+              ) : <Text style={styles.RecentMessage}>
+              No messages yet
+            </Text>}
             </View>
           </View>
         </TouchableOpacity>
@@ -524,6 +526,7 @@ const styles = StyleSheet.create({
   },
   contactInfo: {
     flex: 1,
+    paddingHorizontal: 5,
   },
   contactName: {
     fontSize: 18,
@@ -532,6 +535,7 @@ const styles = StyleSheet.create({
   },
   MessageTime: {
     fontSize: 14,
+    
     fontWeight: "light",
     color: "white", // Add the color for the recent time (optional)
   },

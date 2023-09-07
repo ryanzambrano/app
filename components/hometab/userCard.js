@@ -178,7 +178,7 @@ const UserCard = ({ navigation, route }) => {
     fetchGenderAndAge();
     fetchBookmarkedProfiles();
     fetchPrompts();
-    console.log(`${picURL}/${user_id}/${user_id}-0-${lastModified}`);
+    //console.log(`${picURL}/${user_id}/${user_id}-0-${lastModified}`);
   }, []);
 
   const handleBlockUser = async (user_id) => {
