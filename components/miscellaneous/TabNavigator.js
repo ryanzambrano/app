@@ -16,7 +16,7 @@ const TabNavigator = ({ route }) => {
   const { session } = route.params;
   return (
     <Tab.Navigator
-      initialRouteName="Contacts"
+      initialRouteName="Home"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {

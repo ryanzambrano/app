@@ -86,6 +86,7 @@ export const Colleges = ({ navigation, route }) => {
           placeholderTextColor={"grey"}
           onChangeText={(text) => setSearchQuery(text)}
           value={searchQuery}
+          keyboardAppearance="dark"
         />
         {searchQuery ? (
           <FlatList
