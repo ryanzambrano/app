@@ -497,7 +497,7 @@ const styles = StyleSheet.create({
 
   message: {
     fontSize: 16,
-    paddingVertical: 9,
+    paddingVertical: 8,
     paddingHorizontal: 14,
     color: "#000",
   },
