@@ -225,8 +225,17 @@ export const Profile = ({ navigation, route }) => {
                 )}
               </TouchableOpacity>
             )}
+        
           </View>
+          {!profilePicture && (
+    <View style={styles.uploadPromptContainer}>
+      <Text style={styles.uploadPrompt}>
+        Upload a photo to make yourself visible to other people!
+      </Text>
+    </View>
+  )}
         </Animated.View>
+        
         <ScrollView
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -558,6 +567,19 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "white",
   },
+  uploadPromptContainer: {
+    position: 'absolute',
+    bottom: -10,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  uploadPrompt: {
+    color: 'red',
+    fontSize: 11,
+    fontWeight: '400',
+  }
 });
 
 export default Profile;

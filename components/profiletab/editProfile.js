@@ -127,13 +127,13 @@ export const EditProfileScreen = ({ navigation, route }) => {
         return;
       }
       if (editedUser.bio.length <= 700) {
-        const trimmedBio = editedUser.bio.trimEnd();  // Remove trailing white spaces
+        const trimmedBio = editedUser.bio.trimEnd(); 
         const { data, error } = await supabase
           .from("UGC")
           .update([
             {
               name: editedUser.name,
-              bio: trimmedBio,  // Use the trimmed version of bio
+              bio: trimmedBio, 
               major: editedUser.major,
               class_year: editedUser.class_year,
               hometown: editedUser.hometown,
@@ -413,7 +413,6 @@ const styles = StyleSheet.create({
     padding: 7,
     alignSelf: "center",
     //backgroundColor: "transparent",
-    // Style for the 'cancel' button container if needed
   },
 
   center: {

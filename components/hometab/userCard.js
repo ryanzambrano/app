@@ -307,8 +307,7 @@ const UserCard = ({ navigation, route }) => {
 
       if (data) {
         // alert(`Image data fetched: ${JSON.stringify(data)}`);
-        data.forEach((item) => {
-          // Use the image_index as the position for the last_modified value
+        data.forEach((item) => {         
           lastModifiedList[item.image_index] = item.last_modified;
         });
       }
@@ -432,7 +431,6 @@ const UserCard = ({ navigation, route }) => {
             </TouchableWithoutFeedback>
           ))}
         </ScrollView>
-
         <Modal
           visible={selectedPhotoIndex !== null}
           transparent={true}
@@ -448,7 +446,6 @@ const UserCard = ({ navigation, route }) => {
           </TouchableWithoutFeedback>
         </Modal>
       </Animated.View>
-
       <ScrollView
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
@@ -477,15 +474,13 @@ const UserCard = ({ navigation, route }) => {
             >
               <Text style={styles.chatButtonText}>Message</Text>
             </TouchableOpacity>
-          </View>
-          
+          </View>         
           {class_year && (
             <View style={styles.bioContainer}>
               <Entypo name="graduation-cap" marginTop={-2} size={22} color="white" />
               <Text style={styles.bio}>  {class_year}</Text>
             </View>
-          )}
-          
+          )}         
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -499,8 +494,6 @@ const UserCard = ({ navigation, route }) => {
             </View>
             
           )}
-          
-          
           {age && (
             <View style={styles.infoContainer}>
               <MaterialIcons name="cake" size={22} color="white" />
@@ -508,7 +501,6 @@ const UserCard = ({ navigation, route }) => {
               <View style={styles.verticalDivider}/>
             </View>
           )}
-
           {gender && (
             <View style={styles.infoContainer}>
               <Ionicons name="md-person-sharp" size={22} color="white" />
@@ -516,7 +508,6 @@ const UserCard = ({ navigation, route }) => {
               <View style={styles.verticalDivider}/>
             </View>
           )}
-
           {hometown && (
             <View style={styles.infoContainer} paddingRight={30}>
               <MaterialIcons name="home-filled" size={26} color="white" />
@@ -529,7 +520,6 @@ const UserCard = ({ navigation, route }) => {
               <Text style={styles.bio}>{bio}</Text>
             </View>
           </View>
-
           <TouchableOpacity
             style={styles.questionaireButtonContainer}
             onPress={() => handleQuestionaireButtonPress()}
@@ -572,6 +562,7 @@ const UserCard = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    zIndex: 300,
     padding: 16,
     marginHorizontal: 0,
     backgroundColor: "#1D1D20",
@@ -580,9 +571,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
+    marginTop: -80,
+    paddingTop: 80,
     backgroundColor: "#1D1D20",
     justifyContent: "space-between",
-    paddingVertical: 5,
+    paddingVertical: 10,
     zIndex: 3,
   },
 
@@ -635,7 +628,8 @@ const styles = StyleSheet.create({
     height: 440,
     marginLeft: 6,
     width: Dimensions.get("window").width - 12,
-    marginBottom: 10,
+    marginBottom: 5,
+    marginTop: -5,
     marginHorizontal: 0,
     borderRadius: 15,
     borderWidth: 0.7,
@@ -658,6 +652,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingTop: 10,
+    marginTop: -8,
     //shadow
     shadowColor: "#000",
     shadowOffset: {

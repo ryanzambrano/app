@@ -37,7 +37,7 @@ const ContactsUI = ({ route }) => {
 
   const renderEmptyComponent = () => (
     <View style={styles.emptyContainer}>
-      <Text style={styles.emptyText}>No users found</Text>
+      <Text style={styles.emptyText}>No messages</Text>
     </View>
   );
 

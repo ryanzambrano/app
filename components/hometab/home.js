@@ -331,14 +331,14 @@ const Home = ({ route }) => {
           />
           <View style={styles.userInfo}>
             <Text style={styles.name}> {item.name} </Text>
-            <Text style={styles.major}> {item.major}</Text>
+            <Text style={styles.major}> {item.major || 'Undecided'}</Text>
             <View style={styles.tagsContainer}>
-              {item.tags.map((tag, index) => (
-                <View key={index} style={styles.tag}>
-                  <Text style={styles.tagText}>{tag}</Text>
-                </View>
-              ))}
-            </View>
+            {(item.tags.slice(0, 8)).map((tag, index) => (
+              <View key={index} style={styles.tag}>
+                <Text style={styles.tagText}>{tag}</Text>
+              </View>
+            ))}
+          </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
   tag: {
     backgroundColor: "#14999999",
     borderRadius: 15,
-    //paddingVertical: 3,
+    paddingVertical: 5,
     paddingHorizontal: 7,
     padding: 4,
     margin: 2,

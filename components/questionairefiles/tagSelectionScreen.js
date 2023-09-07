@@ -75,7 +75,7 @@ const TagSelectionScreen = ({ navigation, route }) => {
     setIsError(null);
 
     if (session?.user) {
-      if (userData.tags.length >= 3 && userData.tags.length <= 7) {
+      if (userData.tags.length >= 3 && userData.tags.length <= 15) {
         const { data, error } = await supabase
           .from("UGC")
           .update({
@@ -98,8 +98,8 @@ const TagSelectionScreen = ({ navigation, route }) => {
           navigation.navigate("Congrats");
           //signOut();
         }
-      } else if (userData.tags.length > 7) {
-        setIsError("Less than 7 interests");
+      } else if (userData.tags.length > 15) {
+        setIsError("Choose less than 15 interests");
         startShakeAnimation(shakeAnimationValue);
       } else if (userData.tags.length < 3) {
         setIsError("At least 3 interests are required");
