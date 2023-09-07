@@ -201,14 +201,17 @@ const Home = ({ route }) => {
       try {
         const { data: ugcData, error: ugcError } = await supabase
           .from("UGC")
-          .select("*");
+          .select("*")
+          .neq("has_ugc", false);
         const { data: profileData, error: profileError } = await supabase
           .from("profile")
-          .select("*");
+          .select("*")
+          .neq("profile_complete", false);
         const { data: imageData, error: imageError } = await supabase
           .from("images")
           .select("*")
-          .eq("image_index", 0);
+          .eq("image_index", 0)
+          .neq("last_modified", null);
 
         if (ugcError || profileError || imageError) {
           console.error(ugcError || profileError || imageError);
@@ -364,7 +367,12 @@ const Home = ({ route }) => {
 
       <View style={styles.viewContainer}>
         <View style={styles.searchContainer}>
-          <AntDesign name="search1" size={15} paddingRight={5} color="#575D61" />
+          <AntDesign
+            name="search1"
+            size={15}
+            paddingRight={5}
+            color="#575D61"
+          />
           <TextInput
             style={styles.searchInput}
             placeholder="Search by name or tag"
