@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
   },
   uploadPromptContainer: {
     position: "absolute",
-    bottom: -30,
+    bottom: -25,
     left: 0,
     right: 0,
     //top: 20,
@@ -594,8 +594,9 @@ const styles = StyleSheet.create({
   },
   uploadPrompt: {
     color: "lightgrey",
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "400",
+    textAlign: "center",
   },
 });
 
