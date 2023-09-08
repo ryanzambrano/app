@@ -18,6 +18,8 @@ import {
 import { supabase } from "./supabase.js";
 import { startShakeAnimation } from "./profileUtils.js";
 
+const logo = require("../../assets/logo4.png");
+
 export const SignIn = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -75,17 +77,9 @@ export const SignIn = ({ navigation }) => {
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Image
-              source={{
-                uri: "https://cdn3.iconfinder.com/data/icons/furniture-volume-1-2/48/12-512.png",
-              }}
-              style={styles.headerImage}
-              alt="Logo "
-            />
+            <Image source={logo} style={styles.headerImage} alt="Logo " />
             <Text style={styles.titleText}>Sign into Cabana</Text>
-            <Text style={styles.sloganText}>
-              Find and meet new roomates, for any situation!
-            </Text>
+            <Text style={styles.sloganText}>Find and meet new roomates!</Text>
           </View>
 
           <View style={styles.form}>
@@ -239,7 +233,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderWidth: 1,
-    backgroundColor: "#4EB1A3",
+    backgroundColor: "#14999999",
     borderColor: "#14999999",
   },
 

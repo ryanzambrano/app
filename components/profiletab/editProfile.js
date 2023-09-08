@@ -22,6 +22,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
   const { session } = route.params;
   const [editedUser, setEditedUser] = useState(route.params.editedUser);
   //editedUser.tags = route.params.selectedTags;
+  const [bioCharCount, setBioCharCount] = useState(0);
 
   const { updated } = route.params;
   const selectedTags = route.params.selectedTags;
@@ -41,9 +42,22 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
   const promptQuestions = {
     greek_life: "Are you participating in Greek Life?",
-    night_out: "What is your idea of a perfect night out?",
-    pet_peeves: "What are your biggest pet peeves?",
-    favorite_movies: "What are your favorite movies?",
+    night_out: "A perfect night out for me looks like...",
+    pet_peeves: "My biggest pet peeves are...",
+    favorite_movies: "My favorite movies are...",
+    favorite_artists: "My favorite artists / bands are...",
+    living_considerations: "The dorms halls / apartment complexes I'm considering are...",
+    sharing: "When it comes to sharing my amenities and personal property...",
+    cooking: "When it comes to sharing food and cooking...",
+    burnt_out: "When I'm burnt out, I relax by...",
+    involvement: "The organizations I'm involved in on campus are...",
+    smoking: "My opinion toward smoking in the dorm / apartment are...",
+    other_people: "My thoughts on having guests over are...",
+    temperature: "I like the temperature of the room to be...", 
+    pets: "My thoughts on having pets are...",
+    parties: "My thoughts on throwing parties are...",
+    decorations: "My ideas for decorating the home involve...",
+    conflict: "When it comes to handling conflict, I am...", 
   };
 
   useEffect(() => {
@@ -103,13 +117,23 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
   const updateProfile = async () => {
     if (session?.user) {
-      if (editedUser.bio.length < 500) {
+      if (editedUser.name.trim() === "") {
+        alert("Must enter a name");
+        return;
+      }
+      const classYear = Number(editedUser.class_year);
+      if (isNaN(classYear) || classYear < 2023 || classYear > 2030) {
+        alert("Enter a valid class year");
+        return;
+      }
+      if (editedUser.bio.length <= 700) {
+        const trimmedBio = editedUser.bio.trimEnd(); 
         const { data, error } = await supabase
           .from("UGC")
           .update([
             {
               name: editedUser.name,
-              bio: editedUser.bio,
+              bio: trimmedBio, 
               major: editedUser.major,
               class_year: editedUser.class_year,
               hometown: editedUser.hometown,
@@ -255,11 +279,23 @@ export const EditProfileScreen = ({ navigation, route }) => {
               <TextInput
                 style={styles.input}
                 value={editedUser.bio}
-                onChangeText={(bio) => setEditedUser({ ...editedUser, bio })}
+                onChangeText={(bio) => {
+                  setEditedUser({ ...editedUser, bio });
+                  setBioCharCount(bio.length);
+                }}
                 multiline
                 placeholder="Bio"
                 placeholderTextColor="#575D61"
               />
+              <Text style={{ 
+                color: bioCharCount > 700 ? 'red' : 'lightgrey', 
+                textAlign: 'right', 
+                marginRight: 10, 
+                marginBottom: 10, 
+                fontSize: 12 
+              }}>
+                {bioCharCount}/700
+              </Text>
             </View>
 
             <Text style={styles.more}>Interests</Text>
@@ -383,7 +419,6 @@ const styles = StyleSheet.create({
     padding: 7,
     alignSelf: "center",
     //backgroundColor: "transparent",
-    // Style for the 'cancel' button container if needed
   },
 
   center: {

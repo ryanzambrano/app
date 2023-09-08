@@ -18,7 +18,6 @@ import FiltersUI from "../hometab/filters.js";
 import GroupChatScreen from "../contactstab/otherprofile";
 import { QuestionaireAnswers } from "../hometab/questionaireAnswers";
 import Questionaire from "../questionairefiles/questionaire";
-import MessageUserCard from "../contactstab/messageUserCard";
 
 const Stack = createStackNavigator(); // Initialize stack navigator
 
@@ -108,11 +107,6 @@ const ThreeMainPages = ({ route }) => {
           component={AddPerson}
           initialParams={{ session }}
           options={{ presentation: "modal" }}
-        />
-        <Stack.Screen
-          name="MessageUserCard"
-          component={MessageUserCard}
-          initialParams={{ session }}
         />
       </Stack.Navigator>
     </NavigationContainer>

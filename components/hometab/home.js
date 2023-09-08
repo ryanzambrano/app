@@ -20,7 +20,7 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator } from "react-native";
 
-const logo = require("../../assets/logo3.png");
+const logo = require("../../assets/logo4.png");
 const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
 
@@ -196,19 +196,22 @@ const Home = ({ route }) => {
   });
 
   useEffect(() => {
-    setIsLoading(true);
+    //setIsLoading(true);
     const fetchUsers = async () => {
       try {
         const { data: ugcData, error: ugcError } = await supabase
           .from("UGC")
-          .select("*");
+          .select("*")
+          .neq("has_ugc", false);
         const { data: profileData, error: profileError } = await supabase
           .from("profile")
-          .select("*");
+          .select("*")
+          .neq("profile_complete", false);
         const { data: imageData, error: imageError } = await supabase
           .from("images")
           .select("*")
-          .eq("image_index", 0);
+          .eq("image_index", 0)
+          .neq("last_modified", null);
 
         if (ugcError || profileError || imageError) {
           console.error(ugcError || profileError || imageError);
@@ -285,6 +288,7 @@ const Home = ({ route }) => {
       } catch (error) {
         console.error("An unexpected error occurred:", error);
       }
+      setIsLoading(false);
     };
 
     fetchUsers();
@@ -296,7 +300,7 @@ const Home = ({ route }) => {
       fetchUsers();
     }
 
-    setIsLoading(false);
+    //setIsLoading(false);
   }, [isFocused]);
 
   const handleUserCardPress = (user) => {
@@ -327,9 +331,9 @@ const Home = ({ route }) => {
           />
           <View style={styles.userInfo}>
             <Text style={styles.name}> {item.name} </Text>
-            <Text style={styles.major}> {item.major}</Text>
+            <Text style={styles.major}> {item.major || "Undecided"}</Text>
             <View style={styles.tagsContainer}>
-              {item.tags.map((tag, index) => (
+              {item.tags.slice(0, 8).map((tag, index) => (
                 <View key={index} style={styles.tag}>
                   <Text style={styles.tagText}>{tag}</Text>
                 </View>
@@ -364,13 +368,20 @@ const Home = ({ route }) => {
 
       <View style={styles.viewContainer}>
         <View style={styles.searchContainer}>
-          <AntDesign name="search1" size={15} color="#575D61" />
+          <AntDesign
+            name="search1"
+            size={15}
+            paddingRight={5}
+            color="#575D61"
+          />
           <TextInput
             style={styles.searchInput}
-            placeholder=" Search by name or tag"
+            placeholder="Search by name or tag"
             placeholderTextColor={"#575D61"}
             onChangeText={handleSearch}
             value={searchQuery}
+            keyboardAppearance="dark"
+            returnKeyType="done"
           />
         </View>
         {isLoading ? ( // Step 3
@@ -439,7 +450,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingTop: 13,
-    paddingBottom: 6,
+    paddingBottom: 0,
     paddingLeft: 15,
     paddingRight: 15,
     marginBottom: 8,
@@ -448,7 +459,6 @@ const styles = StyleSheet.create({
   logoTitleContainer: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
   },
 
   headerText: {
@@ -561,11 +571,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "flex-start",
-    paddingVertical: 10,
+    paddingVertical: 5,
     borderRadius: 15,
     maxHeight: 90,
     paddingRight: 5,
     //position: "absolute",
+    //padding: 20,
     overflow: "hidden",
     marginBottom: 10,
     justifyContent: "left",
@@ -573,7 +584,7 @@ const styles = StyleSheet.create({
   tag: {
     backgroundColor: "#14999999",
     borderRadius: 15,
-    //paddingVertical: 3,
+    paddingVertical: 5,
     paddingHorizontal: 7,
     padding: 4,
     margin: 2,

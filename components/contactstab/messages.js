@@ -20,10 +20,11 @@ import {
   useRoute,
   useFocusEffect,
 } from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
-import { createClient } from "@supabase/supabase-js";
 
 const MessagingUI = () => {
+  const isFocused = useIsFocused();
   const [selectedPerson, setSelectedPerson] = useState(null);
   const scrollViewRef = useRef();
   const [inputHeight, setInputHeight] = useState(40);
@@ -86,20 +87,38 @@ const MessagingUI = () => {
           return acc;
         }, {});
         setSenderNames(fetchedPersons);
-        const people = data.map((person) => person);
-        setPersons(people);
-        //console.log(persons[0].name);
+
+        // Check if user.images[0] exists and has a last_modified property
+        if (user.images[0] && user.images[0].last_modified) {
+          // Map last_modified to lastModified for each person in data
+          const people = data.map((person) => ({
+            ...person,
+            lastModified: user.images[0].last_modified,
+          }));
+          setPersons(people);
+        } else {
+          const peoples = data.map((person) => person);
+          // If user.images[0] does not exist or doesn't have last_modified, setPersons with the original data
+          setPersons(peoples);
+        }
       }
     } catch (error) {
       console.error("An error occurred:", error.message);
     }
   }
+
   async function getJoinedGroups() {
     try {
       const { data, error: sessionError } = await supabase
         .from("UGC")
         .select("name")
         .eq("user_id", session.user.id)
+        .single();
+
+      const { data: groupchatdata, error } = await supabase
+        .from("Group Chats")
+        .select("*")
+        .eq("Group_ID", user.Group_ID)
         .single();
 
       if (sessionError) {
@@ -109,7 +128,9 @@ const MessagingUI = () => {
 
       const sessionusername = data.name;
 
-      const groupNames = user.Group_Name.split(",").map((name) => name.trim());
+      const groupNames = groupchatdata.Group_Name.split(",").map((name) =>
+        name.trim()
+      );
       const filteredGroupNames = groupNames.filter(
         (name) => name !== sessionusername
       );
@@ -123,14 +144,16 @@ const MessagingUI = () => {
     }
   }
   useEffect(() => {
-    getJoinedGroups();
+    if (isFocused) {
+      getJoinedGroups();
+    }
     if (user.Ammount_Users <= 2) {
       fetchUsers();
     }
     if (editedJoinedGroups !== undefined) {
       setJoinedGroups(editedJoinedGroups);
     }
-  }, [user.User_ID, session.user.id]);
+  }, [user.User_ID, session.user.id, isFocused]);
 
   const fetchMessages = async () => {
     const { data, error } = await supabase
@@ -203,7 +226,7 @@ const MessagingUI = () => {
     if (user.Ammount_Users > 2) {
       navigation.navigate("GroupChatScreen", { user });
     } else {
-      navigation.navigate("MessageUserCard", { user: persons[0] });
+      navigation.navigate("userCard", { user: persons[0] });
     }
   };
   const renderProfilePicture = (item) => {
@@ -231,7 +254,7 @@ const MessagingUI = () => {
           <Image
             style={[
               styles.layeredImage,
-              { zIndex: 2, position: "absolute", top: 0, left: 17 },
+              { zIndex: 2, position: "absolute", top: 0, left: 14 },
             ]}
             source={{
               uri: `${picURL}/${user.images[1].user_id}/${user.images[1].user_id}-0-${user.images[1].last_modified}`, // Replace with actual URLs
@@ -325,7 +348,9 @@ const MessagingUI = () => {
         >
           <AntDesign name="arrowleft" size={24} color="#159e9e" />
         </TouchableOpacity>
-        <Text style={styles.contactName}>{joinedGroups}</Text>
+        <Text style={styles.contactName} numberOfLines={1}>
+          {joinedGroups}
+        </Text>
         <TouchableOpacity onPress={navigateToProfile}>
           {renderProfilePicture()}
         </TouchableOpacity>
@@ -350,7 +375,6 @@ const MessagingUI = () => {
 
             return (
               <View>
-                {/* Display sender name for the first consecutive message from the sender */}
                 {shouldDisplaySenderName && (
                   <Text style={styles.senderName}>{item.UGC.name}</Text>
                 )}
@@ -360,6 +384,13 @@ const MessagingUI = () => {
                     isOwnMessage
                       ? styles.messageContainerRight
                       : styles.messageContainerLeft,
+                    // conditionally apply the smaller margin styles
+                    isFirstOwnMessage
+                      ? {}
+                      : styles.messageContainerRightSmallMargin,
+                    isFirstOtherMessage
+                      ? {}
+                      : styles.messageContainerLeftSmallMargin,
                   ]}
                 >
                   <Text
@@ -390,6 +421,7 @@ const MessagingUI = () => {
           onContentSizeChange={(e) =>
             setInputHeight(e.nativeEvent.contentSize.height)
           }
+          keyboardAppearance="dark"
         />
         <Button
           title="Send"
@@ -404,19 +436,20 @@ const MessagingUI = () => {
 
 const styles = StyleSheet.create({
   layeredImage: {
-    width: 40, // Set the width as needed
-    height: 40, // Set the height as needed
+    width: 40,
+    height: 40,
     borderRadius: 20,
-    marginRight: 25,
     backgroundColor: "#dedede",
     overflow: "hidden",
     marginRight: 10,
   },
   senderName: {
     marginVertical: 2,
+    paddingBottom: 4,
     color: "#afafb2",
-    fontWeight: "bold",
-    fontSize: 7,
+    fontWeight: "500",
+    paddingLeft: 0,
+    fontSize: 12,
     marginLeft: 7,
   },
   container: {
@@ -431,7 +464,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 0,
-    paddingVertical: 20,
+    paddingTop: 20,
+    paddingBottom: 5,
+    borderBottomColor: "grey",
+    borderBottomWidth: 0.2,
+    // borderBottomRightRadius: 10,
+    // borderBottomLeftRadius: 10,
   },
   button: {
     padding: 10,
@@ -440,9 +478,11 @@ const styles = StyleSheet.create({
   contactName: {
     fontSize: 18,
     fontWeight: "bold",
-    marginLeft: 10,
+    marginLeft: 5,
     color: "white",
     paddingVertical: 20,
+    maxWidth: 260,
+    paddingHorizontal: 10,
   },
   profileContainer: {
     width: 40,
@@ -468,17 +508,28 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     alignSelf: "flex-end",
     backgroundColor: "#14999999",
+    marginBottom: 15,
+    maxWidth: "80%",
   },
   messageContainerLeft: {
     borderRadius: 20,
     marginBottom: 2,
     alignSelf: "flex-start",
     backgroundColor: "#2B2D2F",
+    marginBottom: 15,
+    maxWidth: "80%",
   },
+  messageContainerRightSmallMargin: {
+    marginBottom: 5,
+  },
+  messageContainerLeftSmallMargin: {
+    marginBottom: 5,
+  },
+
   message: {
     fontSize: 16,
     paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     color: "#000",
   },
   inputContainer: {
@@ -498,10 +549,11 @@ const styles = StyleSheet.create({
     color: "white",
     borderRadius: 20,
     paddingHorizontal: 0,
+    paddingVertical: 10,
     backgroundColor: "#2B2D2F",
     fontSize: 20,
     paddingTop: 10,
-    marginLeft: 10,
+    marginLeft: 15,
   },
 });
 

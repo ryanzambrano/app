@@ -35,6 +35,12 @@ const ContactsUI = ({ route }) => {
     setSearchQuery(text);
   };
 
+  const renderEmptyComponent = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>No messages</Text>
+    </View>
+  );
+
   const filteredUsers = users.filter((user) => {
     const nameMatch = user.joinedGroups
       .toLowerCase()
@@ -90,7 +96,7 @@ const ContactsUI = ({ route }) => {
 
         const { data: Imagedata, error: ImageError } = await supabase
           .from("images")
-          .select('*')
+          .select("*")
           .in("user_id", extractedIds)
           .eq("image_index", 0);
         if (ImageError && !messageError) {
@@ -277,7 +283,7 @@ const ContactsUI = ({ route }) => {
       if (item.Ammount_Users > 2 && item.images.length > 1) {
         // Overlay two profile pictures
         return (
-          <View style={{ position: "relative" }}>
+          <View style={{ position: "relative", paddingVertical: 3 }}>
             <Image
               style={[styles.layeredImage, { zIndex: 1, bottom: 6 }]}
               source={{
@@ -372,7 +378,7 @@ const ContactsUI = ({ route }) => {
             {renderProfilePicture()}
             <View style={styles.contactInfo}>
               <View style={styles.contactNameContainer}>
-                <Text style={styles.contactName}>{item.joinedGroups}</Text>
+                <Text numberOfLines={1} ellipsizeMode='tail' style={styles.contactName}>{item.joinedGroups}</Text>
                 {item.recentMessage && item.recentMessage.created_at ? (
                   <Text style={styles.MessageTime}>
                     {formatRecentTime(item.recentMessage.created_at)}
@@ -380,10 +386,20 @@ const ContactsUI = ({ route }) => {
                 ) : null}
               </View>
               {item.recentMessage ? (
-                <Text style={styles.RecentMessage}>
+                <Text 
+                numberOfLines={1} 
+                ellipsizeMode='tail' 
+                style={styles.RecentMessage}
+                >
                   {item.recentMessage.Message_Content}
                 </Text>
-              ) : null}
+              ) : <Text 
+              numberOfLines={1}
+              ellipsizeMode='tail'
+              style={styles.RecentMessage}
+            >
+              No messages yet
+            </Text>}
             </View>
           </View>
         </TouchableOpacity>
@@ -409,13 +425,20 @@ const ContactsUI = ({ route }) => {
       </View>
       <View style={styles.viewContainer}>
         <View style={styles.searchContainer}>
-          <AntDesign name="search1" size={15} color="#575D61" />
+          <AntDesign
+            name="search1"
+            size={15}
+            paddingRight={1}
+            color="#575D61"
+          />
           <TextInput
             style={styles.searchInput}
-            placeholder=" Search Messages"
+            placeholder="Search Messages"
             placeholderTextColor="#575D61"
             onChangeText={handleSearch}
             value={searchQuery}
+            keyboardAppearance="dark"
+            returnKeyType="done"
           />
         </View>
 
@@ -423,6 +446,7 @@ const ContactsUI = ({ route }) => {
           data={filteredUsers}
           renderItem={renderContact}
           keyExtractor={(item) => item.Group_ID.toString()}
+          ListEmptyComponent={renderEmptyComponent}
         />
       </View>
       <StatusBar style="light" />
@@ -436,8 +460,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#1D1D20",
   },
   layeredImage: {
-    width: 40, // Set the width as needed
-    height: 40, // Set the height as needed
+    width: 40, 
+    height: 40, 
     borderRadius: 20,
     marginRight: 25,
   },
@@ -448,15 +472,15 @@ const styles = StyleSheet.create({
     //borderBottomWidth: 1,
     borderColor: "gray",
     paddingTop: 13,
-    paddingBottom: 6,
+    paddingBottom: 0,
     paddingLeft: 15,
     paddingRight: 15,
     //marginBottom: 8,
   },
   headerText: {
-    fontSize: 25,
+    fontSize: 27,
     fontWeight: "bold",
-    marginTop: -10,
+    //marginTop: -10,
     color: "white",
   },
   logo: {
@@ -476,7 +500,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 15,
     marginTop: 15,
-    marginBottom: 20,
+    marginBottom: 5,
     elevation: 3,
     marginHorizontal: 10,
     // borderWidth: 0.20,
@@ -493,14 +517,14 @@ const styles = StyleSheet.create({
   },
   contactItem: {
     flexDirection: "row",
-    alignItems: "flex-start", // Align elements at the top of the container
+    alignItems: "flex-start", 
     paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingVertical: 15,
     borderBottomWidth: 0.3,
     borderBottomColor: "grey",
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-    width: "100%", // Set the width to 100% to fill the container
+    width: "100%",
   },
   profilePicture: {
     width: 50,
@@ -510,21 +534,27 @@ const styles = StyleSheet.create({
   },
   contactInfo: {
     flex: 1,
+    paddingHorizontal: 5,
   },
   contactName: {
     fontSize: 18,
-    fontWeight: 400,
+    fontWeight: "400",
+    marginBottom: 5,
     color: "white",
+    flexShrink: 1,
   },
   MessageTime: {
     fontSize: 14,
     fontWeight: "light",
-    color: "white", // Add the color for the recent time (optional)
+    color: "white", 
+    flexShrink: 0, 
+    marginLeft: 10 
   },
   RecentMessage: {
     fontSize: 14,
     fontWeight: "light",
     color: "#cbcace",
+    marginRight: 80,
   },
   contactStatus: {
     fontSize: 14,
@@ -532,7 +562,8 @@ const styles = StyleSheet.create({
   },
   contactNameContainer: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    paddingRight: 5,
+    //flex: 1, 
     justifyContent: "space-between",
   },
   rowBack: {
@@ -554,6 +585,16 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 140,
+  },
+  emptyText: {
+    fontSize: 20,
+    color: "grey",
   },
 });
 

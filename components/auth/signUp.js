@@ -18,6 +18,8 @@ import {
 import { supabase } from "./supabase.js";
 import { startShakeAnimation } from "./profileUtils.js";
 
+const logo = require("../../assets/logo4.png");
+
 export const SignUp = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [isSignedUp, setIsSignedUp] = useState(false);
@@ -106,13 +108,7 @@ export const SignUp = ({ navigation }) => {
         ) : (
           <View style={styles.container}>
             <View style={styles.header}>
-              <Image
-                source={{
-                  uri: "https://cdn3.iconfinder.com/data/icons/furniture-volume-1-2/48/12-512.png",
-                }}
-                style={styles.headerImage}
-                alt="Logo "
-              />
+              <Image source={logo} style={styles.headerImage} alt="Logo " />
               <Text style={styles.titleText}>Create an Account!</Text>
             </View>
 

@@ -22,6 +22,7 @@ const App = () => {
   const [session, setSession] = useState(null);
   const [hasProfile, setHasProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const logo = require("./assets/logo4.png");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -97,13 +98,7 @@ const App = () => {
     // Render a loading state or splash screen
     return (
       <View style={styles.container}>
-        <Image
-          source={{
-            uri: "https://cdn3.iconfinder.com/data/icons/furniture-volume-1-2/48/12-512.png",
-          }}
-          style={styles.headerImage}
-          alt="Logo "
-        />
+        <Image source={logo} style={styles.headerImage} alt="Logo " />
       </View>
     );
   }

@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     color: "white",
   },
   card: {
-    backgroundColor: "#111111",
+    backgroundColor: "#2B2D2F",
     gap: 40,
     paddingTop: 50,
     paddingBottom: 40,
