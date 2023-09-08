@@ -242,6 +242,10 @@ const GroupChatScreen = ({}) => {
     </TouchableOpacity>
   );
   const updateJoinedGroups = async () => {
+    if (!editedJoinedGroups.trim()) {
+      alert('Name cannot be empty.');
+      return;
+    }
     try {
       // Update the joined groups in Supabase
       const { data, error } = await supabase
@@ -280,26 +284,32 @@ const GroupChatScreen = ({}) => {
         </TouchableOpacity>
         <View />
       </View>
-
-      {/* Profile Picture and Group Name */}
       <View style={styles.groupInfo}>
         {renderProfilePicture()}
         <TouchableOpacity onPress={updateJoinedGroups}>
-          <TextInput
-            style={{
-              marginTop: 15,
-              marginBottom: 15,
-              fontSize: 20,
-              fontWeight: "bold",
-              color: "white",
-            }}
-            value={editedJoinedGroups}
-            onChangeText={setEditedJoinedGroups}
-            onBlur={updateJoinedGroups} // Update when input is blurred
-          />
+          <View style={{ marginBottom: 15 }}>
+            <TextInput
+              style={{
+                marginTop: 15,
+                fontSize: 20,
+                fontWeight: "bold",
+                color: "white",
+              }}
+              value={editedJoinedGroups}
+              onChangeText={setEditedJoinedGroups}
+              onBlur={updateJoinedGroups}
+            />
+            <View
+              style={{
+                height: 0.8,
+                backgroundColor: "grey",
+                marginTop: 5,
+                marginHorizontal: -10,
+              }}
+            />
+          </View>
         </TouchableOpacity>
       </View>
-      {/* Buttons */}
       <View
         style={{ flexDirection: "row", justifyContent: "center", padding: 10 }}
       >
