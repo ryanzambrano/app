@@ -20,10 +20,12 @@ import {
   useRoute,
   useFocusEffect,
 } from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
 import { createClient } from "@supabase/supabase-js";
 
 const MessagingUI = () => {
+  const isFocused = useIsFocused();
   const [selectedPerson, setSelectedPerson] = useState(null);
   const scrollViewRef = useRef();
   const [inputHeight, setInputHeight] = useState(40);
@@ -113,6 +115,15 @@ const MessagingUI = () => {
         .select("name")
         .eq("user_id", session.user.id)
         .single();
+      
+
+      const { data: groupchatdata, error } = await supabase
+      .from("Group Chats")
+      .select("*")
+      .eq("Group_ID", user.Group_ID)
+      .single();
+
+      
 
       if (sessionError) {
         console.error(sessionError);
@@ -121,7 +132,7 @@ const MessagingUI = () => {
 
       const sessionusername = data.name;
 
-      const groupNames = user.Group_Name.split(",").map((name) => name.trim());
+      const groupNames = groupchatdata.Group_Name.split(",").map((name) => name.trim());
       const filteredGroupNames = groupNames.filter(
         (name) => name !== sessionusername
       );
@@ -135,14 +146,17 @@ const MessagingUI = () => {
     }
   }
   useEffect(() => {
-    getJoinedGroups();
+    if(isFocused)
+    {
+      getJoinedGroups();
+    }
     if (user.Ammount_Users <= 2) {
       fetchUsers();
     }
     if (editedJoinedGroups !== undefined) {
       setJoinedGroups(editedJoinedGroups);
     }
-  }, [user.User_ID, session.user.id]);
+  }, [user.User_ID, session.user.id, isFocused]);
 
   const fetchMessages = async () => {
     const { data, error } = await supabase
@@ -187,6 +201,7 @@ const MessagingUI = () => {
       supabase.removeChannel(channel);
     };
   }, [session.user.id, messages]);
+
 
   useEffect(() => {
     if (messages.length > 0) {

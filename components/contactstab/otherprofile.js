@@ -57,6 +57,7 @@ const GroupChatScreen = ({}) => {
           return {
             ...people,
             image: `${picURL}/${Imagedata.user_id}/${Imagedata.user_id}-0-${Imagedata.last_modified}`,
+            lastModified: Imagedata.last_modified,
           };
         }
       })
@@ -76,7 +77,7 @@ const GroupChatScreen = ({}) => {
     setSelectedPerson(person);
 
     // Navigate to Message page and pass selected person data
-    navigation.navigate("MessageUserCard", { user: person });
+    navigation.navigate("userCard", { user: person });
   };
   const renderProfilePicture = (item) => {
     if (user.Ammount_Users > 2 && user.images.length > 1) {
