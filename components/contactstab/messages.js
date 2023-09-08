@@ -77,7 +77,7 @@ const MessagingUI = () => {
         .from("UGC")
         .select("*")
         .in("user_id", extractedIds);
-
+  
       if (error) {
         console.error("Error fetching users:", error);
       } else {
@@ -86,14 +86,26 @@ const MessagingUI = () => {
           return acc;
         }, {});
         setSenderNames(fetchedPersons);
-        const people = data.map((person) => person);
-        setPersons(people);
-        //console.log(persons[0].name);
+  
+        // Check if user.images[0] exists and has a last_modified property
+        if (user.images[0] && user.images[0].last_modified) {
+          // Map last_modified to lastModified for each person in data
+          const people = data.map((person) => ({
+            ...person,
+            lastModified: user.images[0].last_modified,
+          }));
+          setPersons(people);
+        } else {
+          const peoples = data.map((person) => person);
+          // If user.images[0] does not exist or doesn't have last_modified, setPersons with the original data
+          setPersons(peoples);
+        }
       }
     } catch (error) {
       console.error("An error occurred:", error.message);
     }
   }
+  
   async function getJoinedGroups() {
     try {
       const { data, error: sessionError } = await supabase
@@ -203,7 +215,7 @@ const MessagingUI = () => {
     if (user.Ammount_Users > 2) {
       navigation.navigate("GroupChatScreen", { user });
     } else {
-      navigation.navigate("MessageUserCard", { user: persons[0] });
+      navigation.navigate("userCard", { user: persons[0] });
     }
   };
   const renderProfilePicture = (item) => {

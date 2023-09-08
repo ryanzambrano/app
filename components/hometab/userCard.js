@@ -209,8 +209,7 @@ const UserCard = ({ navigation, route }) => {
         return;
       }
 
-      const { blocked_profiles } = data[0];
-      console.log(user_id);
+      const { blocked_profiles } = data[0];;
       if (!blocked_profiles.includes(user_id)) {
         const updatedBlockedProfiles = [...blocked_profiles, user_id];
         const { data: updateData, error: updateError } = await supabase
@@ -338,6 +337,12 @@ const UserCard = ({ navigation, route }) => {
         console.error(sessionError);
         return;
       }
+      const { data: Imagedata, error: ImageError } = await supabase
+      .from("images")
+      .select("*")
+      .eq("user_id", user_id)
+      .eq("image_index", 0);
+
 
       const sessionusername = data.name;
       const combinedArray = [sessionusername, name];
@@ -359,7 +364,7 @@ const UserCard = ({ navigation, route }) => {
         .select();
 
       if (insertError) {
-        if (insertError.code === "23505") {
+        if (insertError.code === "23505") { // dupe error
           const { data: navigationdata, error: navigationError } =
             await supabase
               .from("Group Chats")
@@ -371,7 +376,11 @@ const UserCard = ({ navigation, route }) => {
             return;
           } else {
             //console.log(navigationdata);
-            const fetchedPersons = navigationdata.map((person) => person);
+            const  fetchedPersons = navigationdata.map((person) => ({
+              ...person,
+              images: Imagedata,
+            }));
+            
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
               navigation.navigate("Message", { user: fetchedPersons[0] });
@@ -384,7 +393,10 @@ const UserCard = ({ navigation, route }) => {
         }
         return;
       }
-      const fetchedPersons = insertData.map((person) => person);
+      const  fetchedPersons = navigationdata.map((person) => ({
+        ...person,
+        images: Imagedata,
+      }));
       setPersons(fetchedPersons);
       if (fetchedPersons.length > 0) {
         navigation.navigate("Message", { user: fetchedPersons[0] });
