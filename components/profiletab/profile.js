@@ -146,6 +146,7 @@ export const Profile = ({ navigation, route }) => {
         setUploading(false);
         setProfilePicture(profilePictureURL);
       } else {
+        setUploading(false);
         setProfilePicture(null);
       }
     } catch (error) {
@@ -592,7 +593,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   uploadPrompt: {
-    color: "red",
+    color: "lightgrey",
     fontSize: 11,
     fontWeight: "400",
   },

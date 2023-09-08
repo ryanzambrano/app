@@ -22,7 +22,6 @@ import {
 } from "@react-navigation/native";
 import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
-import { createClient } from "@supabase/supabase-js";
 
 const MessagingUI = () => {
   const isFocused = useIsFocused();
@@ -79,7 +78,7 @@ const MessagingUI = () => {
         .from("UGC")
         .select("*")
         .in("user_id", extractedIds);
-  
+
       if (error) {
         console.error("Error fetching users:", error);
       } else {
@@ -88,7 +87,7 @@ const MessagingUI = () => {
           return acc;
         }, {});
         setSenderNames(fetchedPersons);
-  
+
         // Check if user.images[0] exists and has a last_modified property
         if (user.images[0] && user.images[0].last_modified) {
           // Map last_modified to lastModified for each person in data
@@ -107,7 +106,7 @@ const MessagingUI = () => {
       console.error("An error occurred:", error.message);
     }
   }
-  
+
   async function getJoinedGroups() {
     try {
       const { data, error: sessionError } = await supabase
@@ -115,15 +114,12 @@ const MessagingUI = () => {
         .select("name")
         .eq("user_id", session.user.id)
         .single();
-      
 
       const { data: groupchatdata, error } = await supabase
-      .from("Group Chats")
-      .select("*")
-      .eq("Group_ID", user.Group_ID)
-      .single();
-
-      
+        .from("Group Chats")
+        .select("*")
+        .eq("Group_ID", user.Group_ID)
+        .single();
 
       if (sessionError) {
         console.error(sessionError);
@@ -132,7 +128,9 @@ const MessagingUI = () => {
 
       const sessionusername = data.name;
 
-      const groupNames = groupchatdata.Group_Name.split(",").map((name) => name.trim());
+      const groupNames = groupchatdata.Group_Name.split(",").map((name) =>
+        name.trim()
+      );
       const filteredGroupNames = groupNames.filter(
         (name) => name !== sessionusername
       );
@@ -146,8 +144,7 @@ const MessagingUI = () => {
     }
   }
   useEffect(() => {
-    if(isFocused)
-    {
+    if (isFocused) {
       getJoinedGroups();
     }
     if (user.Ammount_Users <= 2) {
@@ -201,7 +198,6 @@ const MessagingUI = () => {
       supabase.removeChannel(channel);
     };
   }, [session.user.id, messages]);
-
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -367,40 +363,48 @@ const MessagingUI = () => {
             const isOwnMessage = item.Sent_From === session.user.id;
             const isFirstOwnMessage =
               isOwnMessage &&
-              (index === 0 || messages[index - 1].Sent_From !== session.user.id);
+              (index === 0 ||
+                messages[index - 1].Sent_From !== session.user.id);
             const isOtherMessage = item.Sent_From !== session.user.id;
             const isFirstOtherMessage =
               isOtherMessage &&
-              (index === 0 || messages[index - 1].Sent_From === session.user.id);
+              (index === 0 ||
+                messages[index - 1].Sent_From === session.user.id);
             const shouldDisplaySenderName =
               user.Ammount_Users >= 3 && isFirstOtherMessage;
-          
-              return (
-                <View>
-                  {shouldDisplaySenderName && (
-                    <Text style={styles.senderName}>{item.UGC.name}</Text>
-                  )}
-                  <View
+
+            return (
+              <View>
+                {shouldDisplaySenderName && (
+                  <Text style={styles.senderName}>{item.UGC.name}</Text>
+                )}
+                <View
+                  style={[
+                    styles.messageContainer,
+                    isOwnMessage
+                      ? styles.messageContainerRight
+                      : styles.messageContainerLeft,
+                    // conditionally apply the smaller margin styles
+                    isFirstOwnMessage
+                      ? {}
+                      : styles.messageContainerRightSmallMargin,
+                    isFirstOtherMessage
+                      ? {}
+                      : styles.messageContainerLeftSmallMargin,
+                  ]}
+                >
+                  <Text
                     style={[
-                      styles.messageContainer,
-                      isOwnMessage ? styles.messageContainerRight : styles.messageContainerLeft,
-                      // conditionally apply the smaller margin styles
-                      isFirstOwnMessage ? {} : styles.messageContainerRightSmallMargin,
-                      isFirstOtherMessage ? {} : styles.messageContainerLeftSmallMargin,
+                      styles.message,
+                      isOwnMessage ? { color: "white" } : { color: "white" },
                     ]}
                   >
-                    <Text
-                      style={[
-                        styles.message,
-                        isOwnMessage ? { color: "white" } : { color: "white" },
-                      ]}
-                    >
-                      {item.Message_Content}
-                    </Text>
-                  </View>
+                    {item.Message_Content}
+                  </Text>
                 </View>
-              );
-            }}
+              </View>
+            );
+          }}
           keyExtractor={(_, index) => index.toString()}
           contentContainerStyle={styles.messagesContent}
         />
@@ -432,8 +436,8 @@ const MessagingUI = () => {
 
 const styles = StyleSheet.create({
   layeredImage: {
-    width: 40, 
-    height: 40, 
+    width: 40,
+    height: 40,
     borderRadius: 20,
     backgroundColor: "#dedede",
     overflow: "hidden",
@@ -505,7 +509,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     backgroundColor: "#14999999",
     marginBottom: 15,
-    maxWidth: '80%',
+    maxWidth: "80%",
   },
   messageContainerLeft: {
     borderRadius: 20,
@@ -513,13 +517,13 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     backgroundColor: "#2B2D2F",
     marginBottom: 15,
-    maxWidth: '80%',
+    maxWidth: "80%",
   },
   messageContainerRightSmallMargin: {
-    marginBottom: 5, 
+    marginBottom: 5,
   },
   messageContainerLeftSmallMargin: {
-    marginBottom: 5, 
+    marginBottom: 5,
   },
 
   message: {
