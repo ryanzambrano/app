@@ -114,12 +114,14 @@ const ComposeMessageScreen = ({ route }) => {
   };
   const handleCreateMessage = async () => {
     try {
+      
       const selectedUserNames = selectedUsers.map((user) => user.name);
       selectedUserNames.push(sessionusername);
       selectedUserNames.sort();
       const usernames = selectedUserNames.join(", ");
 
       // Get the IDs of the selected users
+      const ids = selectedUsers.map((user) => user.user_id);
       const selectedUserIDs = selectedUsers.map((user) => user.user_id);
       selectedUserIDs.push(session.user.id);
       selectedUserIDs.sort();
@@ -144,12 +146,23 @@ const ComposeMessageScreen = ({ route }) => {
               .select("*")
               .contains("User_ID", selectedUserIDs)
               .eq("Ammount_Users", selectedUserIDs.length);
+
+          const { data: Imagedata, error: ImageError } = await supabase
+              .from("images")
+              .select("*")
+              .in("user_id", ids)
+              .eq("image_index", 0);
+
+          console.log(Imagedata);
           if (navigationError) {
             console.log(navigationError);
             return;
           } else {
             //console.log(navigationdata);
-            const fetchedPersons = navigationdata.map((person) => person);
+            const fetchedPersons = navigationdata.map((person) => ({
+              ...person,
+              images: Imagedata,
+            }));
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
               navigation.navigate("Message", { user: fetchedPersons[0] });
