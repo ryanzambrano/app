@@ -4,8 +4,8 @@
     "slug": "hello-world",
     "version": "1.0.1",
     "orientation": "portrait",
-    "icon": "./assets/logo4.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/logo1.png",
+    "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/logo1.png",
       "resizeMode": "contain",

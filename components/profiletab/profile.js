@@ -278,14 +278,14 @@ export const Profile = ({ navigation, route }) => {
                 </View>
               </View>
             </View>
-            {editedUser.bio && (
-              <View style={styles.bio}>
-                <View>
-                  <Text style={styles.bioHeader}>About me</Text>
-                  <Text style={styles.bioText}>{editedUser.bio}</Text>
-                </View>
+
+            <View style={styles.bio}>
+              <View>
+                <Text style={styles.bioHeader}>About me</Text>
+                <Text style={styles.bioText}>{editedUser.bio}</Text>
               </View>
-            )}
+            </View>
+
             <View
               style={{
                 borderBottomWidth: hasValidItems ? 0.3 : 0,
@@ -387,7 +387,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     //paddingLeft: 25,
-    paddingBottom: 25,
+    paddingBottom: 35,
     paddingTop: 25,
     marginBottom: 0,
     //color: "white",
@@ -502,8 +502,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#111111",
     borderRadius: 15,
     justifyContent: "center",
-    marginTop: 0,
-    marginBottom: 20,
+    marginTop: 10,
+    marginBottom: 45,
   },
   tag: {
     backgroundColor: "#14999999",
