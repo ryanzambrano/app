@@ -123,9 +123,14 @@ export const EditProfileScreen = ({ navigation, route }) => {
       }
       const classYear = Number(editedUser.class_year);
       if (isNaN(classYear) || classYear < 2023 || classYear > 2030) {
-        alert("Enter a valid class year");
+        alert("Please enter a valid class year");
         return;
       }
+      if (editedUser.major.length > 30) {
+        alert("Please enter a valid major") 
+        return;
+      }
+      
       if (editedUser.bio.length <= 700) {
         const trimmedBio = editedUser.bio.trimEnd(); 
         const { data, error } = await supabase
