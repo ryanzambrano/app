@@ -137,6 +137,22 @@ const ComposeMessageScreen = ({ route }) => {
           },
         ])
         .select();
+        if(insertData)
+        {
+          const { data: Imagedata, error: ImageError } = await supabase
+              .from("images")
+              .select("*")
+              .in("user_id", ids)
+              .eq("image_index", 0);
+          const fetchedPersons = insertData.map((person) => ({
+            ...person,
+            images: Imagedata,
+          }));
+          setPersons(fetchedPersons);
+          if (fetchedPersons.length > 0) {
+            navigation.navigate("Message", { user: fetchedPersons[0] });
+           }
+        }
 
       if (insertError) {
         if (insertError.code === "23505") {
@@ -165,7 +181,7 @@ const ComposeMessageScreen = ({ route }) => {
             }));
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
-              navigation.navigate("Message", { user: fetchedPersons[0] });
+             navigation.navigate("Message", { user: fetchedPersons[0] });
             }
 
             return;
@@ -178,11 +194,11 @@ const ComposeMessageScreen = ({ route }) => {
         return;
       }
 
+
       // Log the Group_ID
     } catch (err) {
       console.error("An error occurred:", err);
     }
-    navigation.goBack();
   };
 
   const selectedUserNames = selectedUsers.map((user) => user.name).join(" ");

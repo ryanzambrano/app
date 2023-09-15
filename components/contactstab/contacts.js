@@ -84,7 +84,7 @@ const ContactsUI = ({ route }) => {
           (name) => name !== sessionusername
         );
         const joinedGroups = filteredGroupNames.join(", ");
-
+    
         // Fetch the most recent group chat message
         const { data: recentMessageData, error: messageError } = await supabase
           .from("Group Chat Messages")
@@ -93,55 +93,38 @@ const ContactsUI = ({ route }) => {
           .order("created_at", { ascending: false })
           .limit(1)
           .single();
-
+    
         const { data: Imagedata, error: ImageError } = await supabase
           .from("images")
           .select("*")
           .in("user_id", extractedIds)
           .eq("image_index", 0);
-        if (ImageError && !messageError) {
-          //console.log(user.Group_Name);
-          return {
-            ...user,
-            joinedGroups,
-            recentMessage: recentMessageData,
-            images: null,
-          };
+    
+        // Check if recentMessageData exists, and only include users with recent messages
+        if (!recentMessageData) {
+          return null;
         }
-        if (messageError && !ImageError) {
-          //console.error(messageError);
-          return {
-            ...user,
-            joinedGroups,
-            recentMessage: "",
-            images: Imagedata,
-          };
-        }
-        if (messageError && ImageError) {
-          //console.log(user.Group_Name);
-          //console.error(messageError);
-          return { ...user, joinedGroups, recentMessage: "", images: null };
-        } else {
-          return {
-            ...user,
-            joinedGroups,
-            recentMessage: recentMessageData,
-            images: Imagedata,
-          };
-        }
+    
+        return {
+          ...user,
+          joinedGroups,
+          recentMessage: recentMessageData,
+          images: ImageError ? null : Imagedata,
+        };
       })
     );
-
-    modifiedUsers.sort((a, b) => {
-      if (!a.recentMessage) return 1; // Move contacts with no recent message to the end
-      if (!b.recentMessage) return -1; // Move contacts with no recent message to the end
+    
+    // Filter out null values (users with no recent messages) and sort
+    const filteredUsers = modifiedUsers.filter((user) => user !== null);
+    
+    filteredUsers.sort((a, b) => {
       return (
         new Date(b.recentMessage.created_at) -
         new Date(a.recentMessage.created_at)
       );
     });
-
-    setUsers(modifiedUsers);
+    
+    setUsers(filteredUsers);
   };
 
   const formatRecentTime = (timestamp) => {
