@@ -37,7 +37,13 @@ export const Questionaire1 = ({ navigation, route }) => {
   const [selectedWho, setSelectedWho] = useState("");
 
   const gender = ["Male", "Female", "Other"];
-  const race = ["White", "Black / African American", "American Indian/Alaska Native", "Asian", "Native Hawaiian/Pacific Islander"];
+  const race = [
+    "White",
+    "Black / African American",
+    "American Indian/Alaska Native",
+    "Asian",
+    "Native Hawaiian/Pacific Islander",
+  ];
   const ages = Array.from(Array(31).keys()).map((age) => String(age + 1));
 
   const openAgeModal = () => {
@@ -231,7 +237,7 @@ export const Questionaire1 = ({ navigation, route }) => {
 
             <View style={styles.input}>
               <Text style={styles.inputHeader}>
-                Who do you want to room with?
+                What gender do you want to room with?
               </Text>
 
               <TouchableOpacity

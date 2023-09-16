@@ -37,7 +37,7 @@ export default function Questionaire2({ navigation, route }) {
     useState("");
 
   const livingPreferences = ["Apartment", "Dorm", "No Preferences", "Other"];
-  const forFun = ["Stay in", "Go out"];
+  const forFun = ["Going Clubbing", "Movie night in", "Inner circle hang"];
   const studies = [
     "Business",
     "Natural Science",
@@ -202,7 +202,7 @@ export default function Questionaire2({ navigation, route }) {
 
             <View style={styles.input}>
               <Text style={styles.inputHeader}>
-                For fun, would you rather stay in or go out?
+                A typical weekend looks like?
               </Text>
 
               <TouchableOpacity
