@@ -313,6 +313,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
             </View>
 
             <Text style={styles.more}>Interests</Text>
+            <Text style={{ textAlign: "center", fontSize: 12, fontWeight: 500, color: "darkgrey", paddingBottom: 8}}>Click any tag to edit</Text>
             {editedUser.tags && editedUser.tags.length > 0 && (
               <View style={styles.tagsContainer}>
                 {editedUser.tags.map((tag, index) => (
@@ -535,6 +536,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     margin: 10,
+    marginBottom: 6,
   },
 });
 

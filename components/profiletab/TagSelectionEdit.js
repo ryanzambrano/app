@@ -17,10 +17,17 @@ import { availableTags } from "../auth/profileUtils.js";
 
 const TagSelectionEdit = ({ navigation, route }) => {
   const { session } = route.params;
+  const [tagCount, setTagCount] = useState(0);
+
+
   const [selectedTags, setSelectedTags] = useState(
     route.params.editedUser.tags
   );
 
+  useEffect(() => {
+    setTagCount(selectedTags.length);
+  }, [selectedTags]);
+  
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
 
@@ -118,14 +125,6 @@ const TagSelectionEdit = ({ navigation, route }) => {
       </View>
       <View style={styles.container}>
         <Text style={styles.title}>Select Your Interests</Text>
-        <ScrollView
-          contentContainerStyle={styles.tagContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          {availableTags.map((tag) => renderTag(tag))}
-        </ScrollView>
-        <Text style={styles.selectedTagsText}>Selected Tags:  {selectedTags.join(",  ")}</Text>
-
         {isError && (
           <Animated.Text
             style={[styles.errorText, shakeAnimationStyle]}
@@ -134,6 +133,25 @@ const TagSelectionEdit = ({ navigation, route }) => {
             {isError}
           </Animated.Text>
         )}
+        <ScrollView
+          contentContainerStyle={styles.tagContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {availableTags.map((tag) => renderTag(tag))}
+        </ScrollView>
+        <View style={styles.selectedTagsContainer}>
+          <Text style={[styles.selectedTagsText, styles.selectedTagsTextUnderline]}>
+            Selected Tags:
+          </Text>
+          <Text style={styles.selectedTagsText}>
+            {selectedTags.join(",  ")}
+          </Text>
+        </View>
+        <Text style={[styles.tagCounter, tagCount > 15 || tagCount < 3 ? styles.tagCounterOverLimit : null]}>
+          {tagCount}/15
+        </Text>
+
+        
 
         <StatusBar style="light" />
       </View>
@@ -153,8 +171,8 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "white",
-    marginBottom: "10%",
-    marginTop: "5%",
+    marginBottom: 20,
+    marginTop: 10,
   },
   tagContainer: {
     flexDirection: "row",
@@ -193,7 +211,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "white",
-    marginBottom: "10%",
+    marginBottom: 30,
   },
   formAction: {
     flex: 1,
@@ -224,7 +242,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
     fontWeight: "600",
-    marginBottom: 10,
+    marginBottom: 18,
   },
 
   header: {
@@ -254,6 +272,36 @@ const styles = StyleSheet.create({
     color: "#149999",
     fontWeight: "bold",
     // Add other styling as needed
+  },
+  tagCounter: {
+    position: 'absolute',
+    bottom: 0,
+    right: 30,
+    fontSize: 18,
+    color: 'grey',
+  },
+  tagCounterOverLimit: {
+    color: 'red',
+  },
+  selectedTagsContainer: {
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    marginTop: 15,
+    marginBottom: 30,
+    justifyContent: 'center',
+  },
+  selectedTagsText: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: 'white',
+    textAlign: 'center',
+  },
+  selectedTagsTextUnderline: {
+    textDecorationLine: 'underline',
+    fontWeight: 'bold',
+
+    marginBottom: 10,
   },
 });
 
