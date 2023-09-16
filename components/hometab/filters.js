@@ -289,9 +289,10 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 0.5,
-    marginRight: 20,
-    marginLeft: 20,
-    backgroundColor: "grey",
+    paddingVertical: 0.4,
+    marginRight: 18,
+    marginLeft: 18,
+    backgroundColor: "#2B2D2F",
     marginVertical: 8,
     marginHorizontal: -10,
   },

@@ -386,8 +386,9 @@ const styles = StyleSheet.create({
 
   inputContainer: {
     flexDirection: "column",
-    borderBottomColor: "grey",
-    borderBottomWidth: 0.3,
+    borderBottomColor: "#2B2D2F",
+    borderBottomWidth: 1.4,
+    borderBottomRightRadius: 20,
     paddingRight: 10,
     marginLeft: 20,
     marginBottom: 10,
@@ -396,8 +397,8 @@ const styles = StyleSheet.create({
 
   questionaireInputContainer: {
     flexDirection: "column",
-    borderTopColor: "grey",
-    borderTopWidth: 0.3,
+    borderTopColor: "#2B2D2F",
+    borderTopWidth: 1.4,
     marginHorizontal: 10,
     marginTop: 10,
     paddingTop: 10,
@@ -417,8 +418,8 @@ const styles = StyleSheet.create({
   },
   Container: {
     flexDirection: "column",
-    borderBottomColor: "grey",
-    borderBottomWidth: 0.3,
+    borderBottomColor: "#2B2D2F",
+    borderBottomWidth: 1.4,
     marginLeft: 20,
     marginBottom: 10,
     gap: 5,
@@ -476,13 +477,13 @@ const styles = StyleSheet.create({
   tagsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    borderBottomColor: "grey",
+    borderBottomColor: "#2B2D2F",
     borderRadius: 15,
     justifyContent: "center",
     paddingBottom: 10,
     marginBottom: 10,
     paddingHorizontal: 15,
-    borderBottomWidth: 0.4,
+    borderBottomWidth: 1.4,
   },
   profilePictureContainer: {
     margin: 50,

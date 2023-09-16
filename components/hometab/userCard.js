@@ -171,7 +171,7 @@ const UserCard = ({ navigation, route }) => {
         setGender(genderData[0].gender);
         setAge(genderData[0].age);
         setLivingPreference(genderData[0].living_preferences);
-        console.log(genderData.age);
+        //console.log(genderData.age);
       } else {
         console.log("Error fetching prompts: ");
       }
@@ -530,11 +530,13 @@ const UserCard = ({ navigation, route }) => {
             </View>
           )}
         </ScrollView>
+        {bio && (
           <View style={styles.bioContainer}>
             <View style={styles.roundedContainer}>
               <Text style={styles.bio}>{bio}</Text>
             </View>
           </View>
+        )}
           <TouchableOpacity
             style={styles.questionaireButtonContainer}
             onPress={() => handleQuestionaireButtonPress()}

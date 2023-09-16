@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#111111", // 111111
     justifyContent: "center",
     paddingHorizontal: 20,
+    
   },
   title: {
     fontSize: 24,
@@ -173,6 +174,7 @@ const styles = StyleSheet.create({
     color: "white",
     marginBottom: 20,
     marginTop: 10,
+    
   },
   tagContainer: {
     flexDirection: "row",
@@ -290,6 +292,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 30,
     justifyContent: 'center',
+    
   },
   selectedTagsText: {
     fontSize: 18,

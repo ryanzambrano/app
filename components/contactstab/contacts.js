@@ -445,6 +445,7 @@ const styles = StyleSheet.create({
   layeredImage: {
     width: 40, 
     height: 40, 
+    marginTop: 5,
     borderRadius: 20,
     marginRight: 25,
   },
@@ -475,6 +476,7 @@ const styles = StyleSheet.create({
   viewContainer: {
     flex: 1,
     backgroundColor: "#1D1D20",
+    borderBottomColor: "#2B2D2F",
   },
   searchContainer: {
     flexDirection: "row",
@@ -502,9 +504,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start", 
     paddingHorizontal: 15,
-    paddingVertical: 15,
-    borderBottomWidth: 0.3,
-    borderBottomColor: "grey",
+    paddingVertical: 12,
+    borderBottomWidth: 1.2,
+    borderBottomColor: "#2B2D2F",
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     width: "100%",

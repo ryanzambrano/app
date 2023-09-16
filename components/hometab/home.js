@@ -413,6 +413,20 @@ const Home = ({ route }) => {
             returnKeyType="done"
           />
         </View>
+        <View style={styles.sortContainer}>
+          <Text style={styles.sortText}>Sort by:</Text>
+          <TouchableOpacity onPress={() => showSortMenu()}>
+            <Text
+              style={{
+                color: "#159e9e",
+                fontWeight: "bold",
+                fontSize: 15,
+              }}
+            >
+              {sortMethod}
+            </Text>
+          </TouchableOpacity>
+        </View>
         {isLoading ? ( // Step 3
           renderLoading()
         ) : (
@@ -421,24 +435,24 @@ const Home = ({ route }) => {
             extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
             renderItem={renderUserCard}
             keyExtractor={(item) => item.user_id.toString()}
-            ListHeaderComponent={() => (
-              <>
-                <View style={styles.sortContainer}>
-                  <Text style={styles.sortText}>Sort by:</Text>
-                  <TouchableOpacity onPress={() => showSortMenu()}>
-                    <Text
-                      style={{
-                        color: "#159e9e",
-                        fontWeight: "bold",
-                        fontSize: 15,
-                      }}
-                    >
-                      {sortMethod}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </>
-            )}
+            // ListHeaderComponent={() => (
+            //   <>
+            //     <View style={styles.sortContainer}>
+            //       <Text style={styles.sortText}>Sort by:</Text>
+            //       <TouchableOpacity onPress={() => showSortMenu()}>
+            //         <Text
+            //           style={{
+            //             color: "#159e9e",
+            //             fontWeight: "bold",
+            //             fontSize: 15,
+            //           }}
+            //         >
+            //           {sortMethod}
+            //         </Text>
+            //       </TouchableOpacity>
+            //     </View>
+            //   </>
+            // )}
             ListEmptyComponent={renderEmptyComponent}
           />
         )}
@@ -555,8 +569,8 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     // paddingVertical: 10,
     height: 185,
-    marginTop: 3,
-    marginBottom: 7,
+    marginTop: 6,
+    marginBottom: 2,
     borderWidth: 0.2,
     //borderColor: "grey",
   },
@@ -629,7 +643,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "flex-start",
     paddingHorizontal: 6,
-    paddingVertical: 8,
+    paddingTop: 5,
+    paddingBottom: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#2B2D2F",
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
   },
   sortText: {
     marginHorizontal: 5,
