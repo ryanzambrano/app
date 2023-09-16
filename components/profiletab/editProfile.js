@@ -123,6 +123,10 @@ export const EditProfileScreen = ({ navigation, route }) => {
         alert("Must enter a name");
         return;
       }
+      if (editedUser.name.length > 30) {
+        alert("Please enter a valid name") 
+        return;
+      }
       const classYear = Number(editedUser.class_year);
       if (isNaN(classYear) || classYear < 2023 || classYear > 2030) {
         alert("Please enter a valid class year");
@@ -132,7 +136,10 @@ export const EditProfileScreen = ({ navigation, route }) => {
         alert("Please enter a valid major") 
         return;
       }
-      
+      if (editedUser.hometown.length > 30) {
+        alert("Please enter a valid hometown") 
+        return;
+      }
       if (editedUser.bio.length <= 700) {
         const trimmedBio = editedUser.bio.trimEnd(); 
         const { data, error } = await supabase
@@ -380,6 +387,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     borderBottomColor: "grey",
     borderBottomWidth: 0.3,
+    paddingRight: 10,
     marginLeft: 20,
     marginBottom: 10,
     gap: 5,

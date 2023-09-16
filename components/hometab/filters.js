@@ -85,6 +85,7 @@ const FiltersUI = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.swipeIndicator}></View>
       <View style={styles.headerContainer}>
         <View style={{ width: '33%' }}></View>
         <Text style={styles.headerText}>Filters</Text>
@@ -319,6 +320,15 @@ const styles = StyleSheet.create({
     borderColor: "grey",
     borderRadius: 2,
     backgroundColor: "#1D1D20"
+  },
+  swipeIndicator: {
+    alignSelf: 'center',
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'grey',
+    marginTop: 25,
+    marginBottom: 5, 
   },
 });
 

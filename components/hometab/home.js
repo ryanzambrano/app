@@ -264,6 +264,8 @@ const Home = ({ route }) => {
             setGendaPreference(mergedSessionUser.profiles.who);
             setHousinPreference(mergedSessionUser.profiles.living_preferences); 
           }
+
+          
           const { data: allBlockedProfilesData, error: allBlockedProfilesError } = 
             await supabase
               .from("UGC")
@@ -274,9 +276,11 @@ const Home = ({ route }) => {
             const usersWhoBlockedMe = allBlockedProfilesData
             .filter(user => Array.isArray(user.blocked_profiles) && user.blocked_profiles.includes(session.user.id))
             .map(user => user.user_id);
-            console.log(usersWhoBlockedMe);
+            //console.log(usersWhoBlockedMe);
           setUsersBlockingMe(usersWhoBlockedMe);
           }
+
+
           const { data: bookmarkedData, error: bookmarkedError } =
             await supabase
               .from("UGC")
