@@ -36,6 +36,7 @@ const Home = ({ route }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkedProfiles, setBookmarkedProfiles] = useState([]);
   const [blockedProfiles, setBlockedProfiles] = useState([]);
+  const [usersBlockingMe, setUsersBlockingMe] = useState([]);
   const [gendaPreference, setGendaPreference] = useState("Any");
   const [housinPreference, setHousinPreference] = useState("Any");
   const isFocused = useIsFocused();
@@ -154,7 +155,8 @@ const Home = ({ route }) => {
   const filteredUsers = sortedUsers.filter((user) => {
     const isSessionUser = user.user_id === session.user.id;
     const isBlocked = blockedProfiles.includes(user.user_id);
-
+    const isBlockingMe = usersBlockingMe.includes(user.user_id);
+    //console.log(usersBlockingMe);
     const nameMatch = user.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -176,7 +178,7 @@ const Home = ({ route }) => {
     const isStudyMatch =
       studyPreference === "Any" || user.profiles.studies === studyPreference;
 
-    if (isSessionUser || isBlocked) {
+    if (isSessionUser || isBlocked || isBlockingMe) {
       return false;
     }
 
@@ -191,7 +193,7 @@ const Home = ({ route }) => {
         (isStudyMatch || studyPreference === "Any")
       );
     }
-    console.log(isGenderMatch);
+    
     return (
       (nameMatch || tagMatch) &&
       (isHousingMatch || housingPreference === "Any") &&
@@ -219,7 +221,7 @@ const Home = ({ route }) => {
           .select("*")
           .eq("image_index", 0)
           .neq("last_modified", null);
-
+      
         if (ugcError || profileError || imageError) {
           console.error(ugcError || profileError || imageError);
         } else {
@@ -262,7 +264,19 @@ const Home = ({ route }) => {
             setGendaPreference(mergedSessionUser.profiles.who);
             setHousinPreference(mergedSessionUser.profiles.living_preferences); 
           }
-
+          const { data: allBlockedProfilesData, error: allBlockedProfilesError } = 
+            await supabase
+              .from("UGC")
+              .select("user_id, blocked_profiles");
+          if (allBlockedProfilesError) {
+            console.error("Error fetching all blocked profiles:", allBlockedProfilesError.message);
+          } else {
+            const usersWhoBlockedMe = allBlockedProfilesData
+            .filter(user => Array.isArray(user.blocked_profiles) && user.blocked_profiles.includes(session.user.id))
+            .map(user => user.user_id);
+            console.log(usersWhoBlockedMe);
+          setUsersBlockingMe(usersWhoBlockedMe);
+          }
           const { data: bookmarkedData, error: bookmarkedError } =
             await supabase
               .from("UGC")
@@ -309,6 +323,7 @@ const Home = ({ route }) => {
     if (isBookmarked) {
       fetchUsers();
     }
+
 
     //setIsLoading(false);
   }, [isFocused]);

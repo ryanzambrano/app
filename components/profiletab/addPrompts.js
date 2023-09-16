@@ -14,6 +14,7 @@ export const AddPrompts = ({ navigation, route }) => {
   const { session } = route.params;
   const presetQuestions = [
     "Are you participating in Greek Life?",
+    "My budget restrictions for housing are...",
     "A perfect night out for me looks like...",
     "My biggest pet peeves are...",
     "My favorite movies are...",
@@ -34,6 +35,7 @@ export const AddPrompts = ({ navigation, route }) => {
 
   const questionColumnMapping = {
     "Are you participating in Greek Life?": "greek_life",
+    "My budget restrictions for housing are...": "budget",
     "A perfect night out for me looks like...": "night_out",
     "My biggest pet peeves are...": "pet_peeves",
     "My favorite movies are...": "favorite_movies",

@@ -14,9 +14,12 @@ import { AntDesign } from "@expo/vector-icons";
 
 const SettingsScreen = ({ navigation, route }) => {
   const { session } = route.params;
+
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
   };
+
+  
 
   const handleBackPress = () => {
     navigation.navigate("Tabs");
@@ -25,7 +28,7 @@ const SettingsScreen = ({ navigation, route }) => {
   const sections = [
     {
       title: "Social",
-      items: ["Report", "Block", "Allow Your account viewable"],
+      items: ["Report", "Blocked Users", "Allow Your account viewable"],
     },
     {
       title: "About",
@@ -43,12 +46,30 @@ const SettingsScreen = ({ navigation, route }) => {
     },
   ];
 
+const screenMap = {
+    "Report": "ReportScreen",
+    "Blocked Users": "BlockedList",
+    "Allow Your account viewable": "AccountVisibility",
+    "About Us": "AboutUs",
+    "User Agreement": "UserAgreement",
+    "Privacy Policy": "PrivacyPolicy",
+    "Content Policy": "ContentPolicy",
+    "Help Center": "HelpCenter",
+    "Report an Issue": "ReportIssue",
+  };
+
+  const navigateToScreen = (screenName) => {
+    if (screenMap[screenName]) {
+      navigation.navigate(screenMap[screenName]);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("Contacts")}
+          onPress={() => navigation.navigate("Profile")}
         >
           <AntDesign name="arrowleft" size={24} color="#159e9e" />
         </TouchableOpacity>
@@ -60,7 +81,7 @@ const SettingsScreen = ({ navigation, route }) => {
               <Text style={styles.sectionTitle}>{section.title}</Text>
             </View>
             {section.items.map((text, index) => (
-              <TouchableOpacity key={index} style={styles.settingRow}>
+              <TouchableOpacity key={index} style={styles.settingRow} onPress={() => navigateToScreen(text)}>
                 <Text style={styles.text}>{text}</Text>
               </TouchableOpacity>
             ))}

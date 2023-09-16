@@ -38,6 +38,7 @@ export const Profile = ({ navigation, route }) => {
 
   const promptQuestions = {
     greek_life: "Are you participating in Greek Life?",
+    budget: "My budget restrictions for housing are...",
     night_out: "A perfect night out for me looks like...",
     pet_peeves: "My biggest pet peeves are...",
     favorite_movies: "My favorite movies are...",

@@ -18,6 +18,7 @@ import FiltersUI from "../hometab/filters.js";
 import GroupChatScreen from "../contactstab/otherprofile";
 import { QuestionaireAnswers } from "../hometab/questionaireAnswers";
 import Questionaire from "../questionairefiles/questionaire";
+import BlockedList from "./blockedList";
 
 const Stack = createStackNavigator(); // Initialize stack navigator
 
@@ -107,6 +108,11 @@ const ThreeMainPages = ({ route }) => {
           component={AddPerson}
           initialParams={{ session }}
           options={{ presentation: "modal" }}
+        />
+        <Stack.Screen
+          name="BlockedList"
+          component={BlockedList}
+          initialParams={{session}}
         />
       </Stack.Navigator>
     </NavigationContainer>
