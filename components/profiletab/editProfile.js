@@ -22,7 +22,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
   const { session } = route.params;
   const [editedUser, setEditedUser] = useState(route.params.editedUser);
   //editedUser.tags = route.params.selectedTags;
-  const [bioCharCount, setBioCharCount] = useState(0);
+  const [bioCharCount, setBioCharCount] = useState(editedUser.bio.length);
 
   const { updated } = route.params;
   const selectedTags = route.params.selectedTags;
@@ -37,11 +37,13 @@ export const EditProfileScreen = ({ navigation, route }) => {
   if (updated == true) {
     editedUser.tags = selectedTags;
   }
-
+ 
+  
   //const { name, bio, major, class_year, hometown, tags } =
 
   const promptQuestions = {
     greek_life: "Are you participating in Greek Life?",
+    budget: "My budget restrictions for housing are...",
     night_out: "A perfect night out for me looks like...",
     pet_peeves: "My biggest pet peeves are...",
     favorite_movies: "My favorite movies are...",
@@ -123,9 +125,14 @@ export const EditProfileScreen = ({ navigation, route }) => {
       }
       const classYear = Number(editedUser.class_year);
       if (isNaN(classYear) || classYear < 2023 || classYear > 2030) {
-        alert("Enter a valid class year");
+        alert("Please enter a valid class year");
         return;
       }
+      if (editedUser.major.length > 30) {
+        alert("Please enter a valid major") 
+        return;
+      }
+      
       if (editedUser.bio.length <= 700) {
         const trimmedBio = editedUser.bio.trimEnd(); 
         const { data, error } = await supabase

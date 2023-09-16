@@ -41,7 +41,7 @@ export const MatchingData = ({ navigation, route }) => {
     "Somewhat messy",
     "Very messy",
   ];
-  const sleepTimes = ["8 PM", "10 PM", "12 PM", "2 AM"];
+  const sleepTimes = ["Morning Person", "Night Owl", "In Between"];
   const noisePreferences = ["Yes", "Somewhat Yes", "Somewhat No", "No"];
 
   // ... [rest of the modal handling functions

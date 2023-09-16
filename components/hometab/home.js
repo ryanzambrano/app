@@ -36,11 +36,14 @@ const Home = ({ route }) => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkedProfiles, setBookmarkedProfiles] = useState([]);
   const [blockedProfiles, setBlockedProfiles] = useState([]);
+  const [usersBlockingMe, setUsersBlockingMe] = useState([]);
+  const [gendaPreference, setGendaPreference] = useState("Any");
+  const [housinPreference, setHousinPreference] = useState("Any");
   const isFocused = useIsFocused();
 
   const {
-    housingPreference = "Any",
-    genderPreference = "Any",
+    housingPreference = housinPreference,
+    genderPreference = gendaPreference,
     youngestAgePreference = "Any",
     oldestAgePreference = "Any",
     studyPreference = "Any",
@@ -53,6 +56,8 @@ const Home = ({ route }) => {
       currentYoungestAgePreference: youngestAgePreference,
       currentOldestAgePreference: oldestAgePreference,
       currentStudyPreference: studyPreference,
+      originalGenderPreference: sessionUser.profiles.who,
+      originalHousingPreference: sessionUser.profiles.living_preferences,
     });
   };
 
@@ -95,6 +100,7 @@ const Home = ({ route }) => {
   const calculateCompatibility = (sessionUser, otherUser) => {
     //console.log(otherUser.profiles.sleep_time);
     //console.log(sessionUser.profiles.sleep_time);
+
     let score = 0;
 
     if (Array.isArray(sessionUser.tags) && Array.isArray(otherUser.tags)) {
@@ -118,6 +124,7 @@ const Home = ({ route }) => {
     )
       score += 5;
     if (sessionUser.profiles.studies === otherUser.profiles.studies) score += 3;
+    
     if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 2;
     if (sessionUser.class_year === otherUser.class_year) score += 2;
     if (sessionUser.profiles.gender === otherUser.profiles.gender) score += 1;
@@ -148,7 +155,8 @@ const Home = ({ route }) => {
   const filteredUsers = sortedUsers.filter((user) => {
     const isSessionUser = user.user_id === session.user.id;
     const isBlocked = blockedProfiles.includes(user.user_id);
-
+    const isBlockingMe = usersBlockingMe.includes(user.user_id);
+    //console.log(usersBlockingMe);
     const nameMatch = user.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -159,17 +167,18 @@ const Home = ({ route }) => {
     // console.log(housingPreference);
     const isHousingMatch =
       housingPreference === "Any" ||
-      user.profiles.living_preferences === housingPreference;
+      user.profiles.living_preferences === housingPreference || user.profiles.living_preferences === "No Preference";
     //console.log(isHousingMatch);
     const isGenderMatch =
       genderPreference === "Any" || user.profiles.gender === genderPreference;
+  
     const isAgeMatch =
-      (youngestAgePreference === "Any" || user.age >= youngestAgePreference) &&
-      (oldestAgePreference === "Any" || user.age <= oldestAgePreference);
+      (youngestAgePreference === "Any" || user.profiles.age >= youngestAgePreference) &&
+      (oldestAgePreference === "Any" || user.profiles.age <= oldestAgePreference);
     const isStudyMatch =
       studyPreference === "Any" || user.profiles.studies === studyPreference;
 
-    if (isSessionUser || isBlocked) {
+    if (isSessionUser || isBlocked || isBlockingMe) {
       return false;
     }
 
@@ -184,7 +193,7 @@ const Home = ({ route }) => {
         (isStudyMatch || studyPreference === "Any")
       );
     }
-
+    
     return (
       (nameMatch || tagMatch) &&
       (isHousingMatch || housingPreference === "Any") &&
@@ -212,7 +221,7 @@ const Home = ({ route }) => {
           .select("*")
           .eq("image_index", 0)
           .neq("last_modified", null);
-
+      
         if (ugcError || profileError || imageError) {
           console.error(ugcError || profileError || imageError);
         } else {
@@ -252,8 +261,22 @@ const Home = ({ route }) => {
               profiles: profileResponse.data,
             };
             setSessionuser(mergedSessionUser);
+            setGendaPreference(mergedSessionUser.profiles.who);
+            setHousinPreference(mergedSessionUser.profiles.living_preferences); 
           }
-
+          const { data: allBlockedProfilesData, error: allBlockedProfilesError } = 
+            await supabase
+              .from("UGC")
+              .select("user_id, blocked_profiles");
+          if (allBlockedProfilesError) {
+            console.error("Error fetching all blocked profiles:", allBlockedProfilesError.message);
+          } else {
+            const usersWhoBlockedMe = allBlockedProfilesData
+            .filter(user => Array.isArray(user.blocked_profiles) && user.blocked_profiles.includes(session.user.id))
+            .map(user => user.user_id);
+            console.log(usersWhoBlockedMe);
+          setUsersBlockingMe(usersWhoBlockedMe);
+          }
           const { data: bookmarkedData, error: bookmarkedError } =
             await supabase
               .from("UGC")
@@ -284,6 +307,7 @@ const Home = ({ route }) => {
           }
 
           setUsers(mergedData);
+          
         }
       } catch (error) {
         console.error("An unexpected error occurred:", error);
@@ -299,6 +323,7 @@ const Home = ({ route }) => {
     if (isBookmarked) {
       fetchUsers();
     }
+
 
     //setIsLoading(false);
   }, [isFocused]);
@@ -331,7 +356,7 @@ const Home = ({ route }) => {
           />
           <View style={styles.userInfo}>
             <Text style={styles.name}> {item.name} </Text>
-            <Text style={styles.major}> {item.major || "Undecided"}</Text>
+            <Text numberOfLines={1} ellipsizeMode='tail' style={styles.major}> {item.major || "Undecided"}</Text>
             <View style={styles.tagsContainer}>
               {item.tags.slice(0, 8).map((tag, index) => (
                 <View key={index} style={styles.tag}>
@@ -546,6 +571,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 500,
     paddingTop: 5,
+    paddingRight: 20,
     color: "grey",
     //textAlign: "justify",
   },
