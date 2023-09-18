@@ -77,13 +77,23 @@ const ContactsUI = ({ route }) => {
         const extractedIds = user.User_ID.filter(
           (item) => item !== session.user.id
         );
-        const groupNames = user.Group_Name.split(",").map((name) =>
-          name.trim()
-        );
-        const filteredGroupNames = groupNames.filter(
-          (name) => name !== sessionusername
-        );
-        const joinedGroups = filteredGroupNames.join(", ");
+        const { data, error: sessionError } = await supabase
+        .from("UGC")
+        .select("name")
+        .in("user_id", extractedIds);
+        let joinedGroups;
+        if(!user.Group_Name)
+        {
+          const groupNames = data.map(item => item.name);
+      
+          joinedGroups = groupNames.join(", ");
+        }
+        else
+        {
+      
+          joinedGroups = user.Group_Name;
+        }
+        
     
         // Fetch the most recent group chat message
         const { data: recentMessageData, error: messageError } = await supabase

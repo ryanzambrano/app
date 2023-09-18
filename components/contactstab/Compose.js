@@ -218,8 +218,7 @@ const ComposeMessageScreen = ({ route }) => {
         .from("Group Chats")
         .insert([
           {
-            User_ID: selectedUserIDs,
-            Group_Name: usernames, // Join selected user names with commas
+            User_ID: selectedUserIDs, // Join selected user names with commas
             Ammount_Users: selectedUserIDs.length,
           },
         ])

@@ -132,18 +132,27 @@ const MessagingUI = () => {
         console.error(sessionError);
         return null;
       }
-
-      const sessionusername = data.name;
-
-      const groupNames = groupchatdata.Group_Name.split(",").map((name) =>
-        name.trim()
+      const extractedIds = user.User_ID.filter(
+        (item) => item !== session.user.id
       );
-      const filteredGroupNames = groupNames.filter(
-        (name) => name !== sessionusername
-      );
-      const joinedGroups = filteredGroupNames.join(", ");
+      const { data: UGCdata, error: sessionErrors } = await supabase
+      .from("UGC")
+      .select("name")
+      .in("user_id", extractedIds);
+      let Groupnames;
+      if(!user.Group_Name)
+      {
+        const joinedGroups = UGCdata.map(item => item.name);
+        Groupnames = joinedGroups.join(", ");
+      }
+      else
+      {
+        Groupnames = user.Group_Name;
+      }
+    
 
-      setJoinedGroups(joinedGroups);
+
+      setJoinedGroups(Groupnames);
       return;
     } catch (error) {
       console.error(error);
