@@ -154,13 +154,6 @@ export const Retake4 = ({ navigation, route }) => {
               >
                 <AntDesign name="arrowleft" size={24} color="#159e9e" />
               </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate("Retake4");
-                }}
-              >
-                <AntDesign name="arrowright" size={24} color="#159e9e" />
-              </TouchableOpacity>
             </View>
             <Text style={styles.titleText}>
               Answer some questions about yourself!
@@ -346,7 +339,7 @@ const styles = StyleSheet.create({
     fontSize: 27,
     fontWeight: "700",
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 40,
     color: "white",
   },
 
@@ -399,7 +392,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderWidth: 1,
     backgroundColor: "#14999999",
-    borderColor: "#14999999",
+    //borderColor: "#14999999",
   },
 
   continueText: {

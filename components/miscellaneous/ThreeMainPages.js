@@ -20,6 +20,7 @@ import { QuestionaireAnswers } from "../hometab/questionaireAnswers";
 import Retake from "../retakeQuestionaireFiles/retake.js";
 import Questionaire from "../questionairefiles/questionaire.js";
 import BlockedList from "./blockedList";
+import ReportUI from "../hometab/report";
 
 const Stack = createStackNavigator(); // Initialize stack navigator
 
@@ -119,6 +120,12 @@ const ThreeMainPages = ({ route }) => {
           name="BlockedList"
           component={BlockedList}
           initialParams={{ session }}
+        />
+        <Stack.Screen
+          name="ReportUI"
+          component={ReportUI}
+          initialParams={{session}}
+          options={{ presentation: "modal" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

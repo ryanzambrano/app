@@ -54,7 +54,7 @@ export const Congrats = ({ navigation, route }) => {
           onPress={triggerConfetti}
           >
           <View style={styles.continue}>
-            <Text style={styles.continueText}>More Confetti</Text>
+            <Text style={styles.continueText}>(More Confetti)</Text>
           </View>
         </TouchableOpacity>
         </View>
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 30,
     backgroundColor: "#14999999",
-    borderColor: "#14999999",
+    //borderColor: "#14999999",
   },
 
   continueText: {

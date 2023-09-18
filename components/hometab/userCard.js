@@ -20,6 +20,7 @@ import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { picURL } from "../auth/supabase";
 import { supabase } from "../auth/supabase.js";
+import ActionSheet from "@expo/react-native-action-sheet";
 
 const MAX_IMAGES = 4;
 
