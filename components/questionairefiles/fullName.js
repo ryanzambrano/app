@@ -107,7 +107,7 @@ export const Name = ({ navigation, route }) => {
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.titleText}>What's your name?</Text>
+            <Text style={styles.titleText}>What's your full name?</Text>
           </View>
           <View style={styles.input}>
             <Text style={styles.inputHeader}>Name</Text>

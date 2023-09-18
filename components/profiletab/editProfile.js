@@ -17,6 +17,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { picURL } from "../auth/supabase";
+import Retake from "../retakeQuestionaireFiles/retake.js";
 
 export const EditProfileScreen = ({ navigation, route }) => {
   const { session } = route.params;
@@ -37,8 +38,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
   if (updated == true) {
     editedUser.tags = selectedTags;
   }
- 
-  
+
   //const { name, bio, major, class_year, hometown, tags } =
 
   const promptQuestions = {
@@ -48,18 +48,19 @@ export const EditProfileScreen = ({ navigation, route }) => {
     pet_peeves: "My biggest pet peeves are...",
     favorite_movies: "My favorite movies are...",
     favorite_artists: "My favorite artists / bands are...",
-    living_considerations: "The dorms halls / apartment complexes I'm considering are...",
+    living_considerations:
+      "The dorms halls / apartment complexes I'm considering are...",
     sharing: "When it comes to sharing my amenities and personal property...",
     cooking: "When it comes to sharing food and cooking...",
     burnt_out: "When I'm burnt out, I relax by...",
     involvement: "The organizations I'm involved in on campus are...",
     smoking: "My opinion toward smoking in the dorm / apartment are...",
     other_people: "My thoughts on having guests over are...",
-    temperature: "I like the temperature of the room to be...", 
+    temperature: "I like the temperature of the room to be...",
     pets: "My thoughts on having pets are...",
     parties: "My thoughts on throwing parties are...",
     decorations: "My ideas for decorating the home involve...",
-    conflict: "When it comes to handling conflict, I am...", 
+    conflict: "When it comes to handling conflict, I am...",
   };
 
   useEffect(() => {
@@ -124,7 +125,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
         return;
       }
       if (editedUser.name.length > 30) {
-        alert("Please enter a valid name") 
+        alert("Please enter a valid name");
         return;
       }
       const classYear = Number(editedUser.class_year);
@@ -133,21 +134,23 @@ export const EditProfileScreen = ({ navigation, route }) => {
         return;
       }
       if (editedUser.major.length > 30) {
-        alert("Please enter a valid major") 
+        alert("Please enter a valid major");
         return;
       }
+
       if (editedUser.hometown.length > 30) {
-        alert("Please enter a valid hometown") 
+        alert("Please enter a valid hometown");
         return;
       }
+
       if (editedUser.bio.length <= 700) {
-        const trimmedBio = editedUser.bio.trimEnd(); 
+        const trimmedBio = editedUser.bio.trimEnd();
         const { data, error } = await supabase
           .from("UGC")
           .update([
             {
               name: editedUser.name,
-              bio: trimmedBio, 
+              bio: trimmedBio,
               major: editedUser.major,
               class_year: editedUser.class_year,
               hometown: editedUser.hometown,
@@ -301,19 +304,31 @@ export const EditProfileScreen = ({ navigation, route }) => {
                 placeholder="Bio"
                 placeholderTextColor="#575D61"
               />
-              <Text style={{ 
-                color: bioCharCount > 700 ? 'red' : 'lightgrey', 
-                textAlign: 'right', 
-                marginRight: 10, 
-                marginBottom: 10, 
-                fontSize: 12 
-              }}>
+              <Text
+                style={{
+                  color: bioCharCount > 700 ? "red" : "lightgrey",
+                  textAlign: "right",
+                  marginRight: 10,
+                  marginBottom: 10,
+                  fontSize: 12,
+                }}
+              >
                 {bioCharCount}/700
               </Text>
             </View>
 
             <Text style={styles.more}>Interests</Text>
-            <Text style={{ textAlign: "center", fontSize: 12, fontWeight: 500, color: "darkgrey", paddingBottom: 8}}>Click any tag to edit</Text>
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: 12,
+                fontWeight: 500,
+                color: "darkgrey",
+                paddingBottom: 8,
+              }}
+            >
+              Click any tag to edit
+            </Text>
             {editedUser.tags && editedUser.tags.length > 0 && (
               <View style={styles.tagsContainer}>
                 {editedUser.tags.map((tag, index) => (
@@ -348,11 +363,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
               <Text style={styles.more}>Questionaire Answers</Text>
               <TouchableOpacity
                 style={styles.questionaireButton}
-                onPress={() =>
-                  navigation.navigate("questionaire", {
-                    screen: "Questionaire1",
-                  })
-                }
+                onPress={() => navigation.navigate("Retake")}
               >
                 <Text style={{ color: "white", fontSize: 16, fontWeight: 500 }}>
                   Retake Questionaire

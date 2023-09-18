@@ -1,6 +1,7 @@
 import "react-native-url-polyfill/auto";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
+import { AntDesign } from "@expo/vector-icons";
 
 import {
   StyleSheet,
@@ -18,7 +19,7 @@ import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
 
-export const Questionaire3 = ({ navigation, route }) => {
+export const Retake3 = ({ navigation, route }) => {
   const { session } = route.params;
 
   const dismissKeyboard = () => {
@@ -26,6 +27,7 @@ export const Questionaire3 = ({ navigation, route }) => {
   };
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
+  const [fetched, setFetched] = useState(false);
 
   const [isGradYearModalVisible, setIsGradYearModalVisible] = useState(false);
 
@@ -49,6 +51,27 @@ export const Questionaire3 = ({ navigation, route }) => {
     setIsGradYearModalVisible(false);
   };
 
+  useEffect(() => {
+    if (!fetched) {
+      fetchData();
+    }
+  }, [fetched]);
+
+  const fetchData = async () => {
+    const { data, error } = await supabase
+      .from("UGC")
+      .select("class_year")
+      .eq("user_id", session.user.id)
+      .single();
+
+    if (error) {
+    }
+    if (data) {
+      setSelectedGradYear(data.class_year);
+      setFetched(true);
+    }
+  };
+
   const userData = {
     gradYear: selectedGradYear,
   };
@@ -70,7 +93,7 @@ export const Questionaire3 = ({ navigation, route }) => {
 
         if (ugcError) throw ugcError;
 
-        navigation.navigate("MatchingData");
+        navigation.navigate("Retake4");
       } catch (error) {
         startShakeAnimation(shakeAnimationValue);
         setIsError(error.message);
@@ -100,6 +123,22 @@ export const Questionaire3 = ({ navigation, route }) => {
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
+            <View style={styles.heading}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.goBack();
+                }}
+              >
+                <AntDesign name="arrowleft" size={24} color="#159e9e" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate("Retake4");
+                }}
+              >
+                <AntDesign name="arrowright" size={24} color="#159e9e" />
+              </TouchableOpacity>
+            </View>
             <Text style={styles.titleText}>What year do you graduate?</Text>
           </View>
 
@@ -186,7 +225,7 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    marginVertical: 36,
+    //marginVertical: 36,
   },
 
   titleText: {
@@ -287,6 +326,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 10,
   },
+  heading: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 36,
+  },
 });
-
-export default Questionaire3;
+export default Retake3;
