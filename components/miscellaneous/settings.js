@@ -59,6 +59,7 @@ const screenMap = {
   };
 
   const navigateToScreen = (screenName) => {
+    
     if (screenMap[screenName]) {
       navigation.navigate(screenMap[screenName]);
     }

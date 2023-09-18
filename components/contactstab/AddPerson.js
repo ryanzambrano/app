@@ -56,6 +56,12 @@ const AddPerson = ({ route }) => {
     }
   }, [selectedUsers]);
 
+  const renderEmptyComponent = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>No users found</Text>
+    </View>
+  );
+  
   const fetchSessionWho = async () => {
     const { data, error } = await supabase
       .from('profile')  
@@ -305,6 +311,7 @@ const AddPerson = ({ route }) => {
         data={filteredUsers.slice(0, 50)}
         renderItem={renderUserItem}
         keyExtractor={(item) => item.id.toString()}
+        ListEmptyComponent={renderEmptyComponent}
       />
 
       <TouchableOpacity
@@ -521,6 +528,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'grey',
     marginTop: 25,
     marginBottom: 5, 
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 140,
+  },
+  emptyText: {
+    fontSize: 20,
+    color: "grey",
   },
 });
 export default AddPerson;
