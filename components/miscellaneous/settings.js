@@ -28,7 +28,7 @@ const SettingsScreen = ({ navigation, route }) => {
   const sections = [
     {
       title: "Social",
-      items: ["Report", "Blocked Users", "Allow Your account viewable"],
+      items: ["Report", "Manage Blocked Users", "Allow Your account viewable"],
     },
     {
       title: "About",
@@ -146,6 +146,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     paddingVertical: 10,
   },
+  
 });
 
 export default SettingsScreen;

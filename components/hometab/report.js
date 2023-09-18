@@ -1,29 +1,100 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   SafeAreaView,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
 import { useNavigation } from "@react-navigation/native";
 import { supabase } from "../auth/supabase";
 
 const ReportUI = ({ route }) => {
   const { session } = route.params;
+  const { user_id } = route.params;
   const navigation = useNavigation();
-
+  const [description, setDescription] = useState("");
   const [isFocus, setIsFocus] = useState(false);
+  const [descriptionCharCount, setDescriptionCharCount] = useState(0);
 
+  const handleDescriptionChange = (text) => {
+    setDescription(text);
+    setDescriptionCharCount(text.length);
+  };
+
+  const handleSubmitReport = async () => {
+    console.log(description);
+    if (description.length > 300) {
+      Alert.alert("Error", "Report should be less than 300 characters.");
+      return;
+    }
+    const trimmedReport = description.trimEnd();
+    try {
+      const { data, error } = await supabase.from('Reports').insert([
+        {
+          user_id: user_id,
+          description: trimmedReport,
+          isUserReport: true,
+        },
+      ]);
+
+      if (error) {
+        console.error('Error inserting report:', error);
+      } else {
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.error('Error submitting report:', error);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.swipeIndicator}></View>
       <View style={styles.headerContainer}>
         <View style={{ width: '33%' }}></View>
-        <Text style={styles.headerText}>Filters</Text>
+        <Text style={styles.headerText}>Report User</Text>
       </View>
+      <View style={styles.descriptionContainer}>
+        <Text style={styles.descriptionLabel}>
+          Why are you reporting this user?
+        </Text>
+        <Text style={styles.smallerText}>Your report is anonymous, unless someone is in immediate danger. If so, call the local emergency services - don't wait.</Text>
+        <View style={styles.inputContainer}>
+        <TextInput
+            style={styles.input}
+            value={description}
+            onChangeText={(text) => {
+              handleDescriptionChange(text); // Call handleDescriptionChange with the text value
+            }}
+            multiline
+            placeholder="Describe the issue..."
+            placeholderTextColor="#575D61"
+          />
+          <Text
+            style={{
+              color: descriptionCharCount > 300 ? "red" : "lightgrey",
+              textAlign: "right",
+              marginRight: 10,
+              marginBottom: 10,
+              fontSize: 12,
+              position: "absolute",
+              bottom: -3,
+              right: 0,
+            }}
+          >
+            {descriptionCharCount}/300
+          </Text>
+        </View>
+      </View>
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPress={handleSubmitReport}
+      >
+        <Text style={styles.submitButtonText}>Submit</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -37,76 +108,44 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 15,
-    //borderBottomWidth: 0.5,
-    borderColor: 'grey'
+    borderBottomWidth: 1,
+    borderColor: '#2B2D2F'
   },
   headerText: {
-    fontSize: 25,
+    fontSize: 20,
     fontWeight: 'bold',
     color: 'white',
     alignSelf: "center",
     width: '33%',
     textAlign: 'center'
   },
-  clearAllText: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: 'grey' 
-  },
-  filterContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 10,
+
+  descriptionContainer: {
     marginHorizontal: 16,
-    
+    marginTop: 20,
   },
-  filterLabel: {
+  descriptionLabel: {
     fontSize: 16,
     fontWeight: "500",
     color: "white",
-    marginRight: 8,
   },
-  dropdown: {
-    flex: 1,
-    borderColor: "gray",
-    
-    //borderWidth: 0.5,
-    borderRadius: 8,
-    color: "white",
-    paddingHorizontal: 8,
-    borderRadius: 8,
-    backgroundColor: "white",
-    backgroundColor: "#2D2D30",
+  characterCount: {
+    color: 'white',
+    alignSelf: 'flex-end',
+    paddingTop: 10,
   },
-  divider: {
-    height: 0.5,
-    paddingVertical: 0.4,
-    marginRight: 18,
-    marginLeft: 18,
-    backgroundColor: "#2B2D2F",
-    marginVertical: 8,
-    marginHorizontal: -10,
-  },
-  applyButtonContainer: {
+  submitButton: {
     alignSelf: "center",
-    backgroundColor: "#149999",
-    borderRadius: 10,  
+    backgroundColor: "#14999999",
+    borderRadius: 10,
     marginTop: 20,
   },
-  applyButtonText: {
-    fontSize: 15,
+  submitButtonText: {
+    fontSize: 17,
     fontWeight: "bold",
     color: "white",
     paddingHorizontal: 16,
     paddingVertical: 8,
-  },
-  placeholderText: {
-    color: "white",
-    paddingLeft: 5,
-    //backgroundColor: "white",
-  },
-  listContainer: {
-    backgroundColor: "#1D1D20",
   },
   border: {
     borderColor: "grey",
@@ -121,6 +160,33 @@ const styles = StyleSheet.create({
     backgroundColor: 'grey',
     marginTop: 25,
     marginBottom: 5, 
+  },
+  smallerText: {
+    color: "grey",
+    marginTop: 10,
+    marginBottom: 2,
+    
+  },
+  inputContainer: {
+    flexDirection: "column",
+    backgroundColor: "#2B2D2F",
+    borderRadius: 8,
+    marginBottom: 10,
+    paddingLeft: 15,
+    paddingTop: 8,
+    marginTop: 15,
+    height: 200,
+    
+    gap: 5,
+  },
+  input: {
+    flex: 0,
+    fontSize: 16,
+    paddingRight: 15,
+    
+    paddingLeft: 2,
+    color: "white",
+    marginBottom: 10,
   },
 });
 

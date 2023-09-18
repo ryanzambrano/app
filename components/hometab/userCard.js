@@ -20,7 +20,8 @@ import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { picURL } from "../auth/supabase";
 import { supabase } from "../auth/supabase.js";
-import ActionSheet from "@expo/react-native-action-sheet";
+import ActionSheet from "react-native-action-sheet";
+import ReportUI from "./report.js";
 
 const MAX_IMAGES = 4;
 
@@ -52,12 +53,10 @@ const UserCard = ({ navigation, route }) => {
     bookmarked_profiles,
     lastModified,
   } = route.params.user;
-
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
   const [living_preferences, setLivingPreference] = useState("");
   const [persons, setPersons] = useState([]);
-
   const [photos, setPhotos] = useState([
     `${picURL}/${user_id}/${user_id}-0-${lastModified}`,
   ]);
@@ -67,6 +66,7 @@ const UserCard = ({ navigation, route }) => {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
   const [prompts, setPrompts] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [isActionSheetVisible, setActionSheetVisible] = useState(false);
 
   const promptQuestions = {
     greek_life: "Are you participating in Greek Life?",
@@ -326,6 +326,32 @@ const UserCard = ({ navigation, route }) => {
     }
   };
 
+  const showActionSheet = () => {
+    ActionSheet.showActionSheetWithOptions(
+      {
+        options: ['Cancel', 'Block User', 'Report User'],
+        cancelButtonIndex: 0,
+        destructiveButtonIndex: 1,
+        tintColor: 'white', // Set a default text color for all buttons
+        
+      },
+      (buttonIndex) => {
+        if (buttonIndex === 1) {
+          handleBlockUser(user_id);
+        } else if (buttonIndex === 2) {
+          navigation.navigate("ReportUI", {user_id: user_id});
+        }
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (isActionSheetVisible) {
+      showActionSheet();
+      setActionSheetVisible(false);
+    }
+  }, [isActionSheetVisible]);
+  
   const handleUserCardPress = async () => {
     {
       //message navigation
@@ -418,7 +444,7 @@ const UserCard = ({ navigation, route }) => {
         <Text style={styles.name}>{name}</Text>
         <View style={styles.backButton}></View>
         <TouchableOpacity
-          onPress={() => handleBlockUser(user_id)}
+          onPress={() => setActionSheetVisible(true)}
           style={styles.blockButton}
         >
           <AntDesign name="deleteuser" size={24} color="white" />
