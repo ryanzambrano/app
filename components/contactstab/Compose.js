@@ -28,6 +28,7 @@ const notBookmarkedColor = "#fff";
 
 
 const ComposeMessageScreen = ({ route }) => {
+  const [selectedUserCount, setSelectedUserCount] = useState(0);
   const [persons, setPersons] = useState([]);
   const navigation = useNavigation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -187,18 +188,20 @@ const ComposeMessageScreen = ({ route }) => {
       
       };
 
-  const handleUserCardPress = (user) => {
-    if (selectedUsers.includes(user)) {
-      setSelectedUsers(
-        selectedUsers.filter((selectedUser) => selectedUser !== user)
-      );
-    } else {
-      setSelectedUsers([...selectedUsers, user]);
-    }
-
-    // Toggle user label visibility with LayoutAnimation
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  };
+      const handleUserCardPress = (user) => {
+        if (selectedUsers.includes(user)) {
+          setSelectedUsers(selectedUsers.filter((selectedUser) => selectedUser !== user));
+          setSelectedUserCount(selectedUserCount - 1);
+        } else {
+          if (selectedUserCount < 6) {
+            setSelectedUsers([...selectedUsers, user]);
+            setSelectedUserCount(selectedUserCount + 1);
+          }
+        }
+      
+        // Toggle user label visibility with LayoutAnimation
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      };
   const handleCreateMessage = async () => {
     try {
       
@@ -321,7 +324,8 @@ const ComposeMessageScreen = ({ route }) => {
   });
 
   const renderUserItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handleUserCardPress(item)}>
+    <TouchableOpacity onPress={() => handleUserCardPress(item)}
+     disabled={selectedUserCount >= 6 && !selectedUsers.includes(item)}>
       <View style={styles.contactItem}>
         <View style={styles.profileContainer}>
           <Image
@@ -351,30 +355,30 @@ const ComposeMessageScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-    <SafeAreaView style={styles.headerSafeArea}>
-      <View style={styles.swipeIndicator}></View>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => navigation.goBack()}
-        >
-          <AntDesign name="arrowleft" size={24} color="#159e9e" />
-        </TouchableOpacity>
-        <Text style={styles.composeHeader}>{"Compose Message"}</Text>
-        <TouchableOpacity onPress={toggleBookmarkButton} style={styles.buttonContainer}>
-          <Icon
-            name="bookmark"
-            size={30}
-            color={isBookmarked ? isBookmarkedColor : notBookmarkedColor}
-          />
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      <SafeAreaView style={styles.headerSafeArea}>
+        <View style={styles.swipeIndicator}></View>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => navigation.goBack()}
+          >
+            <AntDesign name="arrowleft" size={24} color="#159e9e" />
+          </TouchableOpacity>
+          <Text style={styles.composeHeader}>{"Compose Message"}</Text>
+          <TouchableOpacity onPress={toggleBookmarkButton} style={styles.buttonContainer}>
+            <Icon
+              name="bookmark"
+              size={30}
+              color={isBookmarked ? isBookmarkedColor : notBookmarkedColor}
+            />
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
 
       <View style={styles.toInputContainer}>
         <View style={styles.toLabelContainer}>
           <Text style={styles.toLabel}>To:</Text>
-          <ScrollView 
+          <ScrollView
             horizontal={true}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.selectedUserContainer}
@@ -404,21 +408,40 @@ const ComposeMessageScreen = ({ route }) => {
         keyExtractor={(item) => item.id.toString()}
       />
 
-      <TouchableOpacity
-        style={[
-          styles.createButton,
-          { backgroundColor: isButtonDisabled ? "#999" : "#14999999" }, // Apply grey color if disabled
-        ]}
-        onPress={handleCreateMessage}
-        disabled={isButtonDisabled} // Disable the button based on the state
-      >
-        <Text style={styles.createButtonText}>{createButtonLabel}</Text>
-      </TouchableOpacity>
+      <View style={styles.createButtonContainer}>
+        <TouchableOpacity
+          style={[
+            styles.createButton,
+            { backgroundColor: isButtonDisabled ? "#999" : "#14999999" }, // Apply grey color if disabled
+          ]}
+          onPress={handleCreateMessage}
+          disabled={isButtonDisabled} // Disable the button based on the state
+        >
+          <Text style={styles.createButtonText}>{createButtonLabel}</Text>
+        </TouchableOpacity>
+        {/* Counter component */}
+        <Text style={styles.counterText}>{selectedUserCount}/6</Text>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  createButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center', // Center the items horizontally
+    alignItems: 'center',
+    marginHorizontal: 16, // Adjust margin as needed
+    marginBottom: 16, // Adjust margin as needed
+  },
+  
+  // Style for the counter text
+  counterText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: 'white',
+    paddingLeft: 10,
+  },
   contactItem: {
     flexDirection: "row",
     alignItems: "center",

@@ -385,7 +385,6 @@ const UserCard = ({ navigation, route }) => {
         .insert([
           {
             User_ID: Finalarray,
-            Group_Name: combinedString,
             Ammount_Users: Finalarray.length,
           },
         ])
