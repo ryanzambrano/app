@@ -414,19 +414,19 @@ const ComposeMessageScreen = ({ route }) => {
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={renderEmptyComponent}
       />
-
       <View style={styles.createButtonContainer}>
-        <TouchableOpacity
-          style={[
-            styles.createButton,
-            { backgroundColor: isButtonDisabled ? "#999" : "#14999999" }, // Apply grey color if disabled
-          ]}
-          onPress={handleCreateMessage}
-          disabled={isButtonDisabled} // Disable the button based on the state
-        >
-          <Text style={styles.createButtonText}>{createButtonLabel}</Text>
-        </TouchableOpacity>
-        {/* Counter component */}
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <TouchableOpacity
+            style={[
+              styles.createButton,
+              { backgroundColor: isButtonDisabled ? "#999" : "#14999999" },
+            ]}
+            onPress={handleCreateMessage}
+            disabled={isButtonDisabled}
+          >
+            <Text style={styles.createButtonText}>{createButtonLabel}</Text>
+          </TouchableOpacity>
+        </View>
         <Text style={styles.counterText}>{selectedUserCount}/6</Text>
       </View>
     </View>
@@ -438,6 +438,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center', // Center the items horizontally
     alignItems: 'center',
+    marginLeft: 45,
     marginHorizontal: 16, // Adjust margin as needed
     marginBottom: 16, // Adjust margin as needed
   },
@@ -447,7 +448,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: 'bold',
     color: 'white',
-    paddingLeft: 10,
+    marginLeft: 10,
   },
   contactItem: {
     flexDirection: "row",

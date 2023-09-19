@@ -48,7 +48,7 @@ const SettingsScreen = ({ navigation, route }) => {
 
 const screenMap = {
     "Report": "ReportScreen",
-    "Blocked Users": "BlockedList",
+    "Manage Blocked Users": "BlockedList",
     "Allow Your account viewable": "AccountVisibility",
     "About Us": "AboutUs",
     "User Agreement": "UserAgreement",

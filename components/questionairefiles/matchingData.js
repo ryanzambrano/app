@@ -173,7 +173,7 @@ export const MatchingData = ({ navigation, route }) => {
           {/* Sleep Time Question */}
           <View style={styles.input}>
             <Text style={styles.inputHeader}>
-              What time do you go to sleep?
+              What sleep schedule label fits you best?
             </Text>
             <TouchableOpacity onPress={() => setSleepTimeModalVisible(true)}>
               <View style={styles.inputControl}>
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderWidth: 1,
     backgroundColor: "#14999999",
-    borderColor: "#14999999",
+    //borderColor: "#14999999",
   },
 
   continueText: {

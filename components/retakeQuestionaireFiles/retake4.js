@@ -204,11 +204,9 @@ export const Retake4 = ({ navigation, route }) => {
               </View>
             </Modal>
           </View>
-
-          {/* Sleep Time Question */}
           <View style={styles.input}>
             <Text style={styles.inputHeader}>
-              What time do you go to sleep?
+            What sleep schedule label fits you best?
             </Text>
             <TouchableOpacity onPress={() => setSleepTimeModalVisible(true)}>
               <View style={styles.inputControl}>

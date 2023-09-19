@@ -366,7 +366,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
                 onPress={() => navigation.navigate("Retake")}
               >
                 <Text style={{ color: "white", fontSize: 16, fontWeight: 500 }}>
-                  Retake Questionaire
+                  Edit Questionaire Answers
                 </Text>
               </TouchableOpacity>
             </View>

@@ -107,7 +107,7 @@ export const Name = ({ navigation, route }) => {
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.titleText}>What's your full name?</Text>
+            <Text style={styles.titleText}>What is your full name?</Text>
           </View>
           <View style={styles.input}>
             <Text style={styles.inputHeader}>Name</Text>
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
 
   titleText: {
     fontFamily: "Verdana-Bold",
-    fontSize: 27,
+    fontSize: 26,
     fontWeight: "700",
     textAlign: "center",
     marginBottom: 12,
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderWidth: 1,
     backgroundColor: "#14999999",
-    borderColor: "#14999999",
+    //orderColor: "#14999999",
   },
 
   continueText: {

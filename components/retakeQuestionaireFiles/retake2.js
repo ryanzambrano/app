@@ -38,18 +38,19 @@ export const Retake2 = ({ navigation, route }) => {
   const [selectedLivingPreferences, setSelectedLivingPreferences] =
     useState("");
 
-  const livingPreferences = ["Apartment", "Dorm", "No Preferences", "Other"];
-  const forFun = ["Going Clubbing", "Movie night in", "Inner circle hang"];
-  const studies = [
-    "Business",
-    "Natural Science",
-    "Social Science",
-    "Mathematics",
-    "Engineering",
-    "Art",
-    "Exploratory",
-    "Other",
-  ];
+    const livingPreferences = ["Apartment", "Dorm", "House", "No Preferences"];
+    const forFun = ["Going Clubbing", "Movie night in", "Inner circle hang"];
+    const studies = [
+      "Business",
+      "Natural Science",
+      "Social Science",
+      "Medical",
+      "Mathematics",
+      "Engineering",
+      "Art",
+      "Exploratory",
+      "Other",
+    ];
 
   const openStudiesModal = () => {
     setIsStudiesModalVisible(true);
@@ -182,7 +183,7 @@ export const Retake2 = ({ navigation, route }) => {
           <View style={styles.form}>
             <View style={styles.input}>
               <Text style={styles.inputHeader}>
-                Where are you planning to live?
+              What is your preferred housing situation?
               </Text>
 
               <TouchableOpacity
