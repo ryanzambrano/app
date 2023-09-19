@@ -222,22 +222,32 @@ const Home = ({ route }) => {
           .eq("image_index", 0)
           .neq("last_modified", null);
       
-        if (ugcError || profileError || imageError) {
-          console.error(ugcError || profileError || imageError);
-        } else {
-          const mergedData = ugcData.map((ugcUser) => {
-            const relatedProfileData = profileData.find(
-              (profileUser) => profileUser.user_id === ugcUser.user_id
-            );
-            const relatedImageData = imageData.find(
-              (img) => img.user_id === ugcUser.user_id
-            );
-            return {
-              ...ugcUser,
-              profiles: relatedProfileData,
-              lastModified: relatedImageData?.last_modified || null,
-            };
+          if (ugcError || profileError || imageError) {
+            console.error(ugcError || profileError || imageError);
+          } 
+          else {
+            const mergedData = ugcData.map((ugcUser) => {
+              const relatedProfileData = profileData.find(
+                (profileUser) => profileUser.user_id === ugcUser.user_id
+              );
+              const relatedImageData = imageData.find(
+                (img) => img.user_id === ugcUser.user_id
+              );
+              if (
+                ugcUser.has_ugc &&
+                relatedProfileData?.profile_complete &&
+                relatedImageData?.last_modified
+              ) {
+                return {
+                  ...ugcUser,
+                  profiles: relatedProfileData,
+                  lastModified: relatedImageData?.last_modified || null,
+                };
+              } else {
+                return null;
+            }
           });
+          const filteredData = mergedData.filter((user) => user !== null);
 
           const userId = session.user.id;
           const ugcResponse = await supabase
@@ -310,7 +320,7 @@ const Home = ({ route }) => {
             setBlockedProfiles(blocked_profiles);
           }
 
-          setUsers(mergedData);
+          setUsers(filteredData);
           
         }
       } catch (error) {
@@ -347,6 +357,7 @@ const Home = ({ route }) => {
 
   const renderUserCard = ({ item }) => {
     if (!item.lastModified) {
+      console.log(item);
       return null;
     }
     return (

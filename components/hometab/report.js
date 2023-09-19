@@ -34,7 +34,8 @@ const ReportUI = ({ route }) => {
     try {
       const { data, error } = await supabase.from('Reports').insert([
         {
-          user_id: user_id,
+          reported_user_id: user_id,
+          sender_user_id: session.user.id,
           description: trimmedReport,
           isUserReport: true,
         },
@@ -67,7 +68,7 @@ const ReportUI = ({ route }) => {
             style={styles.input}
             value={description}
             onChangeText={(text) => {
-              handleDescriptionChange(text); // Call handleDescriptionChange with the text value
+              handleDescriptionChange(text); 
             }}
             multiline
             placeholder="Describe the issue..."

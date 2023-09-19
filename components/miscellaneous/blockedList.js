@@ -21,10 +21,6 @@ const BlockedList = ({ navigation, route }) => {
   const [sessionUser, setSessionuser] = useState(session.user);
   const [blockedUsers, setBlockedUsers] = useState([]);
 
-  const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-  };
-
   useEffect(() => {
     const fetchBlockedUsers = async () => {
       try {
