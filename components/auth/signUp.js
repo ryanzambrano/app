@@ -41,7 +41,21 @@ export const SignUp = ({ navigation }) => {
     setPasswordsMatch(true);
     setIsError(null);
 
-    if (form.password === form.confirmPassword) {
+    // Check if the last 4 characters of email are ".edu"
+    if (form.email.slice(-4) !== ".edu") {
+      startShakeAnimation(shakeAnimationValue);
+      setIsError("Must use the email provided by your college");
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      startShakeAnimation(shakeAnimationValue);
+      setPasswordsMatch(false);
+      return;
+    }
+
+    try {
+      // If all checks pass, proceed with sign-up
       const { data, error } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
@@ -54,9 +68,10 @@ export const SignUp = ({ navigation }) => {
       } else {
         setIsSignedUp(true);
       }
-    } else {
-      startShakeAnimation(shakeAnimationValue);
-      setPasswordsMatch(false);
+    } catch (error) {
+      // Handle any unexpected errors during sign-up
+      //console.error("Error during sign-up:", error);
+      // You can set an appropriate error message here if needed
     }
   };
 
