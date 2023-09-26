@@ -91,6 +91,7 @@ export const SignUp = ({ navigation }) => {
                 Check your email for an account verification email, and then
                 sign in!
               </Text>
+              <Text style={styles.sloganText}>(it might be in your spam)</Text>
               <View style={styles.verifyFormAction}>
                 <TouchableOpacity
                   onPress={() => {
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
   header: {
     flex: 0,
     flexDirection: "row",
-    justifyContent: "left",
+    alignItems: "center",
     gap: "10%",
     marginBottom: "20%",
     //padding: "0%",
@@ -225,7 +226,8 @@ const styles = StyleSheet.create({
   verifyHeader: {
     flex: 0,
     flexDirection: "row",
-    justifyContent: "left",
+    alignItems: "center",
+    //alignSelf: "center",
     gap: "10%",
     marginBottom: "10%",
     //padding: "0%",
@@ -234,7 +236,6 @@ const styles = StyleSheet.create({
   headerImage: {
     width: 40,
     height: 40,
-    //alignSelf: "center",
     marginBottom: 0,
   },
 
@@ -242,7 +243,8 @@ const styles = StyleSheet.create({
     fontFamily: "Verdana-Bold",
     fontSize: 27,
     fontWeight: "700",
-    textAlign: "center",
+
+    //textAlign: "center",
     //AlignSelf: "center",
     color: "#fff",
     paddingTop: 5,
