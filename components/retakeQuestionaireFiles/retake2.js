@@ -1,6 +1,7 @@
 import "react-native-url-polyfill/auto";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
+import { AntDesign } from "@expo/vector-icons";
 
 import {
   StyleSheet,
@@ -18,13 +19,14 @@ import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
 
-export const Questionaire2 = ({ navigation, route }) => {
+export const Retake2 = ({ navigation, route }) => {
   const { session } = route.params;
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
+  const [fetched, setFetched] = useState(false);
 
   const [isStudiesModalVisible, setIsStudiesModalVisible] = useState(false);
   const [isForFunModalVisible, setIsForFunModalVisible] = useState(false);
@@ -36,19 +38,19 @@ export const Questionaire2 = ({ navigation, route }) => {
   const [selectedLivingPreferences, setSelectedLivingPreferences] =
     useState("");
 
-  const livingPreferences = ["Apartment", "Dorm", "House", "No Preferences"];
-  const forFun = ["Going Clubbing", "Movie night in", "Inner circle hang"];
-  const studies = [
-    "Business",
-    "Natural Sciences",
-    "Social Sciences",
-    "Medical",
-    "Mathematics",
-    "Engineering",
-    "Art",
-    "Exploratory",
-    "Other",
-  ];
+    const livingPreferences = ["Apartment", "Dorm", "House", "No Preferences"];
+    const forFun = ["Going Clubbing", "Movie night in", "Inner circle hang"];
+    const studies = [
+      "Business",
+      "Natural Science",
+      "Social Science",
+      "Medical",
+      "Mathematics",
+      "Engineering",
+      "Art",
+      "Exploratory",
+      "Other",
+    ];
 
   const openStudiesModal = () => {
     setIsStudiesModalVisible(true);
@@ -67,6 +69,29 @@ export const Questionaire2 = ({ navigation, route }) => {
   };
   const closeLivingPreferencesModal = () => {
     setIsLivingPreferencesModalVisible(false);
+  };
+
+  useEffect(() => {
+    if (!fetched) {
+      fetchData();
+    }
+  }, [fetched]);
+
+  const fetchData = async () => {
+    const { data, error } = await supabase
+      .from("profile")
+      .select("living_preferences, for_fun, studies")
+      .eq("user_id", session.user.id)
+      .single();
+
+    if (error) {
+    }
+    if (data) {
+      setSelectedLivingPreferences(data.living_preferences);
+      setSelectedForFun(data.for_fun);
+      setSelectedStudies(data.studies);
+      setFetched(true);
+    }
   };
 
   const userData = {
@@ -97,8 +122,7 @@ export const Questionaire2 = ({ navigation, route }) => {
           startShakeAnimation(shakeAnimationValue);
           setIsError(error.message);
         } else {
-          //navigation.navigate("Questionaire3");
-          navigation.navigate("Questionaire3");
+          navigation.navigate("Retake3");
         }
       } else {
         startShakeAnimation(shakeAnimationValue);
@@ -142,6 +166,15 @@ export const Questionaire2 = ({ navigation, route }) => {
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
+            <View style={styles.heading}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.goBack();
+                }}
+              >
+                <AntDesign name="arrowleft" size={24} color="#159e9e" />
+              </TouchableOpacity>
+            </View>
             <Text style={styles.titleText}>
               Answer some lifestyle questions!
             </Text>
@@ -150,7 +183,7 @@ export const Questionaire2 = ({ navigation, route }) => {
           <View style={styles.form}>
             <View style={styles.input}>
               <Text style={styles.inputHeader}>
-                What is your preferred housing situation?
+              What is your preferred housing situation?
               </Text>
 
               <TouchableOpacity
@@ -330,7 +363,7 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    marginVertical: 36,
+    //marginVertical: 36,
   },
 
   titleText: {
@@ -338,7 +371,7 @@ const styles = StyleSheet.create({
     fontSize: 27,
     fontWeight: "700",
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 40,
     color: "white",
   },
 
@@ -431,5 +464,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 10,
   },
+
+  heading: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 36,
+  },
 });
-export default Questionaire2;
+
+export default Retake2;

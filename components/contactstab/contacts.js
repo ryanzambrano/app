@@ -77,14 +77,24 @@ const ContactsUI = ({ route }) => {
         const extractedIds = user.User_ID.filter(
           (item) => item !== session.user.id
         );
-        const groupNames = user.Group_Name.split(",").map((name) =>
-          name.trim()
-        );
-        const filteredGroupNames = groupNames.filter(
-          (name) => name !== sessionusername
-        );
-        const joinedGroups = filteredGroupNames.join(", ");
-
+        const { data, error: sessionError } = await supabase
+        .from("UGC")
+        .select("name")
+        .in("user_id", extractedIds);
+        let joinedGroups;
+        if(!user.Group_Name)
+        {
+          const groupNames = data.map(item => item.name);
+      
+          joinedGroups = groupNames.join(", ");
+        }
+        else
+        {
+      
+          joinedGroups = user.Group_Name;
+        }
+        
+    
         // Fetch the most recent group chat message
         const { data: recentMessageData, error: messageError } = await supabase
           .from("Group Chat Messages")
@@ -93,55 +103,38 @@ const ContactsUI = ({ route }) => {
           .order("created_at", { ascending: false })
           .limit(1)
           .single();
-
+    
         const { data: Imagedata, error: ImageError } = await supabase
           .from("images")
           .select("*")
           .in("user_id", extractedIds)
           .eq("image_index", 0);
-        if (ImageError && !messageError) {
-          //console.log(user.Group_Name);
-          return {
-            ...user,
-            joinedGroups,
-            recentMessage: recentMessageData,
-            images: null,
-          };
+    
+        // Check if recentMessageData exists, and only include users with recent messages
+        if (!recentMessageData) {
+          return null;
         }
-        if (messageError && !ImageError) {
-          //console.error(messageError);
-          return {
-            ...user,
-            joinedGroups,
-            recentMessage: "",
-            images: Imagedata,
-          };
-        }
-        if (messageError && ImageError) {
-          //console.log(user.Group_Name);
-          //console.error(messageError);
-          return { ...user, joinedGroups, recentMessage: "", images: null };
-        } else {
-          return {
-            ...user,
-            joinedGroups,
-            recentMessage: recentMessageData,
-            images: Imagedata,
-          };
-        }
+    
+        return {
+          ...user,
+          joinedGroups,
+          recentMessage: recentMessageData,
+          images: ImageError ? null : Imagedata,
+        };
       })
     );
-
-    modifiedUsers.sort((a, b) => {
-      if (!a.recentMessage) return 1; // Move contacts with no recent message to the end
-      if (!b.recentMessage) return -1; // Move contacts with no recent message to the end
+    
+    // Filter out null values (users with no recent messages) and sort
+    const filteredUsers = modifiedUsers.filter((user) => user !== null);
+    
+    filteredUsers.sort((a, b) => {
       return (
         new Date(b.recentMessage.created_at) -
         new Date(a.recentMessage.created_at)
       );
     });
-
-    setUsers(modifiedUsers);
+    
+    setUsers(filteredUsers);
   };
 
   const formatRecentTime = (timestamp) => {
@@ -462,6 +455,7 @@ const styles = StyleSheet.create({
   layeredImage: {
     width: 40, 
     height: 40, 
+    marginTop: 5,
     borderRadius: 20,
     marginRight: 25,
   },
@@ -492,6 +486,7 @@ const styles = StyleSheet.create({
   viewContainer: {
     flex: 1,
     backgroundColor: "#1D1D20",
+    borderBottomColor: "#2B2D2F",
   },
   searchContainer: {
     flexDirection: "row",
@@ -519,9 +514,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start", 
     paddingHorizontal: 15,
-    paddingVertical: 15,
-    borderBottomWidth: 0.3,
-    borderBottomColor: "grey",
+    paddingVertical: 12,
+    borderBottomWidth: 1.2,
+    borderBottomColor: "#2B2D2F",
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     width: "100%",

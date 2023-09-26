@@ -17,7 +17,10 @@ import TagSelectionEdit from "../profiletab/TagSelectionEdit";
 import FiltersUI from "../hometab/filters.js";
 import GroupChatScreen from "../contactstab/otherprofile";
 import { QuestionaireAnswers } from "../hometab/questionaireAnswers";
-import Questionaire from "../questionairefiles/questionaire";
+import Retake from "../retakeQuestionaireFiles/retake.js";
+import Questionaire from "../questionairefiles/questionaire.js";
+import BlockedList from "./blockedList";
+import ReportUI from "../hometab/report";
 
 const Stack = createStackNavigator(); // Initialize stack navigator
 
@@ -44,6 +47,7 @@ const ThreeMainPages = ({ route }) => {
           name="Message"
           component={MessagingUI}
           initialParams={{ session }}
+          options={{ gestureEnabled: false }}
         />
         <Stack.Screen
           name="AddProfileImages"
@@ -92,8 +96,13 @@ const ThreeMainPages = ({ route }) => {
           initialParams={{ session }}
         />
         <Stack.Screen
-          name="questionaire"
+          name="Questionaire"
           component={Questionaire}
+          initialParams={{ session }}
+        />
+        <Stack.Screen
+          name="Retake"
+          component={Retake}
           initialParams={{ session }}
         />
         <Stack.Screen
@@ -106,6 +115,17 @@ const ThreeMainPages = ({ route }) => {
           mode="modal"
           component={AddPerson}
           initialParams={{ session }}
+          options={{ presentation: "modal" }}
+        />
+        <Stack.Screen
+          name="BlockedList"
+          component={BlockedList}
+          initialParams={{ session }}
+        />
+        <Stack.Screen
+          name="ReportUI"
+          component={ReportUI}
+          initialParams={{session}}
           options={{ presentation: "modal" }}
         />
       </Stack.Navigator>

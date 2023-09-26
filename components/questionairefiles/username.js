@@ -104,7 +104,7 @@ export const Username = ({ navigation, route }) => {
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.titleText}>Create a Username!</Text>
+            <Text style={styles.titleText}>Create a username</Text>
           </View>
           <View style={styles.input}>
             <Text style={styles.inputHeader}>Username</Text>
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderWidth: 1,
     backgroundColor: "#14999999",
-    borderColor: "#14999999",
+    //borderColor: "#14999999",
   },
 
   continueText: {

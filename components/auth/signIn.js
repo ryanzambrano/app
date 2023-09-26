@@ -79,7 +79,7 @@ export const SignIn = ({ navigation }) => {
           <View style={styles.header}>
             <Image source={logo} style={styles.headerImage} alt="Logo " />
             <Text style={styles.titleText}>Sign into Cabana</Text>
-            <Text style={styles.sloganText}>Find and meet new roomates!</Text>
+            <Text style={styles.sloganText}>Find and meet new roommates!</Text>
           </View>
 
           <View style={styles.form}>
@@ -177,8 +177,8 @@ const styles = StyleSheet.create({
   },
 
   sloganText: {
-    fontFamily: "Verdana",
-    fontSize: 15,
+    //fontFamily: "Verdana",
+    fontSize: 17,
     fontWeight: "500",
     color: "#929292",
     textAlign: "center",
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderWidth: 1,
     backgroundColor: "#14999999",
-    borderColor: "#14999999",
+    //borderColor: "#14999999",
   },
 
   continueText: {

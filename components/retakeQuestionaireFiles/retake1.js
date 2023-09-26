@@ -1,5 +1,5 @@
 import "react-native-url-polyfill/auto";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 
 import {
@@ -14,82 +14,118 @@ import {
   Keyboard,
   Animated,
 } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+
 import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
 
-export const Questionaire2 = ({ navigation, route }) => {
+export const Retake1 = ({ navigation, route }) => {
   const { session } = route.params;
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
 
-  const [isStudiesModalVisible, setIsStudiesModalVisible] = useState(false);
-  const [isForFunModalVisible, setIsForFunModalVisible] = useState(false);
-  const [isLivingPreferencesModalVisible, setIsLivingPreferencesModalVisible] =
-    useState(false);
+  const [isAgeModalVisible, setIsAgeModalVisible] = useState(false);
+  const [isGenderModalVisible, setIsGenderModalVisible] = useState(false);
+  const [isWhoModalVisible, setIsWhoModalVisible] = useState(false);
 
-  const [selectedStudies, setSelectedStudies] = useState("");
-  const [selectedForFun, setSelectedForFun] = useState("");
-  const [selectedLivingPreferences, setSelectedLivingPreferences] =
-    useState("");
+  const [selectedAge, setSelectedAge] = useState("");
+  const [selectedGender, setSelectedGender] = useState("");
+  const [selectedWho, setSelectedWho] = useState("");
+  const [fetched, setFetched] = useState(false);
 
-  const livingPreferences = ["Apartment", "Dorm", "House", "No Preferences"];
-  const forFun = ["Going Clubbing", "Movie night in", "Inner circle hang"];
-  const studies = [
-    "Business",
-    "Natural Sciences",
-    "Social Sciences",
-    "Medical",
-    "Mathematics",
-    "Engineering",
-    "Art",
-    "Exploratory",
-    "Other",
+  const gender = ["Male", "Female", "Other"];
+  const race = [
+    "White",
+    "Black / African American",
+    "American Indian/Alaska Native",
+    "Asian",
+    "Native Hawaiian/Pacific Islander",
   ];
+  const ages = Array.from(Array(31).keys()).map((age) => String(age + 1));
 
-  const openStudiesModal = () => {
-    setIsStudiesModalVisible(true);
+  useEffect(() => {
+    if (!fetched) {
+      fetchData();
+    }
+  }, [fetched]);
+
+  const fetchData = async () => {
+    const { data, error } = await supabase
+      .from("profile")
+      .select("age, gender, who")
+      .eq("user_id", session.user.id)
+      .single();
+
+    if (error) {
+    }
+    if (data) {
+      setSelectedAge(data.age);
+      setSelectedWho(data.who);
+      setSelectedGender(data.gender);
+      setFetched(true);
+    }
   };
-  const closeStudiesModal = () => {
-    setIsStudiesModalVisible(false);
+
+  const openAgeModal = () => {
+    setIsAgeModalVisible(true);
   };
-  const openForFunModal = () => {
-    setIsForFunModalVisible(true);
+  const closeAgeModal = () => {
+    setIsAgeModalVisible(false);
   };
-  const closeForFunModal = () => {
-    setIsForFunModalVisible(false);
+  const openGenderModal = () => {
+    setIsGenderModalVisible(true);
   };
-  const openLivingPreferencesModal = () => {
-    setIsLivingPreferencesModalVisible(true);
+  const closeGenderModal = () => {
+    setIsGenderModalVisible(false);
   };
-  const closeLivingPreferencesModal = () => {
-    setIsLivingPreferencesModalVisible(false);
+  const openWhoModal = () => {
+    setIsWhoModalVisible(true);
+  };
+  const closeWhoModal = () => {
+    setIsWhoModalVisible(false);
+  };
+
+  handleSaveAge = () => {
+    if (!selectedAge) {
+      setSelectedAge(1);
+    }
+    closeAgeModal();
+  };
+  handleSaveGender = () => {
+    if (!selectedGender) {
+      setSelectedGender("Male");
+    }
+    closeGenderModal();
+  };
+  handleSaveWho = () => {
+    if (!selectedWho) {
+      setSelectedWho("Male");
+    }
+    closeWhoModal();
   };
 
   const userData = {
-    livingPreferences: selectedLivingPreferences,
-    forFun: selectedForFun,
-    studies: selectedStudies,
+    age: selectedAge,
+    who: selectedWho,
+    gender: selectedGender,
   };
 
   const handleUpdate = async (userData, session) => {
     setIsError(null);
 
     if (session?.user) {
-      if (
-        !!userData.livingPreferences &&
-        !!userData.forFun &&
-        !!userData.studies
-      ) {
+      if (!!userData.age && !!userData.gender && !!userData.who) {
         const { data, error } = await supabase
           .from("profile")
           .update({
-            living_preferences: userData.livingPreferences,
-            for_fun: userData.forFun,
-            studies: userData.studies,
+            age: userData.age,
+            who: userData.who,
+            gender: userData.gender,
           })
           .eq("user_id", session.user.id);
 
@@ -97,33 +133,13 @@ export const Questionaire2 = ({ navigation, route }) => {
           startShakeAnimation(shakeAnimationValue);
           setIsError(error.message);
         } else {
-          //navigation.navigate("Questionaire3");
-          navigation.navigate("Questionaire3");
+          navigation.navigate("Retake2");
         }
       } else {
         startShakeAnimation(shakeAnimationValue);
-        setIsError("All fields are required");
+        setIsError("Enter all required fields");
       }
     }
-  };
-
-  handleLivingPreferences = () => {
-    if (!selectedLivingPreferences) {
-      setSelectedLivingPreferences("Apartment");
-    }
-    closeLivingPreferencesModal();
-  };
-  handleForFun = () => {
-    if (!selectedForFun) {
-      setSelectedForFun("Stay in");
-    }
-    closeForFunModal();
-  };
-  handleStudies = () => {
-    if (!selectedStudies) {
-      setSelectedStudies("Science");
-    }
-    closeStudiesModal();
   };
 
   const shakeAnimationStyle = {
@@ -142,95 +158,101 @@ export const Questionaire2 = ({ navigation, route }) => {
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
+            <View style={styles.heading}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.goBack();
+                }}
+              >
+                <AntDesign name="arrowleft" size={24} color="#159e9e" />
+              </TouchableOpacity>
+            </View>
             <Text style={styles.titleText}>
-              Answer some lifestyle questions!
+              Answer some questions about yourself!
             </Text>
           </View>
 
           <View style={styles.form}>
             <View style={styles.input}>
-              <Text style={styles.inputHeader}>
-                What is your preferred housing situation?
-              </Text>
+              <Text style={styles.inputHeader}>Select your age</Text>
 
               <TouchableOpacity
                 onPress={() => {
-                  openLivingPreferencesModal();
+                  openAgeModal();
                 }}
               >
                 <View style={styles.inputControl}>
-                  <Text style={styles.inputText}>
-                    {selectedLivingPreferences}
+                  <Text
+                    style={styles.inputText}
+                    placeholder="Select your Gender"
+                    placeholderTextColor="white"
+                    value={`${selectedAge}`}
+                  >
+                    {selectedAge}
                   </Text>
                 </View>
               </TouchableOpacity>
 
               <Modal
-                visible={isLivingPreferencesModalVisible}
+                visible={isAgeModalVisible}
                 animationType="slide"
                 transparent
               >
-                <View style={styles.modalContainer}>
-                  <View style={styles.pickerContainer}>
+                <View style={styles.modalContainerGender}>
+                  <View style={styles.pickerContainerGender}>
                     <Picker
                       style={styles.picker}
-                      selectedValue={selectedLivingPreferences}
-                      onValueChange={(itemValue) =>
-                        setSelectedLivingPreferences(itemValue)
-                      }
+                      selectedValue={selectedAge}
+                      onValueChange={(itemValue) => setSelectedAge(itemValue)}
                     >
-                      {livingPreferences.map((livingPreferences) => (
-                        <Picker.Item
-                          key={livingPreferences}
-                          label={livingPreferences}
-                          value={livingPreferences}
-                        />
+                      {ages.map((age) => (
+                        <Picker.Item key={age} label={age} value={age} />
                       ))}
                     </Picker>
                   </View>
-
                   <View style={styles.bbuttons}>
-                    <Button title="Save" onPress={handleLivingPreferences} />
-
-                    <Button
-                      title="Cancel"
-                      onPress={closeLivingPreferencesModal}
-                    />
+                    <Button title="Save" onPress={handleSaveAge} />
+                    <Button title="Cancel" onPress={closeAgeModal} />
                   </View>
                 </View>
               </Modal>
             </View>
 
             <View style={styles.input}>
-              <Text style={styles.inputHeader}>
-                A typical weekend looks like?
-              </Text>
+              <Text style={styles.inputHeader}>Select your Gender</Text>
 
               <TouchableOpacity
                 onPress={() => {
-                  openForFunModal();
+                  openGenderModal();
                 }}
               >
                 <View style={styles.inputControl}>
-                  <Text style={styles.inputText}>{selectedForFun}</Text>
+                  <Text
+                    style={styles.inputText}
+                    placeholder="Select your Gender"
+                    placeholderTextColor="white"
+                    value={`${selectedGender}`}
+                  >
+                    {selectedGender}
+                  </Text>
                 </View>
               </TouchableOpacity>
 
               <Modal
-                visible={isForFunModalVisible}
+                visible={isGenderModalVisible}
                 animationType="slide"
                 transparent
               >
-                <View style={styles.modalContainer}>
-                  <View style={styles.pickerContainer}>
+                <View style={styles.modalContainerGender}>
+                  <View style={styles.pickerContainerGender}>
                     <Picker
                       style={styles.picker}
-                      selectedValue={selectedForFun}
+                      selectedValue={selectedGender}
                       onValueChange={(itemValue) =>
-                        setSelectedForFun(itemValue)
+                        setSelectedGender(itemValue)
                       }
                     >
-                      {forFun.map((Gender) => (
+                      {gender.map((Gender) => (
                         <Picker.Item
                           key={Gender}
                           label={Gender}
@@ -240,8 +262,8 @@ export const Questionaire2 = ({ navigation, route }) => {
                     </Picker>
                   </View>
                   <View style={styles.bbuttons}>
-                    <Button title="Save" onPress={handleForFun} />
-                    <Button title="Cancel" onPress={closeForFunModal} />
+                    <Button title="Save" onPress={handleSaveGender} />
+                    <Button title="Cancel" onPress={closeGenderModal} />
                   </View>
                 </View>
               </Modal>
@@ -249,46 +271,51 @@ export const Questionaire2 = ({ navigation, route }) => {
 
             <View style={styles.input}>
               <Text style={styles.inputHeader}>
-                What is your general area of study?
+                What gender do you want to room with?
               </Text>
 
               <TouchableOpacity
                 onPress={() => {
-                  openStudiesModal();
+                  openWhoModal();
                 }}
               >
                 <View style={styles.inputControl}>
-                  <Text style={styles.inputText}>{selectedStudies}</Text>
+                  <Text
+                    style={styles.inputText}
+                    placeholder="Select your Gender"
+                    placeholderTextColor="white"
+                    value={`${selectedGender}`}
+                  >
+                    {selectedWho}
+                  </Text>
                 </View>
               </TouchableOpacity>
 
               <Modal
-                visible={isStudiesModalVisible}
+                visible={isWhoModalVisible}
                 animationType="slide"
                 transparent
               >
-                <View style={styles.modalContainer}>
-                  <View style={styles.pickerContainer}>
+                <View style={styles.modalContainerGender}>
+                  <View style={styles.pickerContainerGender}>
                     <Picker
                       style={styles.picker}
-                      selectedValue={selectedStudies}
-                      onValueChange={(itemValue) =>
-                        setSelectedStudies(itemValue)
-                      }
+                      selectedValue={selectedWho}
+                      onValueChange={(itemValue) => setSelectedWho(itemValue)}
                     >
-                      {studies.map((studies) => (
+                      {gender.map((gender) => (
                         <Picker.Item
-                          key={studies}
-                          label={studies}
-                          value={studies}
+                          key={gender}
+                          label={gender}
+                          value={gender}
                         />
                       ))}
                     </Picker>
                   </View>
 
                   <View style={styles.bbuttons}>
-                    <Button title="Save" onPress={handleStudies} />
-                    <Button title="Cancel" onPress={closeStudiesModal} />
+                    <Button title="Save" onPress={handleSaveWho} />
+                    <Button title="Cancel" onPress={closeWhoModal} />
                   </View>
                 </View>
               </Modal>
@@ -306,8 +333,9 @@ export const Questionaire2 = ({ navigation, route }) => {
             <View style={styles.formAction}>
               <TouchableOpacity
                 onPress={() => {
-                  handleUpdate(userData, session);
-                  //navigation.navigate("TagSelectionScreen");
+                  {
+                    handleUpdate(userData, session);
+                  }
                 }}
               >
                 <View style={styles.continue}>
@@ -330,7 +358,7 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    marginVertical: 36,
+    marginTop: 0,
   },
 
   titleText: {
@@ -338,7 +366,7 @@ const styles = StyleSheet.create({
     fontSize: 27,
     fontWeight: "700",
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 40,
     color: "white",
   },
 
@@ -369,7 +397,8 @@ const styles = StyleSheet.create({
   },
 
   inputText: {
-    color: "#fff",
+    color: "white",
+    fontWeight: "500",
   },
 
   form: {
@@ -379,6 +408,7 @@ const styles = StyleSheet.create({
 
   formAction: {
     marginVertical: 24,
+    backgroundColor: "#1D1D20",
   },
 
   continue: {
@@ -400,10 +430,24 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
 
+  center: {
+    marginTop: "60%",
+    marginBottom: "20%",
+  },
+
   modalContainer: {
+    flex: 1,
+    marginTop: "100%",
+    backgroundColor: "#111111",
+    justifyContent: "space-around",
+    gap: "50%",
+  },
+
+  modalContainerGender: {
     flex: 1,
     marginTop: "130%",
     backgroundColor: "lightgrey",
+
     justifyContent: "space-around",
     gap: "50%",
   },
@@ -411,11 +455,27 @@ const styles = StyleSheet.create({
   pickerContainer: {
     flex: 1,
     flexDirection: "row",
-    marginTop: "1%",
+    marginTop: "7%",
   },
 
+  pickerContainerGender: {
+    flex: 1,
+    flexDirection: "row",
+    marginTop: "1%",
+  },
   picker: {
     flex: 1,
+    color: "white",
+  },
+
+  pickerDate: {
+    flex: 0,
+    width: "28%",
+  },
+
+  pickerYear: {
+    flex: 0,
+    width: "28%",
   },
 
   bbuttons: {
@@ -431,5 +491,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 10,
   },
+
+  heading: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 36,
+  },
 });
-export default Questionaire2;
+
+export default Retake1;

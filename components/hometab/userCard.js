@@ -20,6 +20,8 @@ import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { picURL } from "../auth/supabase";
 import { supabase } from "../auth/supabase.js";
+import ActionSheet from "react-native-action-sheet";
+import ReportUI from "./report.js";
 
 const MAX_IMAGES = 4;
 
@@ -51,12 +53,10 @@ const UserCard = ({ navigation, route }) => {
     bookmarked_profiles,
     lastModified,
   } = route.params.user;
-
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
   const [living_preferences, setLivingPreference] = useState("");
   const [persons, setPersons] = useState([]);
-
   const [photos, setPhotos] = useState([
     `${picURL}/${user_id}/${user_id}-0-${lastModified}`,
   ]);
@@ -66,9 +66,11 @@ const UserCard = ({ navigation, route }) => {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
   const [prompts, setPrompts] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [isActionSheetVisible, setActionSheetVisible] = useState(false);
 
   const promptQuestions = {
     greek_life: "Are you participating in Greek Life?",
+    budget: "My budget restrictions for housing are...",
     night_out: "A perfect night out for me looks like...",
     pet_peeves: "My biggest pet peeves are...",
     favorite_movies: "My favorite movies are...",
@@ -170,7 +172,7 @@ const UserCard = ({ navigation, route }) => {
         setGender(genderData[0].gender);
         setAge(genderData[0].age);
         setLivingPreference(genderData[0].living_preferences);
-        console.log(genderData.age);
+        //console.log(genderData.age);
       } else {
         console.log("Error fetching prompts: ");
       }
@@ -324,6 +326,32 @@ const UserCard = ({ navigation, route }) => {
     }
   };
 
+  const showActionSheet = () => {
+    ActionSheet.showActionSheetWithOptions(
+      {
+        options: ['Cancel', 'Block User', 'Report User'],
+        cancelButtonIndex: 0,
+        destructiveButtonIndex: 1,
+        tintColor: 'white', // Set a default text color for all buttons
+        
+      },
+      (buttonIndex) => {
+        if (buttonIndex === 1) {
+          handleBlockUser(user_id);
+        } else if (buttonIndex === 2) {
+          navigation.navigate("ReportUI", {user_id: user_id});
+        }
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (isActionSheetVisible) {
+      showActionSheet();
+      setActionSheetVisible(false);
+    }
+  }, [isActionSheetVisible]);
+  
   const handleUserCardPress = async () => {
     {
       //message navigation
@@ -357,7 +385,6 @@ const UserCard = ({ navigation, route }) => {
         .insert([
           {
             User_ID: Finalarray,
-            Group_Name: combinedString,
             Ammount_Users: Finalarray.length,
           },
         ])
@@ -416,7 +443,7 @@ const UserCard = ({ navigation, route }) => {
         <Text style={styles.name}>{name}</Text>
         <View style={styles.backButton}></View>
         <TouchableOpacity
-          onPress={() => handleBlockUser(user_id)}
+          onPress={() => setActionSheetVisible(true)}
           style={styles.blockButton}
         >
           <AntDesign name="deleteuser" size={24} color="white" />
@@ -529,11 +556,13 @@ const UserCard = ({ navigation, route }) => {
             </View>
           )}
         </ScrollView>
+        {bio && (
           <View style={styles.bioContainer}>
             <View style={styles.roundedContainer}>
               <Text style={styles.bio}>{bio}</Text>
             </View>
           </View>
+        )}
           <TouchableOpacity
             style={styles.questionaireButtonContainer}
             onPress={() => handleQuestionaireButtonPress()}

@@ -70,6 +70,7 @@ const GroupChatScreen = ({}) => {
     // Extract session.user.id values from user.User_ID array
 
     fetchUsers();
+
   }, [user.User_ID, session.user.id]);
 
   const handleUserPress = (person) => {
@@ -227,6 +228,7 @@ const GroupChatScreen = ({}) => {
         ],
         { cancelable: false }
       );
+      
     }
   };
 
@@ -261,6 +263,7 @@ const GroupChatScreen = ({}) => {
     } catch (error) {
       console.error("An error occurred:", error.message);
     }
+
   };
   const navigatetomessages = () => {
     navigation.navigate("Message", {
@@ -352,8 +355,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 10,
-    borderBottomWidth: 0.3,
-    borderBottomColor: "grey",
+    borderBottomWidth: 1.2,
+    borderBottomColor: "#2B2D2F",
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },

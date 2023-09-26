@@ -1,5 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
+import { AntDesign } from "@expo/vector-icons";
+
 import {
   StyleSheet,
   Text,
@@ -16,7 +18,7 @@ import { Picker } from "@react-native-picker/picker";
 import { supabase } from "../auth/supabase.js";
 import { startShakeAnimation } from "../auth/profileUtils.js";
 
-export const MatchingData = ({ navigation, route }) => {
+export const Retake4 = ({ navigation, route }) => {
   const { session } = route.params;
 
   const dismissKeyboard = () => {
@@ -25,6 +27,7 @@ export const MatchingData = ({ navigation, route }) => {
 
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
+  const [fetched, setFetched] = useState(false);
 
   const [tidinessModalVisible, setTidinessModalVisible] = useState(false);
   const [sleepTimeModalVisible, setSleepTimeModalVisible] = useState(false);
@@ -65,6 +68,29 @@ export const MatchingData = ({ navigation, route }) => {
     closeNoiseModal();
   };
 
+  useEffect(() => {
+    if (!fetched) {
+      fetchData();
+    }
+  }, [fetched]);
+
+  const fetchData = async () => {
+    const { data, error } = await supabase
+      .from("profile")
+      .select("tidiness, noise_preference, sleep_time")
+      .eq("user_id", session.user.id)
+      .single();
+
+    if (error) {
+    }
+    if (data) {
+      setSelectedTidiness(data.tidiness);
+      setSelectedNoise(data.noise_preference);
+      setSelectedSleepTime(data.sleep_time);
+      setFetched(true);
+    }
+  };
+
   const userData = {
     tidiness: selectedTidiness,
     sleepTime: selectedSleepTime,
@@ -95,7 +121,7 @@ export const MatchingData = ({ navigation, route }) => {
           startShakeAnimation(shakeAnimationValue);
           setIsError(error.message);
         } else {
-          navigation.navigate("TagSelectionScreen");
+          navigation.navigate("Congrats");
         }
       } else {
         startShakeAnimation(shakeAnimationValue);
@@ -120,6 +146,15 @@ export const MatchingData = ({ navigation, route }) => {
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
           <View style={styles.header}>
+            <View style={styles.heading}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.goBack();
+                }}
+              >
+                <AntDesign name="arrowleft" size={24} color="#159e9e" />
+              </TouchableOpacity>
+            </View>
             <Text style={styles.titleText}>
               Answer some questions about yourself!
             </Text>
@@ -169,11 +204,9 @@ export const MatchingData = ({ navigation, route }) => {
               </View>
             </Modal>
           </View>
-
-          {/* Sleep Time Question */}
           <View style={styles.input}>
             <Text style={styles.inputHeader}>
-              What sleep schedule label fits you best?
+            What sleep schedule label fits you best?
             </Text>
             <TouchableOpacity onPress={() => setSleepTimeModalVisible(true)}>
               <View style={styles.inputControl}>
@@ -296,7 +329,7 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    marginVertical: 36,
+    //marginVertical: 36,
   },
 
   titleText: {
@@ -304,7 +337,7 @@ const styles = StyleSheet.create({
     fontSize: 27,
     fontWeight: "700",
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 40,
     color: "white",
   },
 
@@ -416,6 +449,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 10,
   },
+  heading: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 36,
+  },
 });
 
-export default MatchingData;
+export default Retake4;

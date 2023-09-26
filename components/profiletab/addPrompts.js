@@ -14,6 +14,7 @@ export const AddPrompts = ({ navigation, route }) => {
   const { session } = route.params;
   const presetQuestions = [
     "Are you participating in Greek Life?",
+    "My budget restrictions for housing are...",
     "A perfect night out for me looks like...",
     "My biggest pet peeves are...",
     "My favorite movies are...",
@@ -30,15 +31,17 @@ export const AddPrompts = ({ navigation, route }) => {
     "My thoughts on throwing parties are...",
     "My ideas for decorating the home involve...",
     "When it comes to handling conflict, I am...",
-  ]; 
+  ];
 
   const questionColumnMapping = {
     "Are you participating in Greek Life?": "greek_life",
+    "My budget restrictions for housing are...": "budget",
     "A perfect night out for me looks like...": "night_out",
     "My biggest pet peeves are...": "pet_peeves",
     "My favorite movies are...": "favorite_movies",
     "My favorite artists / bands are...": "favorite_artists",
-    "The dorms halls / apartment complexes I'm considering are...": "living_considerations",
+    "The dorms halls / apartment complexes I'm considering are...":
+      "living_considerations",
     "When it comes to sharing my amenities and personal property...": "sharing",
     "When it comes to sharing food and cooking...": "cooking",
     "When I'm burnt out, I relax by...": "burnt_out",
@@ -50,7 +53,7 @@ export const AddPrompts = ({ navigation, route }) => {
     "My thoughts on throwing parties are...": "parties",
     "My ideas for decorating the home involve...": "decorations",
     "When it comes to handling conflict, I am...": "conflict",
-  }; 
+  };
 
   const [answers, setAnswers] = useState(
     Array(presetQuestions.length).fill("")
@@ -138,23 +141,26 @@ export const AddPrompts = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Text style={styles.backButtonText}>←</Text>
+        <View style={styles.left}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <Text style={styles.backButtonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.center}>
+          <Text style={styles.headerText}>Prompts</Text>
+        </View>
+        <TouchableOpacity style={styles.dbuttonContainer} onPress={handleSave}>
+          <Text style={styles.dbutton}>Done</Text>
         </TouchableOpacity>
-        <Text style={styles.headerText}>Prompts</Text>
       </View>
       <FlatList
         data={presetQuestions}
         renderItem={renderItems}
         keyExtractor={(item, index) => index.toString()}
       />
-
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Save</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -168,21 +174,33 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 15,
+    marginBottom: 5,
+    justifyContent: "space-between",
   },
+  left: {
+    //flex: 0,
+    alignSelf: "center",
+  },
+  center: {
+    alignSelf: "center",
+    padding: 7,
+  },
+
   backButton: {
-    marginRight: 15,
     paddingLeft: 15,
-    paddingRight: 85,
   },
   backButtonText: {
-    fontSize: 30,
-    color: "#14999999",
+    alignSelf: "center",
+    fontSize: 16,
+    color: "grey",
+    fontWeight: "bold",
   },
   headerText: {
-    fontSize: 25,
-    fontWeight: "bold",
+    alignSelf: "center",
+
+    fontSize: 19,
     color: "white",
+    fontWeight: "bold",
   },
   card: {
     backgroundColor: "#2B2D2F",
@@ -213,13 +231,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "white",
     borderRadius: 5,
-    padding: 10,
+    //padding: 10,
     height: 40,
     fontSize: 26,
     fontFamily: "Helvetica",
   },
   saveButton: {
-    backgroundColor: "#14999999",
+    backgroundColor: "#1499999",
     padding: 20,
     borderRadius: 50,
     marginBottom: 20,
@@ -231,6 +249,17 @@ const styles = StyleSheet.create({
     fontWeight: 500,
     textAlign: "center",
     fontSize: 15,
+  },
+  dbuttonContainer: {
+    //flex: 0,
+    padding: 7,
+  },
+  dbutton: {
+    marginRight: 16,
+    fontSize: 16,
+    color: "#149999",
+    fontWeight: "bold",
+    // Add other styling as needed
   },
 });
 

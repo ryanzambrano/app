@@ -38,9 +38,12 @@ const MessagingUI = () => {
   const [joinedGroups, setJoinedGroups] = useState("");
   const [persons, setPersons] = useState([]);
   const [senderNames, setSenderNames] = useState({});
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   const sendMessage = async () => {
-    if (message.trim() !== "") {
+    if (!isButtonDisabled && message.trim() !== "") {
+      setIsButtonDisabled(true); // Disable the button
+
       const { data, error } = await supabase
         .from("Group Chat Messages")
         .insert([
@@ -59,17 +62,21 @@ const MessagingUI = () => {
         setMessages((prevMessages) => [...prevMessages, data]);
         setMessage("");
       }
+
       if (messages.length > 1) {
         setTimeout(() => {
-          //flatListRef?.current?.scrollToOffset({ animated: true, offset: 0 });
           flatListRef?.current?.scrollToIndex({
             animated: true,
             index: messages.length - 1,
           });
         }, 100);
       }
+
+      // Re-enable the button after a 1-second cooldown
+      setTimeout(() => setIsButtonDisabled(false), 1000);
     }
   };
+
   const extractedIds = user.User_ID.filter((item) => item !== session.user.id);
 
   async function fetchUsers() {
@@ -125,18 +132,27 @@ const MessagingUI = () => {
         console.error(sessionError);
         return null;
       }
-
-      const sessionusername = data.name;
-
-      const groupNames = groupchatdata.Group_Name.split(",").map((name) =>
-        name.trim()
+      const extractedIds = user.User_ID.filter(
+        (item) => item !== session.user.id
       );
-      const filteredGroupNames = groupNames.filter(
-        (name) => name !== sessionusername
-      );
-      const joinedGroups = filteredGroupNames.join(", ");
+      const { data: UGCdata, error: sessionErrors } = await supabase
+      .from("UGC")
+      .select("name")
+      .in("user_id", extractedIds);
+      let Groupnames;
+      if(!user.Group_Name)
+      {
+        const joinedGroups = UGCdata.map(item => item.name);
+        Groupnames = joinedGroups.join(", ");
+      }
+      else
+      {
+        Groupnames = user.Group_Name;
+      }
+    
 
-      setJoinedGroups(joinedGroups);
+
+      setJoinedGroups(Groupnames);
       return;
     } catch (error) {
       console.error(error);
@@ -154,6 +170,17 @@ const MessagingUI = () => {
       setJoinedGroups(editedJoinedGroups);
     }
   }, [user.User_ID, session.user.id, isFocused]);
+
+  useEffect(() => {
+    // This effect will run whenever isButtonDisabled changes
+    if (isButtonDisabled) {
+      // If the button is disabled, re-enable it after 1 second
+      const timeout = setTimeout(() => setIsButtonDisabled(false), 1000);
+      
+      // Cleanup the timeout if the component unmounts or the dependency changes
+      return () => clearTimeout(timeout);
+    }
+  }, [isButtonDisabled]);
 
   const fetchMessages = async () => {
     const { data, error } = await supabase
@@ -428,6 +455,7 @@ const MessagingUI = () => {
           onPress={sendMessage}
           color="#159e9e"
           text="bold"
+          disabled={isButtonDisabled}
         />
       </View>
     </KeyboardAvoidingView>
@@ -466,8 +494,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingTop: 20,
     paddingBottom: 5,
-    borderBottomColor: "grey",
-    borderBottomWidth: 0.2,
+    borderBottomColor: "#2B2D2F",
+    borderBottomWidth: 1.2,
     // borderBottomRightRadius: 10,
     // borderBottomLeftRadius: 10,
   },
