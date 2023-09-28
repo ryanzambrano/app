@@ -20,39 +20,29 @@ import { startShakeAnimation } from "./profileUtils.js";
 
 const logo = require("../../assets/logo4.png");
 
-export const SignIn = ({ navigation }) => {
+export const ForgotPassword = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
+  const [emailSent, setEmailSent] = useState(false);
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
 
-  async function validateUserSession() {
-    const {
-      data: { user, error },
-    } = await supabase.auth.getUser();
-    if (error) {
-      console.error(error.message);
-    } else if (user == null) {
-      console.error("invalid authentication");
-    }
-  }
-
-  async function signInUser(email, password) {
+  async function forgotPassword(email) {
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
 
-    if (error) {
-      setError("Invalid email or password, please try again");
-      startShakeAnimation(shakeAnimationValue); // Set error message
+    try {
+      await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: "http://thecabanaapp.com",
+      });
+    } catch (error) {
+      console.error("Error sending password reset email:", error);
+      setError("There was a problem sending the password reset email.");
+    } finally {
+      setEmailSent(true);
       setLoading(false);
-    } else {
-      validateUserSession();
     }
   }
 
@@ -76,10 +66,21 @@ export const SignIn = ({ navigation }) => {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#111111" }}>
       <TouchableWithoutFeedback onPress={dismissKeyboard}>
         <View style={styles.container}>
+          <TouchableOpacity
+            onPress={() => {
+              // handle onPress
+              navigation.goBack();
+            }}
+          >
+            <Text style={styles.backButtonText}>←</Text>
+          </TouchableOpacity>
           <View style={styles.header}>
             <Image source={logo} style={styles.headerImage} alt="Logo " />
-            <Text style={styles.titleText}>Sign into Cabana</Text>
-            <Text style={styles.sloganText}>Find and meet new roommates!</Text>
+            <Text style={styles.titleText}>Forgot Password?</Text>
+            <Text style={styles.sloganText}>
+              Enter the email address that you used to sign up and we'll send
+              you an email
+            </Text>
           </View>
 
           <View style={styles.form}>
@@ -87,7 +88,6 @@ export const SignIn = ({ navigation }) => {
               <Text style={styles.inputHeader}>Email Address:</Text>
               <TextInput
                 style={styles.inputControl}
-                hi
                 autoCapitalize="none"
                 autoCorrect={false}
                 keyboardType="email-address"
@@ -98,63 +98,29 @@ export const SignIn = ({ navigation }) => {
               />
             </View>
 
-            <View style={styles.input}>
-              <Text style={styles.inputHeader}>Password:</Text>
-              <TextInput
-                style={styles.inputControl}
-                styles={styles.inputControl}
-                autoCorrect={false}
-                //placeholder="*********"
-                placeholderTextColor="#6b7280"
-                value={form.password}
-                onChangeText={(password) => setForm({ ...form, password })}
-                secureTextEntry={true}
-              />
-            </View>
-
             <View style={styles.formAction}>
               <TouchableOpacity
-                onPress={() => {
+                onPress={async () => {
                   // handle onPress
-
-                  signInUser(form.email, form.password);
+                  await forgotPassword(form.email);
+                  setForm({ ...form, email: "" });
                 }}
               >
                 <View style={styles.continue}>
-                  <Text style={styles.continueText}>Sign in</Text>
+                  <Text style={styles.continueText}>Send Email</Text>
                 </View>
               </TouchableOpacity>
             </View>
+            {emailSent && (
+              <Animated.Text style={[styles.formFooter, shakeAnimationStyle]}>
+                Email successfully sent
+              </Animated.Text>
+            )}
             {error && (
               <Animated.Text style={[styles.errorText, shakeAnimationStyle]}>
                 {error}
               </Animated.Text>
             )}
-            <TouchableOpacity
-              onPress={() => {
-                // handle link
-                navigation.navigate("ForgotPassword");
-              }}
-              style={{ marginTop: 30 }}
-            >
-              <Text style={styles.formFooter}>
-                <Text style={{ textDecorationLine: "underline" }}>
-                  Forgot password?
-                </Text>
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                // handle link
-                navigation.navigate("SignUp");
-              }}
-              style={{ marginTop: "auto" }}
-            >
-              <Text style={styles.formFooter}>
-                Don't have an account?{" "}
-                <Text style={{ textDecorationLine: "underline" }}>Sign up</Text>
-              </Text>
-            </TouchableOpacity>
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -170,7 +136,9 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    marginVertical: 36,
+    //marginVertical: 36,
+    marginTop: 24,
+    marginBottom: 36,
   },
 
   headerImage: {
@@ -191,9 +159,10 @@ const styles = StyleSheet.create({
 
   sloganText: {
     //fontFamily: "Verdana",
-    fontSize: 17,
+    marginTop: 10,
+    fontSize: 18,
     fontWeight: "500",
-    color: "#929292",
+    color: "lightgrey",
     textAlign: "center",
   },
 
@@ -257,7 +226,11 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
 
-  none: {},
+  backButtonText: {
+    fontSize: 30,
+    color: "#149999",
+    zIndex: 1,
+  },
   errorText: {
     color: "red",
     textAlign: "center",
@@ -266,4 +239,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignIn;
+export default ForgotPassword;

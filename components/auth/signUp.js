@@ -123,8 +123,16 @@ export const SignUp = ({ navigation }) => {
           </>
         ) : (
           <View style={styles.container}>
+            <TouchableOpacity
+              onPress={() => {
+                // handle onPress
+                navigation.goBack();
+              }}
+            >
+              <Text style={styles.backButtonText}>←</Text>
+            </TouchableOpacity>
             <View style={styles.header}>
-              <Image source={logo} style={styles.headerImage} alt="Logo " />
+              {/*<Image source={logo} style={styles.headerImage} alt="Logo " />*/}
               <Text style={styles.titleText}>Create an Account!</Text>
             </View>
 
@@ -233,8 +241,10 @@ const styles = StyleSheet.create({
     flex: 0,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: "10%",
-    marginBottom: "20%",
+    marginTop: "5%",
+    marginBottom: "10%",
     //padding: "0%",
   },
 
@@ -262,7 +272,6 @@ const styles = StyleSheet.create({
     //textAlign: "center",
     //AlignSelf: "center",
     color: "#fff",
-    paddingTop: 5,
   },
 
   sloganText: {
@@ -346,6 +355,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 10,
+  },
+
+  backButtonText: {
+    fontSize: 30,
+    color: "#149999",
+    zIndex: 1,
   },
 });
 
