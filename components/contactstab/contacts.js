@@ -21,6 +21,7 @@ import { Swipeable } from "react-native-gesture-handler";
 import { supabase } from "../auth/supabase.js";
 import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import { LayoutAnimation } from 'react-native';
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
@@ -29,6 +30,8 @@ const ContactsUI = ({ route }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const isFocused = useIsFocused();
+  const fadeAnimation = new Animated.Value(1);
+  const [contactOpacities, setContactOpacities] = useState({});
   const [images, setImages] = useState([]);
 
   const handleSearch = (text) => {
@@ -93,6 +96,10 @@ const ContactsUI = ({ route }) => {
       
           joinedGroups = user.Group_Name;
         }
+        setContactOpacities((prevOpacities) => ({
+          ...prevOpacities,
+          [user.Group_ID]: new Animated.Value(1),
+        }));
         
     
         // Fetch the most recent group chat message
@@ -204,32 +211,50 @@ const ContactsUI = ({ route }) => {
   const renderContact = ({ item }) => {
     const handleDelete = async () => {
       try {
-        const { error } = await supabase
-          .from("Group Chat Messages")
-          .delete()
-          .eq("Group_ID_Sent_To", item.Group_ID);
+        LayoutAnimation.configureNext({
+          duration: 200, // Adjust the duration as needed
+          update: {
+            type: LayoutAnimation.Types.easeInEaseOut,
+            property: LayoutAnimation.Properties.opacity,
+          },
+        });
 
-        if (error) {
-          console.error(error);
-          return;
-        }
-
-        // Now delete from the "Group Chats" table
-        const { error: groupChatsError } = await supabase
-          .from("Group Chats")
-          .delete()
-          .eq("Group_ID", item.Group_ID);
-
-        if (groupChatsError) {
-          console.error(groupChatsError);
-        }
-
-        // Fetch users again to update the UI
-        fetchUsers();
+        // Create a fade-out animation specific to the contact
+        const opacityValue = contactOpacities[item.Group_ID];
+        Animated.timing(opacityValue, {
+          toValue: 0, // Make it fully transparent
+          duration: 150, // Animation duration in milliseconds
+          useNativeDriver: false, // Required for opacity animations
+        }).start(async () => {
+          // After the animation is complete, perform the deletion logic
+          const { error } = await supabase
+            .from("Group Chat Messages")
+            .delete()
+            .eq("Group_ID_Sent_To", item.Group_ID);
+  
+          if (error) {
+            console.error(error);
+            return;
+          }
+  
+          // Now delete from the "Group Chats" table
+          const { error: groupChatsError } = await supabase
+            .from("Group Chats")
+            .delete()
+            .eq("Group_ID", item.Group_ID);
+  
+          if (groupChatsError) {
+            console.error(groupChatsError);
+          }
+  
+          // Fetch users again to update the UI
+          fetchUsers();
+        });
       } catch (error) {
         console.error(error);
       }
     };
+    const opacityValue = contactOpacities[item.Group_ID];
 
     const renderRightActions = (progress, dragX) => {
       // console.log("Progress:", progress);
@@ -361,6 +386,7 @@ const ContactsUI = ({ route }) => {
       }
     };
     return (
+      <Animated.View style={{ opacity: opacityValue }}>
       <Swipeable
         renderRightActions={renderRightActions}
         overshootRight={false}
@@ -397,6 +423,7 @@ const ContactsUI = ({ route }) => {
           </View>
         </TouchableOpacity>
       </Swipeable>
+      </Animated.View>
     );
   };
   return (
