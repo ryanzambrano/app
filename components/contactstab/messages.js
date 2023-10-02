@@ -22,6 +22,7 @@ import {
 } from "@react-navigation/native";
 import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
+import * as Animatable from 'react-native-animatable';
 
 const MessagingUI = () => {
   const isFocused = useIsFocused();
@@ -61,6 +62,7 @@ const MessagingUI = () => {
       } else {
         setMessages((prevMessages) => [...prevMessages, data]);
         setMessage("");
+        animateMessage();
       }
 
       if (messages.length > 1) {
@@ -199,6 +201,9 @@ const MessagingUI = () => {
       //console.log(data.UGC.name);
     }
   };
+  animateMessage = () => {
+    this.messageRef.fadeIn(250); // You can adjust the duration (1000ms in this example)
+  }
 
   useEffect(() => {
     fetchMessages();
@@ -401,6 +406,7 @@ const MessagingUI = () => {
               user.Ammount_Users >= 3 && isFirstOtherMessage;
 
             return (
+              <Animatable.View ref={(ref) => this.messageRef = ref}>
               <View>
                 {shouldDisplaySenderName && (
                   <Text style={styles.senderName}>{item.UGC.name}</Text>
@@ -430,6 +436,7 @@ const MessagingUI = () => {
                   </Text>
                 </View>
               </View>
+              </Animatable.View>
             );
           }}
           keyExtractor={(_, index) => index.toString()}
@@ -437,8 +444,11 @@ const MessagingUI = () => {
         />
       </View>
       <View style={styles.inputContainer}>
-        <TextInput
-          style={[styles.input, { height: Math.max(40, inputHeight) }]}
+      <TextInput
+    style={[
+      styles.input,
+      { height: Math.min(200, Math.max(40, inputHeight)) } // Set maximum height to 100
+    ]}
           value={message}
           onChangeText={(text) => setMessage(text)}
           placeholder="Type a message..."
