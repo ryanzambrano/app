@@ -71,15 +71,14 @@ export const AddPrompts = ({ navigation, route }) => {
   const fetchExistingAnswers = async () => {
     if (session?.user) {
       const { data: existingAnswers, error } = await supabase
-        .from("prompts") // Replace "prompts" with your actual table name.
+        .from("prompts") 
         .select("*")
         .eq("user_id", session.user.id)
-        .single(); // Use this if there's only one row of data for each user.
+        .single(); 
 
       if (error) {
         console.error("Error fetching existing answers:", error);
       } else if (existingAnswers) {
-        // Map existing answers to your questions.
         const mappedAnswers = presetQuestions.map((question) => {
           const columnName = questionColumnMapping[question];
           return existingAnswers[columnName] || "";
@@ -91,13 +90,13 @@ export const AddPrompts = ({ navigation, route }) => {
   };
 
   const handleSave = async () => {
+    const trimmedAnswers = answers.map(answer => answer.trim()); 
     const answersObj = presetQuestions.reduce((obj, question, index) => {
-      const columnName = questionColumnMapping[question];
-      obj[columnName] = answers[index];
-      return obj;
-    }, {});
+    const columnName = questionColumnMapping[question];
+    obj[columnName] = trimmedAnswers[index];  
+    return obj;
+  }, {});
 
-    console.log(answersObj);
     if (session?.user) {
       const { data, error } = await supabase
         .from("prompts")

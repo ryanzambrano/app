@@ -145,15 +145,19 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
       if (editedUser.bio.length <= 700) {
         const trimmedBio = editedUser.bio.trimEnd();
+        const name = editedUser.name.trimEnd();
+        const major = editedUser.major.trimEnd();
+        const class_year = editedUser.class_year.trimEnd();
+        const hometown = editedUser.hometown.trimEnd();
         const { data, error } = await supabase
           .from("UGC")
           .update([
             {
-              name: editedUser.name,
+              name: name,
               bio: trimmedBio,
-              major: editedUser.major,
-              class_year: editedUser.class_year,
-              hometown: editedUser.hometown,
+              major: major,
+              class_year: class_year,
+              hometown: hometown,
             },
           ])
           .eq("user_id", session.user.id);
@@ -348,6 +352,17 @@ export const EditProfileScreen = ({ navigation, route }) => {
             )}
 
             <Text style={styles.more}>More about me:</Text>
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: 12,
+                fontWeight: 500,
+                color: "darkgrey",
+                paddingBottom: 8,
+              }}
+            >
+              Click any prompt to edit
+            </Text>
           </>
         }
         ListFooterComponent={
@@ -491,7 +506,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#2B2D2F",
     borderRadius: 15,
     justifyContent: "center",
-    paddingBottom: 10,
+    paddingBottom: 18,
     marginBottom: 10,
     paddingHorizontal: 15,
     borderBottomWidth: 1.4,

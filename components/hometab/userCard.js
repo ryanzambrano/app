@@ -433,13 +433,21 @@ const UserCard = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
+      <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
         >
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
+      <Animated.View
+        style={{
+          //...styles.profileContainer,
+          opacity: profileOpacity,
+          zIndex: profileZIndex,
+        }}
+      >
+      <View style={styles.header}>
+        
         <Text style={styles.name}>{name}</Text>
         <View style={styles.backButton}></View>
         <TouchableOpacity
@@ -449,7 +457,7 @@ const UserCard = ({ navigation, route }) => {
           <AntDesign name="deleteuser" size={24} color="white" />
         </TouchableOpacity>
       </View>
-
+</Animated.View>
       <Animated.View
         style={{
           ...styles.profileContainer,
@@ -658,9 +666,10 @@ const styles = StyleSheet.create({
   backButton: {
   position: 'absolute',   
   left: 0,   
-  paddingTop: 70,    
+  paddingTop: 45,    
   marginRight: 15,
   paddingLeft: 15,
+  zIndex: 10000000,
   },
   blockButton: {
     position: 'absolute',  
@@ -705,7 +714,8 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontSize: 30,
     color: "#149999",
-    zIndex: 1,
+    
+    zIndex: 10000000,
   },
 
   photoContainer: {
