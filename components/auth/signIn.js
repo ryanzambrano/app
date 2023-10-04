@@ -89,7 +89,7 @@ export const SignIn = ({ navigation }) => {
                 style={styles.inputControl}
                 hi
                 autoCapitalize="none"
-                autoCorrect={false}
+                autoCorrect={true}
                 keyboardType="email-address"
                 //placeholder="deeznuts@bruh.com"
                 placeholderTextColor="#6b7280"
@@ -103,7 +103,7 @@ export const SignIn = ({ navigation }) => {
               <TextInput
                 style={styles.inputControl}
                 styles={styles.inputControl}
-                autoCorrect={false}
+                autoCorrect={true}
                 //placeholder="*********"
                 placeholderTextColor="#6b7280"
                 value={form.password}

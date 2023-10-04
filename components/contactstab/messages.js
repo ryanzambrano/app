@@ -137,7 +137,8 @@ const MessagingUI = () => {
         .eq("Group_ID_Sent_To", user.Group_ID)
         .order("created_at", { ascending: false })
         .limit(1); // Get only the most recent message;
-        const readArray = recentmessage1[0]?.Read || []; // Extract the Read array
+        const readArray = recentmessage1[0]?.Read || [];
+         // Extract the Read array
         if (!readArray.includes(session.user.id)) {
           // Append session.user.id to the array
           readArray.push(session.user.id);
@@ -228,6 +229,33 @@ const MessagingUI = () => {
       //console.log(data.UGC.name);
     }
   };
+  const readMessages = async () => {
+    const { data: recentmessage1, error: recentmessageerror1 } = await supabase
+        .from("Group Chat Messages")
+        .select('Read') // Update the "Read" column
+        .eq("Group_ID_Sent_To", user.Group_ID)
+        .order("created_at", { ascending: false })
+        .limit(1); // Get only the most recent message;
+        const readArray = recentmessage1[0]?.Read || [];
+         // Extract the Read array
+        if (!readArray.includes(session.user.id)) {
+          // Append session.user.id to the array
+          readArray.push(session.user.id);
+
+
+        const { data: recentmessagedata, error: recentmessageerror } = await supabase
+        .from("Group Chat Messages")
+        .update({ Read: readArray }) // Update the "Read" column
+        .eq("Group_ID_Sent_To", user.Group_ID)
+        .order("created_at", { ascending: false })
+        .limit(1); // Get only the most recent message;
+        
+      if(recentmessageerror)
+      {
+        console.log(recentmessageerror);
+      }
+    }
+  };
   animateMessage = () => {
     this.messageRef.fadeIn(250); // You can adjust the duration (1000ms in this example)
   }
@@ -249,6 +277,7 @@ const MessagingUI = () => {
         },
         (payload) => {
           fetchMessages();
+          readMessages();
         }
       )
       .subscribe();

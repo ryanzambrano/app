@@ -397,9 +397,19 @@ const ContactsUI = ({ route }) => {
               {renderProfilePicture()}
               <View style={styles.contactInfo}>
   <View style={styles.contactNameContainer}>
-    <Text numberOfLines={1} ellipsizeMode='tail' style={styles.contactName}>
-      {item.joinedGroups}
-    </Text>
+  <Text
+    numberOfLines={1}
+    ellipsizeMode="tail"
+    style={{
+      ...(item.recentMessage && !item.recentMessage.Read.includes(session.user.id)
+        ? styles.UnreadcontactName // Apply this style when the condition is true
+        : styles.contactName // Apply this style when the condition is false
+      ),
+    }}
+  >
+    {item.joinedGroups}
+  </Text>
+
     {item.recentMessage && item.recentMessage.created_at ? (
       <Text style={styles.MessageTime}>
         {formatRecentTime(item.recentMessage.created_at)}
@@ -409,14 +419,20 @@ const ContactsUI = ({ route }) => {
   <View style={styles.recentMessageContainer}>
     {item.recentMessage ? (
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Text 
-          numberOfLines={1} 
-          ellipsizeMode='tail' 
-          style={styles.RecentMessage}
-        >
-          {item.recentMessage.Message_Content}
-        </Text>
-        {item.recentMessage && item.recentMessage.Read != null ? (
+  <Text
+    numberOfLines={1}
+    ellipsizeMode="tail"
+    style={{
+      ...(item.recentMessage && !item.recentMessage.Read.includes(session.user.id)
+        ? styles.UnreadRecentMessage // Apply this style when the condition is true
+        : styles.RecentMessage // Apply this style when the condition is false
+      ),
+      width: 265, // Adjust the width as needed
+    }}
+  >
+    {item.recentMessage.Message_Content}
+  </Text>
+        {item.recentMessage && !item.recentMessage.Read.includes(session.user.id) ? (
           <View style={styles.circle} /> // Add this View for the solid circle
         ) : null}
       </View>
@@ -495,8 +511,8 @@ const styles = StyleSheet.create({
     height: 10, // Adjust the height to your preference
     borderRadius: 5, // Half of the width/height to create a circle
     backgroundColor: '#159e9e', // Change this to your desired circle color
-    alignSelf: 'flex-end', 
-    marginRight: 3,// Align the circle to the right of its container
+    //alignSelf: 'flex-end', 
+    marginRight: 4,// Align the circle to the right of its container
   },
   layeredImage: {
     width: 40, 
@@ -591,6 +607,13 @@ const styles = StyleSheet.create({
     color: "white",
     flexShrink: 1,
   },
+  UnreadcontactName: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 5,
+    color: "white",
+    flexShrink: 1,
+  },
   MessageTime: {
     fontSize: 14,
     fontWeight: "light",
@@ -602,6 +625,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "light",
     color: "#cbcace",
+  },
+  UnreadRecentMessage: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "white",
   },
   contactStatus: {
     fontSize: 14,
