@@ -110,7 +110,7 @@ const ContactsUI = ({ route }) => {
           .order("created_at", { ascending: false })
           .limit(1)
           .single();
-    
+
         const { data: Imagedata, error: ImageError } = await supabase
           .from("images")
           .select("*")
@@ -387,42 +387,53 @@ const ContactsUI = ({ route }) => {
     };
     return (
       <Animated.View style={{ opacity: opacityValue }}>
-      <Swipeable
-        renderRightActions={renderRightActions}
-        overshootRight={false}
-        useNativeDriver={true}
+        <Swipeable
+          renderRightActions={renderRightActions}
+          overshootRight={false}
+          useNativeDriver={true}
+        >
+          <TouchableOpacity onPress={() => handleUserCardPress(item)}>
+            <View style={styles.contactItem}>
+              {renderProfilePicture()}
+              <View style={styles.contactInfo}>
+  <View style={styles.contactNameContainer}>
+    <Text numberOfLines={1} ellipsizeMode='tail' style={styles.contactName}>
+      {item.joinedGroups}
+    </Text>
+    {item.recentMessage && item.recentMessage.created_at ? (
+      <Text style={styles.MessageTime}>
+        {formatRecentTime(item.recentMessage.created_at)}
+      </Text>
+    ) : null}
+  </View>
+  <View style={styles.recentMessageContainer}>
+    {item.recentMessage ? (
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Text 
+          numberOfLines={1} 
+          ellipsizeMode='tail' 
+          style={styles.RecentMessage}
+        >
+          {item.recentMessage.Message_Content}
+        </Text>
+        {item.recentMessage && item.recentMessage.Read != null ? (
+          <View style={styles.circle} /> // Add this View for the solid circle
+        ) : null}
+      </View>
+    ) : (
+      <Text 
+        numberOfLines={1}
+        ellipsizeMode='tail'
+        style={styles.RecentMessage}
       >
-        <TouchableOpacity onPress={() => handleUserCardPress(item)}>
-          <View style={styles.contactItem}>
-            {renderProfilePicture()}
-            <View style={styles.contactInfo}>
-              <View style={styles.contactNameContainer}>
-                <Text numberOfLines={1} ellipsizeMode='tail' style={styles.contactName}>{item.joinedGroups}</Text>
-                {item.recentMessage && item.recentMessage.created_at ? (
-                  <Text style={styles.MessageTime}>
-                    {formatRecentTime(item.recentMessage.created_at)}
-                  </Text>
-                ) : null}
+        No messages yet
+      </Text>
+    )}
+  </View>
               </View>
-              {item.recentMessage ? (
-                <Text 
-                numberOfLines={1} 
-                ellipsizeMode='tail' 
-                style={styles.RecentMessage}
-                >
-                  {item.recentMessage.Message_Content}
-                </Text>
-              ) : <Text 
-              numberOfLines={1}
-              ellipsizeMode='tail'
-              style={styles.RecentMessage}
-            >
-              No messages yet
-            </Text>}
             </View>
-          </View>
-        </TouchableOpacity>
-      </Swipeable>
+          </TouchableOpacity>
+        </Swipeable>
       </Animated.View>
     );
   };
@@ -478,6 +489,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#1D1D20",
+  },
+  circle: {
+    width: 10, // Adjust the width to your preference
+    height: 10, // Adjust the height to your preference
+    borderRadius: 5, // Half of the width/height to create a circle
+    backgroundColor: '#159e9e', // Change this to your desired circle color
+    alignSelf: 'flex-end', 
+    marginRight: 3,// Align the circle to the right of its container
   },
   layeredImage: {
     width: 40, 
@@ -576,7 +595,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "light",
     color: "#cbcace",
-    marginRight: 80,
   },
   contactStatus: {
     fontSize: 14,

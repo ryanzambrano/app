@@ -52,6 +52,7 @@ const MessagingUI = () => {
             Message_Content: message,
             Group_ID_Sent_To: user.Group_ID,
             Sent_From: session.user.id,
+            Read: [session.user.id],
           },
         ])
         .select()
@@ -129,6 +130,32 @@ const MessagingUI = () => {
         .select("*")
         .eq("Group_ID", user.Group_ID)
         .single();
+
+        const { data: recentmessage1, error: recentmessageerror1 } = await supabase
+        .from("Group Chat Messages")
+        .select('Read') // Update the "Read" column
+        .eq("Group_ID_Sent_To", user.Group_ID)
+        .order("created_at", { ascending: false })
+        .limit(1); // Get only the most recent message;
+        const readArray = recentmessage1[0]?.Read || []; // Extract the Read array
+        if (!readArray.includes(session.user.id)) {
+          // Append session.user.id to the array
+          readArray.push(session.user.id);
+
+
+        const { data: recentmessagedata, error: recentmessageerror } = await supabase
+        .from("Group Chat Messages")
+        .update({ Read: readArray }) // Update the "Read" column
+        .eq("Group_ID_Sent_To", user.Group_ID)
+        .order("created_at", { ascending: false })
+        .limit(1); // Get only the most recent message;
+        
+      if(recentmessageerror)
+      {
+        console.log(recentmessageerror);
+      }
+    }
+
 
       if (sessionError) {
         console.error(sessionError);
