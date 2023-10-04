@@ -437,6 +437,7 @@ const ContactsUI = ({ route }) => {
       </Animated.View>
     );
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -472,14 +473,13 @@ const ContactsUI = ({ route }) => {
             returnKeyType="done"
           />
         </View>
-
-        <FlatList
+      </View>
+      <FlatList
           data={filteredUsers}
           renderItem={renderContact}
           keyExtractor={(item) => item.Group_ID.toString()}
           ListEmptyComponent={renderEmptyComponent}
         />
-      </View>
       <StatusBar style="light" />
     </SafeAreaView>
   );
@@ -516,6 +516,7 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     //marginBottom: 8,
+    
   },
   headerText: {
     fontSize: 27,
@@ -530,9 +531,13 @@ const styles = StyleSheet.create({
     marginTop: -10,
   },
   viewContainer: {
-    flex: 1,
     backgroundColor: "#1D1D20",
     borderBottomColor: "#2B2D2F",
+    //paddingBottom: 3,
+    // borderBottomWidth: 0.5,
+    // borderBottomColor: "#2B2D2F",
+    // borderBottomLeftRadius: 14,
+    // borderBottomRightRadius: 14,
   },
   searchContainer: {
     flexDirection: "row",
@@ -547,6 +552,7 @@ const styles = StyleSheet.create({
     // borderWidth: 0.20,
     // borderTopWidth: 0.20,
     //borderBottomWidth: 0.2,
+    
     borderColor: "grey",
   },
   searchInput: {
@@ -555,6 +561,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
     marginLeft: 5,
+    
   },
   contactItem: {
     flexDirection: "row",
@@ -563,8 +570,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1.2,
     borderBottomColor: "#2B2D2F",
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14,
     width: "100%",
   },
   profilePicture: {

@@ -497,6 +497,7 @@ const UserCard = ({ navigation, route }) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.tab}>
+          
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
               style={[styles.friendButton, { backgroundColor: buttonColor }]}
@@ -514,55 +515,6 @@ const UserCard = ({ navigation, route }) => {
               <Text style={styles.chatButtonText}>Message</Text>
             </TouchableOpacity>
           </View>         
-                  
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.horizontalInfoScrollView}
-          >
-          {class_year && (
-            <View style={styles.infoContainer}>
-              <Entypo name="graduation-cap" size={22} color="white" />
-              <Text style={styles.bio}>  {class_year}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-          )} 
-          {major && (
-            <View style={styles.infoContainer}>
-              <Entypo name="open-book" size={22} color="white" />
-              <Text style={styles.bio}>  {major}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-            
-          )}
-          {age && (
-            <View style={styles.infoContainer}>
-              <MaterialIcons name="cake" size={22} color="white" />
-              <Text style={styles.bio}>  {age}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-          )}
-          {gender && (
-            <View style={styles.infoContainer}>
-              <Ionicons name="md-person-sharp" size={22} color="white" />
-              <Text style={styles.bio}>  {gender}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-          )}
-          {hometown && (
-            <View style={styles.infoContainer} paddingRight={30}>
-              <MaterialIcons name="home-filled" size={26} color="white" />
-              <Text style={styles.bio}>  {hometown}</Text>
-            </View>
-          )}
-        </ScrollView>
-        {bio && (
-          <View style={styles.bioContainer}>
-            <View style={styles.roundedContainer}>
-              <Text style={styles.bio}>{bio}</Text>
-            </View>
-          </View>
-        )}
           <TouchableOpacity
             style={styles.questionaireButtonContainer}
             onPress={() => handleQuestionaireButtonPress()}
@@ -572,14 +524,86 @@ const UserCard = ({ navigation, route }) => {
               View Questionaire Responses
             </Text>
           </TouchableOpacity>
+
+          <View style={styles.roundedContainer}>
+          <Text style={styles.bioHeader} paddingBottom={15}>Details</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            paddingBottom={20}
+            paddingTop={4}
+            paddingHorizontal={15}
+          >
+          {class_year && (
+            <View style={styles.infoContainer}>
+              <Entypo name="graduation-cap" size={22} color="white" />
+              <Text style={styles.detailsText}> {class_year}</Text>
+              <View style={styles.verticalDivider}/>
+            </View>
+          )} 
+          
+          {age && (
+            <View style={styles.infoContainer}>
+              <MaterialIcons name="cake" size={22} color="white" />
+              <Text style={styles.detailsText}>{age}</Text>
+              <View style={styles.verticalDivider}/>
+            </View>
+          )}
+          {gender && (
+            <View style={styles.infoContainer}>
+              <Ionicons name="md-person-sharp" size={22} color="white" />
+              <Text style={styles.detailsText}>{gender}</Text>
+            </View>
+          )}
+          {major && (
+            <View style={styles.infoContainer}>
+              <View style={styles.verticalDivider2}/>
+              <Entypo name="open-book" size={22} color="white" />
+              <Text style={styles.detailsText}> {major}</Text>
+            </View>
+          )}
+          {!hometown && (
+            <View style={styles.infoContainer} paddingRight={33}></View>
+          )}
+          {hometown && (
+            <View style={styles.infoContainer} paddingRight={35}>
+              <View style={styles.verticalDivider2}/>
+              <MaterialIcons name="home-filled" marginLeft={-2} size={26} color="white" />
+              <Text style={styles.detailsText}>{hometown}</Text>
+            </View>
+          )}
+        </ScrollView>
+        </View>     
+
+        {bio && (
+          <View style={styles.roundedContainer}>
+          <View style={styles.bio}>
+            <View>
+              <Text style={styles.bioHeader}>About {name}</Text>
+              <Text style={styles.bioText}>
+                {bio}
+              </Text>
+            </View>
+          </View>
+          </View>
+        )}
+
+      {prompts.some((item) => item.answer) && (
+        <View style={styles.roundedContainer}>
+          {prompts.some((item) => item.answer) && (
+                <Text style={styles.bioHeader}>Additional Info</Text>
+              )}
           <ScrollView
             horizontal
             style={styles.horizontalScrollView}
             showsHorizontalScrollIndicator={false}
             bounces={false}
+            
           >
             {prompts.map((item, index) =>
+            
               item.answer ? (
+                
                 <View key={index} style={styles.itemContainer}>
                   <Text style={styles.itemPrompt}>
                     {promptQuestions[item.prompt]}
@@ -589,12 +613,17 @@ const UserCard = ({ navigation, route }) => {
               ) : null
             )}
           </ScrollView>
-          <View style={styles.tagsContainer}>
-            {tags.map((tag, index) => (
-              <View key={index} style={styles.tag}>
-                <Text style={styles.tagText}>{tag}</Text>
-              </View>
-            ))}
+          </View>
+          )}
+          <View style={styles.roundedContainer}>
+            <Text style={styles.bioHeader}>Interests</Text>
+            <View style={styles.tagsContainer} marginBottom={25}>
+              {tags.map((tag, index) => (
+                <View key={index} style={styles.tag}>
+                  <Text style={styles.tagText}>{tag}</Text>
+                </View>
+              ))}
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -605,47 +634,59 @@ const UserCard = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    zIndex: 300,
+    //zIndex: 300,
     padding: 16,
     marginHorizontal: 0,
     backgroundColor: "#1D1D20",
   },
+  
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 13,
     marginTop: -80,
     paddingTop: 80,
     backgroundColor: "#1D1D20",
-    justifyContent: "space-between",
-    paddingVertical: 10,
-    zIndex: 3,
+    justifyContent: "center",
+    paddingVertical: 15,
+    //zIndex: 3,
+    // borderBottomColor: "#2B2D2F",
+    // borderBottomWidth: 1,
+  
   },
 
   backButton: {
-    marginRight: 15,
-    paddingLeft: 15,
-    paddingRight: 40,
+  position: 'absolute',   
+  left: 0,   
+  paddingTop: 70,    
+  marginRight: 15,
+  paddingLeft: 15,
   },
   blockButton: {
+    position: 'absolute',  
+    right: 0,            
+    paddingTop: 70,
     paddingRight: 10,
   },
   name: {
     fontSize: 20,
-    marginRight: -50,
     fontWeight: "600",
     color: "white",
     textAlign: "center",
   },
   questionaireButtonContainer: {
     flex: 1,
-    marginHorizontal: 10,
+    marginHorizontal: 13,
+    marginTop: 4,
     backgroundColor: "#14999999", //#2B2D2F
-    paddingVertical: 10,
-    borderRadius: 15,
+    paddingVertical: 12,
+    borderRadius: 12,
     //marginBottom: 10,
     borderWidth: 0.4,
     alignItems: "center",
+    marginBottom: 15,
+  
+    
   },
   scrollView: {
     flex: 1,
@@ -694,8 +735,8 @@ const styles = StyleSheet.create({
     flex: 1,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    paddingTop: 10,
-    marginTop: -8,
+    paddingTop: 12,
+    marginTop: -10,
     //shadow
     shadowColor: "#000",
     shadowOffset: {
@@ -704,7 +745,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.75,
     shadowRadius: 4.84,
-    zIndex: 2,
+    zIndex: 1000,
+    paddingBottom: 20,
   },
   fullPhoto: {
     width: "100%",
@@ -715,10 +757,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 0,
+    paddingHorizontal: 3,
+  
+    // borderBottomColor: "grey",
+    // borderBottomWidth: 0.3,
+    // borderBottomEndRadius: 20,
+    // borderBottomStartRadius: 20,
   },
   friendButton: {
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 13,
     alignItems: "center",
     marginBottom: 10,
@@ -735,7 +782,7 @@ const styles = StyleSheet.create({
   },
   chatButton: {
     backgroundColor: "#1D1D20",
-    borderRadius: 10,
+    borderRadius: 12,
     marginRight: 10,
     padding: 13,
     alignItems: "center",
@@ -761,42 +808,95 @@ const styles = StyleSheet.create({
     borderWidth: 0.4,
     //borderColor: "grey",
   },
+  bio: {
+    fontSize: 18,
+    fontWeight: "600",
+    //paddingLeft: 25,
+    
+    paddingBottom: 25,
+    paddingTop: 5,
+    //color: "white",
+    // borderBottomColor: "grey",
+    // borderBottomWidth: 0.3,
+    // borderBottomEndRadius: 20,
+    // borderBottomStartRadius: 20,
+  },
+  bioHeader: {
+    alignSelf: "center",
+    fontWeight: "600",
+    paddingBottom: 20,
+    marginTop: 20,
+    marginBottom: 5,
+    fontSize: 20,
+    color: "white",
+  },
+  bioText: {
+    fontSize: 16,
+    marginLeft: 25,
+    marginRight: 25,
+    color: "white",
+  },
   roundedContainer: {
     backgroundColor: "#1D1D20",
     borderRadius: 50,
     padding: 1,
   },
-  bio: {
+  detailsText: {
     color: "white",
     fontSize: 16,
     textAlign: "justify",
   },
-  ageMajorGradeContainer: {
-    paddingHorizontal: 20,
-    flexDirection: "column",
-    alignItems: "stretch",
+  details: {
+    alignItems: "left",
     justifyContent: "center",
-    backgroundColor: "#1D1D20",
-    borderRadius: 15,
-    marginBottom: 10,
-    paddingVertical: 15,
-    borderWidth: 0.4,
-    marginRight: 10,
-    marginLeft: 10,
-    //borderColor: "grey",
+    gap: 23,
   },
-  divider: {
-    height: 0.3,
-    backgroundColor: "grey",
-    marginVertical: 12,
-    marginHorizontal: -10,
+  
+  major: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 0,
+    gap: 10,
+    justifyContent: "left",
+  },
+  icons: {
+    alignContent: "center",
+    alignItems: "center",
+    gap: 17,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', 
+    paddingLeft: 10,  // Space on the left side of the row
+    paddingRight: 20,
+  },
+  leftColumn: {
+    flexDirection: 'column',
+    gap: 5,
+  },
+  rightColumn: {
+    flexDirection: 'column',
+    alignItems: 'flex-start', 
+    gap: 5,
+  },
+  iconAndText: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,  
+  },
+  detailsText: {
+    marginLeft: 10, 
+    color: 'white',
+    fontSize: 16,
   },
   tagsContainer: {
-    backgroundColor: "#111111",
+    backgroundColor: "#1D1D20",
     flexDirection: "row",
     flexWrap: "wrap",
-    paddingVertical: 10,
-    marginBottom: 40,
+    paddingBottom: 25,
+    marginTop: -2,
+    marginBottom: 0,
     borderRadius: 15,
     justifyContent: "center",
     // borderWidth: 0.4,
@@ -818,19 +918,22 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "600",
   },
-  horizontalScrollView: {
-    borderBottomEndRadius: 20,
-    borderBottomStartRadius: 20,
-  },
+  // horizontalScrollView: {
+  //   borderBottomWidth: 0.3,
+  //   borderBottomColor: "grey",
+
+  //   borderBottomEndRadius: 20,
+  //   borderBottomStartRadius: 20,
+  // },
   itemContainer: {
     marginHorizontal: 15,
-    backgroundColor: "#1D1D20",
-    borderWidth: 0.5,
+    backgroundColor: "#2B2D2F",
+    //borderWidth: 0.5,
     //borderColor: "lightgrey",
     borderRadius: 50,
     padding: 30,
     width: 300,
-    marginVertical: 15,
+    marginBottom: 25,
     minWidth: 150,
     gap: 10,
   },
@@ -860,7 +963,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
     flexDirection: "row",
   },
 
@@ -869,13 +972,40 @@ const styles = StyleSheet.create({
     backgroundColor: "grey",
     height: "100%",
     alignSelf: "center",
-    marginLeft: 15,
-    marginRight: -5,
+    marginLeft: 20,
+    marginRight: 10,
   },
-  icon: {
-    width: 30,
-    height: 30,
+  verticalDivider2: {
+    width: 0.3,
+    backgroundColor: "grey",
+    height: "100%",
+    alignSelf: "center",
+    marginLeft: 9,
+    marginRight: 20,
   },
+  profileDetails: {
+    flex: 1,
+    padding: 16,
+    paddingVertical: 20,
+    paddingTop: 0,
+    gap: 10,
+    marginBottom: -5,
+    // borderBottomColor: "grey",
+    // borderBottomWidth: 0.3,
+    // borderBottomEndRadius: 20,
+    // borderBottomStartRadius: 20,
+    
+  },
+  
+  roundedContainer: {
+    backgroundColor: "#1D1D20",
+    borderRadius: 20, 
+    padding: 0, 
+     
+    marginBottom: 15,
+    marginHorizontal: 15,
+},
+
 });
 
 export default UserCard;
