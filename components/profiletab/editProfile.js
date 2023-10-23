@@ -23,7 +23,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
   const { session } = route.params;
   const [editedUser, setEditedUser] = useState(route.params.editedUser);
   //editedUser.tags = route.params.selectedTags;
-  const [bioCharCount, setBioCharCount] = useState(editedUser.bio.length);
+  const [bioCharCount, setBioCharCount] = useState("");
 
   const { updated } = route.params;
   const selectedTags = route.params.selectedTags;
@@ -113,10 +113,9 @@ export const EditProfileScreen = ({ navigation, route }) => {
         setProfilePicture(null);
       }
     } catch (error) {
-      alert("Couldn't fetch profile picture");
+      console.log(error.message);
     }
   };
-  2;
 
   const updateProfile = async () => {
     if (session?.user) {
@@ -162,7 +161,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
           ])
           .eq("user_id", session.user.id);
         if (error) {
-          alert(error.message);
+          console.error(error.message);
         } else {
           navigation.navigate("Tabs", { updated: true });
         }

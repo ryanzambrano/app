@@ -44,7 +44,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
         .eq("user_id", session.user.id);
 
       if (error) {
-        alert(error.message);
+        console.log(error.message);
       }
 
       if (data) {
@@ -395,7 +395,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     margin: 10,
   },
- 
 });
 
 export default ImagePickerScreen;

@@ -19,6 +19,8 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { calculateCompatibility } from "../auth/profileUtils.js";
 
 const logo = require("../../assets/logo4.png");
 const isBookmarkedColor = "#14999999";
@@ -40,6 +42,15 @@ const Home = ({ route }) => {
   const [gendaPreference, setGendaPreference] = useState("Any");
   const [housinPreference, setHousinPreference] = useState("Any");
   const isFocused = useIsFocused();
+
+  // Assume this function is called whenever the homepage is visited.
+  const onHomePageVisit = async () => {
+    try {
+      await AsyncStorage.setItem("homepageVisited", "true");
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const {
     housingPreference = housinPreference,
@@ -97,40 +108,6 @@ const Home = ({ route }) => {
     );
   };
 
-  const calculateCompatibility = (sessionUser, otherUser) => {
-    //console.log(otherUser.profiles.sleep_time);
-    //console.log(sessionUser.profiles.sleep_time);
-
-    let score = 0;
-
-    if (Array.isArray(sessionUser.tags) && Array.isArray(otherUser.tags)) {
-      sessionUser.tags.forEach((tag) => {
-        if (otherUser.tags.includes(tag)) score += 4;
-      });
-    }
-    if (sessionUser.profiles.for_fun === otherUser.profiles.for_fun) score += 5;
-    if (sessionUser.profiles.tidiness === otherUser.profiles.tidiness)
-      score += 5;
-    if (
-      sessionUser.profiles.noise_preference ===
-      otherUser.profiles.noise_preference
-    )
-      score += 5;
-    if (sessionUser.profiles.sleep_time === otherUser.profiles.sleep_time)
-      score += 5;
-    if (
-      sessionUser.profiles.living_preferences ===
-      otherUser.profiles.living_preferences
-    )
-      score += 5;
-    if (sessionUser.profiles.studies === otherUser.profiles.studies) score += 3;
-
-    if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 2;
-    if (sessionUser.class_year === otherUser.class_year) score += 2;
-    if (sessionUser.profiles.gender === otherUser.profiles.gender) score += 1;
-    return score;
-  };
-
   const sortedUsers = users.sort((a, b) => {
     //console.log(a, b);
     switch (sortMethod) {
@@ -165,6 +142,9 @@ const Home = ({ route }) => {
     );
 
     // console.log(housingPreference);
+    /*if (user.profiles.living_preferences === "No Preferences") {
+      housingPreference === "Any";
+    }*/
     const isHousingMatch =
       housingPreference === "Any" ||
       user.profiles.living_preferences === housingPreference ||
@@ -333,6 +313,7 @@ const Home = ({ route }) => {
         console.error("An unexpected error occurred:", error);
       }
       setIsLoading(false);
+      onHomePageVisit();
     };
 
     fetchUsers();
@@ -362,7 +343,7 @@ const Home = ({ route }) => {
 
   const renderUserCard = ({ item }) => {
     if (!item.lastModified) {
-      console.log(item);
+      //console.log(item);
       return null;
     }
     return (
@@ -454,24 +435,6 @@ const Home = ({ route }) => {
             extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
             renderItem={renderUserCard}
             keyExtractor={(item) => item.user_id.toString()}
-            // ListHeaderComponent={() => (
-            //   <>
-            //     <View style={styles.sortContainer}>
-            //       <Text style={styles.sortText}>Sort by:</Text>
-            //       <TouchableOpacity onPress={() => showSortMenu()}>
-            //         <Text
-            //           style={{
-            //             color: "#159e9e",
-            //             fontWeight: "bold",
-            //             fontSize: 15,
-            //           }}
-            //         >
-            //           {sortMethod}
-            //         </Text>
-            //       </TouchableOpacity>
-            //     </View>
-            //   </>
-            // )}
             ListEmptyComponent={renderEmptyComponent}
           />
         )}
