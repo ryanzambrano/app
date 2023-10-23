@@ -190,7 +190,7 @@ const AddPerson = ({ route }) => {
     const combinedArray = selectedUserIDs.concat(groupids);
     const finalarray = combinedArray.sort();
     const { data: insertData, error: insertError } = await supabase
-        .from("Group Chats")
+        .from("Group_Chats")
         .update({ User_ID: finalarray, Ammount_Users: finalarray.length })
         .contains("User_ID", groupids)
         .eq("Ammount_Users", groupids.length);

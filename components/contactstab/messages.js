@@ -46,7 +46,7 @@ const MessagingUI = () => {
       setIsButtonDisabled(true); // Disable the button
 
       const { data, error } = await supabase
-        .from("Group Chat Messages")
+        .from("Group_Chat_Messages")
         .insert([
           {
             Message_Content: message,
@@ -126,13 +126,13 @@ const MessagingUI = () => {
         .single();
 
       const { data: groupchatdata, error } = await supabase
-        .from("Group Chats")
+        .from("Group_Chats")
         .select("*")
         .eq("Group_ID", user.Group_ID)
         .single();
 
         const { data: recentmessage1, error: recentmessageerror1 } = await supabase
-        .from("Group Chat Messages")
+        .from("Group_Chat_Messages")
         .select('Read') // Update the "Read" column
         .eq("Group_ID_Sent_To", user.Group_ID)
         .order("created_at", { ascending: false })
@@ -145,7 +145,7 @@ const MessagingUI = () => {
 
 
         const { data: recentmessagedata, error: recentmessageerror } = await supabase
-        .from("Group Chat Messages")
+        .from("Group_Chat_Messages")
         .update({ Read: readArray }) // Update the "Read" column
         .eq("Group_ID_Sent_To", user.Group_ID)
         .order("created_at", { ascending: false })
@@ -214,7 +214,7 @@ const MessagingUI = () => {
 
   const fetchMessages = async () => {
     const { data, error } = await supabase
-      .from("Group Chat Messages")
+      .from("Group_Chat_Messages")
       .select(`*, UGC (name)`)
       .eq("Group_ID_Sent_To", user.Group_ID)
       .order("created_at", { ascending: false })
@@ -231,7 +231,7 @@ const MessagingUI = () => {
   };
   const readMessages = async () => {
     const { data: recentmessage1, error: recentmessageerror1 } = await supabase
-        .from("Group Chat Messages")
+        .from("Group_Chat_Messages")
         .select('Read') // Update the "Read" column
         .eq("Group_ID_Sent_To", user.Group_ID)
         .order("created_at", { ascending: false })
@@ -244,7 +244,7 @@ const MessagingUI = () => {
 
 
         const { data: recentmessagedata, error: recentmessageerror } = await supabase
-        .from("Group Chat Messages")
+        .from("Group_Chat_Messages")
         .update({ Read: readArray }) // Update the "Read" column
         .eq("Group_ID_Sent_To", user.Group_ID)
         .order("created_at", { ascending: false })
@@ -263,28 +263,6 @@ const MessagingUI = () => {
   useEffect(() => {
     fetchMessages();
 
-    const channel = supabase
-      .channel("custom-all-channel")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "Group Chat Messages",
-          filter: {
-            Group_ID_Sent_To: user.Group_ID,
-          },
-        },
-        (payload) => {
-          fetchMessages();
-          readMessages();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
   }, [session.user.id, messages]);
 
   useEffect(() => {

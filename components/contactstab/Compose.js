@@ -224,7 +224,7 @@ const ComposeMessageScreen = ({ route }) => {
 
       // Insert the new record with User_ID, Group_ID, and Group_Name
       const { data: insertData, error: insertError } = await supabase
-        .from("Group Chats")
+        .from("Group_Chats")
         .insert([
           {
             User_ID: selectedUserIDs, // Join selected user names with commas
@@ -253,7 +253,7 @@ const ComposeMessageScreen = ({ route }) => {
         if (insertError.code === "23505") {
           const { data: navigationdata, error: navigationError } =
             await supabase
-              .from("Group Chats")
+              .from("Group_Chats")
               .select("*")
               .contains("User_ID", selectedUserIDs)
               .eq("Ammount_Users", selectedUserIDs.length);

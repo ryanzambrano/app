@@ -53,7 +53,7 @@ const ContactsUI = ({ route }) => {
 
   const fetchUsers = async () => {
     const { data: users, error } = await supabase
-      .from("Group Chats")
+      .from("Group_Chats")
       .select("*")
       .contains("User_ID", [session.user.id]);
 
@@ -104,7 +104,7 @@ const ContactsUI = ({ route }) => {
     
         // Fetch the most recent group chat message
         const { data: recentMessageData, error: messageError } = await supabase
-          .from("Group Chat Messages")
+          .from("Group_Chat_Messages")
           .select("*")
           .eq("Group_ID_Sent_To", user.Group_ID)
           .order("created_at", { ascending: false })
@@ -175,25 +175,22 @@ const ContactsUI = ({ route }) => {
 
   useEffect(() => {
     fetchUsers();
-
-    const channel = supabase
-      .channel("custom-all-channel")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table:
-            "Group Chats" /*filter: `.or(Sent_From.eq.${session.user.id}, Contact_ID.eq.${session.user.id})`, */,
-        },
-        (payload) => {
-          fetchUsers();
-        }
-      )
+    const channel = supabase.channel('room1');
+    const subscription = channel
+      .on('postgres_changes', { event: '*', schema: 'public', table: "Group_Chats"}, payload => {
+        fetchUsers();
+      })
       .subscribe();
+
+    // Clean up the subscription when the component unmounts
     return () => {
-      supabase.removeChannel(channel);
+      subscription.unsubscribe();
     };
+  }, []);  
+
+
+  useEffect(() => {
+   
   }, [isFocused]);
 
   const handleUserCardPress = (user) => {
@@ -228,7 +225,7 @@ const ContactsUI = ({ route }) => {
         }).start(async () => {
           // After the animation is complete, perform the deletion logic
           const { error } = await supabase
-            .from("Group Chat Messages")
+            .from("Group_Chat_Messages")
             .delete()
             .eq("Group_ID_Sent_To", item.Group_ID);
   
@@ -239,7 +236,7 @@ const ContactsUI = ({ route }) => {
   
           // Now delete from the "Group Chats" table
           const { error: groupChatsError } = await supabase
-            .from("Group Chats")
+            .from("Group_Chats")
             .delete()
             .eq("Group_ID", item.Group_ID);
   
