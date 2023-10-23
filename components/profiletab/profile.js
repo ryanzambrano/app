@@ -247,83 +247,102 @@ export const Profile = ({ navigation, route }) => {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.tab}>
-            <View style={styles.profileDetails}>
-              <Text style={styles.name}>{editedUser.name}</Text>
-              <View style={styles.major}>
-                <View style={styles.icons}>
-                  {editedUser.class_year && (
-                    <Entypo
-                      name="graduation-cap"
-                      marginTop={-2}
-                      size={22}
+            <View style={styles.roundedContainer}>
+              <Text style={styles.nameHeader} paddingBottom={15}>
+                {editedUser.name}
+              </Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                paddingBottom={20}
+                paddingTop={4}
+                paddingHorizontal={15}
+              >
+                {editedUser.class_year && (
+                  <View style={styles.infoContainer}>
+                    <Entypo name="graduation-cap" size={22} color="white" />
+                    <Text style={styles.detailsText}>
+                      {" "}
+                      {editedUser.class_year}
+                    </Text>
+                  </View>
+                )}
+
+                {editedUser.major && (
+                  <View style={styles.infoContainer}>
+                    <View style={styles.verticalDivider2} />
+                    <Entypo name="open-book" size={22} color="white" />
+                    <Text style={styles.detailsText}> {editedUser.major}</Text>
+                  </View>
+                )}
+                {!editedUser.hometown && (
+                  <View style={styles.infoContainer} paddingRight={33}></View>
+                )}
+                {editedUser.hometown && (
+                  <View style={styles.infoContainer} paddingRight={35}>
+                    <View style={styles.verticalDivider2} />
+                    <MaterialIcons
+                      name="home-filled"
+                      marginLeft={-2}
+                      size={26}
                       color="white"
                     />
-                  )}
-                  {editedUser.major && (
-                    <Entypo name="open-book" size={22} color="white" />
-                  )}
-                  {editedUser.hometown && (
-                    <MaterialIcons name="home-filled" size={26} color="white" />
-                  )}
-                </View>
-                <View style={styles.details}>
-                  {editedUser.class_year && (
-                    <Text style={styles.text}>{editedUser.class_year}</Text>
-                  )}
-                  {editedUser.major && (
-                    <Text style={styles.text}>{editedUser.major}</Text>
-                  )}
-                  {editedUser.hometown && (
-                    <Text style={styles.text}>{editedUser.hometown}</Text>
-                  )}
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.bio}>
-              <View>
-                <Text style={styles.bioHeader}>About me</Text>
-                <Text style={styles.bioText}>
-                  {editedUser.bio ? editedUser.bio : "Your profile is looking a bit empty... click edit to get started!"}
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                borderBottomWidth: hasValidItems ? 0.3 : 0,
-                borderBottomColor: "grey",
-
-                borderBottomEndRadius: 20,
-                borderBottomStartRadius: 20,
-              }}
-            >
-              {prompts.some((item) => item.answer) && (
-                <Text style={styles.promptsHeader}>Additional Info</Text>
-              )}
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {prompts.map((item, index) =>
-                  item.answer ? (
-                    <View key={index} style={styles.itemContainer}>
-                      <Text style={styles.itemPrompt}>
-                        {promptQuestions[item.prompt]}
-                      </Text>
-                      <Text style={styles.itemAnswer}>{item.answer}</Text>
-                    </View>
-                  ) : null
+                    <Text style={styles.detailsText}>
+                      {editedUser.hometown}
+                    </Text>
+                  </View>
                 )}
               </ScrollView>
             </View>
-            <Text style={styles.promptsHeader}>Interests</Text>
-            {editedUser.tags && editedUser.tags.length > 0 && (
-              <View style={styles.tagsContainer}>
-                {editedUser.tags.map((tag, index) => (
-                  <View key={index} style={styles.tag}>
-                    <Text style={styles.tagText}>{tag}</Text>
-                  </View>
-                ))}
+
+            <View style={styles.roundedContainer}>
+              <View style={styles.bio}>
+                <View>
+                  <Text style={styles.bioHeader}>About Me</Text>
+                  <Text style={styles.bioText}>
+                    {editedUser.bio
+                      ? editedUser.bio
+                      : "Your profile is looking a bit empty... click edit to get started!"}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            {prompts.some((item) => item.answer) && (
+              <View style={styles.roundedContainer}>
+                {prompts.some((item) => item.answer) && (
+                  <Text style={styles.bioHeader}>Additional Info</Text>
+                )}
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  bounces={false}
+                >
+                  {prompts.map((item, index) =>
+                    item.answer ? (
+                      <View key={index} style={styles.itemContainer}>
+                        <Text style={styles.itemPrompt}>
+                          {promptQuestions[item.prompt]}
+                        </Text>
+                        <Text style={styles.itemAnswer}>{item.answer}</Text>
+                      </View>
+                    ) : null
+                  )}
+                </ScrollView>
               </View>
             )}
+            <View style={styles.roundedContainer}>
+              <Text style={styles.bioHeader}>Interests</Text>
+              {editedUser.tags && editedUser.tags.length > 0 && (
+                <View style={styles.tagsContainer}>
+                  {editedUser.tags.map((tag, index) => (
+                    <View key={index} style={styles.tag}>
+                      <Text style={styles.tagText}>{tag}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
           </View>
         </ScrollView>
       </View>
@@ -391,19 +410,32 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     //paddingLeft: 25,
     paddingBottom: 35,
-    paddingTop: 25,
+
     marginBottom: 0,
     //color: "white",
-    borderBottomColor: "grey",
-    borderBottomWidth: 0.3,
-    borderBottomEndRadius: 20,
-    borderBottomStartRadius: 20,
+  },
+  nameHeader: {
+    alignSelf: "center",
+    fontWeight: "700",
+    paddingBottom: 20,
+    marginTop: 20,
+    marginBottom: 5,
+    fontSize: 20,
+    color: "white",
   },
   bioHeader: {
     alignSelf: "center",
     fontWeight: "600",
     paddingBottom: 20,
+    marginTop: 20,
+    marginBottom: 5,
     fontSize: 20,
+    color: "white",
+  },
+  bioText: {
+    fontSize: 16,
+    marginLeft: 25,
+    marginRight: 25,
     color: "white",
   },
   promptsHeader: {
@@ -545,8 +577,10 @@ const styles = StyleSheet.create({
     // 1D1D20
     backgroundColor: "#111111", //101010
     flex: 1,
-    borderTopLeftRadius: 50,
-    borderTopRightRadius: 50,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    paddingTop: 12,
+    marginTop: -10,
     //shadow
     shadowColor: "#000",
     shadowOffset: {
@@ -561,21 +595,6 @@ const styles = StyleSheet.create({
     backgroundColor: "lightblue",
   },
 
-  itemContainer: {
-    borderBottomWidth: 0.3,
-    marginHorizontal: 15,
-    borderWidth: 0.5,
-    //borderColor: "grey",
-    backgroundColor: "#2B2D2F",
-    borderRadius: 50,
-    padding: 30,
-    width: 300,
-    marginRight: 10,
-    minWidth: 150,
-    gap: 10,
-    marginTop: 30,
-    marginBottom: 30,
-  },
   itemPrompt: {
     fontSize: 15,
     marginBottom: 5,
@@ -600,6 +619,139 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "400",
     textAlign: "center",
+  },
+  detailsText: {
+    color: "white",
+    fontSize: 16,
+    textAlign: "justify",
+  },
+  roundedContainer: {
+    backgroundColor: "#1D1D20",
+    borderRadius: 50,
+    padding: 1,
+  },
+  detailsText: {
+    color: "white",
+    fontSize: 16,
+    textAlign: "justify",
+  },
+  details: {
+    alignItems: "left",
+    justifyContent: "center",
+    gap: 23,
+  },
+
+  major: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 0,
+    gap: 10,
+    justifyContent: "left",
+  },
+  icons: {
+    alignContent: "center",
+    alignItems: "center",
+    gap: 17,
+  },
+
+  leftColumn: {
+    flexDirection: "column",
+    gap: 5,
+  },
+  rightColumn: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 5,
+  },
+  iconAndText: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  detailsText: {
+    marginLeft: 10,
+    color: "white",
+    fontSize: 16,
+  },
+  tagsContainer: {
+    backgroundColor: "#1D1D20",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingBottom: 25,
+    marginTop: -2,
+    marginBottom: 0,
+    borderRadius: 15,
+    justifyContent: "center",
+    marginRight: 10,
+    marginLeft: 10,
+  },
+  tag: {
+    backgroundColor: "#14999999",
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    margin: 5,
+    borderColor: "white",
+  },
+  tagText: {
+    fontSize: 14,
+    color: "white",
+    fontWeight: "600",
+  },
+
+  itemContainer: {
+    marginHorizontal: 15,
+    backgroundColor: "#2B2D2F",
+
+    borderRadius: 50,
+    padding: 30,
+    width: 300,
+    marginBottom: 25,
+    minWidth: 150,
+    gap: 10,
+  },
+  itemPrompt: {
+    fontSize: 15,
+    color: "white",
+    marginBottom: 5,
+  },
+  itemAnswer: {
+    fontWeight: "bold",
+    color: "white",
+    fontSize: 20,
+  },
+
+  infoContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 5,
+    flexDirection: "row",
+  },
+
+  verticalDivider2: {
+    width: 0.3,
+    backgroundColor: "grey",
+    height: "100%",
+    alignSelf: "center",
+    marginLeft: 9,
+    marginRight: 20,
+  },
+  profileDetails: {
+    flex: 1,
+    padding: 16,
+    paddingVertical: 20,
+    paddingTop: 0,
+    gap: 10,
+    marginBottom: -5,
+  },
+
+  roundedContainer: {
+    backgroundColor: "#1D1D20",
+    borderRadius: 20,
+    padding: 0,
+    marginBottom: 15,
+    marginHorizontal: 15,
   },
 });
 

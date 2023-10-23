@@ -124,7 +124,7 @@ const Home = ({ route }) => {
     )
       score += 5;
     if (sessionUser.profiles.studies === otherUser.profiles.studies) score += 3;
-    
+
     if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 2;
     if (sessionUser.class_year === otherUser.class_year) score += 2;
     if (sessionUser.profiles.gender === otherUser.profiles.gender) score += 1;
@@ -167,14 +167,17 @@ const Home = ({ route }) => {
     // console.log(housingPreference);
     const isHousingMatch =
       housingPreference === "Any" ||
-      user.profiles.living_preferences === housingPreference || user.profiles.living_preferences === "No Preference";
+      user.profiles.living_preferences === housingPreference ||
+      user.profiles.living_preferences === "No Preference";
     //console.log(isHousingMatch);
     const isGenderMatch =
       genderPreference === "Any" || user.profiles.gender === genderPreference;
-  
+
     const isAgeMatch =
-      (youngestAgePreference === "Any" || user.profiles.age >= youngestAgePreference) &&
-      (oldestAgePreference === "Any" || user.profiles.age <= oldestAgePreference);
+      (youngestAgePreference === "Any" ||
+        user.profiles.age >= youngestAgePreference) &&
+      (oldestAgePreference === "Any" ||
+        user.profiles.age <= oldestAgePreference);
     const isStudyMatch =
       studyPreference === "Any" || user.profiles.studies === studyPreference;
 
@@ -193,7 +196,7 @@ const Home = ({ route }) => {
         (isStudyMatch || studyPreference === "Any")
       );
     }
-    
+
     return (
       (nameMatch || tagMatch) &&
       (isHousingMatch || housingPreference === "Any") &&
@@ -221,30 +224,29 @@ const Home = ({ route }) => {
           .select("*")
           .eq("image_index", 0)
           .neq("last_modified", null);
-      
-          if (ugcError || profileError || imageError) {
-            console.error(ugcError || profileError || imageError);
-          } 
-          else {
-            const mergedData = ugcData.map((ugcUser) => {
-              const relatedProfileData = profileData.find(
-                (profileUser) => profileUser.user_id === ugcUser.user_id
-              );
-              const relatedImageData = imageData.find(
-                (img) => img.user_id === ugcUser.user_id
-              );
-              if (
-                ugcUser.has_ugc &&
-                relatedProfileData?.profile_complete &&
-                relatedImageData?.last_modified
-              ) {
-                return {
-                  ...ugcUser,
-                  profiles: relatedProfileData,
-                  lastModified: relatedImageData?.last_modified || null,
-                };
-              } else {
-                return null;
+
+        if (ugcError || profileError || imageError) {
+          console.error(ugcError || profileError || imageError);
+        } else {
+          const mergedData = ugcData.map((ugcUser) => {
+            const relatedProfileData = profileData.find(
+              (profileUser) => profileUser.user_id === ugcUser.user_id
+            );
+            const relatedImageData = imageData.find(
+              (img) => img.user_id === ugcUser.user_id
+            );
+            if (
+              ugcUser.has_ugc &&
+              relatedProfileData?.profile_complete &&
+              relatedImageData?.last_modified
+            ) {
+              return {
+                ...ugcUser,
+                profiles: relatedProfileData,
+                lastModified: relatedImageData?.last_modified || null,
+              };
+            } else {
+              return null;
             }
           });
           const filteredData = mergedData.filter((user) => user !== null);
@@ -272,24 +274,29 @@ const Home = ({ route }) => {
             };
             setSessionuser(mergedSessionUser);
             setGendaPreference(mergedSessionUser.profiles.who);
-            setHousinPreference(mergedSessionUser.profiles.living_preferences); 
+            setHousinPreference(mergedSessionUser.profiles.living_preferences);
           }
 
-          
-          const { data: allBlockedProfilesData, error: allBlockedProfilesError } = 
-            await supabase
-              .from("UGC")
-              .select("user_id, blocked_profiles");
+          const {
+            data: allBlockedProfilesData,
+            error: allBlockedProfilesError,
+          } = await supabase.from("UGC").select("user_id, blocked_profiles");
           if (allBlockedProfilesError) {
-            console.error("Error fetching all blocked profiles:", allBlockedProfilesError.message);
+            console.error(
+              "Error fetching all blocked profiles:",
+              allBlockedProfilesError.message
+            );
           } else {
             const usersWhoBlockedMe = allBlockedProfilesData
-            .filter(user => Array.isArray(user.blocked_profiles) && user.blocked_profiles.includes(session.user.id))
-            .map(user => user.user_id);
+              .filter(
+                (user) =>
+                  Array.isArray(user.blocked_profiles) &&
+                  user.blocked_profiles.includes(session.user.id)
+              )
+              .map((user) => user.user_id);
             //console.log(usersWhoBlockedMe);
-          setUsersBlockingMe(usersWhoBlockedMe);
+            setUsersBlockingMe(usersWhoBlockedMe);
           }
-
 
           const { data: bookmarkedData, error: bookmarkedError } =
             await supabase
@@ -321,7 +328,6 @@ const Home = ({ route }) => {
           }
 
           setUsers(filteredData);
-          
         }
       } catch (error) {
         console.error("An unexpected error occurred:", error);
@@ -337,7 +343,6 @@ const Home = ({ route }) => {
     if (isBookmarked) {
       fetchUsers();
     }
-
 
     //setIsLoading(false);
   }, [isFocused]);
@@ -371,7 +376,10 @@ const Home = ({ route }) => {
           />
           <View style={styles.userInfo}>
             <Text style={styles.name}> {item.name} </Text>
-            <Text numberOfLines={1} ellipsizeMode='tail' style={styles.major}> {item.major || "Undecided"}</Text>
+            <Text numberOfLines={1} ellipsizeMode="tail" style={styles.major}>
+              {" "}
+              {item.major || "Undecided"}
+            </Text>
             <View style={styles.tagsContainer}>
               {item.tags.slice(0, 8).map((tag, index) => (
                 <View key={index} style={styles.tag}>
