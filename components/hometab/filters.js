@@ -36,6 +36,7 @@ const FiltersUI = ({ route }) => {
     { label: "Any", value: "Any" },
     { label: "Apartment", value: "Apartment" },
     { label: "Dorm", value: "Dorm" },
+    { label: "House", value: "House" },
   ];
 
   const genders = [

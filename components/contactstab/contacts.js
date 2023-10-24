@@ -606,7 +606,7 @@ const styles = StyleSheet.create({
   },
   UnreadcontactName: {
     fontSize: 18,
-    fontWeight: "600",
+    fontWeight: "400",
     marginBottom: 5,
     color: "white",
     flexShrink: 1,

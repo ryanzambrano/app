@@ -302,7 +302,7 @@ export const Profile = ({ navigation, route }) => {
                   <Text style={styles.bioText}>
                     {editedUser.bio
                       ? editedUser.bio
-                      : "Your profile is looking a bit empty... click edit to get started!"}
+                      : "Your bio is looking empty... click edit to add information and let others get to know you better!"}
                   </Text>
                 </View>
               </View>

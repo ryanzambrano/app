@@ -19,10 +19,24 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator } from "react-native";
+import { availableTags } from "../auth/profileUtils.js";
 
 const logo = require("../../assets/logo4.png");
 const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
+
+const categories = {
+  sports: ["Adventures", "Baseball", "Basketball", "Boxing", "Camping", "Fishing", "Fitness", "Football", "Hiking", "Jiu-Jitsu", "Rollerblading", "Running", "Soccer", "Surfing", "Swimming", "Yoga", "Cycling", "Gymnastics", "Parkour", "Skating"],
+  arts: ["Art", "Board Games", "Design", "Drumming", "Guitar", "Karaoke", "Live Music", "Makeup/Beauty", "Piano", "Photography", "Singing", "Writing", "Dance", "Acting", "Pottery", "Sculpture"],
+  socialActivities: ["Activism", "Animals", "Clubbing", "Greek Life", "Instagram", "Raves", "Road Trips", "Urban Exploration", "Volunteering", "Networking", "Public Speaking", "Social Media", "Partying"],
+  intellectual: ["Books", "Coding", "Education", "History", "Journalism", "Science", "Language Learning", "Chess", "Philosophy", "Psychology", "Astronomy", "Robotics"],
+  business: ["Business", "Start Ups", "Entrepreneurship", "Finance", "Marketing", "Real Estate"],
+  entertainment: ["Movies", "Music", "Stand-Up Comedy", "TV Shows", "Theater", "Podcasts", "Video Games", "Anime"],
+  musicGenres: ["Country Music", "DJ", "Rap/Hip Hop", "Rock", "Jazz", "Pop", "Classical", "R&B", "Electronic Music"],
+  lifestyle: ["Beauty", "Craft Beer", "Cooking", "DIY", "Environmentalism", "Fashion", "Health", "Interior Design", "Mixology", "Sneakers", "Tattoos", "Technology", "Thrifting", "Travel", "Veganism", "Wellness", "Wine Tasting"],
+  professions: ["JROTC", "Medical/Nursing", "Engineering", "Law", "Teaching", "Software Development", "Data Science", "Graphic Design"],
+  misc: ["Multilingual", "Politics", "Nature", "Sports", "Gaming", "Spirituality", "Astrology", "Cryptocurrency", "Sustainability"]
+};
 
 const Home = ({ route }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -97,37 +111,54 @@ const Home = ({ route }) => {
     );
   };
 
+
   const calculateCompatibility = (sessionUser, otherUser) => {
     //console.log(otherUser.profiles.sleep_time);
     //console.log(sessionUser.profiles.sleep_time);
+    const tidinessLevels = ["Very tidy", "Somewhat tidy", "Neutral", "Somewhat messy", "Very messy"];
+    const sleepTimes = ["Morning Person", "Night Owl", "In Between"];
+    const noisePreferences = ["Yes", "Somewhat Yes", "Somewhat No", "No"];
 
     let score = 0;
+    sessionUser.tags.forEach((tag) => {
+      if (otherUser.tags.includes(tag)) {
+          score += 4;
+      } else {
+          let foundCategory = null;
+          for (const [category, tags] of Object.entries(categories)) {
+              if (tags.includes(tag)) {
+                  foundCategory = tags;
+                  break;
+              }
+          }
+          if (foundCategory && otherUser.tags.some(otherTag => foundCategory.includes(otherTag))) {
+              score += 2;
+          }
+      }
+    });
 
-    if (Array.isArray(sessionUser.tags) && Array.isArray(otherUser.tags)) {
-      sessionUser.tags.forEach((tag) => {
-        if (otherUser.tags.includes(tag)) score += 4;
-      });
-    }
     if (sessionUser.profiles.for_fun === otherUser.profiles.for_fun) score += 5;
-    if (sessionUser.profiles.tidiness === otherUser.profiles.tidiness)
-      score += 5;
-    if (
-      sessionUser.profiles.noise_preference ===
-      otherUser.profiles.noise_preference
-    )
-      score += 5;
-    if (sessionUser.profiles.sleep_time === otherUser.profiles.sleep_time)
-      score += 5;
     if (
       sessionUser.profiles.living_preferences ===
       otherUser.profiles.living_preferences
     )
       score += 5;
     if (sessionUser.profiles.studies === otherUser.profiles.studies) score += 3;
-
     if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 2;
     if (sessionUser.class_year === otherUser.class_year) score += 2;
     if (sessionUser.profiles.gender === otherUser.profiles.gender) score += 1;
+   
+    const tidinessDiff = Math.abs(tidinessLevels.indexOf(sessionUser.profiles.tidiness) - tidinessLevels.indexOf(otherUser.profiles.tidiness));
+    score += 5 - tidinessDiff;
+
+    const sleepTimeDiff = Math.abs(sleepTimes.indexOf(sessionUser.profiles.sleep_time) - sleepTimes.indexOf(otherUser.profiles.sleep_time));
+    score += (3 - sleepTimeDiff) > 0 ? (3 - sleepTimeDiff) : 0;
+
+    const noisePrefDiff = Math.abs(noisePreferences.indexOf(sessionUser.profiles.noise_preference) - noisePreferences.indexOf(otherUser.profiles.noise_preference));
+    score += 5 - (noisePrefDiff * 1.5);
+   
+    console.log(otherUser.name, score);
+    
     return score;
   };
 
@@ -168,7 +199,7 @@ const Home = ({ route }) => {
     const isHousingMatch =
       housingPreference === "Any" ||
       user.profiles.living_preferences === housingPreference ||
-      user.profiles.living_preferences === "No Preference";
+      user.profiles.living_preferences === "No Preferences";
     //console.log(isHousingMatch);
     const isGenderMatch =
       genderPreference === "Any" || user.profiles.gender === genderPreference;
