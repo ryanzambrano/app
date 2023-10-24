@@ -19,8 +19,6 @@ const SettingsScreen = ({ navigation, route }) => {
     const { error } = await supabase.auth.signOut();
   };
 
-  
-
   const handleBackPress = () => {
     navigation.navigate("Tabs");
   };
@@ -28,7 +26,7 @@ const SettingsScreen = ({ navigation, route }) => {
   const sections = [
     {
       title: "Social",
-      items: ["Report", "Manage Blocked Users", "Allow Your account viewable"],
+      items: ["Manage Blocked Users", "Allow Your Account Discoverable"],
     },
     {
       title: "About",
@@ -37,7 +35,7 @@ const SettingsScreen = ({ navigation, route }) => {
         "User Agreement",
         "Privacy Policy",
         "Content Policy",
-        "Help Center",
+        "FAQ",
       ],
     },
     {
@@ -46,20 +44,18 @@ const SettingsScreen = ({ navigation, route }) => {
     },
   ];
 
-const screenMap = {
-    "Report": "ReportScreen",
+  const screenMap = {
     "Manage Blocked Users": "BlockedList",
-    "Allow Your account viewable": "AccountVisibility",
+    "Allow Your Account Discoverable": "AccountDiscoverability",
     "About Us": "AboutUs",
     "User Agreement": "UserAgreement",
     "Privacy Policy": "PrivacyPolicy",
     "Content Policy": "ContentPolicy",
-    "Help Center": "HelpCenter",
+    FAQ: "FAQ",
     "Report an Issue": "ReportIssue",
   };
 
   const navigateToScreen = (screenName) => {
-    
     if (screenMap[screenName]) {
       navigation.navigate(screenMap[screenName]);
     }
@@ -82,7 +78,11 @@ const screenMap = {
               <Text style={styles.sectionTitle}>{section.title}</Text>
             </View>
             {section.items.map((text, index) => (
-              <TouchableOpacity key={index} style={styles.settingRow} onPress={() => navigateToScreen(text)}>
+              <TouchableOpacity
+                key={index}
+                style={styles.settingRow}
+                onPress={() => navigateToScreen(text)}
+              >
                 <Text style={styles.text}>{text}</Text>
               </TouchableOpacity>
             ))}
@@ -147,7 +147,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     paddingVertical: 10,
   },
-  
 });
 
 export default SettingsScreen;

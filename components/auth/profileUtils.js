@@ -121,6 +121,39 @@ export const getLastModifiedFromSupabase = async (user_id) => {
   }
 };
 
+export const calculateCompatibility = (sessionUser, otherUser) => {
+  //console.log(otherUser.profiles.sleep_time);
+  //console.log(sessionUser.profiles.sleep_time);
+
+  let score = 0;
+
+  if (Array.isArray(sessionUser.tags) && Array.isArray(otherUser.tags)) {
+    sessionUser.tags.forEach((tag) => {
+      if (otherUser.tags.includes(tag)) score += 4;
+    });
+  }
+  if (sessionUser.profiles.for_fun === otherUser.profiles.for_fun) score += 5;
+  if (sessionUser.profiles.tidiness === otherUser.profiles.tidiness) score += 5;
+  if (
+    sessionUser.profiles.noise_preference ===
+    otherUser.profiles.noise_preference
+  )
+    score += 5;
+  if (sessionUser.profiles.sleep_time === otherUser.profiles.sleep_time)
+    score += 5;
+  if (
+    sessionUser.profiles.living_preferences ===
+    otherUser.profiles.living_preferences
+  )
+    score += 5;
+  if (sessionUser.profiles.studies === otherUser.profiles.studies) score += 3;
+
+  if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 2;
+  if (sessionUser.class_year === otherUser.class_year) score += 2;
+  if (sessionUser.profiles.gender === otherUser.profiles.gender) score += 1;
+  return score;
+};
+
 export const availableTags = [
   "Adventures",
   "Baseball",

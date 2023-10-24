@@ -151,7 +151,7 @@ export const Profile = ({ navigation, route }) => {
         setProfilePicture(null);
       }
     } catch (error) {
-      alert("Couldn't fetch profile picture");
+      console.log("Couldn't fetch profile picture");
     }
   };
 

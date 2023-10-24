@@ -21,6 +21,11 @@ import Retake from "../retakeQuestionaireFiles/retake.js";
 import Questionaire from "../questionairefiles/questionaire.js";
 import BlockedList from "./blockedList";
 import ReportUI from "../hometab/report";
+import AboutUs from "./aboutUs";
+import PrivacyPolicy from "./privacyPolicy";
+import ContentPolicy from "./contentPolicy";
+import FAQ from "./faq";
+import UserAgreement from "./userAgreement";
 
 const Stack = createStackNavigator(); // Initialize stack navigator
 
@@ -123,9 +128,30 @@ const ThreeMainPages = ({ route }) => {
           initialParams={{ session }}
         />
         <Stack.Screen
+          name="AboutUs"
+          component={AboutUs}
+          initialParams={{ session }}
+        />
+        <Stack.Screen
+          name="PrivacyPolicy"
+          component={PrivacyPolicy}
+          initialParams={{ session }}
+        />
+        <Stack.Screen
+          name="ContentPolicy"
+          component={ContentPolicy}
+          initialParams={{ session }}
+        />
+        <Stack.Screen
+          name="UserAgreement"
+          component={UserAgreement}
+          initialParams={{ session }}
+        />
+        <Stack.Screen name="FAQ" component={FAQ} initialParams={{ session }} />
+        <Stack.Screen
           name="ReportUI"
           component={ReportUI}
-          initialParams={{session}}
+          initialParams={{ session }}
           options={{ presentation: "modal" }}
         />
       </Stack.Navigator>

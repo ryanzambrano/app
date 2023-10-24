@@ -19,7 +19,12 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator } from "react-native";
+
 import { availableTags } from "../auth/profileUtils.js";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { calculateCompatibility } from "../auth/profileUtils.js";
+
 
 const logo = require("../../assets/logo4.png");
 const isBookmarkedColor = "#14999999";
@@ -54,6 +59,15 @@ const Home = ({ route }) => {
   const [gendaPreference, setGendaPreference] = useState("Any");
   const [housinPreference, setHousinPreference] = useState("Any");
   const isFocused = useIsFocused();
+
+  // Assume this function is called whenever the homepage is visited.
+  const onHomePageVisit = async () => {
+    try {
+      await AsyncStorage.setItem("homepageVisited", "true");
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const {
     housingPreference = housinPreference,
@@ -110,6 +124,7 @@ const Home = ({ route }) => {
       { cancelable: true }
     );
   };
+
 
 
   const calculateCompatibility = (sessionUser, otherUser) => {
@@ -196,6 +211,9 @@ const Home = ({ route }) => {
     );
 
     // console.log(housingPreference);
+    /*if (user.profiles.living_preferences === "No Preferences") {
+      housingPreference === "Any";
+    }*/
     const isHousingMatch =
       housingPreference === "Any" ||
       user.profiles.living_preferences === housingPreference ||
@@ -364,6 +382,7 @@ const Home = ({ route }) => {
         console.error("An unexpected error occurred:", error);
       }
       setIsLoading(false);
+      onHomePageVisit();
     };
 
     fetchUsers();
@@ -393,7 +412,7 @@ const Home = ({ route }) => {
 
   const renderUserCard = ({ item }) => {
     if (!item.lastModified) {
-      console.log(item);
+      //console.log(item);
       return null;
     }
     return (
@@ -485,24 +504,6 @@ const Home = ({ route }) => {
             extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
             renderItem={renderUserCard}
             keyExtractor={(item) => item.user_id.toString()}
-            // ListHeaderComponent={() => (
-            //   <>
-            //     <View style={styles.sortContainer}>
-            //       <Text style={styles.sortText}>Sort by:</Text>
-            //       <TouchableOpacity onPress={() => showSortMenu()}>
-            //         <Text
-            //           style={{
-            //             color: "#159e9e",
-            //             fontWeight: "bold",
-            //             fontSize: 15,
-            //           }}
-            //         >
-            //           {sortMethod}
-            //         </Text>
-            //       </TouchableOpacity>
-            //     </View>
-            //   </>
-            // )}
             ListEmptyComponent={renderEmptyComponent}
           />
         )}
