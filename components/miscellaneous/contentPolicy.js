@@ -41,10 +41,10 @@ const ContentPolicy = ({ navigation, route }) => {
       <ScrollView style={styles.textContainer}>
         <Text style={styles.heading}>1. Introduction </Text>
         <Text style={styles.text}>
-          Cabana is a platform aimed at connecting college students with
-          potential roommates. We strive to maintain a respectful, safe, and
-          inclusive environment for all users. This Content Policy outlines the
-          guidelines and standards for content shared within the Cabana app.
+          Būnk is a platform aimed at connecting college students with potential
+          roommates. We strive to maintain a respectful, safe, and inclusive
+          environment for all users. This Content Policy outlines the guidelines
+          and standards for content shared within the Būnk app.
         </Text>
 
         <Text style={styles.heading}>2. User Responsibilities</Text>
@@ -59,7 +59,7 @@ const ContentPolicy = ({ navigation, route }) => {
           harassing behavior.
         </Text>
         <Text style={styles.text}>
-          Age Requirement: Users must be at least 18 years old to use Cabana.
+          Age Requirement: Users must be at least 18 years old to use Būnk.
         </Text>
 
         {/* ... Previous sections ... */}
@@ -105,16 +105,16 @@ const ContentPolicy = ({ navigation, route }) => {
           6. Modifications to This Content Policy
         </Text>
         <Text style={styles.text}>
-          Cabana reserves the right to modify this Content Policy at any time.
-          Any changes will be posted on this page and, where appropriate,
-          notified to you by email or through the app.
+          Būnk reserves the right to modify this Content Policy at any time. Any
+          changes will be posted on this page and, where appropriate, notified
+          to you by email or through the app.
         </Text>
 
         <Text style={styles.heading}>7. Contact Us</Text>
         <Text style={styles.text}>
           If you have any questions or concerns regarding this Content Policy,
           please contact us at:
-          {"\n"}Cabana
+          {"\n"}Būnk
           {"\n"}[Email]
           {"\n"}[Address]
           {"\n"}[Phone]

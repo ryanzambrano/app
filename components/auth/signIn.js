@@ -78,7 +78,7 @@ export const SignIn = ({ navigation }) => {
         <View style={styles.container}>
           <View style={styles.header}>
             <Image source={logo} style={styles.headerImage} alt="Logo " />
-            <Text style={styles.titleText}>Sign into Cabana</Text>
+            <Text style={styles.titleText}>Sign into Būnk</Text>
             <Text style={styles.sloganText}>Find and meet new roommates!</Text>
           </View>
 

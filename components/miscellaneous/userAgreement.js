@@ -40,14 +40,14 @@ const UserAgreement = ({ navigation, route }) => {
       <ScrollView style={styles.textContainer}>
         <Text style={styles.heading}>1. Acceptance of Terms</Text>
         <Text style={styles.text}>
-          By accessing and using the Cabana app, you agree to be bound by the
+          By accessing and using the Būnk app, you agree to be bound by the
           terms and conditions contained in this User Agreement, including our
           Privacy Policy and Content Policy.
         </Text>
 
         <Text style={styles.heading}>2. Modification of Terms</Text>
         <Text style={styles.text}>
-          Cabana reserves the right to change, modify, or update these terms at
+          Būnk reserves the right to change, modify, or update these terms at
           any time without prior notice. It's your responsibility to review this
           User Agreement periodically.
         </Text>
@@ -56,7 +56,7 @@ const UserAgreement = ({ navigation, route }) => {
         <Text style={styles.heading}>3. Account Registration and Use</Text>
         <Text style={styles.text}>
           Eligibility: You must be at least 18 years old to create an account
-          and use Cabana.
+          and use Būnk.
         </Text>
         <Text style={styles.text}>
           Account Security: You are responsible for maintaining the
@@ -70,7 +70,7 @@ const UserAgreement = ({ navigation, route }) => {
         <Text style={styles.heading}>4. Content and Conduct</Text>
         <Text style={styles.text}>
           User Content: You are solely responsible for the content you upload,
-          post, or share on Cabana.
+          post, or share on Būnk.
         </Text>
         <Text style={styles.text}>
           Prohibited Conduct: Engaging in harassing, threatening, or
@@ -79,36 +79,36 @@ const UserAgreement = ({ navigation, route }) => {
 
         <Text style={styles.heading}>5. Intellectual Property Rights</Text>
         <Text style={styles.text}>
-          All content on Cabana, including text, graphics, logos, and software,
-          is the property of Cabana or its licensors and protected by
-          international copyright laws.
+          All content on Būnk, including text, graphics, logos, and software, is
+          the property of Būnk or its licensors and protected by international
+          copyright laws.
         </Text>
 
         <Text style={styles.heading}>6. Dispute Resolution</Text>
         <Text style={styles.text}>
           Any disputes arising out of or related to this User Agreement or your
-          use of Cabana will be governed by the laws of [Jurisdiction].
+          use of Būnk will be governed by the laws of [Jurisdiction].
         </Text>
 
         <Text style={styles.heading}>
           7. Limitation of Liability and Disclaimer of Warranties
         </Text>
         <Text style={styles.text}>
-          Cabana is provided "as is" and without warranties of any kind. We do
-          not guarantee that Cabana will be available at all times or that it
-          will meet your needs.
+          Būnk is provided "as is" and without warranties of any kind. We do not
+          guarantee that Būnk will be available at all times or that it will
+          meet your needs.
         </Text>
 
         <Text style={styles.heading}>8. Indemnification</Text>
         <Text style={styles.text}>
-          You agree to indemnify and hold harmless Cabana, its affiliates,
+          You agree to indemnify and hold harmless Būnk, its affiliates,
           officers, and employees from any claims arising out of your use of
-          Cabana.
+          Būnk.
         </Text>
 
         <Text style={styles.heading}>9. Termination</Text>
         <Text style={styles.text}>
-          Cabana reserves the right to suspend or terminate your account at any
+          Būnk reserves the right to suspend or terminate your account at any
           time for any reason.
         </Text>
 
@@ -116,7 +116,7 @@ const UserAgreement = ({ navigation, route }) => {
         <Text style={styles.text}>
           If you have any questions or concerns regarding this User Agreement,
           please contact us at:
-          {"\n"}Cabana
+          {"\n"}Būnk
           {"\n"}[Email]
           {"\n"}[Address]
           {"\n"}[Phone]
