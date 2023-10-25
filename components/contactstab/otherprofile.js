@@ -209,7 +209,7 @@ const GroupChatScreen = ({}) => {
               );
 
               const { data: insertData, error: insertError } = await supabase
-                .from("Group Chats")
+                .from("Group_Chats")
                 .update({
                   User_ID: filteredGroupIds,
                   Ammount_Users: filteredGroupIds.length,
@@ -251,7 +251,7 @@ const GroupChatScreen = ({}) => {
     try {
       // Update the joined groups in Supabase
       const { data, error } = await supabase
-        .from("Group Chats")
+        .from("Group_Chats")
         .update({ Group_Name: editedJoinedGroups })
         .eq("Group_ID", user.Group_ID);
 

@@ -262,8 +262,23 @@ const MessagingUI = () => {
 
   useEffect(() => {
     fetchMessages();
+    const channel = supabase.channel('messaging');
+    const subscription = channel
+      .on('postgres_changes', { event: 'insert', schema: 'public', table: "Group_Chat_Messages" ,filter: `Group_ID_Sent_To=eq.${user.Group_ID}` }, genericPayload => {
+        if (genericPayload)
+        {
+          fetchMessages();
+        }
+        // Handle generic event
+      })
+      .subscribe();
+  
+    // Clean up the subscription when the component unmounts
+    return () => {
+      subscription.unsubscribe();
+    };
 
-  }, [session.user.id, messages]);
+  }, []);
 
   useEffect(() => {
     if (messages.length > 0) {

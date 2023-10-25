@@ -27,12 +27,14 @@ const ContactsUI = ({ route }) => {
   const { session } = route.params;
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
+  const [contacts, setContacts] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const isFocused = useIsFocused();
   const fadeAnimation = new Animated.Value(1);
   const [contactOpacities, setContactOpacities] = useState({});
   const [images, setImages] = useState([]);
+  const groupIds = contacts.map(contact => contact.Group_ID);
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -56,6 +58,10 @@ const ContactsUI = ({ route }) => {
       .from("Group_Chats")
       .select("*")
       .contains("User_ID", [session.user.id]);
+      if(users)
+      {
+        setContacts(users);
+      }
 
     if (error) {
       console.error(error);
@@ -177,21 +183,40 @@ const ContactsUI = ({ route }) => {
     fetchUsers();
     const channel = supabase.channel('room1');
     const subscription = channel
-      .on('postgres_changes', { event: '*', schema: 'public', table: "Group_Chats"}, payload => {
-        fetchUsers();
+      .on('postgres_changes', { event: 'insert', schema: 'public', table: "Group_Chats"}, deletePayload => {
+        if (deletePayload) {
+          const payloadarray = deletePayload.new.User_ID;
+          if (payloadarray.includes(session.user.id)) {
+            //console.log("Group data altered");
+            fetchUsers();
+          }
+        }
+        // Handle delete event
+      })
+      .on('postgres_changes', { event: 'update', schema: 'public', table: "Group_Chats"}, updatePayload => {
+        if (deletePayload) {
+          const payloadarray = updatePayload.new.User_ID;
+          if (payloadarray.includes(session.user.id)) {
+           // console.log("Group data altered");
+            fetchUsers();
+          }
+        }
+        // Handle delete event
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: "Group_Chat_Messages" }, genericPayload => {
+        if (genericPayload)
+        {
+          fetchUsers();
+        }
+        // Handle generic event
       })
       .subscribe();
-
+  
     // Clean up the subscription when the component unmounts
     return () => {
       subscription.unsubscribe();
     };
-  }, []);  
-
-
-  useEffect(() => {
-   
-  }, [isFocused]);
+  }, []);
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
