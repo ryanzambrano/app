@@ -184,7 +184,7 @@ export const calculateCompatibility = (sessionUser, otherUser) => {
   );
   score += 5 - noisePrefDiff * 1.5;
 
-  console.log(otherUser.name, score);
+  //console.log(otherUser.name, score);
 
   return score;
 };

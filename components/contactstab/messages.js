@@ -268,6 +268,7 @@ const MessagingUI = () => {
         if (genericPayload)
         {
           fetchMessages();
+          readMessages();
         }
         // Handle generic event
       })

@@ -18,7 +18,7 @@ import {
 import { supabase } from "./supabase.js";
 import { startShakeAnimation } from "./profileUtils.js";
 
-const logo = require("../../assets/logo4.png");
+const logo = require("../../assets/Bunk-vector-2.png");
 
 export const SignIn = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
