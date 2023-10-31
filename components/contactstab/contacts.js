@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   Animated,
   Alert,
+  RefreshControl,
 } from "react-native";
 
 import { AntDesign } from "@expo/vector-icons";
@@ -34,8 +35,15 @@ const ContactsUI = ({ route }) => {
   const fadeAnimation = new Animated.Value(1);
   const [contactOpacities, setContactOpacities] = useState({});
   const [images, setImages] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
   const groupIds = contacts.map(contact => contact.Group_ID);
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchUsers().then(() => setRefreshing(false));
+  }, []);
+
+  
   const handleSearch = (text) => {
     setSearchQuery(text);
   };
@@ -517,6 +525,9 @@ const ContactsUI = ({ route }) => {
           renderItem={renderContact}
           keyExtractor={(item) => item.Group_ID.toString()}
           ListEmptyComponent={renderEmptyComponent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         />
       <StatusBar style="light" />
     </SafeAreaView>

@@ -10,6 +10,7 @@ import {
   FlatList,
   SafeAreaView,
   Alert,
+  RefreshControl,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
@@ -45,9 +46,14 @@ const Home = ({ route }) => {
   const [usersBlockingMe, setUsersBlockingMe] = useState([]);
   const [gendaPreference, setGendaPreference] = useState("Any");
   const [housinPreference, setHousinPreference] = useState("Any");
+  const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
 
-  // Assume this function is called whenever the homepage is visited.
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchUsers().then(() => setRefreshing(false));
+  }, []);
+
   const onHomePageVisit = async () => {
     try {
       await AsyncStorage.setItem("homepageVisited", "true");
@@ -191,8 +197,9 @@ const Home = ({ route }) => {
     );
   });
 
-  useEffect(() => {
-    //setIsLoading(true);
+
+
+  
     const fetchUsers = async () => {
       try {
         const { data: ugcData, error: ugcError } = await supabase
@@ -320,16 +327,16 @@ const Home = ({ route }) => {
       onHomePageVisit();
     };
 
-    fetchUsers();
-    if (isFocused) {
-      fetchUsers();
-    }
+    
 
-    if (isBookmarked) {
+  useEffect(() => {
       fetchUsers();
-    }
-
-    //setIsLoading(false);
+      if (isFocused) {
+        fetchUsers();
+      }
+      if (isBookmarked) {
+        fetchUsers();
+      }
   }, [isFocused]);
 
   const handleUserCardPress = (user) => {
@@ -440,6 +447,9 @@ const Home = ({ route }) => {
             renderItem={renderUserCard}
             keyExtractor={(item) => item.user_id.toString()}
             ListEmptyComponent={renderEmptyComponent}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
           />
         )}
       </View>
