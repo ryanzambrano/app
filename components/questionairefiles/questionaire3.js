@@ -133,6 +133,7 @@ export const Questionaire3 = ({ navigation, route }) => {
                     >
                       {gradYear.map((gradYear) => (
                         <Picker.Item
+                          color="white"
                           key={gradYear}
                           label={gradYear}
                           value={gradYear}
@@ -259,7 +260,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     marginTop: "130%",
-    backgroundColor: "lightgrey",
+    backgroundColor: "#111111",
     justifyContent: "space-around",
     gap: "50%",
   },

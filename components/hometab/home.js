@@ -20,13 +20,11 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator } from "react-native";
-
 import { availableTags } from "../auth/profileUtils.js";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { calculateCompatibility } from "../auth/profileUtils.js";
 
-const logo = require("../../assets/Bunk-vector-2.png");
+const logo = require("../../assets/logo4.png");
 
 const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
@@ -151,10 +149,6 @@ const Home = ({ route }) => {
       tag.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // console.log(housingPreference);
-    /*if (user.profiles.living_preferences === "No Preferences") {
-      housingPreference === "Any";
-    }*/
     const isHousingMatch =
       housingPreference === "Any" ||
       user.profiles.living_preferences === housingPreference ||
@@ -390,7 +384,7 @@ const Home = ({ route }) => {
       <View style={styles.header}>
         <View style={styles.logoTitleContainer}>
           <Image style={styles.logo} source={logo} />
-          <Text style={styles.headerText}> Būnk </Text>
+          <Text style={styles.headerText}> Cabaná </Text>
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity onPress={handleFiltersPress}>

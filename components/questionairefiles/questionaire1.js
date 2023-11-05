@@ -44,7 +44,7 @@ export const Questionaire1 = ({ navigation, route }) => {
     "Asian",
     "Native Hawaiian/Pacific Islander",
   ];
-  const ages = Array.from(Array(31).keys()).map((age) => String(age + 1));
+  const ages = Array.from(Array(9).keys()).map((age) => String(age + 18));
 
   const openAgeModal = () => {
     setIsAgeModalVisible(true);
@@ -172,7 +172,12 @@ export const Questionaire1 = ({ navigation, route }) => {
                       onValueChange={(itemValue) => setSelectedAge(itemValue)}
                     >
                       {ages.map((age) => (
-                        <Picker.Item key={age} label={age} value={age} />
+                        <Picker.Item
+                          color="white"
+                          key={age}
+                          label={age}
+                          value={age}
+                        />
                       ))}
                     </Picker>
                   </View>
@@ -220,6 +225,7 @@ export const Questionaire1 = ({ navigation, route }) => {
                     >
                       {gender.map((Gender) => (
                         <Picker.Item
+                          color="white"
                           key={Gender}
                           label={Gender}
                           value={Gender}
@@ -271,6 +277,7 @@ export const Questionaire1 = ({ navigation, route }) => {
                     >
                       {gender.map((gender) => (
                         <Picker.Item
+                          color="white"
                           key={gender}
                           label={gender}
                           value={gender}
@@ -412,7 +419,7 @@ const styles = StyleSheet.create({
   modalContainerGender: {
     flex: 1,
     marginTop: "130%",
-    backgroundColor: "lightgrey",
+    backgroundColor: "#111111",
 
     justifyContent: "space-around",
     gap: "50%",
