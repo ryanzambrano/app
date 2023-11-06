@@ -35,7 +35,7 @@ export const ForgotPassword = ({ navigation }) => {
 
     try {
       await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: "http://thebūnkapp.com",
+        redirectTo: "http://thecabanaapp.com/forgot-password",
       });
     } catch (error) {
       console.error("Error sending password reset email:", error);
