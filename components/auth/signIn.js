@@ -18,7 +18,7 @@ import {
 import { supabase } from "./supabase.js";
 import { startShakeAnimation } from "./profileUtils.js";
 
-const logo = require("../../assets/Bunk-vector-2.png");
+const logo = require("../../assets/logo4.png");
 
 export const SignIn = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
@@ -78,7 +78,7 @@ export const SignIn = ({ navigation }) => {
         <View style={styles.container}>
           <View style={styles.header}>
             <Image source={logo} style={styles.headerImage} alt="Logo " />
-            <Text style={styles.titleText}>Sign into Cabaná</Text>
+            <Text style={styles.titleText}>Sign into Cabana</Text>
             <Text style={styles.sloganText}>Find and meet new roommates!</Text>
           </View>
 
