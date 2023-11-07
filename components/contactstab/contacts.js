@@ -202,7 +202,7 @@ const ContactsUI = ({ route }) => {
         // Handle delete event
       })
       .on('postgres_changes', { event: 'update', schema: 'public', table: "Group_Chats"}, updatePayload => {
-        if (deletePayload) {
+        if (updatePayload) {
           const payloadarray = updatePayload.new.User_ID;
           if (payloadarray.includes(session.user.id)) {
            // console.log("Group data altered");
