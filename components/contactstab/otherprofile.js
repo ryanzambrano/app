@@ -263,11 +263,12 @@ const GroupChatScreen = ({}) => {
     } catch (error) {
       console.error("An error occurred:", error.message);
     }
+    //console.log(editedJoinedGroups);
 
   };
   const navigatetomessages = () => {
+    user.joinedGroups = editedJoinedGroups;
     navigation.navigate("Message", {
-      editedJoinedGroups: editedJoinedGroups,
       user: user,
     });
   };
