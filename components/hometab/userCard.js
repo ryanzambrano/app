@@ -374,7 +374,7 @@ const UserCard = ({ navigation, route }) => {
       const Finalarray = combinedIDs.slice().sort();
 
       const { data: insertData, error: insertError } = await supabase
-        .from("Group Chats")
+        .from("Group_Chats")
         .insert([
           {
             User_ID: Finalarray,
@@ -388,7 +388,7 @@ const UserCard = ({ navigation, route }) => {
           // dupe error
           const { data: navigationdata, error: navigationError } =
             await supabase
-              .from("Group Chats")
+              .from("Group_Chats")
               .select("*")
               .contains("User_ID", Finalarray)
               .eq("Ammount_Users", Finalarray.length);
@@ -400,6 +400,7 @@ const UserCard = ({ navigation, route }) => {
             const fetchedPersons = navigationdata.map((person) => ({
               ...person,
               images: Imagedata,
+              joinedGroups: name,
             }));
 
             setPersons(fetchedPersons);
