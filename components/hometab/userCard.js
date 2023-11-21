@@ -382,6 +382,7 @@ const UserCard = ({ navigation, route }) => {
           },
         ])
         .select();
+        
 
       if (insertError) {
         if (insertError.code === "23505") {
@@ -415,9 +416,10 @@ const UserCard = ({ navigation, route }) => {
         }
         return;
       }
-      const fetchedPersons = navigationdata.map((person) => ({
+      const fetchedPersons = insertData.map((person) => ({
         ...person,
         images: Imagedata,
+        joinedGroups: name,
       }));
       setPersons(fetchedPersons);
       if (fetchedPersons.length > 0) {

@@ -7,13 +7,13 @@ import {
   TextInput,
   StyleSheet,
   Image,
+  Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { supabase } from "../auth/supabase";
 import { picURL } from "../auth/supabase.js";
-import { Alert } from "react-native";
 
 const GroupChatScreen = ({}) => {
   const [persons, setPersons] = useState([]);
@@ -168,8 +168,26 @@ const GroupChatScreen = ({}) => {
       );
     }
   };
-  const handleAddButtonPress = () =>
-    navigation.navigate("AddPerson", { group: user });
+  const handleAddButtonPress = () => {
+    // Assuming you want to navigate only if the user is a college user
+    if (user.Is_College == true)
+      {
+        Alert.alert(
+          "School Channel",
+          "You do not have permission to delete this channel",
+          [
+            {
+              text: "Ok",
+            }
+          ]
+        );
+        return;
+      } else {
+      // Handle the case where the user doesn't meet the condition
+      navigation.navigate("AddPerson", { group: user });
+      // Optionally, you can show an alert or perform other actions.
+    }
+  };
 
   const handleLeaveButtonPress = async () => {
     if (user.Ammount_Users === 3) {
@@ -290,19 +308,19 @@ const GroupChatScreen = ({}) => {
       </View>
       <View style={styles.groupInfo}>
         {renderProfilePicture()}
-        <TouchableOpacity onPress={updateJoinedGroups}>
           <View style={{ marginBottom: 15 }}>
-            <TextInput
-              style={{
-                marginTop: 15,
-                fontSize: 20,
-                fontWeight: "bold",
-                color: "white",
-              }}
-              value={editedJoinedGroups}
-              onChangeText={setEditedJoinedGroups}
-              onBlur={updateJoinedGroups}
-            />
+          <TextInput
+  style={{
+    marginTop: 15,
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
+  }}
+  value={editedJoinedGroups}
+  onChangeText={setEditedJoinedGroups}
+  onBlur={updateJoinedGroups}
+  editable={!user.Is_College}
+/>
             <View
               style={{
                 height: 0.8,
@@ -312,7 +330,6 @@ const GroupChatScreen = ({}) => {
               }}
             />
           </View>
-        </TouchableOpacity>
       </View>
       <View
         style={{ flexDirection: "row", justifyContent: "center", padding: 10 }}
