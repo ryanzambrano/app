@@ -127,7 +127,7 @@ export const Profile = ({ navigation, route }) => {
       let lastModified;
       const { data, error } = await supabase
         .from("images")
-        .select("*")
+        .select("last_modified")
         .eq("user_id", session.user.id)
         .eq("image_index", 0)
         .single();
