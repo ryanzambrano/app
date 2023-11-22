@@ -20,13 +20,11 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator } from "react-native";
-
 import { availableTags } from "../auth/profileUtils.js";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { calculateCompatibility } from "../auth/profileUtils.js";
 
-const logo = require("../../assets/Bunk-vector-2.png");
+const logo = require("../../assets/logo4.png");
 
 const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
@@ -151,10 +149,6 @@ const Home = ({ route }) => {
       tag.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // console.log(housingPreference);
-    /*if (user.profiles.living_preferences === "No Preferences") {
-      housingPreference === "Any";
-    }*/
     const isHousingMatch =
       housingPreference === "Any" ||
       user.profiles.living_preferences === housingPreference ||
@@ -197,146 +191,138 @@ const Home = ({ route }) => {
     );
   });
 
+  const fetchUsers = async () => {
+    try {
+      const { data: ugcData, error: ugcError } = await supabase
+        .from("UGC")
+        .select("*")
+        .neq("has_ugc", false);
+      const { data: profileData, error: profileError } = await supabase
+        .from("profile")
+        .select("*")
+        .neq("profile_complete", false);
+      const { data: imageData, error: imageError } = await supabase
+        .from("images")
+        .select("*")
+        .eq("image_index", 0)
+        .neq("last_modified", null);
 
+      if (ugcError || profileError || imageError) {
+        console.error(ugcError || profileError || imageError);
+      } else {
+        const mergedData = ugcData.map((ugcUser) => {
+          const relatedProfileData = profileData.find(
+            (profileUser) => profileUser.user_id === ugcUser.user_id
+          );
+          const relatedImageData = imageData.find(
+            (img) => img.user_id === ugcUser.user_id
+          );
+          if (
+            ugcUser.has_ugc &&
+            relatedProfileData?.profile_complete &&
+            relatedImageData?.last_modified
+          ) {
+            return {
+              ...ugcUser,
+              profiles: relatedProfileData,
+              lastModified: relatedImageData?.last_modified || null,
+            };
+          } else {
+            return null;
+          }
+        });
+        const filteredData = mergedData.filter((user) => user !== null);
 
-  
-    const fetchUsers = async () => {
-      try {
-        const { data: ugcData, error: ugcError } = await supabase
+        const userId = session.user.id;
+        const ugcResponse = await supabase
           .from("UGC")
-          .select("*")
-          .neq("has_ugc", false);
-        const { data: profileData, error: profileError } = await supabase
+          .select("name, bio, tags, major, class_year, hometown")
+          .eq("user_id", userId)
+          .single();
+        const profileResponse = await supabase
           .from("profile")
           .select("*")
-          .neq("profile_complete", false);
-        const { data: imageData, error: imageError } = await supabase
-          .from("images")
-          .select("*")
-          .eq("image_index", 0)
-          .neq("last_modified", null);
+          .eq("user_id", userId)
+          .single();
 
-        if (ugcError || profileError || imageError) {
-          console.error(ugcError || profileError || imageError);
+        if (ugcResponse.error || profileResponse.error) {
+          console.error(
+            ugcResponse.error?.message || profileResponse.error?.message
+          );
         } else {
-          const mergedData = ugcData.map((ugcUser) => {
-            const relatedProfileData = profileData.find(
-              (profileUser) => profileUser.user_id === ugcUser.user_id
-            );
-            const relatedImageData = imageData.find(
-              (img) => img.user_id === ugcUser.user_id
-            );
-            if (
-              ugcUser.has_ugc &&
-              relatedProfileData?.profile_complete &&
-              relatedImageData?.last_modified
-            ) {
-              return {
-                ...ugcUser,
-                profiles: relatedProfileData,
-                lastModified: relatedImageData?.last_modified || null,
-              };
-            } else {
-              return null;
-            }
-          });
-          const filteredData = mergedData.filter((user) => user !== null);
-
-          const userId = session.user.id;
-          const ugcResponse = await supabase
-            .from("UGC")
-            .select("name, bio, tags, major, class_year, hometown")
-            .eq("user_id", userId)
-            .single();
-          const profileResponse = await supabase
-            .from("profile")
-            .select("*")
-            .eq("user_id", userId)
-            .single();
-
-          if (ugcResponse.error || profileResponse.error) {
-            console.error(
-              ugcResponse.error?.message || profileResponse.error?.message
-            );
-          } else {
-            const mergedSessionUser = {
-              ...ugcResponse.data,
-              profiles: profileResponse.data,
-            };
-            setSessionuser(mergedSessionUser);
-            setGendaPreference(mergedSessionUser.profiles.who);
-            setHousinPreference(mergedSessionUser.profiles.living_preferences);
-          }
-
-          const {
-            data: allBlockedProfilesData,
-            error: allBlockedProfilesError,
-          } = await supabase.from("UGC").select("user_id, blocked_profiles");
-          if (allBlockedProfilesError) {
-            console.error(
-              "Error fetching all blocked profiles:",
-              allBlockedProfilesError.message
-            );
-          } else {
-            const usersWhoBlockedMe = allBlockedProfilesData
-              .filter(
-                (user) =>
-                  Array.isArray(user.blocked_profiles) &&
-                  user.blocked_profiles.includes(session.user.id)
-              )
-              .map((user) => user.user_id);
-            //console.log(usersWhoBlockedMe);
-            setUsersBlockingMe(usersWhoBlockedMe);
-          }
-
-          const { data: bookmarkedData, error: bookmarkedError } =
-            await supabase
-              .from("UGC")
-              .select("bookmarked_profiles")
-              .eq("user_id", userId);
-          if (bookmarkedError) {
-            console.error(
-              "Error fetching bookmarked profiles:",
-              bookmarkedError.message
-            );
-          } else {
-            const { bookmarked_profiles } = bookmarkedData[0];
-            setBookmarkedProfiles(bookmarked_profiles);
-          }
-
-          const { data: blockedData, error: blockedError } = await supabase
-            .from("UGC")
-            .select("blocked_profiles")
-            .eq("user_id", userId);
-          if (blockedError) {
-            console.error(
-              "Error fetching blocked profiles:",
-              blockedError.message
-            );
-          } else {
-            const { blocked_profiles } = blockedData[0];
-            setBlockedProfiles(blocked_profiles);
-          }
-
-          setUsers(filteredData);
+          const mergedSessionUser = {
+            ...ugcResponse.data,
+            profiles: profileResponse.data,
+          };
+          setSessionuser(mergedSessionUser);
+          setGendaPreference(mergedSessionUser.profiles.who);
+          setHousinPreference(mergedSessionUser.profiles.living_preferences);
         }
-      } catch (error) {
-        console.error("An unexpected error occurred:", error);
-      }
-      setIsLoading(false);
-      onHomePageVisit();
-    };
 
-    
+        const { data: allBlockedProfilesData, error: allBlockedProfilesError } =
+          await supabase.from("UGC").select("user_id, blocked_profiles");
+        if (allBlockedProfilesError) {
+          console.error(
+            "Error fetching all blocked profiles:",
+            allBlockedProfilesError.message
+          );
+        } else {
+          const usersWhoBlockedMe = allBlockedProfilesData
+            .filter(
+              (user) =>
+                Array.isArray(user.blocked_profiles) &&
+                user.blocked_profiles.includes(session.user.id)
+            )
+            .map((user) => user.user_id);
+          //console.log(usersWhoBlockedMe);
+          setUsersBlockingMe(usersWhoBlockedMe);
+        }
+
+        const { data: bookmarkedData, error: bookmarkedError } = await supabase
+          .from("UGC")
+          .select("bookmarked_profiles")
+          .eq("user_id", userId);
+        if (bookmarkedError) {
+          console.error(
+            "Error fetching bookmarked profiles:",
+            bookmarkedError.message
+          );
+        } else {
+          const { bookmarked_profiles } = bookmarkedData[0];
+          setBookmarkedProfiles(bookmarked_profiles);
+        }
+
+        const { data: blockedData, error: blockedError } = await supabase
+          .from("UGC")
+          .select("blocked_profiles")
+          .eq("user_id", userId);
+        if (blockedError) {
+          console.error(
+            "Error fetching blocked profiles:",
+            blockedError.message
+          );
+        } else {
+          const { blocked_profiles } = blockedData[0];
+          setBlockedProfiles(blocked_profiles);
+        }
+
+        setUsers(filteredData);
+      }
+    } catch (error) {
+      console.error("An unexpected error occurred:", error);
+    }
+    setIsLoading(false);
+    onHomePageVisit();
+  };
 
   useEffect(() => {
+    fetchUsers();
+    if (isFocused) {
       fetchUsers();
-      if (isFocused) {
-        fetchUsers();
-      }
-      if (isBookmarked) {
-        fetchUsers();
-      }
+    }
+    if (isBookmarked) {
+      fetchUsers();
+    }
   }, [isFocused]);
 
   const handleUserCardPress = (user) => {
@@ -390,7 +376,7 @@ const Home = ({ route }) => {
       <View style={styles.header}>
         <View style={styles.logoTitleContainer}>
           <Image style={styles.logo} source={logo} />
-          <Text style={styles.headerText}> Būnk </Text>
+          <Text style={styles.headerText}> Cabana </Text>
         </View>
         <View style={styles.buttonContainer}>
           <TouchableOpacity onPress={handleFiltersPress}>

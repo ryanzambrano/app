@@ -39,7 +39,7 @@ const AboutUs = ({ navigation, route }) => {
       <View style={styles.textContainer}>
         <Text style={styles.text}>
           {"    "}
-          Founded by college students, for college students, Būnk was born out
+          Founded by college students, for college students, Cabana was born out
           of personal experiences of navigating the challenges of finding the
           right roommate. We understand the importance of compatibility, whether
           it's related to study habits, sleep schedules, or hobbies.

@@ -181,6 +181,7 @@ export const Questionaire2 = ({ navigation, route }) => {
                     >
                       {livingPreferences.map((livingPreferences) => (
                         <Picker.Item
+                          color="white"
                           key={livingPreferences}
                           label={livingPreferences}
                           value={livingPreferences}
@@ -232,6 +233,7 @@ export const Questionaire2 = ({ navigation, route }) => {
                     >
                       {forFun.map((Gender) => (
                         <Picker.Item
+                          color="white"
                           key={Gender}
                           label={Gender}
                           value={Gender}
@@ -278,6 +280,7 @@ export const Questionaire2 = ({ navigation, route }) => {
                     >
                       {studies.map((studies) => (
                         <Picker.Item
+                          color="white"
                           key={studies}
                           label={studies}
                           value={studies}
@@ -403,7 +406,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     marginTop: "130%",
-    backgroundColor: "lightgrey",
+    backgroundColor: "#111111",
     justifyContent: "space-around",
     gap: "50%",
   },

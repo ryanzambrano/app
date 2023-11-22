@@ -23,6 +23,7 @@ import {
 import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
 import * as Animatable from 'react-native-animatable';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
 const MessagingUI = () => {
   const isFocused = useIsFocused();
@@ -40,6 +41,13 @@ const MessagingUI = () => {
   const [persons, setPersons] = useState([]);
   const [senderNames, setSenderNames] = useState({});
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+
+  const handleSwipe = (event) => {
+    if (event.nativeEvent.translationX < -50) {
+      // Perform your swipe left action here
+      //console.log('Swiped left!');
+    }
+  };
 
   const sendMessage = async () => {
     if (!isButtonDisabled && message.trim() !== "") {
@@ -191,7 +199,6 @@ const MessagingUI = () => {
   }
   useEffect(() => {
     if (isFocused) {
-      getJoinedGroups();
     }
     if (user.Ammount_Users <= 2) {
       fetchUsers();
@@ -205,7 +212,7 @@ const MessagingUI = () => {
     // This effect will run whenever isButtonDisabled changes
     if (isButtonDisabled) {
       // If the button is disabled, re-enable it after 1 second
-      const timeout = setTimeout(() => setIsButtonDisabled(false), 1000);
+      const timeout = setTimeout(() => setIsButtonDisabled(false), 250);
       
       // Cleanup the timeout if the component unmounts or the dependency changes
       return () => clearTimeout(timeout);
@@ -412,6 +419,7 @@ const MessagingUI = () => {
   };
 
   return (
+    <PanGestureHandler onGestureEvent={handleSwipe}>
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : null}
@@ -431,7 +439,7 @@ const MessagingUI = () => {
           <AntDesign name="arrowleft" size={24} color="#159e9e" />
         </TouchableOpacity>
         <Text style={styles.contactName} numberOfLines={1}>
-          {joinedGroups}
+          {user.joinedGroups}
         </Text>
         <TouchableOpacity onPress={navigateToProfile}>
           {renderProfilePicture()}
@@ -519,6 +527,7 @@ const MessagingUI = () => {
         />
       </View>
     </KeyboardAvoidingView>
+    </PanGestureHandler>
   );
 };
 

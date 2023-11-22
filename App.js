@@ -9,6 +9,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Authentication from "./components/auth/authentication.js";
 import Questionaire from "./components/questionairefiles/questionaire.js";
 import ThreeMainPages from "./components/miscellaneous/ThreeMainPages.js";
+import LoadingScreen from "./components/miscellaneous/loadingScreen";
 
 const PERSISTENCE_KEY = "NAVIGATION_STATE";
 
@@ -16,7 +17,7 @@ const Stack = createStackNavigator(); // Creating a stack is important for navig
 
 const App = () => {
   const [session, setSession] = useState(null);
-  const [hasProfile, setHasProfile] = useState(false);
+  const [hasProfile, setHasProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [connected, setConnected] = useState(false);
   const [homepageVisited, setHomepageVisited] = useState(null);
@@ -122,9 +123,7 @@ const App = () => {
         setHasProfile(true);
       } else {
         //console.log("profile invalid");
-        if (!connected) {
-          setHasProfile(true);
-        }
+        setHasProfile(false);
       }
     }
 
@@ -144,7 +143,16 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {session && session.user ? (
-          hasProfile ? (
+          hasProfile === false ? (
+            // If hasProfile is explicitly false, navigate to the Questionaire
+            <Stack.Screen
+              key={session?.user?.id ?? "TagSelectionScreen"}
+              name="questionaire"
+              component={Questionaire}
+              initialParams={{ session }}
+            />
+          ) : hasProfile === true ? (
+            // If hasProfile is true, navigate to the ThreeMainPages
             <Stack.Screen
               key={session?.user?.id ?? "ThreeMainPages"}
               name="ThreeMainPages"
@@ -152,17 +160,16 @@ const App = () => {
               initialParams={{ session }}
             />
           ) : (
+            // If hasProfile is null, you should render a loading indicator here
+            // You can create a dedicated loading screen or inline a loading indicator component
             <Stack.Screen
-              key={session?.user?.id ?? "TagSelectionScreen"}
-              name="questionaire"
-              component={Questionaire}
-              initialParams={{ session }}
+              name="LoadingScreen"
+              component={LoadingScreen} // Replace this with your loading component/screen
             />
           )
         ) : (
-          <>
-            <Stack.Screen name="Authentication" component={Authentication} />
-          </>
+          // If there is no session, navigate to the Authentication screen
+          <Stack.Screen name="Authentication" component={Authentication} />
         )}
       </Stack.Navigator>
     </NavigationContainer>

@@ -212,6 +212,8 @@ const ComposeMessageScreen = ({ route }) => {
     try {
       
       const selectedUserNames = selectedUsers.map((user) => user.name);
+      const nnnn = selectedUserNames.sort();
+      const nameparam = nnnn.join(", ");
       selectedUserNames.push(sessionusername);
       selectedUserNames.sort();
       const usernames = selectedUserNames.join(", ");
@@ -242,6 +244,7 @@ const ComposeMessageScreen = ({ route }) => {
           const fetchedPersons = insertData.map((person) => ({
             ...person,
             images: Imagedata,
+            joinedGroups: nameparam,
           }));
           setPersons(fetchedPersons);
           if (fetchedPersons.length > 0) {
@@ -269,11 +272,25 @@ const ComposeMessageScreen = ({ route }) => {
             console.log(navigationError);
             return;
           } else {
-            //console.log(navigationdata);
-            const fetchedPersons = navigationdata.map((person) => ({
-              ...person,
-              images: Imagedata,
-            }));
+            let fetchedPersons;
+            //console.log(navigationdata[0].Group_Name);
+            if(!navigationdata[0].Group_Name){
+              fetchedPersons = navigationdata.map((person) => ({
+                ...person,
+                images: Imagedata,
+                joinedGroups: nameparam,
+              }));
+
+            }
+            else
+            {
+              fetchedPersons = navigationdata.map((person) => ({
+                ...person,
+                images: Imagedata,
+                joinedGroups: navigationdata[0].Group_Name,
+              }));
+            }
+            
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
              navigation.navigate("Message", { user: fetchedPersons[0] });

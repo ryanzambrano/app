@@ -132,7 +132,7 @@ const ContactsUI = ({ route }) => {
           .eq("image_index", 0);
     
         // Check if recentMessageData exists, and only include users with recent messages
-        if (!recentMessageData) {
+        if (!recentMessageData && user.Is_College == false) {
           return null;
         }
     
@@ -149,10 +149,18 @@ const ContactsUI = ({ route }) => {
     const filteredUsers = modifiedUsers.filter((user) => user !== null);
     
     filteredUsers.sort((a, b) => {
-      return (
-        new Date(b.recentMessage.created_at) -
-        new Date(a.recentMessage.created_at)
-      );
+      const dateA = a.recentMessage ? new Date(a.recentMessage.created_at) : null;
+      const dateB = b.recentMessage ? new Date(b.recentMessage.created_at) : null;
+    
+      if (dateA && dateB) {
+        return dateB - dateA;
+      } else if (dateA) {
+        return -1;
+      } else if (dateB) {
+        return 1;
+      } else {
+        return 0;
+      }
     });
     
     setUsers(filteredUsers);
@@ -202,7 +210,7 @@ const ContactsUI = ({ route }) => {
         // Handle delete event
       })
       .on('postgres_changes', { event: 'update', schema: 'public', table: "Group_Chats"}, updatePayload => {
-        if (deletePayload) {
+        if (updatePayload) {
           const payloadarray = updatePayload.new.User_ID;
           if (payloadarray.includes(session.user.id)) {
            // console.log("Group data altered");
@@ -240,6 +248,7 @@ const ContactsUI = ({ route }) => {
 
   const renderContact = ({ item }) => {
     const handleDelete = async () => {
+      
       try {
         LayoutAnimation.configureNext({
           duration: 200, // Adjust the duration as needed
@@ -293,7 +302,20 @@ const ContactsUI = ({ route }) => {
         outputRange: [0, 75], // Modify this line to change the direction of the expansion
       });
 
-      const handleDeleteConfirmation = () => {
+      const handleDeleteConfirmation = (item) => {
+        if (item.Is_College == true)
+      {
+        Alert.alert(
+          "School Channel",
+          "You do not have permission to delete this channel",
+          [
+            {
+              text: "Ok",
+            }
+          ]
+        );
+        return;
+      }
         Alert.alert(
           "Delete Contact",
           "Are you sure you want to delete this contact? This will permanently delete all messages for both you and the recipient.",
@@ -310,7 +332,7 @@ const ContactsUI = ({ route }) => {
       };
 
       return (
-        <TouchableOpacity onPress={handleDeleteConfirmation}>
+        <TouchableOpacity onPress={() => handleDeleteConfirmation(item)}>
           <Animated.View
             style={{
               backgroundColor: "red",

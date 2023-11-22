@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Text,
   SafeAreaView,
+  KeyboardAvoidingView,
 } from "react-native";
 import { supabase } from "../auth/supabase";
 
@@ -139,27 +140,29 @@ export const AddPrompts = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.left}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Text style={styles.backButtonText}>Cancel</Text>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior="padding" // or "height" depending on your needs
+      >
+        <View style={styles.header}>
+          <View style={styles.left}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+              <Text style={styles.backButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.center}>
+            <Text style={styles.headerText}>Prompts</Text>
+          </View>
+          <TouchableOpacity style={styles.dbuttonContainer} onPress={handleSave}>
+            <Text style={styles.dbutton}>Done</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.center}>
-          <Text style={styles.headerText}>Prompts</Text>
-        </View>
-        <TouchableOpacity style={styles.dbuttonContainer} onPress={handleSave}>
-          <Text style={styles.dbutton}>Done</Text>
-        </TouchableOpacity>
-      </View>
-      <FlatList
-        data={presetQuestions}
-        renderItem={renderItems}
-        keyExtractor={(item, index) => index.toString()}
-      />
+        <FlatList
+          data={presetQuestions}
+          renderItem={renderItems}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

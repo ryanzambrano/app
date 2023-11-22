@@ -27,12 +27,6 @@ const MAX_IMAGES = 4;
 
 const scrollY = new Animated.Value(0);
 
-const profileOpacity = scrollY.interpolate({
-  inputRange: [0, 550],
-  outputRange: [1, 0],
-  extrapolate: "clamp",
-});
-
 const profileZIndex = scrollY.interpolate({
   inputRange: [0, 550],
   outputRange: [1, -1],
@@ -75,18 +69,19 @@ const UserCard = ({ navigation, route }) => {
     pet_peeves: "My biggest pet peeves are...",
     favorite_movies: "My favorite movies are...",
     favorite_artists: "My favorite artists / bands are...",
-    living_considerations: "The dorms halls / apartment complexes I'm considering are...",
+    living_considerations:
+      "The dorms halls / apartment complexes I'm considering are...",
     sharing: "When it comes to sharing my amenities and personal property...",
     cooking: "When it comes to sharing food and cooking...",
     burnt_out: "When I'm burnt out, I relax by...",
     involvement: "The organizations I'm involved in on campus are...",
     smoking: "My opinion toward smoking in the dorm / apartment are...",
     other_people: "My thoughts on having guests over are...",
-    temperature: "I like the temperature of the room to be...", 
+    temperature: "I like the temperature of the room to be...",
     pets: "My thoughts on having pets are...",
     parties: "My thoughts on throwing parties are...",
     decorations: "My ideas for decorating the home involve...",
-    conflict: "When it comes to handling conflict, I am...", 
+    conflict: "When it comes to handling conflict, I am...",
   };
 
   const handleModalClose = () => {
@@ -211,7 +206,7 @@ const UserCard = ({ navigation, route }) => {
         return;
       }
 
-      const { blocked_profiles } = data[0];;
+      const { blocked_profiles } = data[0];
       if (!blocked_profiles.includes(user_id)) {
         const updatedBlockedProfiles = [...blocked_profiles, user_id];
         const { data: updateData, error: updateError } = await supabase
@@ -308,7 +303,7 @@ const UserCard = ({ navigation, route }) => {
 
       if (data) {
         // alert(`Image data fetched: ${JSON.stringify(data)}`);
-        data.forEach((item) => {         
+        data.forEach((item) => {
           lastModifiedList[item.image_index] = item.last_modified;
         });
       }
@@ -329,17 +324,16 @@ const UserCard = ({ navigation, route }) => {
   const showActionSheet = () => {
     ActionSheet.showActionSheetWithOptions(
       {
-        options: ['Cancel', 'Block User', 'Report User'],
+        options: ["Cancel", "Block User", "Report User"],
         cancelButtonIndex: 0,
         destructiveButtonIndex: 1,
-        tintColor: 'white', // Set a default text color for all buttons
-        
+        tintColor: "white", // Set a default text color for all buttons
       },
       (buttonIndex) => {
         if (buttonIndex === 1) {
           handleBlockUser(user_id);
         } else if (buttonIndex === 2) {
-          navigation.navigate("ReportUI", {user_id: user_id});
+          navigation.navigate("ReportUI", { user_id: user_id });
         }
       }
     );
@@ -351,7 +345,7 @@ const UserCard = ({ navigation, route }) => {
       setActionSheetVisible(false);
     }
   }, [isActionSheetVisible]);
-  
+
   const handleUserCardPress = async () => {
     {
       //message navigation
@@ -366,11 +360,10 @@ const UserCard = ({ navigation, route }) => {
         return;
       }
       const { data: Imagedata, error: ImageError } = await supabase
-      .from("images")
-      .select("*")
-      .eq("user_id", user_id)
-      .eq("image_index", 0);
-
+        .from("images")
+        .select("*")
+        .eq("user_id", user_id)
+        .eq("image_index", 0);
 
       const sessionusername = data.name;
       const combinedArray = [sessionusername, name];
@@ -381,7 +374,7 @@ const UserCard = ({ navigation, route }) => {
       const Finalarray = combinedIDs.slice().sort();
 
       const { data: insertData, error: insertError } = await supabase
-        .from("Group Chats")
+        .from("Group_Chats")
         .insert([
           {
             User_ID: Finalarray,
@@ -389,12 +382,14 @@ const UserCard = ({ navigation, route }) => {
           },
         ])
         .select();
+        
 
       if (insertError) {
-        if (insertError.code === "23505") { // dupe error
+        if (insertError.code === "23505") {
+          // dupe error
           const { data: navigationdata, error: navigationError } =
             await supabase
-              .from("Group Chats")
+              .from("Group_Chats")
               .select("*")
               .contains("User_ID", Finalarray)
               .eq("Ammount_Users", Finalarray.length);
@@ -403,11 +398,12 @@ const UserCard = ({ navigation, route }) => {
             return;
           } else {
             //console.log(navigationdata);
-            const  fetchedPersons = navigationdata.map((person) => ({
+            const fetchedPersons = navigationdata.map((person) => ({
               ...person,
               images: Imagedata,
+              joinedGroups: name,
             }));
-            
+
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
               navigation.navigate("Message", { user: fetchedPersons[0] });
@@ -420,9 +416,10 @@ const UserCard = ({ navigation, route }) => {
         }
         return;
       }
-      const  fetchedPersons = navigationdata.map((person) => ({
+      const fetchedPersons = insertData.map((person) => ({
         ...person,
         images: Imagedata,
+        joinedGroups: name,
       }));
       setPersons(fetchedPersons);
       if (fetchedPersons.length > 0) {
@@ -434,35 +431,34 @@ const UserCard = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
+        onPress={() => navigation.goBack()}
+        style={styles.backButton}
+      >
+        <Text style={styles.backButtonText}>←</Text>
+      </TouchableOpacity>
       <Animated.View
         style={{
           //...styles.profileContainer,
-          opacity: profileOpacity,
+          //opacity: profileOpacity,
           zIndex: profileZIndex,
         }}
       >
-      <View style={styles.header}>
-        
-        <Text style={styles.name}>{name}</Text>
-        <View style={styles.backButton}></View>
-        <TouchableOpacity
-          onPress={() => setActionSheetVisible(true)}
-          style={styles.blockButton}
-        >
-          <AntDesign name="deleteuser" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
-</Animated.View>
+        <View style={styles.header}>
+          <Text style={styles.name}>{name}</Text>
+          <View style={styles.backButton}></View>
+          <TouchableOpacity
+            onPress={() => setActionSheetVisible(true)}
+            style={styles.blockButton}
+          >
+            <AntDesign name="deleteuser" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
       <Animated.View
         style={{
           ...styles.profileContainer,
-          opacity: profileOpacity,
-          zIndex: profileZIndex,
+          //opacity: profileOpacity,
+          //zIndex: profileZIndex,
         }}
       >
         <ScrollView
@@ -505,7 +501,6 @@ const UserCard = ({ navigation, route }) => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.tab}>
-          
           <View style={styles.buttonsContainer}>
             <TouchableOpacity
               style={[styles.friendButton, { backgroundColor: buttonColor }]}
@@ -522,7 +517,7 @@ const UserCard = ({ navigation, route }) => {
             >
               <Text style={styles.chatButtonText}>Message</Text>
             </TouchableOpacity>
-          </View>         
+          </View>
           <TouchableOpacity
             style={styles.questionaireButtonContainer}
             onPress={() => handleQuestionaireButtonPress()}
@@ -534,94 +529,96 @@ const UserCard = ({ navigation, route }) => {
           </TouchableOpacity>
 
           <View style={styles.roundedContainer}>
-          <Text style={styles.bioHeader} paddingBottom={15}>Details</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            paddingBottom={20}
-            paddingTop={4}
-            paddingHorizontal={15}
-          >
-          {class_year && (
-            <View style={styles.infoContainer}>
-              <Entypo name="graduation-cap" size={22} color="white" />
-              <Text style={styles.detailsText}> {class_year}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-          )} 
-          
-          {age && (
-            <View style={styles.infoContainer}>
-              <MaterialIcons name="cake" size={22} color="white" />
-              <Text style={styles.detailsText}>{age}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-          )}
-          {gender && (
-            <View style={styles.infoContainer}>
-              <Ionicons name="md-person-sharp" size={22} color="white" />
-              <Text style={styles.detailsText}>{gender}</Text>
-            </View>
-          )}
-          {major && (
-            <View style={styles.infoContainer}>
-              <View style={styles.verticalDivider2}/>
-              <Entypo name="open-book" size={22} color="white" />
-              <Text style={styles.detailsText}> {major}</Text>
-            </View>
-          )}
-          {!hometown && (
-            <View style={styles.infoContainer} paddingRight={33}></View>
-          )}
-          {hometown && (
-            <View style={styles.infoContainer} paddingRight={35}>
-              <View style={styles.verticalDivider2}/>
-              <MaterialIcons name="home-filled" marginLeft={-2} size={26} color="white" />
-              <Text style={styles.detailsText}>{hometown}</Text>
-            </View>
-          )}
-        </ScrollView>
-        </View>     
+            <Text style={styles.bioHeader} paddingBottom={15}>
+              Details
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              paddingBottom={20}
+              paddingTop={4}
+              paddingHorizontal={15}
+            >
+              {class_year && (
+                <View style={styles.infoContainer}>
+                  <Entypo name="graduation-cap" size={22} color="white" />
+                  <Text style={styles.detailsText}> {class_year}</Text>
+                  <View style={styles.verticalDivider} />
+                </View>
+              )}
 
-        {bio && (
-          <View style={styles.roundedContainer}>
-          <View style={styles.bio}>
-            <View>
-              <Text style={styles.bioHeader}>About {name}</Text>
-              <Text style={styles.bioText}>
-                {bio}
-              </Text>
-            </View>
+              {age && (
+                <View style={styles.infoContainer}>
+                  <MaterialIcons name="cake" size={22} color="white" />
+                  <Text style={styles.detailsText}>{age}</Text>
+                  <View style={styles.verticalDivider} />
+                </View>
+              )}
+              {gender && (
+                <View style={styles.infoContainer}>
+                  <Ionicons name="md-person-sharp" size={22} color="white" />
+                  <Text style={styles.detailsText}>{gender}</Text>
+                </View>
+              )}
+              {major && (
+                <View style={styles.infoContainer}>
+                  <View style={styles.verticalDivider2} />
+                  <Entypo name="open-book" size={22} color="white" />
+                  <Text style={styles.detailsText}> {major}</Text>
+                </View>
+              )}
+              {!hometown && (
+                <View style={styles.infoContainer} paddingRight={33}></View>
+              )}
+              {hometown && (
+                <View style={styles.infoContainer} paddingRight={35}>
+                  <View style={styles.verticalDivider2} />
+                  <MaterialIcons
+                    name="home-filled"
+                    marginLeft={-2}
+                    size={26}
+                    color="white"
+                  />
+                  <Text style={styles.detailsText}>{hometown}</Text>
+                </View>
+              )}
+            </ScrollView>
           </View>
-          </View>
-        )}
 
-      {prompts.some((item) => item.answer) && (
-        <View style={styles.roundedContainer}>
+          {bio && (
+            <View style={styles.roundedContainer}>
+              <View style={styles.bio}>
+                <View>
+                  <Text style={styles.bioHeader}>About {name}</Text>
+                  <Text style={styles.bioText}>{bio}</Text>
+                </View>
+              </View>
+            </View>
+          )}
+
           {prompts.some((item) => item.answer) && (
+            <View style={styles.roundedContainer}>
+              {prompts.some((item) => item.answer) && (
                 <Text style={styles.bioHeader}>Additional Info</Text>
               )}
-          <ScrollView
-            horizontal
-            style={styles.horizontalScrollView}
-            showsHorizontalScrollIndicator={false}
-            bounces={false}
-            
-          >
-            {prompts.map((item, index) =>
-            
-              item.answer ? (
-                
-                <View key={index} style={styles.itemContainer}>
-                  <Text style={styles.itemPrompt}>
-                    {promptQuestions[item.prompt]}
-                  </Text>
-                  <Text style={styles.itemAnswer}>{item.answer}</Text>
-                </View>
-              ) : null
-            )}
-          </ScrollView>
-          </View>
+              <ScrollView
+                horizontal
+                style={styles.horizontalScrollView}
+                showsHorizontalScrollIndicator={false}
+                bounces={false}
+              >
+                {prompts.map((item, index) =>
+                  item.answer ? (
+                    <View key={index} style={styles.itemContainer}>
+                      <Text style={styles.itemPrompt}>
+                        {promptQuestions[item.prompt]}
+                      </Text>
+                      <Text style={styles.itemAnswer}>{item.answer}</Text>
+                    </View>
+                  ) : null
+                )}
+              </ScrollView>
+            </View>
           )}
           <View style={styles.roundedContainer}>
             <Text style={styles.bioHeader}>Interests</Text>
@@ -647,7 +644,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
     backgroundColor: "#1D1D20",
   },
-  
+
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -660,20 +657,19 @@ const styles = StyleSheet.create({
     //zIndex: 3,
     // borderBottomColor: "#2B2D2F",
     // borderBottomWidth: 1,
-  
   },
 
   backButton: {
-  position: 'absolute',   
-  left: 0,   
-  paddingTop: 45,    
-  marginRight: 15,
-  paddingLeft: 15,
-  zIndex: 10000000,
+    position: "absolute",
+    left: 0,
+    paddingTop: 45,
+    marginRight: 15,
+    paddingLeft: 15,
+    zIndex: 10000000,
   },
   blockButton: {
-    position: 'absolute',  
-    right: 0,            
+    position: "absolute",
+    right: 0,
     paddingTop: 70,
     paddingRight: 10,
   },
@@ -694,8 +690,6 @@ const styles = StyleSheet.create({
     borderWidth: 0.4,
     alignItems: "center",
     marginBottom: 15,
-  
-    
   },
   scrollView: {
     flex: 1,
@@ -714,7 +708,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontSize: 30,
     color: "#149999",
-    
+
     zIndex: 10000000,
   },
 
@@ -768,7 +762,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 3,
-  
+
     // borderBottomColor: "grey",
     // borderBottomWidth: 0.3,
     // borderBottomEndRadius: 20,
@@ -822,7 +816,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     //paddingLeft: 25,
-    
+
     paddingBottom: 25,
     paddingTop: 5,
     //color: "white",
@@ -861,7 +855,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 23,
   },
-  
+
   major: {
     flex: 1,
     flexDirection: "row",
@@ -876,28 +870,28 @@ const styles = StyleSheet.create({
     gap: 17,
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between', 
-    paddingLeft: 10,  // Space on the left side of the row
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingLeft: 10, // Space on the left side of the row
     paddingRight: 20,
   },
   leftColumn: {
-    flexDirection: 'column',
+    flexDirection: "column",
     gap: 5,
   },
   rightColumn: {
-    flexDirection: 'column',
-    alignItems: 'flex-start', 
+    flexDirection: "column",
+    alignItems: "flex-start",
     gap: 5,
   },
   iconAndText: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,  
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
   },
   detailsText: {
-    marginLeft: 10, 
-    color: 'white',
+    marginLeft: 10,
+    color: "white",
     fontSize: 16,
   },
   tagsContainer: {
@@ -1004,18 +998,16 @@ const styles = StyleSheet.create({
     // borderBottomWidth: 0.3,
     // borderBottomEndRadius: 20,
     // borderBottomStartRadius: 20,
-    
   },
-  
+
   roundedContainer: {
     backgroundColor: "#1D1D20",
-    borderRadius: 20, 
-    padding: 0, 
-     
+    borderRadius: 20,
+    padding: 0,
+
     marginBottom: 15,
     marginHorizontal: 15,
-},
-
+  },
 });
 
 export default UserCard;

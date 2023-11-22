@@ -40,11 +40,11 @@ const PrivacyPolicy = ({ navigation, route }) => {
       <ScrollView style={styles.textContainer}>
         <Text style={styles.heading}>1. Introduction </Text>
         <Text style={styles.text}>
-          Welcome to Būnk, a dedicated platform designed to connect college
+          Welcome to Cabana, a dedicated platform designed to connect college
           students with potential roommates. Your privacy is of utmost
           importance to us. This Privacy Policy document outlines the types of
-          information collected by Būnk, and how we use, maintain, protect, and
-          disclose that information.
+          information collected by Cabana, and how we use, maintain, protect,
+          and disclose that information.
         </Text>
         <Text style={styles.heading}>2. Consent</Text>
         <Text style={styles.text}>
@@ -99,7 +99,7 @@ const PrivacyPolicy = ({ navigation, route }) => {
           how our service is used.
         </Text>
         <Text style={styles.text}>
-          Business Transactions: If Būnk is involved in a merger, acquisition,
+          Business Transactions: If Cabana is involved in a merger, acquisition,
           or asset sale, your personal data may be transferred.
         </Text>
         <Text style={styles.heading}>7. Security of Data We employ</Text>
@@ -115,14 +115,14 @@ const PrivacyPolicy = ({ navigation, route }) => {
         </Text>
         <Text style={styles.heading}>9. Your Acceptance of These Terms</Text>
         <Text style={styles.text}>
-          By using Būnk, you signify your acceptance of this policy and terms of
-          service. If you do not agree to this policy, please do not use our
+          By using Cabana, you signify your acceptance of this policy and terms
+          of service. If you do not agree to this policy, please do not use our
           app.
         </Text>
         <Text style={styles.heading}>10. Contact Us</Text>
         <Text style={styles.text}>
           If you have any questions or suggestions about our Privacy Policy, do
-          not hesitate to contact us at: Būnk [Email] [Address] [Phone]
+          not hesitate to contact us at: Cabana [Email] [Address] [Phone]
         </Text>
       </ScrollView>
     </SafeAreaView>
