@@ -33,6 +33,12 @@ const profileZIndex = scrollY.interpolate({
   extrapolate: "clamp",
 });
 
+const profileOpacity = scrollY.interpolate({
+  inputRange: [0, 550],
+  outputRange: [1, 0],
+  extrapolate: "clamp",
+});
+
 const UserCard = ({ navigation, route }) => {
   const { session } = route.params;
   const {
@@ -231,6 +237,7 @@ const UserCard = ({ navigation, route }) => {
 
   const handleAddFriend = async (user_id) => {
     const userId = session.user.id;
+    console.log(photos);
     try {
       const { data, error } = await supabase
         .from("UGC")
@@ -457,8 +464,8 @@ const UserCard = ({ navigation, route }) => {
       <Animated.View
         style={{
           ...styles.profileContainer,
-          //opacity: profileOpacity,
-          //zIndex: profileZIndex,
+          opacity: profileOpacity,
+          zIndex: profileZIndex,
         }}
       >
         <ScrollView
