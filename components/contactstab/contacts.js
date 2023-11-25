@@ -13,6 +13,10 @@ import {
   RefreshControl,
 } from "react-native";
 
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+
+
 import { AntDesign } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
@@ -37,11 +41,45 @@ const ContactsUI = ({ route }) => {
   const [images, setImages] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const groupIds = contacts.map(contact => contact.Group_ID);
+  const [expoPushToken, setExpoPushToken] = useState('');
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     fetchUsers().then(() => setRefreshing(false));
   }, []);
+
+  async function registerForPushNotificationsAsync() {
+    let token;
+  
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+  
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      // Learn more about projectId:
+      // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
+      token = (await Notifications.getExpoPushTokenAsync({ projectId: 'ad275287-fa4a-4f70-8397-8df453abd9a8' })).data;
+    } else {
+      alert('Must use physical device for Push Notifications');
+    }
+  
+    return token;
+  }
 
   
   const handleSearch = (text) => {
@@ -194,45 +232,110 @@ const ContactsUI = ({ route }) => {
       return formattedDate;
     }
   };
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
 
-  useEffect(() => {
-    fetchUsers();
-    const channel = supabase.channel('room1');
-    const subscription = channel
-      .on('postgres_changes', { event: 'insert', schema: 'public', table: "Group_Chats"}, deletePayload => {
-        if (deletePayload) {
-          const payloadarray = deletePayload.new.User_ID;
-          if (payloadarray.includes(session.user.id)) {
-            //console.log("Group data altered");
-            fetchUsers();
-          }
-        }
-        // Handle delete event
-      })
-      .on('postgres_changes', { event: 'update', schema: 'public', table: "Group_Chats"}, updatePayload => {
-        if (updatePayload) {
-          const payloadarray = updatePayload.new.User_ID;
-          if (payloadarray.includes(session.user.id)) {
-           // console.log("Group data altered");
-            fetchUsers();
-          }
-        }
-        // Handle delete event
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: "Group_Chat_Messages" }, genericPayload => {
-        if (genericPayload)
-        {
-          fetchUsers();
-        }
-        // Handle generic event
-      })
-      .subscribe();
+  async function schedulePushNotification(payload) {
+    const message = payload.new.Message_Content;
+    const sentfrom = payload.new.Sent_From;
+    const { data, error } = await supabase
+       .from("UGC")
+       .select("name")
+       .eq("user_id", sentfrom)
+       .single();
+    if(sentfrom == session.user.id)
+    {
+      
+    }
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: data.name,
+        body: message,
+        icon: 'assets/logo4.png',
+      },
+      trigger: { seconds: 1 },
+    });
+    
+  }
+
+  const checkchat = async (payload) => {
+    // console.log(payload.new.Group_ID_Sent_To);
+    const { data, error } = await supabase
+       .from("Group_Chats")
+       .select("*")
+       .eq("Group_ID", payload.new.Group_ID_Sent_To)
+       .single();
+       const isUserInGroup = data.User_ID.includes(session.user.id);
+ 
+       if (isUserInGroup) {
+         return 1;
+       } else {
+         return 0;
+       }
+    
+ 
+   }
+
   
-    // Clean up the subscription when the component unmounts
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+ 
+ 
+ 
+ 
+ 
+   useEffect(() => {
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+     fetchUsers();
+     const channel = supabase.channel('room1');
+     const subscription = channel
+       .on('postgres_changes', { event: 'insert', schema: 'public', table: "Group_Chats"}, deletePayload => {
+         if (deletePayload) {
+           const payloadarray = deletePayload.new.User_ID;
+           if (payloadarray.includes(session.user.id)) {
+             //console.log("Group data altered");
+             fetchUsers();
+           }
+         }
+         // Handle delete event
+       })
+       .on('postgres_changes', { event: 'update', schema: 'public', table: "Group_Chats"}, updatePayload => {
+         if (updatePayload) {
+           const payloadarray = updatePayload.new.User_ID;
+           if (payloadarray.includes(session.user.id)) {
+            // console.log("Group data altered");
+             fetchUsers();
+           }
+         }
+         // Handle delete event
+       })
+       .on('postgres_changes', { event: 'insert', schema: 'public', table: "Group_Chat_Messages" }, genericPayload => {
+         if (genericPayload) {
+           checkchat(genericPayload)
+             .then(result => {
+               if (result === 1) {
+                 fetchUsers();
+                 schedulePushNotification(genericPayload);
+                 console.log("change");
+                 
+               }
+             })
+             .catch(error => {
+               console.error('Error checking chat:', error);
+             });
+         }
+         // Handle generic event
+       })
+       .subscribe();
+   
+     // Clean up the subscription when the component unmounts
+     return () => {
+       subscription.unsubscribe();
+     };
+   }, []);
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
