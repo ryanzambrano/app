@@ -174,7 +174,7 @@ const GroupChatScreen = ({}) => {
       {
         Alert.alert(
           "School Channel",
-          "You do not have permission to delete this channel",
+          "You do not have permission to add people to this channel",
           [
             {
               text: "Ok",
