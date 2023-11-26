@@ -115,6 +115,7 @@ const MessagingUI = () => {
           const people = data.map((person) => ({
             ...person,
             lastModified: user.images[0].last_modified,
+            profiles: user.profiles,
           }));
           //alert(user.profiles.age);
           setPersons(people);

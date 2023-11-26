@@ -173,7 +173,7 @@ const ContactsUI = ({ route }) => {
 
         const { data: profileResponse, error: profileError } = await supabase
           .from("profile")
-          .select("*")
+          .select("age, gender")
           .eq("user_id", extractedIds)
           .single();
 
