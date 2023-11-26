@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -23,11 +23,35 @@ const SettingsScreen = ({ navigation, route }) => {
   const toggleDiscoverable = async () => {
     const newDiscoverableState = !isDiscoverable;
     setIsDiscoverable(newDiscoverableState);
+    updateViewable(newDiscoverableState);
     // Here you can add logic to update this setting in your backend or local storage
   };
 
   const handleBackPress = () => {
     navigation.navigate("Tabs");
+  };
+
+  useEffect(() => {
+    fetchViewable();
+  }, []);
+
+  const fetchViewable = async () => {
+    const { data, error } = await supabase
+      .from("UGC")
+      .select("profile_viewable")
+      .eq("user_id", session.user.id)
+      .single();
+
+    setIsDiscoverable(data.profile_viewable);
+  };
+
+  const updateViewable = async (viewable) => {
+    const { data, error } = await supabase
+      .from("UGC")
+      .update({
+        profile_viewable: viewable,
+      })
+      .eq("user_id", session.user.id);
   };
 
   const sections = [

@@ -56,7 +56,7 @@ export const MatchingData = ({ navigation, route }) => {
   };
 
   handleSaveSleepTime = () => {
-    if (!selectedSleepTime) setSelectedSleepTime("8 PM");
+    if (!selectedSleepTime) setSelectedSleepTime("Morning Person");
     closeSleepTimeModal();
   };
 

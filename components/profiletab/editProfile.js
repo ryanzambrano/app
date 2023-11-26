@@ -132,7 +132,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
         alert("Please enter a valid class year");
         return;
       }
-      s;
+
       if (editedUser.major.length > 30) {
         alert("Please enter a valid major");
         return;

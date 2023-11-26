@@ -71,6 +71,7 @@ const Home = ({ route }) => {
   const handleFiltersPress = () => {
     navigation.navigate("Filters", {
       currentHousingPreference: housingPreference,
+
       currentGenderPreference: genderPreference,
       currentYoungestAgePreference: youngestAgePreference,
       currentOldestAgePreference: oldestAgePreference,
@@ -152,7 +153,9 @@ const Home = ({ route }) => {
     const isHousingMatch =
       housingPreference === "Any" ||
       user.profiles.living_preferences === housingPreference ||
-      user.profiles.living_preferences === "No Preferences";
+      user.profiles.living_preferences === "No Preferences" ||
+      housingPreference === "No Preferences";
+
     //console.log(isHousingMatch);
     const isGenderMatch =
       genderPreference === "Any" || user.profiles.gender === genderPreference;
@@ -196,7 +199,8 @@ const Home = ({ route }) => {
       const { data: ugcData, error: ugcError } = await supabase
         .from("UGC")
         .select("*")
-        .neq("has_ugc", false);
+        .neq("has_ugc", false)
+        .neq("profile_viewable", false);
       const { data: profileData, error: profileError } = await supabase
         .from("profile")
         .select("*")
