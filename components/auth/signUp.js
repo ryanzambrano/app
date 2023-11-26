@@ -59,6 +59,9 @@ export const SignUp = ({ navigation }) => {
       const { data, error } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
+        options: {
+          emailRedirectTo: "https://thecabanaapp.com/congratulations",
+        },
       });
 
       if (error) {
