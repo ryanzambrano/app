@@ -202,6 +202,7 @@ const MessagingUI = () => {
     }
     if (user.Ammount_Users <= 2) {
       fetchUsers();
+      readMessages();
     }
     if (editedJoinedGroups !== undefined) {
       setJoinedGroups(editedJoinedGroups);

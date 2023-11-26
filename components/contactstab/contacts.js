@@ -319,7 +319,6 @@ const ContactsUI = ({ route }) => {
                if (result === 1) {
                  fetchUsers();
                  schedulePushNotification(genericPayload);
-                 console.log("change");
                  
                }
              })
@@ -329,6 +328,22 @@ const ContactsUI = ({ route }) => {
          }
          // Handle generic event
        })
+       .on('postgres_changes', { event: 'update', schema: 'public', table: "Group_Chat_Messages" }, genericPayload => {
+        if (genericPayload) {
+          console.log("heard");
+          checkchat(genericPayload)
+            .then(result => {
+              if (result === 1) {
+                fetchUsers();
+                console.log("heard");
+              }
+            })
+            .catch(error => {
+              console.error('Error checking chat:', error);
+            });
+        }
+        // Handle generic event
+      })
        .subscribe();
    
      // Clean up the subscription when the component unmounts
