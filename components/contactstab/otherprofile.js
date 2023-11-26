@@ -39,16 +39,6 @@ const GroupChatScreen = ({}) => {
       return;
     }
 
-    const { data: profileResponse, error: profileError } = await supabase
-      .from("profile")
-      .select("age, gender")
-      .in("user_id", extractedIds);
-
-    if (profileError) {
-      console.error(profileError.error.message);
-    } else {
-      user.profiles = profileResponse;
-    }
     const modifiedUsers = await Promise.all(
       peoples.map(async (people) => {
         const { data: Imagedata, error: ImageError } = await supabase
@@ -57,6 +47,18 @@ const GroupChatScreen = ({}) => {
           .eq("user_id", people.user_id)
           .eq("image_index", 0)
           .single();
+
+        const { data: profileResponse, error: profileError } = await supabase
+          .from("profile")
+          .select("age, gender")
+          .eq("user_id", people.user_id)
+          .single();
+
+        if (profileError) {
+          console.error(profileError.error.message);
+        } else {
+          user.profiles = profileResponse;
+        }
         if (ImageError) {
           return {
             ...people,
