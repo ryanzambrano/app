@@ -11,6 +11,7 @@ import {
   Platform,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { picURL } from "../auth/supabase.js";
 import { AntDesign } from "@expo/vector-icons";
@@ -22,8 +23,8 @@ import {
 } from "@react-navigation/native";
 import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
-import * as Animatable from 'react-native-animatable';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import * as Animatable from "react-native-animatable";
+import { PanGestureHandler, State } from "react-native-gesture-handler";
 
 const MessagingUI = () => {
   const isFocused = useIsFocused();
@@ -48,6 +49,8 @@ const MessagingUI = () => {
       //console.log('Swiped left!');
     }
   };
+
+  //alert(user.profiles.age);
 
   const sendMessage = async () => {
     if (!isButtonDisabled && message.trim() !== "") {
@@ -113,6 +116,7 @@ const MessagingUI = () => {
             ...person,
             lastModified: user.images[0].last_modified,
           }));
+          //alert(user.profiles.age);
           setPersons(people);
         } else {
           const peoples = data.map((person) => person);
@@ -139,32 +143,31 @@ const MessagingUI = () => {
         .eq("Group_ID", user.Group_ID)
         .single();
 
-        const { data: recentmessage1, error: recentmessageerror1 } = await supabase
-        .from("Group_Chat_Messages")
-        .select('Read') // Update the "Read" column
-        .eq("Group_ID_Sent_To", user.Group_ID)
-        .order("created_at", { ascending: false })
-        .limit(1); // Get only the most recent message;
-        const readArray = recentmessage1[0]?.Read || [];
-         // Extract the Read array
-        if (!readArray.includes(session.user.id)) {
-          // Append session.user.id to the array
-          readArray.push(session.user.id);
+      const { data: recentmessage1, error: recentmessageerror1 } =
+        await supabase
+          .from("Group_Chat_Messages")
+          .select("Read") // Update the "Read" column
+          .eq("Group_ID_Sent_To", user.Group_ID)
+          .order("created_at", { ascending: false })
+          .limit(1); // Get only the most recent message;
+      const readArray = recentmessage1[0]?.Read || [];
+      // Extract the Read array
+      if (!readArray.includes(session.user.id)) {
+        // Append session.user.id to the array
+        readArray.push(session.user.id);
 
+        const { data: recentmessagedata, error: recentmessageerror } =
+          await supabase
+            .from("Group_Chat_Messages")
+            .update({ Read: readArray }) // Update the "Read" column
+            .eq("Group_ID_Sent_To", user.Group_ID)
+            .order("created_at", { ascending: false })
+            .limit(1); // Get only the most recent message;
 
-        const { data: recentmessagedata, error: recentmessageerror } = await supabase
-        .from("Group_Chat_Messages")
-        .update({ Read: readArray }) // Update the "Read" column
-        .eq("Group_ID_Sent_To", user.Group_ID)
-        .order("created_at", { ascending: false })
-        .limit(1); // Get only the most recent message;
-        
-      if(recentmessageerror)
-      {
-        console.log(recentmessageerror);
+        if (recentmessageerror) {
+          console.log(recentmessageerror);
+        }
       }
-    }
-
 
       if (sessionError) {
         console.error(sessionError);
@@ -174,21 +177,16 @@ const MessagingUI = () => {
         (item) => item !== session.user.id
       );
       const { data: UGCdata, error: sessionErrors } = await supabase
-      .from("UGC")
-      .select("name")
-      .in("user_id", extractedIds);
+        .from("UGC")
+        .select("name")
+        .in("user_id", extractedIds);
       let Groupnames;
-      if(!user.Group_Name)
-      {
-        const joinedGroups = UGCdata.map(item => item.name);
+      if (!user.Group_Name) {
+        const joinedGroups = UGCdata.map((item) => item.name);
         Groupnames = joinedGroups.join(", ");
-      }
-      else
-      {
+      } else {
         Groupnames = user.Group_Name;
       }
-    
-
 
       setJoinedGroups(Groupnames);
       return;
@@ -214,7 +212,7 @@ const MessagingUI = () => {
     if (isButtonDisabled) {
       // If the button is disabled, re-enable it after 1 second
       const timeout = setTimeout(() => setIsButtonDisabled(false), 250);
-      
+
       // Cleanup the timeout if the component unmounts or the dependency changes
       return () => clearTimeout(timeout);
     }
@@ -239,54 +237,60 @@ const MessagingUI = () => {
   };
   const readMessages = async () => {
     const { data: recentmessage1, error: recentmessageerror1 } = await supabase
-        .from("Group_Chat_Messages")
-        .select('Read') // Update the "Read" column
-        .eq("Group_ID_Sent_To", user.Group_ID)
-        .order("created_at", { ascending: false })
-        .limit(1); // Get only the most recent message;
-        const readArray = recentmessage1[0]?.Read || [];
-         // Extract the Read array
-        if (!readArray.includes(session.user.id)) {
-          // Append session.user.id to the array
-          readArray.push(session.user.id);
+      .from("Group_Chat_Messages")
+      .select("Read") // Update the "Read" column
+      .eq("Group_ID_Sent_To", user.Group_ID)
+      .order("created_at", { ascending: false })
+      .limit(1); // Get only the most recent message;
+    const readArray = recentmessage1[0]?.Read || [];
+    // Extract the Read array
+    if (!readArray.includes(session.user.id)) {
+      // Append session.user.id to the array
+      readArray.push(session.user.id);
 
+      const { data: recentmessagedata, error: recentmessageerror } =
+        await supabase
+          .from("Group_Chat_Messages")
+          .update({ Read: readArray }) // Update the "Read" column
+          .eq("Group_ID_Sent_To", user.Group_ID)
+          .order("created_at", { ascending: false })
+          .limit(1); // Get only the most recent message;
 
-        const { data: recentmessagedata, error: recentmessageerror } = await supabase
-        .from("Group_Chat_Messages")
-        .update({ Read: readArray }) // Update the "Read" column
-        .eq("Group_ID_Sent_To", user.Group_ID)
-        .order("created_at", { ascending: false })
-        .limit(1); // Get only the most recent message;
-        
-      if(recentmessageerror)
-      {
+      if (recentmessageerror) {
         console.log(recentmessageerror);
       }
     }
   };
   animateMessage = () => {
     this.messageRef.fadeIn(250); // You can adjust the duration (1000ms in this example)
-  }
+  };
 
   useEffect(() => {
     fetchMessages();
-    const channel = supabase.channel('messaging');
+    const channel = supabase.channel("messaging");
     const subscription = channel
-      .on('postgres_changes', { event: 'insert', schema: 'public', table: "Group_Chat_Messages" ,filter: `Group_ID_Sent_To=eq.${user.Group_ID}` }, genericPayload => {
-        if (genericPayload)
+      .on(
+        "postgres_changes",
         {
-          fetchMessages();
-          readMessages();
+          event: "insert",
+          schema: "public",
+          table: "Group_Chat_Messages",
+          filter: `Group_ID_Sent_To=eq.${user.Group_ID}`,
+        },
+        (genericPayload) => {
+          if (genericPayload) {
+            fetchMessages();
+            readMessages();
+          }
+          // Handle generic event
         }
-        // Handle generic event
-      })
+      )
       .subscribe();
-  
+
     // Clean up the subscription when the component unmounts
     return () => {
       subscription.unsubscribe();
     };
-
   }, []);
 
   useEffect(() => {
@@ -421,113 +425,115 @@ const MessagingUI = () => {
 
   return (
     <PanGestureHandler onGestureEvent={handleSwipe}>
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : null}
-      keyboardVerticalOffset={Platform.OS === "ios" ? -5 : 0}
-    >
-      <View style={{ flex: 0.01 }}>
-        <ScrollView
-          ref={scrollViewRef}
-          contentContainerStyle={{ flexGrow: 1 }}
-        ></ScrollView>
-      </View>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Contacts")}
-        >
-          <AntDesign name="arrowleft" size={24} color="#159e9e" />
-        </TouchableOpacity>
-        <Text style={styles.contactName} numberOfLines={1}>
-          {user.joinedGroups}
-        </Text>
-        <TouchableOpacity onPress={navigateToProfile}>
-          {renderProfilePicture()}
-        </TouchableOpacity>
-      </View>
-      <View style={styles.messagesContainer}>
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={({ item, index }) => {
-            const isOwnMessage = item.Sent_From === session.user.id;
-            const isFirstOwnMessage =
-              isOwnMessage &&
-              (index === 0 ||
-                messages[index - 1].Sent_From !== session.user.id);
-            const isOtherMessage = item.Sent_From !== session.user.id;
-            const isFirstOtherMessage =
-              isOtherMessage &&
-              (index === 0 ||
-                messages[index - 1].Sent_From === session.user.id);
-            const shouldDisplaySenderName =
-              user.Ammount_Users >= 3 && isFirstOtherMessage;
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : null}
+        keyboardVerticalOffset={Platform.OS === "ios" ? -5 : 0}
+      >
+        <View style={{ flex: 0.01 }}>
+          <ScrollView
+            ref={scrollViewRef}
+            contentContainerStyle={{ flexGrow: 1 }}
+          ></ScrollView>
+        </View>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Contacts")}
+          >
+            <AntDesign name="arrowleft" size={24} color="#159e9e" />
+          </TouchableOpacity>
+          <Text style={styles.contactName} numberOfLines={1}>
+            {user.joinedGroups}
+          </Text>
+          <TouchableOpacity onPress={navigateToProfile}>
+            {renderProfilePicture()}
+          </TouchableOpacity>
+        </View>
+        <View style={styles.messagesContainer}>
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            renderItem={({ item, index }) => {
+              const isOwnMessage = item.Sent_From === session.user.id;
+              const isFirstOwnMessage =
+                isOwnMessage &&
+                (index === 0 ||
+                  messages[index - 1].Sent_From !== session.user.id);
+              const isOtherMessage = item.Sent_From !== session.user.id;
+              const isFirstOtherMessage =
+                isOtherMessage &&
+                (index === 0 ||
+                  messages[index - 1].Sent_From === session.user.id);
+              const shouldDisplaySenderName =
+                user.Ammount_Users >= 3 && isFirstOtherMessage;
 
-            return (
-              <Animatable.View ref={(ref) => this.messageRef = ref}>
-              <View>
-                {shouldDisplaySenderName && (
-                  <Text style={styles.senderName}>{item.UGC.name}</Text>
-                )}
-                <View
-                  style={[
-                    styles.messageContainer,
-                    isOwnMessage
-                      ? styles.messageContainerRight
-                      : styles.messageContainerLeft,
-                    // conditionally apply the smaller margin styles
-                    isFirstOwnMessage
-                      ? {}
-                      : styles.messageContainerRightSmallMargin,
-                    isFirstOtherMessage
-                      ? {}
-                      : styles.messageContainerLeftSmallMargin,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.message,
-                      isOwnMessage ? { color: "white" } : { color: "white" },
-                    ]}
-                  >
-                    {item.Message_Content}
-                  </Text>
-                </View>
-              </View>
-              </Animatable.View>
-            );
-          }}
-          keyExtractor={(_, index) => index.toString()}
-          contentContainerStyle={styles.messagesContent}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-      <TextInput
-    style={[
-      styles.input,
-      { height: Math.min(200, Math.max(40, inputHeight)) } // Set maximum height to 100
-    ]}
-          value={message}
-          onChangeText={(text) => setMessage(text)}
-          placeholder="Type a message..."
-          placeholderTextColor="#888"
-          autoCorrect={true}
-          multiline
-          onContentSizeChange={(e) =>
-            setInputHeight(e.nativeEvent.contentSize.height)
-          }
-          keyboardAppearance="dark"
-        />
-        <Button
-          title="Send"
-          onPress={sendMessage}
-          color="#159e9e"
-          text="bold"
-          disabled={isButtonDisabled}
-        />
-      </View>
-    </KeyboardAvoidingView>
+              return (
+                <Animatable.View ref={(ref) => (this.messageRef = ref)}>
+                  <View>
+                    {shouldDisplaySenderName && (
+                      <Text style={styles.senderName}>{item.UGC.name}</Text>
+                    )}
+                    <View
+                      style={[
+                        styles.messageContainer,
+                        isOwnMessage
+                          ? styles.messageContainerRight
+                          : styles.messageContainerLeft,
+                        // conditionally apply the smaller margin styles
+                        isFirstOwnMessage
+                          ? {}
+                          : styles.messageContainerRightSmallMargin,
+                        isFirstOtherMessage
+                          ? {}
+                          : styles.messageContainerLeftSmallMargin,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.message,
+                          isOwnMessage
+                            ? { color: "white" }
+                            : { color: "white" },
+                        ]}
+                      >
+                        {item.Message_Content}
+                      </Text>
+                    </View>
+                  </View>
+                </Animatable.View>
+              );
+            }}
+            keyExtractor={(_, index) => index.toString()}
+            contentContainerStyle={styles.messagesContent}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={[
+              styles.input,
+              { height: Math.min(200, Math.max(40, inputHeight)) }, // Set maximum height to 100
+            ]}
+            value={message}
+            onChangeText={(text) => setMessage(text)}
+            placeholder="Type a message..."
+            placeholderTextColor="#888"
+            autoCorrect={true}
+            multiline
+            onContentSizeChange={(e) =>
+              setInputHeight(e.nativeEvent.contentSize.height)
+            }
+            keyboardAppearance="dark"
+          />
+          <Button
+            title="Send"
+            onPress={sendMessage}
+            color="#159e9e"
+            text="bold"
+            disabled={isButtonDisabled}
+          />
+        </View>
+      </KeyboardAvoidingView>
     </PanGestureHandler>
   );
 };

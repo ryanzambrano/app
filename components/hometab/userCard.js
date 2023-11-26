@@ -53,8 +53,13 @@ const UserCard = ({ navigation, route }) => {
     bookmarked_profiles,
     lastModified,
   } = route.params.user;
-  const [age, setAge] = useState("");
-  const [gender, setGender] = useState("");
+
+  const { age, gender } = route.params.user.profiles;
+
+  //alert(route.params.user.profiles.gender);
+  //const [age, setAge] = useState("");
+  //const [gender, setGender] = useState("");
+
   const [living_preferences, setLivingPreference] = useState("");
   const [persons, setPersons] = useState([]);
   const [photos, setPhotos] = useState([
@@ -164,7 +169,7 @@ const UserCard = ({ navigation, route }) => {
         console.log("Error fetching prompts: ", promptsError);
       }
     };
-    const fetchGenderAndAge = async () => {
+    /*const fetchGenderAndAge = async () => {
       const { data: genderData, error: genderError } = await supabase
         .from("profile")
         .select("gender, age, living_preferences")
@@ -177,8 +182,8 @@ const UserCard = ({ navigation, route }) => {
       } else {
         console.log("Error fetching prompts: ");
       }
-    };
-    fetchGenderAndAge();
+    };*/
+    //fetchGenderAndAge();
     fetchBookmarkedProfiles();
     fetchPrompts();
     //console.log(`${picURL}/${user_id}/${user_id}-0-${lastModified}`);
@@ -389,7 +394,6 @@ const UserCard = ({ navigation, route }) => {
           },
         ])
         .select();
-        
 
       if (insertError) {
         if (insertError.code === "23505") {

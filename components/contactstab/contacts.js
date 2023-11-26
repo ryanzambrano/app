@@ -13,9 +13,8 @@ import {
   RefreshControl,
 } from "react-native";
 
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 
 import { AntDesign } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -26,7 +25,7 @@ import { Swipeable } from "react-native-gesture-handler";
 import { supabase } from "../auth/supabase.js";
 import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { LayoutAnimation } from 'react-native';
+import { LayoutAnimation } from "react-native";
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
@@ -40,8 +39,8 @@ const ContactsUI = ({ route }) => {
   const [contactOpacities, setContactOpacities] = useState({});
   const [images, setImages] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const groupIds = contacts.map(contact => contact.Group_ID);
-  const [expoPushToken, setExpoPushToken] = useState('');
+  const groupIds = contacts.map((contact) => contact.Group_ID);
+  const [expoPushToken, setExpoPushToken] = useState("");
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -50,38 +49,42 @@ const ContactsUI = ({ route }) => {
 
   async function registerForPushNotificationsAsync() {
     let token;
-  
-    if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
+
+    if (Platform.OS === "android") {
+      await Notifications.setNotificationChannelAsync("default", {
+        name: "default",
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
+        lightColor: "#FF231F7C",
       });
     }
-  
+
     if (Device.isDevice) {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
+      if (existingStatus !== "granted") {
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
       }
-      if (finalStatus !== 'granted') {
-        alert('Failed to get push token for push notification!');
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
         return;
       }
       // Learn more about projectId:
       // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
-      token = (await Notifications.getExpoPushTokenAsync({ projectId: 'ad275287-fa4a-4f70-8397-8df453abd9a8' })).data;
+      token = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId: "ad275287-fa4a-4f70-8397-8df453abd9a8",
+        })
+      ).data;
     } else {
-      alert('Must use physical device for Push Notifications');
+      alert("Must use physical device for Push Notifications");
     }
-  
+
     return token;
   }
 
-  
   const handleSearch = (text) => {
     setSearchQuery(text);
   };
@@ -104,10 +107,9 @@ const ContactsUI = ({ route }) => {
       .from("Group_Chats")
       .select("*")
       .contains("User_ID", [session.user.id]);
-      if(users)
-      {
-        setContacts(users);
-      }
+    if (users) {
+      setContacts(users);
+    }
 
     if (error) {
       console.error(error);
@@ -133,27 +135,22 @@ const ContactsUI = ({ route }) => {
           (item) => item !== session.user.id
         );
         const { data, error: sessionError } = await supabase
-        .from("UGC")
-        .select("name")
-        .in("user_id", extractedIds);
+          .from("UGC")
+          .select("name")
+          .in("user_id", extractedIds);
         let joinedGroups;
-        if(!user.Group_Name)
-        {
-          const groupNames = data.map(item => item.name);
-      
+        if (!user.Group_Name) {
+          const groupNames = data.map((item) => item.name);
+
           joinedGroups = groupNames.join(", ");
-        }
-        else
-        {
-      
+        } else {
           joinedGroups = user.Group_Name;
         }
         setContactOpacities((prevOpacities) => ({
           ...prevOpacities,
           [user.Group_ID]: new Animated.Value(1),
         }));
-        
-    
+
         // Fetch the most recent group chat message
         const { data: recentMessageData, error: messageError } = await supabase
           .from("Group_Chat_Messages")
@@ -168,12 +165,24 @@ const ContactsUI = ({ route }) => {
           .select("*")
           .in("user_id", extractedIds)
           .eq("image_index", 0);
-    
+
         // Check if recentMessageData exists, and only include users with recent messages
         if (!recentMessageData && user.Is_College == false) {
           return null;
         }
-    
+
+        const { data: profileResponse, error: profileError } = await supabase
+          .from("profile")
+          .select("*")
+          .eq("user_id", extractedIds)
+          .single();
+
+        if (profileError) {
+          console.error(profileError.error.message);
+        } else {
+          user.profiles = profileResponse;
+          //alert(user.profiles.gender);
+        }
         return {
           ...user,
           joinedGroups,
@@ -182,14 +191,18 @@ const ContactsUI = ({ route }) => {
         };
       })
     );
-    
+
     // Filter out null values (users with no recent messages) and sort
     const filteredUsers = modifiedUsers.filter((user) => user !== null);
-    
+
     filteredUsers.sort((a, b) => {
-      const dateA = a.recentMessage ? new Date(a.recentMessage.created_at) : null;
-      const dateB = b.recentMessage ? new Date(b.recentMessage.created_at) : null;
-    
+      const dateA = a.recentMessage
+        ? new Date(a.recentMessage.created_at)
+        : null;
+      const dateB = b.recentMessage
+        ? new Date(b.recentMessage.created_at)
+        : null;
+
       if (dateA && dateB) {
         return dateB - dateA;
       } else if (dateA) {
@@ -200,7 +213,7 @@ const ContactsUI = ({ route }) => {
         return 0;
       }
     });
-    
+
     setUsers(filteredUsers);
   };
 
@@ -244,113 +257,119 @@ const ContactsUI = ({ route }) => {
     const message = payload.new.Message_Content;
     const sentfrom = payload.new.Sent_From;
     const { data, error } = await supabase
-       .from("UGC")
-       .select("name")
-       .eq("user_id", sentfrom)
-       .single();
-    if(sentfrom == session.user.id)
-    {
-      
+      .from("UGC")
+      .select("name")
+      .eq("user_id", sentfrom)
+      .single();
+    if (sentfrom == session.user.id) {
     }
     await Notifications.scheduleNotificationAsync({
       content: {
         title: data.name,
         body: message,
-        icon: 'assets/logo4.png',
+        icon: "assets/logo4.png",
       },
       trigger: { seconds: 1 },
     });
-    
   }
 
   const checkchat = async (payload) => {
     // console.log(payload.new.Group_ID_Sent_To);
     const { data, error } = await supabase
-       .from("Group_Chats")
-       .select("*")
-       .eq("Group_ID", payload.new.Group_ID_Sent_To)
-       .single();
-       const isUserInGroup = data.User_ID.includes(session.user.id);
- 
-       if (isUserInGroup) {
-         return 1;
-       } else {
-         return 0;
-       }
-    
- 
-   }
+      .from("Group_Chats")
+      .select("*")
+      .eq("Group_ID", payload.new.Group_ID_Sent_To)
+      .single();
+    const isUserInGroup = data.User_ID.includes(session.user.id);
 
-  
- 
- 
- 
- 
- 
-   useEffect(() => {
-    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
-     fetchUsers();
-     const channel = supabase.channel('room1');
-     const subscription = channel
-       .on('postgres_changes', { event: 'insert', schema: 'public', table: "Group_Chats"}, deletePayload => {
-         if (deletePayload) {
-           const payloadarray = deletePayload.new.User_ID;
-           if (payloadarray.includes(session.user.id)) {
-             //console.log("Group data altered");
-             fetchUsers();
-           }
-         }
-         // Handle delete event
-       })
-       .on('postgres_changes', { event: 'update', schema: 'public', table: "Group_Chats"}, updatePayload => {
-         if (updatePayload) {
-           const payloadarray = updatePayload.new.User_ID;
-           if (payloadarray.includes(session.user.id)) {
-            // console.log("Group data altered");
-             fetchUsers();
-           }
-         }
-         // Handle delete event
-       })
-       .on('postgres_changes', { event: 'insert', schema: 'public', table: "Group_Chat_Messages" }, genericPayload => {
-         if (genericPayload) {
-           checkchat(genericPayload)
-             .then(result => {
-               if (result === 1) {
-                 fetchUsers();
-                 schedulePushNotification(genericPayload);
-                 
-               }
-             })
-             .catch(error => {
-               console.error('Error checking chat:', error);
-             });
-         }
-         // Handle generic event
-       })
-       .on('postgres_changes', { event: 'update', schema: 'public', table: "Group_Chat_Messages" }, genericPayload => {
-        if (genericPayload) {
-          console.log("heard");
-          checkchat(genericPayload)
-            .then(result => {
-              if (result === 1) {
-                fetchUsers();
-                console.log("heard");
-              }
-            })
-            .catch(error => {
-              console.error('Error checking chat:', error);
-            });
+    if (isUserInGroup) {
+      return 1;
+    } else {
+      return 0;
+    }
+  };
+
+  useEffect(() => {
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token)
+    );
+    fetchUsers();
+    const channel = supabase.channel("room1");
+    const subscription = channel
+      .on(
+        "postgres_changes",
+        { event: "insert", schema: "public", table: "Group_Chats" },
+        (deletePayload) => {
+          if (deletePayload) {
+            const payloadarray = deletePayload.new.User_ID;
+            if (payloadarray.includes(session.user.id)) {
+              //console.log("Group data altered");
+              fetchUsers();
+            }
+          }
+          // Handle delete event
         }
-        // Handle generic event
-      })
-       .subscribe();
-   
-     // Clean up the subscription when the component unmounts
-     return () => {
-       subscription.unsubscribe();
-     };
-   }, []);
+      )
+      .on(
+        "postgres_changes",
+        { event: "update", schema: "public", table: "Group_Chats" },
+        (updatePayload) => {
+          if (updatePayload) {
+            const payloadarray = updatePayload.new.User_ID;
+            if (payloadarray.includes(session.user.id)) {
+              // console.log("Group data altered");
+              fetchUsers();
+            }
+          }
+          // Handle delete event
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "insert", schema: "public", table: "Group_Chat_Messages" },
+        (genericPayload) => {
+          if (genericPayload) {
+            checkchat(genericPayload)
+              .then((result) => {
+                if (result === 1) {
+                  fetchUsers();
+                  schedulePushNotification(genericPayload);
+                }
+              })
+              .catch((error) => {
+                console.error("Error checking chat:", error);
+              });
+          }
+          // Handle generic event
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "update", schema: "public", table: "Group_Chat_Messages" },
+        (genericPayload) => {
+          if (genericPayload) {
+            console.log("heard");
+            checkchat(genericPayload)
+              .then((result) => {
+                if (result === 1) {
+                  fetchUsers();
+                  console.log("heard");
+                }
+              })
+              .catch((error) => {
+                console.error("Error checking chat:", error);
+              });
+          }
+          // Handle generic event
+        }
+      )
+      .subscribe();
+
+    // Clean up the subscription when the component unmounts
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
@@ -365,8 +384,8 @@ const ContactsUI = ({ route }) => {
   };
 
   const renderContact = ({ item }) => {
+    console.log(item);
     const handleDelete = async () => {
-      
       try {
         LayoutAnimation.configureNext({
           duration: 200, // Adjust the duration as needed
@@ -388,22 +407,22 @@ const ContactsUI = ({ route }) => {
             .from("Group_Chat_Messages")
             .delete()
             .eq("Group_ID_Sent_To", item.Group_ID);
-  
+
           if (error) {
             console.error(error);
             return;
           }
-  
+
           // Now delete from the "Group Chats" table
           const { error: groupChatsError } = await supabase
             .from("Group_Chats")
             .delete()
             .eq("Group_ID", item.Group_ID);
-  
+
           if (groupChatsError) {
             console.error(groupChatsError);
           }
-  
+
           // Fetch users again to update the UI
           fetchUsers();
         });
@@ -421,19 +440,18 @@ const ContactsUI = ({ route }) => {
       });
 
       const handleDeleteConfirmation = (item) => {
-        if (item.Is_College == true)
-      {
-        Alert.alert(
-          "School Channel",
-          "You do not have permission to delete this channel",
-          [
-            {
-              text: "Ok",
-            }
-          ]
-        );
-        return;
-      }
+        if (item.Is_College == true) {
+          Alert.alert(
+            "School Channel",
+            "You do not have permission to delete this channel",
+            [
+              {
+                text: "Ok",
+              },
+            ]
+          );
+          return;
+        }
         Alert.alert(
           "Delete Contact",
           "Are you sure you want to delete this contact? This will permanently delete all messages for both you and the recipient.",
@@ -566,56 +584,63 @@ const ContactsUI = ({ route }) => {
             <View style={styles.contactItem}>
               {renderProfilePicture()}
               <View style={styles.contactInfo}>
-  <View style={styles.contactNameContainer}>
-  <Text
-    numberOfLines={1}
-    ellipsizeMode="tail"
-    style={{
-      ...(item.recentMessage && !item.recentMessage.Read.includes(session.user.id)
-        ? styles.UnreadcontactName // Apply this style when the condition is true
-        : styles.contactName // Apply this style when the condition is false
-      ),
-    }}
-  >
-    {item.joinedGroups}
-  </Text>
+                <View style={styles.contactNameContainer}>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={{
+                      ...(item.recentMessage &&
+                      !item.recentMessage.Read.includes(session.user.id)
+                        ? styles.UnreadcontactName // Apply this style when the condition is true
+                        : styles.contactName), // Apply this style when the condition is false
+                    }}
+                  >
+                    {item.joinedGroups}
+                  </Text>
 
-    {item.recentMessage && item.recentMessage.created_at ? (
-      <Text style={styles.MessageTime}>
-        {formatRecentTime(item.recentMessage.created_at)}
-      </Text>
-    ) : null}
-  </View>
-  <View style={styles.recentMessageContainer}>
-    {item.recentMessage ? (
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-  <Text
-    numberOfLines={1}
-    ellipsizeMode="tail"
-    style={{
-      ...(item.recentMessage && !item.recentMessage.Read.includes(session.user.id)
-        ? styles.UnreadRecentMessage // Apply this style when the condition is true
-        : styles.RecentMessage // Apply this style when the condition is false
-      ),
-      width: 265, // Adjust the width as needed
-    }}
-  >
-    {item.recentMessage.Message_Content}
-  </Text>
-        {item.recentMessage && !item.recentMessage.Read.includes(session.user.id) ? (
-          <View style={styles.circle} /> // Add this View for the solid circle
-        ) : null}
-      </View>
-    ) : (
-      <Text 
-        numberOfLines={1}
-        ellipsizeMode='tail'
-        style={styles.RecentMessage}
-      >
-        No messages yet
-      </Text>
-    )}
-  </View>
+                  {item.recentMessage && item.recentMessage.created_at ? (
+                    <Text style={styles.MessageTime}>
+                      {formatRecentTime(item.recentMessage.created_at)}
+                    </Text>
+                  ) : null}
+                </View>
+                <View style={styles.recentMessageContainer}>
+                  {item.recentMessage ? (
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={{
+                          ...(item.recentMessage &&
+                          !item.recentMessage.Read.includes(session.user.id)
+                            ? styles.UnreadRecentMessage // Apply this style when the condition is true
+                            : styles.RecentMessage), // Apply this style when the condition is false
+                          width: 265, // Adjust the width as needed
+                        }}
+                      >
+                        {item.recentMessage.Message_Content}
+                      </Text>
+                      {item.recentMessage &&
+                      !item.recentMessage.Read.includes(session.user.id) ? (
+                        <View style={styles.circle} /> // Add this View for the solid circle
+                      ) : null}
+                    </View>
+                  ) : (
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={styles.RecentMessage}
+                    >
+                      No messages yet
+                    </Text>
+                  )}
+                </View>
               </View>
             </View>
           </TouchableOpacity>
@@ -661,14 +686,14 @@ const ContactsUI = ({ route }) => {
         </View>
       </View>
       <FlatList
-          data={filteredUsers}
-          renderItem={renderContact}
-          keyExtractor={(item) => item.Group_ID.toString()}
-          ListEmptyComponent={renderEmptyComponent}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        />
+        data={filteredUsers}
+        renderItem={renderContact}
+        keyExtractor={(item) => item.Group_ID.toString()}
+        ListEmptyComponent={renderEmptyComponent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      />
       <StatusBar style="light" />
     </SafeAreaView>
   );
@@ -683,13 +708,13 @@ const styles = StyleSheet.create({
     width: 10, // Adjust the width to your preference
     height: 10, // Adjust the height to your preference
     borderRadius: 5, // Half of the width/height to create a circle
-    backgroundColor: '#159e9e', // Change this to your desired circle color
-    //alignSelf: 'flex-end', 
-    marginRight: 4,// Align the circle to the right of its container
+    backgroundColor: "#159e9e", // Change this to your desired circle color
+    //alignSelf: 'flex-end',
+    marginRight: 4, // Align the circle to the right of its container
   },
   layeredImage: {
-    width: 40, 
-    height: 40, 
+    width: 40,
+    height: 40,
     marginTop: 5,
     borderRadius: 20,
     marginRight: 25,
@@ -705,7 +730,6 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     //marginBottom: 8,
-    
   },
   headerText: {
     fontSize: 27,
@@ -741,7 +765,7 @@ const styles = StyleSheet.create({
     // borderWidth: 0.20,
     // borderTopWidth: 0.20,
     //borderBottomWidth: 0.2,
-    
+
     borderColor: "grey",
   },
   searchInput: {
@@ -750,11 +774,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
     marginLeft: 5,
-    
   },
   contactItem: {
     flexDirection: "row",
-    alignItems: "flex-start", 
+    alignItems: "flex-start",
     paddingHorizontal: 15,
     paddingVertical: 12,
     borderBottomWidth: 1.2,
@@ -790,9 +813,9 @@ const styles = StyleSheet.create({
   MessageTime: {
     fontSize: 14,
     fontWeight: "light",
-    color: "white", 
-    flexShrink: 0, 
-    marginLeft: 10 
+    color: "white",
+    flexShrink: 0,
+    marginLeft: 10,
   },
   RecentMessage: {
     fontSize: 14,
@@ -811,7 +834,7 @@ const styles = StyleSheet.create({
   contactNameContainer: {
     flexDirection: "row",
     paddingRight: 5,
-    //flex: 1, 
+    //flex: 1,
     justifyContent: "space-between",
   },
   rowBack: {
