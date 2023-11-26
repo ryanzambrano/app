@@ -171,18 +171,6 @@ const ContactsUI = ({ route }) => {
           return null;
         }
 
-        const { data: profileResponse, error: profileError } = await supabase
-          .from("profile")
-          .select("age, gender")
-          .eq("user_id", extractedIds)
-          .single();
-
-        if (profileError) {
-          console.error(profileError.error.message);
-        } else {
-          user.profiles = profileResponse;
-          //alert(user.profiles.gender);
-        }
         return {
           ...user,
           joinedGroups,

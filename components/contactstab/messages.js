@@ -109,6 +109,19 @@ const MessagingUI = () => {
         }, {});
         setSenderNames(fetchedPersons);
 
+        const { data: profileResponse, error: profileError } = await supabase
+          .from("profile")
+          .select("age, gender")
+          .eq("user_id", extractedIds)
+          .single();
+
+        if (profileError) {
+          console.error(profileError.error.message);
+        } else {
+          user.profiles = profileResponse;
+          //alert(user.profiles.gender);
+        }
+
         // Check if user.images[0] exists and has a last_modified property
         if (user.images[0] && user.images[0].last_modified) {
           // Map last_modified to lastModified for each person in data

@@ -38,6 +38,17 @@ const GroupChatScreen = ({}) => {
       console.error(error);
       return;
     }
+
+    const { data: profileResponse, error: profileError } = await supabase
+      .from("profile")
+      .select("age, gender")
+      .in("user_id", extractedIds);
+
+    if (profileError) {
+      console.error(profileError.error.message);
+    } else {
+      user.profiles = profileResponse;
+    }
     const modifiedUsers = await Promise.all(
       peoples.map(async (people) => {
         const { data: Imagedata, error: ImageError } = await supabase
@@ -58,6 +69,7 @@ const GroupChatScreen = ({}) => {
             ...people,
             image: `${picURL}/${Imagedata.user_id}/${Imagedata.user_id}-0-${Imagedata.last_modified}`,
             lastModified: Imagedata.last_modified,
+            profiles: user.profiles,
           };
         }
       })
@@ -70,7 +82,6 @@ const GroupChatScreen = ({}) => {
     // Extract session.user.id values from user.User_ID array
 
     fetchUsers();
-
   }, [user.User_ID, session.user.id]);
 
   const handleUserPress = (person) => {
@@ -170,19 +181,18 @@ const GroupChatScreen = ({}) => {
   };
   const handleAddButtonPress = () => {
     // Assuming you want to navigate only if the user is a college user
-    if (user.Is_College == true)
-      {
-        Alert.alert(
-          "School Channel",
-          "You do not have permission to add people to this channel",
-          [
-            {
-              text: "Ok",
-            }
-          ]
-        );
-        return;
-      } else {
+    if (user.Is_College == true) {
+      Alert.alert(
+        "School Channel",
+        "You do not have permission to add people to this channel",
+        [
+          {
+            text: "Ok",
+          },
+        ]
+      );
+      return;
+    } else {
       // Handle the case where the user doesn't meet the condition
       navigation.navigate("AddPerson", { group: user });
       // Optionally, you can show an alert or perform other actions.
@@ -246,7 +256,6 @@ const GroupChatScreen = ({}) => {
         ],
         { cancelable: false }
       );
-      
     }
   };
 
@@ -263,7 +272,7 @@ const GroupChatScreen = ({}) => {
   );
   const updateJoinedGroups = async () => {
     if (!editedJoinedGroups.trim()) {
-      alert('Name cannot be empty.');
+      alert("Name cannot be empty.");
       return;
     }
     try {
@@ -282,7 +291,6 @@ const GroupChatScreen = ({}) => {
       console.error("An error occurred:", error.message);
     }
     //console.log(editedJoinedGroups);
-
   };
   const navigatetomessages = () => {
     user.joinedGroups = editedJoinedGroups;
@@ -308,28 +316,28 @@ const GroupChatScreen = ({}) => {
       </View>
       <View style={styles.groupInfo}>
         {renderProfilePicture()}
-          <View style={{ marginBottom: 15 }}>
+        <View style={{ marginBottom: 15 }}>
           <TextInput
-  style={{
-    marginTop: 15,
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "white",
-  }}
-  value={editedJoinedGroups}
-  onChangeText={setEditedJoinedGroups}
-  onBlur={updateJoinedGroups}
-  editable={!user.Is_College}
-/>
-            <View
-              style={{
-                height: 0.8,
-                backgroundColor: "grey",
-                marginTop: 5,
-                marginHorizontal: -10,
-              }}
-            />
-          </View>
+            style={{
+              marginTop: 15,
+              fontSize: 20,
+              fontWeight: "bold",
+              color: "white",
+            }}
+            value={editedJoinedGroups}
+            onChangeText={setEditedJoinedGroups}
+            onBlur={updateJoinedGroups}
+            editable={!user.Is_College}
+          />
+          <View
+            style={{
+              height: 0.8,
+              backgroundColor: "grey",
+              marginTop: 5,
+              marginHorizontal: -10,
+            }}
+          />
+        </View>
       </View>
       <View
         style={{ flexDirection: "row", justifyContent: "center", padding: 10 }}
