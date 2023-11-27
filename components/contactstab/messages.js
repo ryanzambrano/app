@@ -37,6 +37,7 @@ const MessagingUI = () => {
   const [messages, setMessages] = useState([]);
   const { session } = route.params;
   const { user } = route.params;
+  const { datamessages } = route.params;
   const { editedJoinedGroups } = route.params;
   const [joinedGroups, setJoinedGroups] = useState("");
   const [persons, setPersons] = useState([]);
@@ -54,7 +55,10 @@ const MessagingUI = () => {
 
   const sendMessage = async () => {
     if (!isButtonDisabled && message.trim() !== "") {
-      setIsButtonDisabled(true); // Disable the button
+      setMessages((prevMessages) => [...prevMessages, { Message_Content: message, Sent_From: session.user.id, Group_ID_Sent_To: user.Group_ID, Read: [session.user.id]}]);
+        setMessage("");
+        animateMessage();
+       setIsButtonDisabled(true); // Disable the button
 
       const { data, error } = await supabase
         .from("Group_Chat_Messages")
@@ -71,10 +75,6 @@ const MessagingUI = () => {
 
       if (error) {
         console.error(error);
-      } else {
-        setMessages((prevMessages) => [...prevMessages, data]);
-        setMessage("");
-        animateMessage();
       }
 
       if (messages.length > 1) {
@@ -211,6 +211,7 @@ const MessagingUI = () => {
   }
   useEffect(() => {
     if (isFocused) {
+      readMessages();
     }
     if (user.Ammount_Users <= 2) {
       fetchUsers();
@@ -293,8 +294,13 @@ const MessagingUI = () => {
         },
         (genericPayload) => {
           if (genericPayload) {
-            fetchMessages();
-            readMessages();
+            if(genericPayload.new.Sent_From != session.user.id && genericPayload.new.Group_ID_Sent_To == user.Group_ID)
+            {
+              const data = genericPayload.new;
+              setMessages((prevMessages) => [...prevMessages, data]);
+              readMessages();
+            }
+            
           }
           // Handle generic event
         }
@@ -518,6 +524,7 @@ const MessagingUI = () => {
                 </Animatable.View>
               );
             }}
+            initialNumToRender={messages.length}
             keyExtractor={(_, index) => index.toString()}
             contentContainerStyle={styles.messagesContent}
           />

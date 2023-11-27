@@ -167,7 +167,7 @@ const ContactsUI = ({ route }) => {
           .eq("image_index", 0);
 
         // Check if recentMessageData exists, and only include users with recent messages
-        if (!recentMessageData && user.Is_College == false) {
+        if (!recentMessageData && user.Is_College == false || user.Ammount_Users == 1)  {
           return null;
         }
 
@@ -336,12 +336,11 @@ const ContactsUI = ({ route }) => {
         { event: "update", schema: "public", table: "Group_Chat_Messages" },
         (genericPayload) => {
           if (genericPayload) {
-            console.log("heard");
             checkchat(genericPayload)
               .then((result) => {
                 if (result === 1) {
                   fetchUsers();
-                  console.log("heard");
+
                 }
               })
               .catch((error) => {
@@ -358,9 +357,11 @@ const ContactsUI = ({ route }) => {
       subscription.unsubscribe();
     };
   }, []);
+  
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
+    
     //console.log(user.joinedGroups);
     navigation.navigate("Message", { user });
   };
@@ -371,8 +372,7 @@ const ContactsUI = ({ route }) => {
     navigation.navigate("ComposeMessage");
   };
 
-  const renderContact = ({ item }) => {
-    console.log(item);
+  const renderContact = ({ item }) => {;
     const handleDelete = async () => {
       try {
         LayoutAnimation.configureNext({
