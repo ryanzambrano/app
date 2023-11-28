@@ -81,6 +81,23 @@ const ContactsUI = ({ route }) => {
     } else {
       alert("Must use physical device for Push Notifications");
     }
+    const { data: istoken, error } = await supabase
+      .from("UGC")
+      .select("notification_token")
+      .eq("user_id", session.user.id);
+      
+      if(istoken.notification_token == null && istoken.length < 0)
+      {
+      console.log(token);
+      const { data: tokendata, error } = await supabase
+      .from("UGC")
+      .update({notification_token: token})
+      .eq("user_id", session.user.id);
+      
+      
+      }
+      
+    
 
     return token;
   }
@@ -233,33 +250,9 @@ const ContactsUI = ({ route }) => {
       return formattedDate;
     }
   };
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
-  });
 
-  async function schedulePushNotification(payload) {
-    const message = payload.new.Message_Content;
-    const sentfrom = payload.new.Sent_From;
-    const { data, error } = await supabase
-      .from("UGC")
-      .select("name")
-      .eq("user_id", sentfrom)
-      .single();
-    if (sentfrom == session.user.id) {
-    }
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: data.name,
-        body: message,
-        icon: "assets/logo4.png",
-      },
-      trigger: { seconds: 1 },
-    });
-  }
+
+  
 
   const checkchat = async (payload) => {
     // console.log(payload.new.Group_ID_Sent_To);
@@ -321,7 +314,6 @@ const ContactsUI = ({ route }) => {
               .then((result) => {
                 if (result === 1) {
                   fetchUsers();
-                  schedulePushNotification(genericPayload);
                 }
               })
               .catch((error) => {

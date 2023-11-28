@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "supabase": "supabase"
   },
   "dependencies": {
     "@ant-design/icons-react-native": "^2.3.2",
@@ -72,10 +73,12 @@
     "react-native-url-polyfill": "^1.3.0",
     "react-native-uuid-generator": "^6.1.1",
     "react-native-vector-icons": "^9.2.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "typescript": "^4.9.4"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "supabase": "^1.115.4"
   },
   "private": true
 }
