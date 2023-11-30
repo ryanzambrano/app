@@ -35,7 +35,7 @@ const profileZIndex = scrollY.interpolate({
 
 const profileOpacity = scrollY.interpolate({
   inputRange: [0, 550],
-  outputRange: [1, 0],
+  outputRange: [1, 1],
   extrapolate: "clamp",
 });
 
@@ -56,10 +56,6 @@ const UserCard = ({ navigation, route }) => {
 
   const { age, gender } = route.params.user.profiles;
 
-  //alert(route.params.user.profiles.gender);
-  //const [age, setAge] = useState("");
-  //const [gender, setGender] = useState("");
-
   const [living_preferences, setLivingPreference] = useState("");
   const [persons, setPersons] = useState([]);
   const [photos, setPhotos] = useState([
@@ -67,7 +63,7 @@ const UserCard = ({ navigation, route }) => {
   ]);
   const [isFriendAdded, setIsFriendAdded] = useState(false);
   const [isProfileBlocked, setIsProfileBlocked] = useState(false);
-  const buttonColor = isFriendAdded ? "#14999999" : "#1D1D20";
+  const buttonColor = isFriendAdded ? "#14999999" : "#181d2b";
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
   const [prompts, setPrompts] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -164,29 +160,13 @@ const UserCard = ({ navigation, route }) => {
           .map(([prompt, answer]) => ({ prompt, answer }));
 
         setPrompts(answeredPrompts);
-        //console.log(answeredPrompts);
       } else {
         console.log("Error fetching prompts: ", promptsError);
       }
     };
-    /*const fetchGenderAndAge = async () => {
-      const { data: genderData, error: genderError } = await supabase
-        .from("profile")
-        .select("gender, age, living_preferences")
-        .eq("user_id", user_id);
-      if (genderData) {
-        setGender(genderData[0].gender);
-        setAge(genderData[0].age);
-        setLivingPreference(genderData[0].living_preferences);
-        //console.log(genderData.age);
-      } else {
-        console.log("Error fetching prompts: ");
-      }
-    };*/
-    //fetchGenderAndAge();
+
     fetchBookmarkedProfiles();
     fetchPrompts();
-    //console.log(`${picURL}/${user_id}/${user_id}-0-${lastModified}`);
   }, []);
 
   const handleBlockUser = async (user_id) => {
@@ -265,7 +245,6 @@ const UserCard = ({ navigation, route }) => {
             updateError.message
           );
         } else {
-          //console.log("Bookmark added successfully!");
           setIsFriendAdded(true);
         }
       } else {
@@ -314,7 +293,6 @@ const UserCard = ({ navigation, route }) => {
       }
 
       if (data) {
-        // alert(`Image data fetched: ${JSON.stringify(data)}`);
         data.forEach((item) => {
           lastModifiedList[item.image_index] = item.last_modified;
         });
@@ -449,8 +427,6 @@ const UserCard = ({ navigation, route }) => {
       </TouchableOpacity>
       <Animated.View
         style={{
-          //...styles.profileContainer,
-          //opacity: profileOpacity,
           zIndex: profileZIndex,
         }}
       >
@@ -539,7 +515,9 @@ const UserCard = ({ navigation, route }) => {
             </Text>
           </TouchableOpacity>
 
-          <View style={styles.roundedContainer}>
+          <View
+            style={[styles.roundedContainer, { backgroundColor: "#181d2b" }]}
+          >
             <Text style={styles.bioHeader} paddingBottom={15}>
               Details
             </Text>
@@ -665,9 +643,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#1D1D20",
     justifyContent: "center",
     paddingVertical: 15,
-    //zIndex: 3,
-    // borderBottomColor: "#2B2D2F",
-    // borderBottomWidth: 1,
   },
 
   backButton: {
@@ -773,11 +748,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 3,
-
-    // borderBottomColor: "grey",
-    // borderBottomWidth: 0.3,
-    // borderBottomEndRadius: 20,
-    // borderBottomStartRadius: 20,
   },
   friendButton: {
     borderRadius: 12,
@@ -796,7 +766,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   chatButton: {
-    backgroundColor: "#1D1D20",
+    backgroundColor: "#181d2b",
     borderRadius: 12,
     marginRight: 10,
     padding: 13,
@@ -814,27 +784,19 @@ const styles = StyleSheet.create({
   bioContainer: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: "#1D1D20",
+    backgroundColor: "#363659",
     borderRadius: 15,
     marginRight: 10,
     marginLeft: 10,
     marginBottom: 10,
     flexDirection: "row",
     borderWidth: 0.4,
-    //borderColor: "grey",
   },
   bio: {
     fontSize: 18,
     fontWeight: "600",
-    //paddingLeft: 25,
-
     paddingBottom: 25,
     paddingTop: 5,
-    //color: "white",
-    // borderBottomColor: "grey",
-    // borderBottomWidth: 0.3,
-    // borderBottomEndRadius: 20,
-    // borderBottomStartRadius: 20,
   },
   bioHeader: {
     alignSelf: "center",
@@ -850,11 +812,6 @@ const styles = StyleSheet.create({
     marginLeft: 25,
     marginRight: 25,
     color: "white",
-  },
-  roundedContainer: {
-    backgroundColor: "#1D1D20",
-    borderRadius: 50,
-    padding: 1,
   },
   detailsText: {
     color: "white",
@@ -906,7 +863,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   tagsContainer: {
-    backgroundColor: "#1D1D20",
+    backgroundColor: "#181d2b",
     flexDirection: "row",
     flexWrap: "wrap",
     paddingBottom: 25,
@@ -933,16 +890,10 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "600",
   },
-  // horizontalScrollView: {
-  //   borderBottomWidth: 0.3,
-  //   borderBottomColor: "grey",
 
-  //   borderBottomEndRadius: 20,
-  //   borderBottomStartRadius: 20,
-  // },
   itemContainer: {
     marginHorizontal: 15,
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#2c3c4f",
     //borderWidth: 0.5,
     //borderColor: "lightgrey",
     borderRadius: 50,
@@ -980,6 +931,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 5,
     flexDirection: "row",
+    backgroundColor: "#181d2b",
   },
 
   verticalDivider: {
@@ -1005,17 +957,12 @@ const styles = StyleSheet.create({
     paddingTop: 0,
     gap: 10,
     marginBottom: -5,
-    // borderBottomColor: "grey",
-    // borderBottomWidth: 0.3,
-    // borderBottomEndRadius: 20,
-    // borderBottomStartRadius: 20,
   },
 
   roundedContainer: {
-    backgroundColor: "#1D1D20",
+    backgroundColor: "#181d2b",
     borderRadius: 20,
     padding: 0,
-
     marginBottom: 15,
     marginHorizontal: 15,
   },

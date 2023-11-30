@@ -35,7 +35,7 @@ const Home = ({ route }) => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [sessionUser, setSessionuser] = useState(session.user);
-  const [sortMethod, setSortMethod] = useState("Most Compatible");
+  const [sortMethod, setSortMethod] = useState("Recomended");
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -46,9 +46,11 @@ const Home = ({ route }) => {
   const [housinPreference, setHousinPreference] = useState("Any");
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
+  const [renderLimit, setRenderLimit] = useState(5);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
+    setRenderLimit(5);
     fetchUsers().then(() => setRefreshing(false));
   }, []);
 
@@ -109,8 +111,8 @@ const Home = ({ route }) => {
           onPress: () => setSortMethod("Shared Interests"),
         },
         {
-          text: "Most Compatible",
-          onPress: () => setSortMethod("Most Compatible"),
+          text: "Recomended",
+          onPress: () => setSortMethod("Recomended"),
         },
       ],
       { cancelable: true }
@@ -193,6 +195,8 @@ const Home = ({ route }) => {
       (isStudyMatch || studyPreference === "Any")
     );
   });
+
+  const renderedUsers = filteredUsers.slice(0, renderLimit);
 
   const fetchUsers = async () => {
     try {
@@ -357,17 +361,22 @@ const Home = ({ route }) => {
             }}
           />
           <View style={styles.userInfo}>
-            <Text style={styles.name}> {item.name} </Text>
-            <Text numberOfLines={1} ellipsizeMode="tail" style={styles.major}>
-              {" "}
-              {item.major || "Undecided"}
-            </Text>
-            <View style={styles.tagsContainer}>
-              {item.tags.slice(0, 8).map((tag, index) => (
-                <View key={index} style={styles.tag}>
-                  <Text style={styles.tagText}>{tag}</Text>
-                </View>
-              ))}
+            <View style={styles.vClass}>
+              <Text style={styles.class}>{item.class_year}</Text>
+            </View>
+            <View style={styles.userStuff}>
+              <Text style={styles.name}> {item.name} </Text>
+              <Text numberOfLines={1} ellipsizeMode="tail" style={styles.major}>
+                {" "}
+                {item.major || "Undecided"}
+              </Text>
+              <View style={styles.tagsContainer}>
+                {item.tags.slice(0, 8).map((tag, index) => (
+                  <View key={index} style={styles.tag}>
+                    <Text style={styles.tagText}>{tag}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
           </View>
         </View>
@@ -432,11 +441,13 @@ const Home = ({ route }) => {
           renderLoading()
         ) : (
           <FlatList
-            data={filteredUsers}
+            data={renderedUsers}
             extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
             renderItem={renderUserCard}
             keyExtractor={(item) => item.user_id.toString()}
             ListEmptyComponent={renderEmptyComponent}
+            onEndReached={() => setRenderLimit((prevLimit) => prevLimit + 5)}
+            onEndReachedThreshold={0.1}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
@@ -534,6 +545,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
+  userStuff: {
+    flex: 1,
+    marginTop: -19,
+    justifyContent: "center",
+  },
+
   userContainer: {
     flex: 1,
     alignItems: "center",
@@ -569,6 +586,7 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     //borderWidth: 0.6,
     borderColor: "grey",
+    marginTop: -10,
   },
 
   major: {
@@ -583,7 +601,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: 600,
-    paddingTop: 10,
+    //paddingTop: 10,
     color: "white",
     zIndex: 1,
     //top: 60,
@@ -652,6 +670,22 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 20,
     color: "grey",
+  },
+  class: {
+    color: "grey",
+    //margin: 10,
+    fontSize: 16,
+    fontWeight: "500",
+    textAlign: "right",
+
+    flex: 1,
+  },
+  vClass: {
+    //flex: 1,
+    flexDirection: "row",
+    //backgroundColor: "blue",
+    marginTop: 7,
+    marginRight: 15,
   },
 });
 

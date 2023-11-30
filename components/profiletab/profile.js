@@ -675,7 +675,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   tagsContainer: {
-    backgroundColor: "#1D1D20",
+    backgroundColor: "#181d2b",
     flexDirection: "row",
     flexWrap: "wrap",
     paddingBottom: 25,
@@ -702,7 +702,7 @@ const styles = StyleSheet.create({
 
   itemContainer: {
     marginHorizontal: 15,
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#2c3c4f",
 
     borderRadius: 50,
     padding: 30,
@@ -747,7 +747,7 @@ const styles = StyleSheet.create({
   },
 
   roundedContainer: {
-    backgroundColor: "#1D1D20",
+    backgroundColor: "#181d2b",
     borderRadius: 20,
     padding: 0,
     marginBottom: 15,
