@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Image,
   TextInput,
@@ -35,7 +35,7 @@ const Home = ({ route }) => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [sessionUser, setSessionuser] = useState(session.user);
-  const [sortMethod, setSortMethod] = useState("Recomended");
+  const [sortMethod, setSortMethod] = useState("Recommended");
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -47,6 +47,7 @@ const Home = ({ route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
   const [renderLimit, setRenderLimit] = useState(5);
+  const flatListRef = useRef(null);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -60,6 +61,10 @@ const Home = ({ route }) => {
     } catch (e) {
       console.error(e);
     }
+  };
+
+  const scrollToTop = () => {
+    flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
   };
 
   const {
@@ -111,8 +116,8 @@ const Home = ({ route }) => {
           onPress: () => setSortMethod("Shared Interests"),
         },
         {
-          text: "Recomended",
-          onPress: () => setSortMethod("Recomended"),
+          text: "Recommended",
+          onPress: () => setSortMethod("Recommended"),
         },
       ],
       { cancelable: true }
@@ -387,10 +392,13 @@ const Home = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.logoTitleContainer}>
+        <TouchableOpacity
+          style={styles.logoTitleContainer}
+          onPress={() => scrollToTop()}
+        >
           <Image style={styles.logo} source={logo} />
           <Text style={styles.headerText}> Cabana </Text>
-        </View>
+        </TouchableOpacity>
         <View style={styles.buttonContainer}>
           <TouchableOpacity onPress={handleFiltersPress}>
             <Icon name="sliders" size={30} color="#fff" />
@@ -441,6 +449,7 @@ const Home = ({ route }) => {
           renderLoading()
         ) : (
           <FlatList
+            ref={flatListRef}
             data={renderedUsers}
             extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
             renderItem={renderUserCard}
@@ -521,7 +530,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#252d36",
     borderRadius: 10,
     paddingHorizontal: 15,
     marginTop: 5,

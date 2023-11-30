@@ -33,12 +33,6 @@ const profileZIndex = scrollY.interpolate({
   extrapolate: "clamp",
 });
 
-const profileOpacity = scrollY.interpolate({
-  inputRange: [0, 550],
-  outputRange: [1, 1],
-  extrapolate: "clamp",
-});
-
 const UserCard = ({ navigation, route }) => {
   const { session } = route.params;
   const {
@@ -444,7 +438,6 @@ const UserCard = ({ navigation, route }) => {
       <Animated.View
         style={{
           ...styles.profileContainer,
-          opacity: profileOpacity,
           zIndex: profileZIndex,
         }}
       >
@@ -688,6 +681,7 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     paddingTop: 550,
+    //marginTop: 550,
     zIndex: 1,
   },
 

@@ -55,10 +55,18 @@ const MessagingUI = () => {
 
   const sendMessage = async () => {
     if (!isButtonDisabled && message.trim() !== "") {
-      setMessages((prevMessages) => [...prevMessages, { Message_Content: message, Sent_From: session.user.id, Group_ID_Sent_To: user.Group_ID, Read: [session.user.id]}]);
-        setMessage("");
-        animateMessage();
-       setIsButtonDisabled(true); // Disable the button
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          Message_Content: message,
+          Sent_From: session.user.id,
+          Group_ID_Sent_To: user.Group_ID,
+          Read: [session.user.id],
+        },
+      ]);
+      setMessage("");
+      animateMessage();
+      setIsButtonDisabled(true); // Disable the button
 
       const { data, error } = await supabase
         .from("Group_Chat_Messages")
@@ -294,13 +302,14 @@ const MessagingUI = () => {
         },
         (genericPayload) => {
           if (genericPayload) {
-            if(genericPayload.new.Sent_From != session.user.id && genericPayload.new.Group_ID_Sent_To == user.Group_ID)
-            {
+            if (
+              genericPayload.new.Sent_From != session.user.id &&
+              genericPayload.new.Group_ID_Sent_To == user.Group_ID
+            ) {
               const data = genericPayload.new;
               setMessages((prevMessages) => [...prevMessages, data]);
               readMessages();
             }
-            
           }
           // Handle generic event
         }
@@ -459,7 +468,7 @@ const MessagingUI = () => {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Contacts")}
+            onPress={() => navigation.goBack()}
           >
             <AntDesign name="arrowleft" size={24} color="#159e9e" />
           </TouchableOpacity>

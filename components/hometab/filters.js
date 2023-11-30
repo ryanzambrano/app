@@ -120,7 +120,7 @@ const FiltersUI = ({ route }) => {
           containerStyle={styles.border}
           autoScroll={false}
           showsVerticalScrollIndicator={false}
-          activeColor="#2D2D30"
+          activeColor="#2b3138"
           searchPlaceholder="Search..."
           value={housingPreference}
           onFocus={() => setIsFocus(true)}
@@ -146,7 +146,7 @@ const FiltersUI = ({ route }) => {
           containerStyle={styles.border}
           autoScroll={false}
           showsVerticalScrollIndicator={false}
-          activeColor="#2D2D30"
+          activeColor="#2b3138"
           placeholder="Select Gender Preference"
           searchPlaceholder="Search..."
           value={genderPreference}
@@ -173,7 +173,7 @@ const FiltersUI = ({ route }) => {
           containerStyle={styles.border}
           autoScroll={false}
           showsVerticalScrollIndicator={false}
-          activeColor="#2D2D30"
+          activeColor="#2b3138"
           placeholder="Select Youngest Age Preference"
           searchPlaceholder="Search..."
           value={youngestAgePreference}
@@ -200,7 +200,7 @@ const FiltersUI = ({ route }) => {
           containerStyle={styles.border}
           autoScroll={false}
           showsVerticalScrollIndicator={false}
-          activeColor="#2D2D30"
+          activeColor="#2b3138"
           placeholder="Select Oldest Age Preference"
           searchPlaceholder="Search..."
           value={oldestAgePreference}
@@ -227,7 +227,7 @@ const FiltersUI = ({ route }) => {
           containerStyle={styles.border}
           autoScroll={false}
           showsVerticalScrollIndicator={false}
-          activeColor="#2D2D30"
+          activeColor="#2b3138"
           placeholder="Select Area of Preference"
           searchPlaceholder="Search..."
           value={studyPreference}
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 8,
     backgroundColor: "white",
-    backgroundColor: "#2D2D30",
+    backgroundColor: "#2b3138",
   },
   divider: {
     height: 0.5,

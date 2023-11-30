@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderRadius: 40,
     gap: 10,
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#252d36",
   },
   promptAdd: {
     padding: 30,

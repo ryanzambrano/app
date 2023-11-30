@@ -703,7 +703,6 @@ const styles = StyleSheet.create({
   itemContainer: {
     marginHorizontal: 15,
     backgroundColor: "#2c3c4f",
-
     borderRadius: 50,
     padding: 30,
     width: 300,

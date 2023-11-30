@@ -85,19 +85,14 @@ const ContactsUI = ({ route }) => {
       .from("UGC")
       .select("notification_token")
       .eq("user_id", session.user.id);
-      
-      if(istoken.notification_token == null && istoken.length < 0)
-      {
+
+    if (istoken.notification_token == null && istoken.length < 0) {
       console.log(token);
       const { data: tokendata, error } = await supabase
-      .from("UGC")
-      .update({notification_token: token})
-      .eq("user_id", session.user.id);
-      
-      
-      }
-      
-    
+        .from("UGC")
+        .update({ notification_token: token })
+        .eq("user_id", session.user.id);
+    }
 
     return token;
   }
@@ -184,7 +179,10 @@ const ContactsUI = ({ route }) => {
           .eq("image_index", 0);
 
         // Check if recentMessageData exists, and only include users with recent messages
-        if (!recentMessageData && user.Is_College == false || user.Ammount_Users == 1)  {
+        if (
+          (!recentMessageData && user.Is_College == false) ||
+          user.Ammount_Users == 1
+        ) {
           return null;
         }
 
@@ -250,9 +248,6 @@ const ContactsUI = ({ route }) => {
       return formattedDate;
     }
   };
-
-
-  
 
   const checkchat = async (payload) => {
     // console.log(payload.new.Group_ID_Sent_To);
@@ -332,7 +327,6 @@ const ContactsUI = ({ route }) => {
               .then((result) => {
                 if (result === 1) {
                   fetchUsers();
-
                 }
               })
               .catch((error) => {
@@ -349,11 +343,10 @@ const ContactsUI = ({ route }) => {
       subscription.unsubscribe();
     };
   }, []);
-  
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
-    
+
     //console.log(user.joinedGroups);
     navigation.navigate("Message", { user });
   };
@@ -364,7 +357,7 @@ const ContactsUI = ({ route }) => {
     navigation.navigate("ComposeMessage");
   };
 
-  const renderContact = ({ item }) => {;
+  const renderContact = ({ item }) => {
     const handleDelete = async () => {
       try {
         LayoutAnimation.configureNext({
@@ -735,7 +728,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#252d36",
     borderRadius: 10,
     paddingHorizontal: 15,
     marginTop: 15,

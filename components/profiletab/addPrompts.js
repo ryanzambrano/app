@@ -72,10 +72,10 @@ export const AddPrompts = ({ navigation, route }) => {
   const fetchExistingAnswers = async () => {
     if (session?.user) {
       const { data: existingAnswers, error } = await supabase
-        .from("prompts") 
+        .from("prompts")
         .select("*")
         .eq("user_id", session.user.id)
-        .single(); 
+        .single();
 
       if (error) {
         console.error("Error fetching existing answers:", error);
@@ -91,12 +91,12 @@ export const AddPrompts = ({ navigation, route }) => {
   };
 
   const handleSave = async () => {
-    const trimmedAnswers = answers.map(answer => answer.trim()); 
+    const trimmedAnswers = answers.map((answer) => answer.trim());
     const answersObj = presetQuestions.reduce((obj, question, index) => {
-    const columnName = questionColumnMapping[question];
-    obj[columnName] = trimmedAnswers[index];  
-    return obj;
-  }, {});
+      const columnName = questionColumnMapping[question];
+      obj[columnName] = trimmedAnswers[index];
+      return obj;
+    }, {});
 
     if (session?.user) {
       const { data, error } = await supabase
@@ -146,14 +146,20 @@ export const AddPrompts = ({ navigation, route }) => {
       >
         <View style={styles.header}>
           <View style={styles.left}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.backButton}
+            >
               <Text style={styles.backButtonText}>Cancel</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.center}>
             <Text style={styles.headerText}>Prompts</Text>
           </View>
-          <TouchableOpacity style={styles.dbuttonContainer} onPress={handleSave}>
+          <TouchableOpacity
+            style={styles.dbuttonContainer}
+            onPress={handleSave}
+          >
             <Text style={styles.dbutton}>Done</Text>
           </TouchableOpacity>
         </View>
@@ -205,7 +211,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   card: {
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#252d36", // chill blu
     gap: 40,
     paddingTop: 50,
     paddingBottom: 40,
