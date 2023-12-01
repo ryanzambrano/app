@@ -29,7 +29,7 @@ const scrollY = new Animated.Value(0);
 
 const profileZIndex = scrollY.interpolate({
   inputRange: [0, 550],
-  outputRange: [1, -1],
+  outputRange: [1, 0],
   extrapolate: "clamp",
 });
 
@@ -621,7 +621,6 @@ const UserCard = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //zIndex: 300,
     padding: 16,
     marginHorizontal: 0,
     backgroundColor: "#1D1D20",
@@ -682,7 +681,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     paddingTop: 550,
     //marginTop: 550,
-    zIndex: 1,
+    //zIndex: 1,
   },
 
   backButtonText: {
@@ -729,7 +728,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.75,
     shadowRadius: 4.84,
-    zIndex: 1000,
+    zIndex: 2,
     paddingBottom: 20,
   },
   fullPhoto: {
