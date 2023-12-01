@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import {
   Image,
   TextInput,
@@ -52,8 +52,31 @@ const Home = ({ route }) => {
   const flatListRef = useRef(null);
   const [expoPushToken, setExpoPushToken] = useState("");
 
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setRenderLimit(5);
+    fetchUsers().then(() => setRefreshing(false));
+  }, []);
+
+  const onHomePageVisit = async () => {
+    try {
+      await AsyncStorage.setItem("homepageVisited", "true");
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const scrollToTop = () => {
+    flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
+  };
   async function registerForPushNotificationsAsync() {
     let token;
+
+    const storedToken = await AsyncStorage.getItem("expoPushToken");
+    if (storedToken !== null) {
+      //alert(storedToken);
+      return storedToken;
+    }
 
     if (Platform.OS === "android") {
       await Notifications.setNotificationChannelAsync("default", {
@@ -73,7 +96,7 @@ const Home = ({ route }) => {
         finalStatus = status;
       }
       if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification!");
+        //alert("Failed to get push token for push notification!");
         return;
       }
       // Learn more about projectId:
@@ -83,17 +106,19 @@ const Home = ({ route }) => {
           projectId: "ad275287-fa4a-4f70-8397-8df453abd9a8",
         })
       ).data;
+
+      await AsyncStorage.setItem("expoPushToken", token);
     } else {
-      alert("Must use physical device for Push Notifications");
+      //   //alert("Must use physical device for Push Notifications");
     }
-    
+
     const { data: istoken, error } = await supabase
       .from("UGC")
       .select("notification_token")
       .eq("user_id", session.user.id);
 
     if (istoken.notification_token === null) {
-      console.log(token)
+      //console.log(token)
       const { data: tokendata, error } = await supabase
         .from("UGC")
         .update({ notification_token: token })
@@ -102,25 +127,6 @@ const Home = ({ route }) => {
 
     return token;
   }
-
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    setRenderLimit(5);
-    fetchUsers().then(() => setRefreshing(false));
-  }, []);
-
-  const onHomePageVisit = async () => {
-    try {
-      await AsyncStorage.setItem("homepageVisited", "true");
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const scrollToTop = () => {
-    flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
-  };
 
   const {
     housingPreference = housinPreference,
@@ -133,7 +139,6 @@ const Home = ({ route }) => {
   const handleFiltersPress = () => {
     navigation.navigate("Filters", {
       currentHousingPreference: housingPreference,
-
       currentGenderPreference: genderPreference,
       currentYoungestAgePreference: youngestAgePreference,
       currentOldestAgePreference: oldestAgePreference,
@@ -179,26 +184,30 @@ const Home = ({ route }) => {
     );
   };
 
-  const sortedUsers = users.sort((a, b) => {
-    //console.log(a, b);
-    switch (sortMethod) {
-      case "Alphabetical Order":
-        return a.name.localeCompare(b.name);
-      case "Shared Interests":
-        const aTagsCount = a.tags.filter((tag) =>
-          sessionUser.tags.includes(tag)
-        ).length;
-        const bTagsCount = b.tags.filter((tag) =>
-          sessionUser.tags.includes(tag)
-        ).length;
-        return bTagsCount - aTagsCount;
-      case "Most Compatible":
-      default:
-        const aScore = calculateCompatibility(sessionUser, a);
-        const bScore = calculateCompatibility(sessionUser, b);
-        return bScore - aScore;
-    }
-  });
+  const sortedUsers = useMemo(() => {
+    return users.sort((a, b) => {
+      //console.log(a, b);
+      switch (sortMethod) {
+        case "Alphabetical Order":
+          return a.name.localeCompare(b.name);
+
+        case "Shared Interests":
+          const aTagsCount = a.tags.filter((tag) =>
+            sessionUser.tags.includes(tag)
+          ).length;
+          const bTagsCount = b.tags.filter((tag) =>
+            sessionUser.tags.includes(tag)
+          ).length;
+          return bTagsCount - aTagsCount;
+
+        case "Most Compatible":
+        default:
+          const aScore = calculateCompatibility(sessionUser, a);
+          const bScore = calculateCompatibility(sessionUser, b);
+          return bScore - aScore;
+      }
+    });
+  }, [users, sortMethod]);
 
   const filteredUsers = sortedUsers.filter((user) => {
     const isSessionUser = user.user_id === session.user.id;
@@ -378,6 +387,7 @@ const Home = ({ route }) => {
       }
     } catch (error) {
       console.error("An unexpected error occurred:", error);
+      alert("An unexpected error occurred, please try again later.");
     }
     setIsLoading(false);
     onHomePageVisit();
@@ -386,10 +396,8 @@ const Home = ({ route }) => {
   useEffect(() => {
     fetchUsers();
     registerForPushNotificationsAsync().then((token) =>
-    setExpoPushToken(token));
-    if (isFocused) {
-      fetchUsers();
-    }
+      setExpoPushToken(token)
+    );
     if (isBookmarked) {
       fetchUsers();
     }

@@ -69,7 +69,6 @@ const SettingsScreen = ({ navigation, route }) => {
         { name: "User Agreement" },
         { name: "Privacy Policy" },
         { name: "Content Policy" },
-        { name: "FAQ" },
       ],
     },
     {

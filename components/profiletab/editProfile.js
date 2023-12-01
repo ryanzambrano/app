@@ -18,6 +18,7 @@ import { supabase } from "../auth/supabase";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { picURL } from "../auth/supabase";
 import Retake from "../retakeQuestionaireFiles/retake.js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const EditProfileScreen = ({ navigation, route }) => {
   const { session } = route.params;
@@ -164,6 +165,16 @@ export const EditProfileScreen = ({ navigation, route }) => {
         if (error) {
           console.error(error.message);
         } else {
+          const userData = {
+            name,
+            bio: trimmedBio,
+            major,
+            class_year,
+            hometown,
+            tags: editedUser.tags,
+          };
+          await AsyncStorage.setItem("userData", JSON.stringify(userData));
+
           navigation.navigate("Tabs", { updated: true });
         }
       } else {

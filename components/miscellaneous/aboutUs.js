@@ -36,15 +36,35 @@ const AboutUs = ({ navigation, route }) => {
         </View>
         <View style={styles.right}></View>
       </View>
-      <View style={styles.textContainer}>
+      <ScrollView style={styles.textContainer}>
         <Text style={styles.text}>
           {"    "}
-          Founded by college students, for college students, Cabana was born out
-          of personal experiences of navigating the challenges of finding the
-          right roommate. We understand the importance of compatibility, whether
-          it's related to study habits, sleep schedules, or hobbies.
+          Cabana, established by a team of dedicated college students, emerged
+          as a strategic solution to a prevalent challenge faced within the
+          academic community - the pursuit of an ideal roommate. Our inception
+          is deeply rooted in the collective experiences and insights gained
+          from navigating the intricacies of campus life, particularly in the
+          realm of shared living arrangements. Our platform is meticulously
+          designed to streamline the roommate selection process, employing a
+          data-driven approach to ensure optimal compatibility among users. At
+          Cabana, we emphasize the criticality of aligning key lifestyle
+          attributes such as study preferences, sleeping patterns, and
+          recreational interests, amongst others. Leveraging advanced algorithms
+          and a comprehensive user interface, Cabana offers an efficient,
+          user-friendly experience that simplifies the roommate search. We are
+          committed to continuously evolving our services, incorporating
+          cutting-edge technologies and user feedback to enhance our offerings.
+          Cabana's corporate philosophy is centered around fostering a
+          supportive and cohesive community among college students. We aim to
+          provide a reliable, secure, and intuitive platform that not only
+          connects individuals based on compatibility but also contributes to
+          their overall collegiate experience. Our dedication to excellence and
+          innovation in the realm of shared living solutions positions us at the
+          forefront of this sector. We remain steadfast in our commitment to
+          facilitating harmonious living arrangements that resonate with the
+          dynamic needs of today's college students.
         </Text>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -88,11 +108,11 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 18,
-    color: "#fff",
+    color: "lightgrey",
   },
   textContainer: {
     margin: 15,
-    alignItems: "center",
+    //alignItems: "center",
   },
 });
 

@@ -22,7 +22,7 @@ import { picURL } from "../auth/supabase";
 import { supabase } from "../auth/supabase.js";
 import ActionSheet from "react-native-action-sheet";
 import ReportUI from "./report.js";
-
+import { promptQuestions } from "../auth/profileUtils.js";
 const MAX_IMAGES = 4;
 
 const scrollY = new Animated.Value(0);
@@ -63,28 +63,6 @@ const UserCard = ({ navigation, route }) => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isActionSheetVisible, setActionSheetVisible] = useState(false);
 
-  const promptQuestions = {
-    greek_life: "Are you participating in Greek Life?",
-    budget: "My budget restrictions for housing are...",
-    night_out: "A perfect night out for me looks like...",
-    pet_peeves: "My biggest pet peeves are...",
-    favorite_movies: "My favorite movies are...",
-    favorite_artists: "My favorite artists / bands are...",
-    living_considerations:
-      "The dorms halls / apartment complexes I'm considering are...",
-    sharing: "When it comes to sharing my amenities and personal property...",
-    cooking: "When it comes to sharing food and cooking...",
-    burnt_out: "When I'm burnt out, I relax by...",
-    involvement: "The organizations I'm involved in on campus are...",
-    smoking: "My opinion toward smoking in the dorm / apartment are...",
-    other_people: "My thoughts on having guests over are...",
-    temperature: "I like the temperature of the room to be...",
-    pets: "My thoughts on having pets are...",
-    parties: "My thoughts on throwing parties are...",
-    decorations: "My ideas for decorating the home involve...",
-    conflict: "When it comes to handling conflict, I am...",
-  };
-
   const handleModalClose = () => {
     setSelectedPhotoIndex(null);
   };
@@ -116,6 +94,42 @@ const UserCard = ({ navigation, route }) => {
       lastModified,
     };
     navigation.navigate("QuestionaireAnswers", { currentUser });
+  };
+
+  useEffect(() => {
+    getProfilePictures();
+  }, [user_id, picURL]);
+
+  const getProfilePictures = async () => {
+    try {
+      let lastModifiedList = [];
+
+      const { data, error } = await supabase
+        .from("images")
+        .select("*")
+        .eq("user_id", user_id);
+
+      if (error) {
+        alert(error.message);
+      }
+
+      if (data) {
+        data.forEach((item) => {
+          lastModifiedList[item.image_index] = item.last_modified;
+        });
+      }
+      let newPhotos = [];
+      for (let i = 1; i < MAX_IMAGES; i++) {
+        const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}-${lastModifiedList[i]}`;
+        const response = await fetch(profilePictureURL);
+        if (response.ok) {
+          newPhotos.push(profilePictureURL);
+        }
+      }
+      setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -267,42 +281,6 @@ const UserCard = ({ navigation, route }) => {
   const goBack = () => {
     console.log("Pressed");
     navigation.goBack();
-  };
-
-  useEffect(() => {
-    getProfilePictures();
-  }, [user_id, picURL]);
-
-  const getProfilePictures = async () => {
-    try {
-      let lastModifiedList = [];
-
-      const { data, error } = await supabase
-        .from("images")
-        .select("*")
-        .eq("user_id", user_id);
-
-      if (error) {
-        alert(error.message);
-      }
-
-      if (data) {
-        data.forEach((item) => {
-          lastModifiedList[item.image_index] = item.last_modified;
-        });
-      }
-      let newPhotos = [];
-      for (let i = 1; i < MAX_IMAGES; i++) {
-        const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}-${lastModifiedList[i]}`;
-        const response = await fetch(profilePictureURL);
-        if (response.ok) {
-          newPhotos.push(profilePictureURL);
-        }
-      }
-      setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   const showActionSheet = () => {

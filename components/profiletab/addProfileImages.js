@@ -248,7 +248,8 @@ const ImagePickerScreen = ({ navigation, route }) => {
         }}
       >
         <View style={styles.buttonContainer}>
-        <Icon name="times" size={22} color="white" /></View>
+          <Icon name="times" size={22} color="white" />
+        </View>
       </TouchableOpacity>
     );
   };
@@ -392,7 +393,7 @@ const styles = StyleSheet.create({
   profilePictureContainer: {
     width: 350,
     height: 350,
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#252d36",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 20,

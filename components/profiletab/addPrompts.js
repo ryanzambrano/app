@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { supabase } from "../auth/supabase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const AddPrompts = ({ navigation, route }) => {
   const { session } = route.params;

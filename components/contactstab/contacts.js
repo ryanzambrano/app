@@ -13,7 +13,8 @@ import {
   RefreshControl,
 } from "react-native";
 
-
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 
 import { AntDesign } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -39,14 +40,12 @@ const ContactsUI = ({ route }) => {
   const [images, setImages] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const groupIds = contacts.map((contact) => contact.Group_ID);
-
+  const [expoPushToken, setExpoPushToken] = useState("");
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     fetchUsers().then(() => setRefreshing(false));
   }, []);
-
-  
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -217,7 +216,6 @@ const ContactsUI = ({ route }) => {
   };
 
   useEffect(() => {
-
     fetchUsers();
     const channel = supabase.channel("room1");
     const subscription = channel

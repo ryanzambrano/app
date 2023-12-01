@@ -23,12 +23,13 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const Profile = ({ navigation, route }) => {
   const { updated, session } = route.params;
 
-  const [editedUser, setEditedUser] = useState(session.user);
-  const [profilePicture, setProfilePicture] = useState(null);
+  const [editedUser, setEditedUser] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
   const [uploading, setUploading] = useState(true);
   const [isUsername, setUsername] = useState("");
   const [isProfileVisible, setIsProfileVisible] = useState(true);
@@ -75,8 +76,22 @@ export const Profile = ({ navigation, route }) => {
   });
 
   const DISABLE_TOUCHABLE_SCROLL_POINT = 100;
+  const loadData = async () => {
+    try {
+      const cachedUserData = await AsyncStorage.getItem("userData");
+      if (cachedUserData !== null) {
+        //alert(cachedUserData);
+        setEditedUser(JSON.parse(cachedUserData));
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error("Error loading user data from cache:", error);
+    }
+  };
 
   useEffect(() => {
+    loadData();
     fetchData();
     if (updated && isFocused) {
       fetchData();
