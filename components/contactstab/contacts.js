@@ -81,13 +81,14 @@ const ContactsUI = ({ route }) => {
     } else {
       alert("Must use physical device for Push Notifications");
     }
+    
     const { data: istoken, error } = await supabase
       .from("UGC")
       .select("notification_token")
       .eq("user_id", session.user.id);
-
-    if (istoken.notification_token == null && istoken.length < 0) {
-      console.log(token);
+      console.log(token)
+    if (istoken.notification_token === null) {
+    
       const { data: tokendata, error } = await supabase
         .from("UGC")
         .update({ notification_token: token })
