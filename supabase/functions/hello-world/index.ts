@@ -11,9 +11,13 @@ Deno.serve(async (_req) => {
   
     const UUID = data[0].User_ID
     
-    const updatedUserdata = UUID.filter((uuid: string) => uuid == payload.record.Sent_From)
+    const updatedUserdata = UUID.filter((uuid: string) => uuid !== payload.record.Sent_From)
+
+    const senderdata = UUID.filter((uuid: string) => uuid == payload.record.Sent_From)
+
+    const {data: datasender, error: sendererror } = await supabase.from('UGC').select('*').eq('user_id', senderdata[0])
   
-    const {data: userdata, error: usererror } = await supabase.from('UGC').select('notification_token').eq('user_id', updatedUserdata[0])
+    const {data: userdata, error: usererror } = await supabase.from('UGC').select('*').eq('user_id', updatedUserdata[0])
     console.log(userdata[0].notification_token)
     const notif_token = userdata[0].notification_token
     console.log(notif_token)
@@ -31,12 +35,12 @@ Deno.serve(async (_req) => {
       },
       body: JSON.stringify({
         to: notif_token,
-        sound: 'default',
-        body: 'Test',
+        title: datasender[0].name,
+        body: payload.record.Message_Content,
       }),
     }).then((res) => res.json())
+    console.log(res)
 
-    console.log('Expo API response:', res)
     
     return new Response(JSON.stringify(res), {
       headers: { 'Content-Type': 'application/json' },
