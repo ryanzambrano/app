@@ -23,6 +23,8 @@ import { ActivityIndicator } from "react-native";
 import { availableTags } from "../auth/profileUtils.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { calculateCompatibility } from "../auth/profileUtils.js";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 
 const logo = require("../../assets/logo4.png");
 
@@ -48,6 +50,59 @@ const Home = ({ route }) => {
   const isFocused = useIsFocused();
   const [renderLimit, setRenderLimit] = useState(5);
   const flatListRef = useRef(null);
+  const [expoPushToken, setExpoPushToken] = useState("");
+
+  async function registerForPushNotificationsAsync() {
+    let token;
+
+    if (Platform.OS === "android") {
+      await Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
+    }
+
+    if (Device.isDevice) {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return;
+      }
+      // Learn more about projectId:
+      // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
+      token = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId: "ad275287-fa4a-4f70-8397-8df453abd9a8",
+        })
+      ).data;
+    } else {
+      alert("Must use physical device for Push Notifications");
+    }
+    
+    const { data: istoken, error } = await supabase
+      .from("UGC")
+      .select("notification_token")
+      .eq("user_id", session.user.id);
+
+    if (istoken.notification_token === null) {
+      console.log(token)
+      const { data: tokendata, error } = await supabase
+        .from("UGC")
+        .update({ notification_token: token })
+        .eq("user_id", session.user.id);
+    }
+
+    return token;
+  }
+
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -330,6 +385,8 @@ const Home = ({ route }) => {
 
   useEffect(() => {
     fetchUsers();
+    registerForPushNotificationsAsync().then((token) =>
+    setExpoPushToken(token));
     if (isFocused) {
       fetchUsers();
     }
