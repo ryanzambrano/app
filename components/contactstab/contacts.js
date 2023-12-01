@@ -13,8 +13,7 @@ import {
   RefreshControl,
 } from "react-native";
 
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
+
 
 import { AntDesign } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -40,66 +39,14 @@ const ContactsUI = ({ route }) => {
   const [images, setImages] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const groupIds = contacts.map((contact) => contact.Group_ID);
-  const [expoPushToken, setExpoPushToken] = useState("");
+
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     fetchUsers().then(() => setRefreshing(false));
   }, []);
 
-  async function registerForPushNotificationsAsync() {
-    let token;
-
-    if (Platform.OS === "android") {
-      await Notifications.setNotificationChannelAsync("default", {
-        name: "default",
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF231F7C",
-      });
-    }
-
-    if (Device.isDevice) {
-      const { status: existingStatus } =
-        await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== "granted") {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification!");
-        return;
-      }
-      // Learn more about projectId:
-      // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
-      token = (
-        await Notifications.getExpoPushTokenAsync({
-          projectId: "ad275287-fa4a-4f70-8397-8df453abd9a8",
-        })
-      ).data;
-    } else {
-      alert("Must use physical device for Push Notifications");
-    }
-
-    const { data: istoken, error } = await supabase
-      .from("UGC")
-      .select("notification_token")
-
-      .eq("user_id", session.user.id)
-      .single();
-
-    //alert(istoken.notification_token);
-
-    if (istoken.notification_token == null) {
-      //alert(token);
-      const { data: tokendata, error } = await supabase
-        .from("UGC")
-        .update({ notification_token: token })
-        .eq("user_id", session.user.id);
-    }
-    return token;
-  }
+  
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -270,9 +217,7 @@ const ContactsUI = ({ route }) => {
   };
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then((token) =>
-      setExpoPushToken(token)
-    );
+
     fetchUsers();
     const channel = supabase.channel("room1");
     const subscription = channel
