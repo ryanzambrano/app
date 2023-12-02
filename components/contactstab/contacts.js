@@ -10,7 +10,11 @@ import {
   SafeAreaView,
   Animated,
   Alert,
+  RefreshControl,
 } from "react-native";
+
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 
 import { AntDesign } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
@@ -21,15 +25,27 @@ import { Swipeable } from "react-native-gesture-handler";
 import { supabase } from "../auth/supabase.js";
 import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
+import { LayoutAnimation } from "react-native";
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
+  const [contacts, setContacts] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const isFocused = useIsFocused();
+  const fadeAnimation = new Animated.Value(1);
+  const [contactOpacities, setContactOpacities] = useState({});
   const [images, setImages] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const groupIds = contacts.map((contact) => contact.Group_ID);
+  const [expoPushToken, setExpoPushToken] = useState("");
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchUsers().then(() => setRefreshing(false));
+  }, []);
 
   const handleSearch = (text) => {
     setSearchQuery(text);
@@ -50,9 +66,12 @@ const ContactsUI = ({ route }) => {
 
   const fetchUsers = async () => {
     const { data: users, error } = await supabase
-      .from("Group Chats")
+      .from("Group_Chats")
       .select("*")
       .contains("User_ID", [session.user.id]);
+    if (users) {
+      setContacts(users);
+    }
 
     if (error) {
       console.error(error);
@@ -78,43 +97,45 @@ const ContactsUI = ({ route }) => {
           (item) => item !== session.user.id
         );
         const { data, error: sessionError } = await supabase
-        .from("UGC")
-        .select("name")
-        .in("user_id", extractedIds);
+          .from("UGC")
+          .select("name")
+          .in("user_id", extractedIds);
         let joinedGroups;
-        if(!user.Group_Name)
-        {
-          const groupNames = data.map(item => item.name);
-      
+        if (!user.Group_Name) {
+          const groupNames = data.map((item) => item.name);
+
           joinedGroups = groupNames.join(", ");
-        }
-        else
-        {
-      
+        } else {
           joinedGroups = user.Group_Name;
         }
-        
-    
+        setContactOpacities((prevOpacities) => ({
+          ...prevOpacities,
+          [user.Group_ID]: new Animated.Value(1),
+        }));
+
         // Fetch the most recent group chat message
         const { data: recentMessageData, error: messageError } = await supabase
-          .from("Group Chat Messages")
+          .from("Group_Chat_Messages")
           .select("*")
           .eq("Group_ID_Sent_To", user.Group_ID)
           .order("created_at", { ascending: false })
           .limit(1)
           .single();
-    
+
         const { data: Imagedata, error: ImageError } = await supabase
           .from("images")
           .select("*")
           .in("user_id", extractedIds)
           .eq("image_index", 0);
-    
+
         // Check if recentMessageData exists, and only include users with recent messages
-        if (!recentMessageData) {
+        if (
+          (!recentMessageData && user.Is_College == false) ||
+          user.Ammount_Users == 1
+        ) {
           return null;
         }
-    
+
         return {
           ...user,
           joinedGroups,
@@ -123,17 +144,29 @@ const ContactsUI = ({ route }) => {
         };
       })
     );
-    
+
     // Filter out null values (users with no recent messages) and sort
     const filteredUsers = modifiedUsers.filter((user) => user !== null);
-    
+
     filteredUsers.sort((a, b) => {
-      return (
-        new Date(b.recentMessage.created_at) -
-        new Date(a.recentMessage.created_at)
-      );
+      const dateA = a.recentMessage
+        ? new Date(a.recentMessage.created_at)
+        : null;
+      const dateB = b.recentMessage
+        ? new Date(b.recentMessage.created_at)
+        : null;
+
+      if (dateA && dateB) {
+        return dateB - dateA;
+      } else if (dateA) {
+        return -1;
+      } else if (dateB) {
+        return 1;
+      } else {
+        return 0;
+      }
     });
-    
+
     setUsers(filteredUsers);
   };
 
@@ -166,31 +199,101 @@ const ContactsUI = ({ route }) => {
     }
   };
 
+  const checkchat = async (payload) => {
+    // console.log(payload.new.Group_ID_Sent_To);
+    const { data, error } = await supabase
+      .from("Group_Chats")
+      .select("*")
+      .eq("Group_ID", payload.new.Group_ID_Sent_To)
+      .single();
+    const isUserInGroup = data.User_ID.includes(session.user.id);
+
+    if (isUserInGroup) {
+      return 1;
+    } else {
+      return 0;
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
-
-    const channel = supabase
-      .channel("custom-all-channel")
+    const channel = supabase.channel("room1");
+    const subscription = channel
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table:
-            "Group Chats" /*filter: `.or(Sent_From.eq.${session.user.id}, Contact_ID.eq.${session.user.id})`, */,
-        },
-        (payload) => {
-          fetchUsers();
+        { event: "insert", schema: "public", table: "Group_Chats" },
+        (deletePayload) => {
+          if (deletePayload) {
+            const payloadarray = deletePayload.new.User_ID;
+            if (payloadarray.includes(session.user.id)) {
+              //console.log("Group data altered");
+              fetchUsers();
+            }
+          }
+          // Handle delete event
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "update", schema: "public", table: "Group_Chats" },
+        (updatePayload) => {
+          if (updatePayload) {
+            const payloadarray = updatePayload.new.User_ID;
+            if (payloadarray.includes(session.user.id)) {
+              // console.log("Group data altered");
+              fetchUsers();
+            }
+          }
+          // Handle delete event
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "insert", schema: "public", table: "Group_Chat_Messages" },
+        (genericPayload) => {
+          if (genericPayload) {
+            checkchat(genericPayload)
+              .then((result) => {
+                if (result === 1) {
+                  fetchUsers();
+                }
+              })
+              .catch((error) => {
+                console.error("Error checking chat:", error);
+              });
+          }
+          // Handle generic event
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "update", schema: "public", table: "Group_Chat_Messages" },
+        (genericPayload) => {
+          if (genericPayload) {
+            checkchat(genericPayload)
+              .then((result) => {
+                if (result === 1) {
+                  fetchUsers();
+                }
+              })
+              .catch((error) => {
+                console.error("Error checking chat:", error);
+              });
+          }
+          // Handle generic event
         }
       )
       .subscribe();
+
+    // Clean up the subscription when the component unmounts
     return () => {
-      supabase.removeChannel(channel);
+      subscription.unsubscribe();
     };
-  }, [isFocused]);
+  }, []);
 
   const handleUserCardPress = (user) => {
     setSelectedUser(user);
+
     //console.log(user.joinedGroups);
     navigation.navigate("Message", { user });
   };
@@ -204,32 +307,50 @@ const ContactsUI = ({ route }) => {
   const renderContact = ({ item }) => {
     const handleDelete = async () => {
       try {
-        const { error } = await supabase
-          .from("Group Chat Messages")
-          .delete()
-          .eq("Group_ID_Sent_To", item.Group_ID);
+        LayoutAnimation.configureNext({
+          duration: 200, // Adjust the duration as needed
+          update: {
+            type: LayoutAnimation.Types.easeInEaseOut,
+            property: LayoutAnimation.Properties.opacity,
+          },
+        });
 
-        if (error) {
-          console.error(error);
-          return;
-        }
+        // Create a fade-out animation specific to the contact
+        const opacityValue = contactOpacities[item.Group_ID];
+        Animated.timing(opacityValue, {
+          toValue: 0, // Make it fully transparent
+          duration: 150, // Animation duration in milliseconds
+          useNativeDriver: false, // Required for opacity animations
+        }).start(async () => {
+          // After the animation is complete, perform the deletion logic
+          const { error } = await supabase
+            .from("Group_Chat_Messages")
+            .delete()
+            .eq("Group_ID_Sent_To", item.Group_ID);
 
-        // Now delete from the "Group Chats" table
-        const { error: groupChatsError } = await supabase
-          .from("Group Chats")
-          .delete()
-          .eq("Group_ID", item.Group_ID);
+          if (error) {
+            console.error(error);
+            return;
+          }
 
-        if (groupChatsError) {
-          console.error(groupChatsError);
-        }
+          // Now delete from the "Group Chats" table
+          const { error: groupChatsError } = await supabase
+            .from("Group_Chats")
+            .delete()
+            .eq("Group_ID", item.Group_ID);
 
-        // Fetch users again to update the UI
-        fetchUsers();
+          if (groupChatsError) {
+            console.error(groupChatsError);
+          }
+
+          // Fetch users again to update the UI
+          fetchUsers();
+        });
       } catch (error) {
         console.error(error);
       }
     };
+    const opacityValue = contactOpacities[item.Group_ID];
 
     const renderRightActions = (progress, dragX) => {
       // console.log("Progress:", progress);
@@ -238,7 +359,19 @@ const ContactsUI = ({ route }) => {
         outputRange: [0, 75], // Modify this line to change the direction of the expansion
       });
 
-      const handleDeleteConfirmation = () => {
+      const handleDeleteConfirmation = (item) => {
+        if (item.Is_College == true) {
+          Alert.alert(
+            "School Channel",
+            "You do not have permission to delete this channel",
+            [
+              {
+                text: "Ok",
+              },
+            ]
+          );
+          return;
+        }
         Alert.alert(
           "Delete Contact",
           "Are you sure you want to delete this contact? This will permanently delete all messages for both you and the recipient.",
@@ -255,7 +388,7 @@ const ContactsUI = ({ route }) => {
       };
 
       return (
-        <TouchableOpacity onPress={handleDeleteConfirmation}>
+        <TouchableOpacity onPress={() => handleDeleteConfirmation(item)}>
           <Animated.View
             style={{
               backgroundColor: "red",
@@ -361,44 +494,81 @@ const ContactsUI = ({ route }) => {
       }
     };
     return (
-      <Swipeable
-        renderRightActions={renderRightActions}
-        overshootRight={false}
-        useNativeDriver={true}
-      >
-        <TouchableOpacity onPress={() => handleUserCardPress(item)}>
-          <View style={styles.contactItem}>
-            {renderProfilePicture()}
-            <View style={styles.contactInfo}>
-              <View style={styles.contactNameContainer}>
-                <Text numberOfLines={1} ellipsizeMode='tail' style={styles.contactName}>{item.joinedGroups}</Text>
-                {item.recentMessage && item.recentMessage.created_at ? (
-                  <Text style={styles.MessageTime}>
-                    {formatRecentTime(item.recentMessage.created_at)}
+      <Animated.View style={{ opacity: opacityValue }}>
+        <Swipeable
+          renderRightActions={renderRightActions}
+          overshootRight={false}
+          useNativeDriver={true}
+        >
+          <TouchableOpacity onPress={() => handleUserCardPress(item)}>
+            <View style={styles.contactItem}>
+              {renderProfilePicture()}
+              <View style={styles.contactInfo}>
+                <View style={styles.contactNameContainer}>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={{
+                      ...(item.recentMessage &&
+                      !item.recentMessage.Read.includes(session.user.id)
+                        ? styles.UnreadcontactName // Apply this style when the condition is true
+                        : styles.contactName), // Apply this style when the condition is false
+                    }}
+                  >
+                    {item.joinedGroups}
                   </Text>
-                ) : null}
+
+                  {item.recentMessage && item.recentMessage.created_at ? (
+                    <Text style={styles.MessageTime}>
+                      {formatRecentTime(item.recentMessage.created_at)}
+                    </Text>
+                  ) : null}
+                </View>
+                <View style={styles.recentMessageContainer}>
+                  {item.recentMessage ? (
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={{
+                          ...(item.recentMessage &&
+                          !item.recentMessage.Read.includes(session.user.id)
+                            ? styles.UnreadRecentMessage // Apply this style when the condition is true
+                            : styles.RecentMessage), // Apply this style when the condition is false
+                          width: 265, // Adjust the width as needed
+                        }}
+                      >
+                        {item.recentMessage.Message_Content}
+                      </Text>
+                      {item.recentMessage &&
+                      !item.recentMessage.Read.includes(session.user.id) ? (
+                        <View style={styles.circle} /> // Add this View for the solid circle
+                      ) : null}
+                    </View>
+                  ) : (
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={styles.RecentMessage}
+                    >
+                      No messages yet
+                    </Text>
+                  )}
+                </View>
               </View>
-              {item.recentMessage ? (
-                <Text 
-                numberOfLines={1} 
-                ellipsizeMode='tail' 
-                style={styles.RecentMessage}
-                >
-                  {item.recentMessage.Message_Content}
-                </Text>
-              ) : <Text 
-              numberOfLines={1}
-              ellipsizeMode='tail'
-              style={styles.RecentMessage}
-            >
-              No messages yet
-            </Text>}
             </View>
-          </View>
-        </TouchableOpacity>
-      </Swipeable>
+          </TouchableOpacity>
+        </Swipeable>
+      </Animated.View>
     );
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -434,14 +604,16 @@ const ContactsUI = ({ route }) => {
             returnKeyType="done"
           />
         </View>
-
-        <FlatList
-          data={filteredUsers}
-          renderItem={renderContact}
-          keyExtractor={(item) => item.Group_ID.toString()}
-          ListEmptyComponent={renderEmptyComponent}
-        />
       </View>
+      <FlatList
+        data={filteredUsers}
+        renderItem={renderContact}
+        keyExtractor={(item) => item.Group_ID.toString()}
+        ListEmptyComponent={renderEmptyComponent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      />
       <StatusBar style="light" />
     </SafeAreaView>
   );
@@ -452,9 +624,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1D1D20",
   },
+  circle: {
+    width: 10, // Adjust the width to your preference
+    height: 10, // Adjust the height to your preference
+    borderRadius: 5, // Half of the width/height to create a circle
+    backgroundColor: "#159e9e", // Change this to your desired circle color
+    //alignSelf: 'flex-end',
+    marginRight: 4, // Align the circle to the right of its container
+  },
   layeredImage: {
-    width: 40, 
-    height: 40, 
+    width: 40,
+    height: 40,
     marginTop: 5,
     borderRadius: 20,
     marginRight: 25,
@@ -484,14 +664,18 @@ const styles = StyleSheet.create({
     marginTop: -10,
   },
   viewContainer: {
-    flex: 1,
     backgroundColor: "#1D1D20",
     borderBottomColor: "#2B2D2F",
+    //paddingBottom: 3,
+    // borderBottomWidth: 0.5,
+    // borderBottomColor: "#2B2D2F",
+    // borderBottomLeftRadius: 14,
+    // borderBottomRightRadius: 14,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#252d36",
     borderRadius: 10,
     paddingHorizontal: 15,
     marginTop: 15,
@@ -501,6 +685,7 @@ const styles = StyleSheet.create({
     // borderWidth: 0.20,
     // borderTopWidth: 0.20,
     //borderBottomWidth: 0.2,
+
     borderColor: "grey",
   },
   searchInput: {
@@ -512,13 +697,13 @@ const styles = StyleSheet.create({
   },
   contactItem: {
     flexDirection: "row",
-    alignItems: "flex-start", 
+    alignItems: "flex-start",
     paddingHorizontal: 15,
     paddingVertical: 12,
     borderBottomWidth: 1.2,
     borderBottomColor: "#2B2D2F",
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14,
     width: "100%",
   },
   profilePicture: {
@@ -538,18 +723,29 @@ const styles = StyleSheet.create({
     color: "white",
     flexShrink: 1,
   },
+  UnreadcontactName: {
+    fontSize: 18,
+    fontWeight: "400",
+    marginBottom: 5,
+    color: "white",
+    flexShrink: 1,
+  },
   MessageTime: {
     fontSize: 14,
     fontWeight: "light",
-    color: "white", 
-    flexShrink: 0, 
-    marginLeft: 10 
+    color: "white",
+    flexShrink: 0,
+    marginLeft: 10,
   },
   RecentMessage: {
     fontSize: 14,
     fontWeight: "light",
     color: "#cbcace",
-    marginRight: 80,
+  },
+  UnreadRecentMessage: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "white",
   },
   contactStatus: {
     fontSize: 14,
@@ -558,7 +754,7 @@ const styles = StyleSheet.create({
   contactNameContainer: {
     flexDirection: "row",
     paddingRight: 5,
-    //flex: 1, 
+    //flex: 1,
     justifyContent: "space-between",
   },
   rowBack: {

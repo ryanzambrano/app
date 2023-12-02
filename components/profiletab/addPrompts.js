@@ -7,8 +7,10 @@ import {
   TouchableOpacity,
   Text,
   SafeAreaView,
+  KeyboardAvoidingView,
 } from "react-native";
 import { supabase } from "../auth/supabase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const AddPrompts = ({ navigation, route }) => {
   const { session } = route.params;
@@ -71,15 +73,14 @@ export const AddPrompts = ({ navigation, route }) => {
   const fetchExistingAnswers = async () => {
     if (session?.user) {
       const { data: existingAnswers, error } = await supabase
-        .from("prompts") // Replace "prompts" with your actual table name.
+        .from("prompts")
         .select("*")
         .eq("user_id", session.user.id)
-        .single(); // Use this if there's only one row of data for each user.
+        .single();
 
       if (error) {
         console.error("Error fetching existing answers:", error);
       } else if (existingAnswers) {
-        // Map existing answers to your questions.
         const mappedAnswers = presetQuestions.map((question) => {
           const columnName = questionColumnMapping[question];
           return existingAnswers[columnName] || "";
@@ -91,13 +92,13 @@ export const AddPrompts = ({ navigation, route }) => {
   };
 
   const handleSave = async () => {
+    const trimmedAnswers = answers.map((answer) => answer.trim());
     const answersObj = presetQuestions.reduce((obj, question, index) => {
       const columnName = questionColumnMapping[question];
-      obj[columnName] = answers[index];
+      obj[columnName] = trimmedAnswers[index];
       return obj;
     }, {});
 
-    console.log(answersObj);
     if (session?.user) {
       const { data, error } = await supabase
         .from("prompts")
@@ -140,27 +141,35 @@ export const AddPrompts = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.left}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior="padding" // or "height" depending on your needs
+      >
+        <View style={styles.header}>
+          <View style={styles.left}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.backButton}
+            >
+              <Text style={styles.backButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.center}>
+            <Text style={styles.headerText}>Prompts</Text>
+          </View>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
+            style={styles.dbuttonContainer}
+            onPress={handleSave}
           >
-            <Text style={styles.backButtonText}>Cancel</Text>
+            <Text style={styles.dbutton}>Done</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.center}>
-          <Text style={styles.headerText}>Prompts</Text>
-        </View>
-        <TouchableOpacity style={styles.dbuttonContainer} onPress={handleSave}>
-          <Text style={styles.dbutton}>Done</Text>
-        </TouchableOpacity>
-      </View>
-      <FlatList
-        data={presetQuestions}
-        renderItem={renderItems}
-        keyExtractor={(item, index) => index.toString()}
-      />
+        <FlatList
+          data={presetQuestions}
+          renderItem={renderItems}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -203,7 +212,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   card: {
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#252d36", // chill blu
     gap: 40,
     paddingTop: 50,
     paddingBottom: 40,

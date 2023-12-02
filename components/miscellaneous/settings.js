@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -18,48 +18,77 @@ const SettingsScreen = ({ navigation, route }) => {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
   };
+  const [isDiscoverable, setIsDiscoverable] = useState(false);
 
-  
+  const toggleDiscoverable = async () => {
+    const newDiscoverableState = !isDiscoverable;
+    setIsDiscoverable(newDiscoverableState);
+    updateViewable(newDiscoverableState);
+    // Here you can add logic to update this setting in your backend or local storage
+  };
 
   const handleBackPress = () => {
     navigation.navigate("Tabs");
   };
 
+  useEffect(() => {
+    fetchViewable();
+  }, []);
+
+  const fetchViewable = async () => {
+    const { data, error } = await supabase
+      .from("UGC")
+      .select("profile_viewable")
+      .eq("user_id", session.user.id)
+      .single();
+
+    setIsDiscoverable(data.profile_viewable);
+  };
+
+  const updateViewable = async (viewable) => {
+    const { data, error } = await supabase
+      .from("UGC")
+      .update({
+        profile_viewable: viewable,
+      })
+      .eq("user_id", session.user.id);
+  };
+
   const sections = [
     {
       title: "Social",
-      items: ["Report", "Manage Blocked Users", "Allow Your account viewable"],
+      items: [
+        { name: "Manage Blocked Users" },
+        { name: "Allow Your Account Discoverable", type: "switch" },
+      ],
     },
     {
       title: "About",
       items: [
-        "About Us",
-        "User Agreement",
-        "Privacy Policy",
-        "Content Policy",
-        "Help Center",
+        { name: "About Us" },
+        { name: "User Agreement" },
+        { name: "Privacy Policy" },
+        { name: "Content Policy" },
       ],
     },
     {
       title: "Reach Out",
-      items: ["Report an Issue"],
+      items: [{ name: "Report an Issue" }],
     },
   ];
 
-const screenMap = {
-    "Report": "ReportScreen",
+  const screenMap = {
     "Manage Blocked Users": "BlockedList",
-    "Allow Your account viewable": "AccountVisibility",
+    "Allow Your Account Discoverable": "AccountDiscoverability",
     "About Us": "AboutUs",
     "User Agreement": "UserAgreement",
     "Privacy Policy": "PrivacyPolicy",
     "Content Policy": "ContentPolicy",
-    "Help Center": "HelpCenter",
+    FAQ: "FAQ",
     "Report an Issue": "ReportIssue",
   };
 
   const navigateToScreen = (screenName) => {
-    
     if (screenMap[screenName]) {
       navigation.navigate(screenMap[screenName]);
     }
@@ -76,21 +105,45 @@ const screenMap = {
         </TouchableOpacity>
       </View>
       <ScrollView>
-        {sections.map((section, index) => (
-          <View key={index}>
+        {sections.map((section, sectionIndex) => (
+          <View key={sectionIndex}>
             <View style={styles.titleContainer}>
               <Text style={styles.sectionTitle}>{section.title}</Text>
             </View>
-            {section.items.map((text, index) => (
-              <TouchableOpacity key={index} style={styles.settingRow} onPress={() => navigateToScreen(text)}>
-                <Text style={styles.text}>{text}</Text>
-              </TouchableOpacity>
-            ))}
+            {section.items.map((item, itemIndex) => {
+              if (item.type === "switch") {
+                return (
+                  <View key={itemIndex} style={styles.settingRow}>
+                    <Text style={styles.text}>
+                      {item.name}
+                      {"   "}
+                    </Text>
+                    <Switch
+                      trackColor={{ false: "#767577", true: "#149999" }}
+                      thumbColor={isDiscoverable ? "#fff" : "#fff"}
+                      ios_backgroundColor="#3e3e3e"
+                      onValueChange={toggleDiscoverable}
+                      value={isDiscoverable}
+                    />
+                  </View>
+                );
+              } else {
+                return (
+                  <TouchableOpacity
+                    key={itemIndex}
+                    style={styles.settingRow}
+                    onPress={() => navigateToScreen(item.name)}
+                  >
+                    <Text style={styles.text}>{item.name}</Text>
+                  </TouchableOpacity>
+                );
+              }
+            })}
           </View>
         ))}
 
         <View style={styles.logoutRow}>
-          <Button title="logout" color="red" onPress={signOut} />
+          <Button title="Logout" color="red" onPress={signOut} />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -147,7 +200,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     paddingVertical: 10,
   },
-  
 });
 
 export default SettingsScreen;

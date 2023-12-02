@@ -46,7 +46,7 @@ export const Retake1 = ({ navigation, route }) => {
     "Asian",
     "Native Hawaiian/Pacific Islander",
   ];
-  const ages = Array.from(Array(31).keys()).map((age) => String(age + 1));
+  const ages = Array.from(Array(10).keys()).map((age) => String(age + 18));
 
   useEffect(() => {
     if (!fetched) {
@@ -196,6 +196,8 @@ export const Retake1 = ({ navigation, route }) => {
               <Modal
                 visible={isAgeModalVisible}
                 animationType="slide"
+                //style="dark"
+                backgroundColor="transparent"
                 transparent
               >
                 <View style={styles.modalContainerGender}>
@@ -206,7 +208,12 @@ export const Retake1 = ({ navigation, route }) => {
                       onValueChange={(itemValue) => setSelectedAge(itemValue)}
                     >
                       {ages.map((age) => (
-                        <Picker.Item key={age} label={age} value={age} />
+                        <Picker.Item
+                          color="white"
+                          key={age}
+                          label={age}
+                          value={age}
+                        />
                       ))}
                     </Picker>
                   </View>
@@ -254,6 +261,7 @@ export const Retake1 = ({ navigation, route }) => {
                     >
                       {gender.map((Gender) => (
                         <Picker.Item
+                          color="white"
                           key={Gender}
                           label={Gender}
                           value={Gender}
@@ -305,6 +313,7 @@ export const Retake1 = ({ navigation, route }) => {
                     >
                       {gender.map((gender) => (
                         <Picker.Item
+                          color="white"
                           key={gender}
                           label={gender}
                           value={gender}
@@ -406,6 +415,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
+  pickerItem: {
+    color: "white",
+  },
+
   formAction: {
     marginVertical: 24,
     backgroundColor: "#1D1D20",
@@ -446,8 +459,8 @@ const styles = StyleSheet.create({
   modalContainerGender: {
     flex: 1,
     marginTop: "130%",
-    backgroundColor: "lightgrey",
-
+    backgroundColor: "#111111",
+    color: "white",
     justifyContent: "space-around",
     gap: "50%",
   },
@@ -456,12 +469,14 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     marginTop: "7%",
+    color: "white",
   },
 
   pickerContainerGender: {
     flex: 1,
     flexDirection: "row",
     marginTop: "1%",
+    color: "white",
   },
   picker: {
     flex: 1,

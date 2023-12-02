@@ -38,7 +38,7 @@ export const Username = ({ navigation, route }) => {
         }
 
         // Check if the name contains non-alphabetic characters
-        if (!/^[a-z0-9_]+$/i.test(userData.username)) {
+        if (!/^[a-z0-9_.]+$/i.test(userData.username)) {
           setIsError("Invalid characters");
           return; // Stop the function execution
         }
@@ -49,10 +49,13 @@ export const Username = ({ navigation, route }) => {
             username: selectedUsername,
           })
           .eq("user_id", session.user.id);
-
         if (error) {
-          startShakeAnimation();
-          setIsError(error.message);
+          if (error.code === "23505") {
+            setIsError("This username is already taken");
+          } else {
+            startShakeAnimation();
+            setIsError(error.message);
+          }
         } else {
           navigation.navigate("Colleges");
         }

@@ -50,7 +50,10 @@ export const QuestionaireAnswers = ({ navigation, route }) => {
   const renderItems = ({ item }) => (
     <View style={styles.card}>
       <Text style={styles.question}>{item.question}</Text>
-      <Text style={styles.input}>{item.answer}</Text>
+      <View style={styles.answerContainer}>
+        <Text style={styles.input}>{item.answer}</Text>
+        
+      </View>
     </View>
   );
 
@@ -124,15 +127,26 @@ const styles = StyleSheet.create({
     fontFamily: "Helvetica",
   },
   input: {
-    color: "#fff",
+    color: "white",
     borderBottomWidth: 1,
     borderBottomColor: "white",
     borderRadius: 5,
-    padding: 10,
+    padding: 0,
     height: 40,
     fontSize: 26,
     fontFamily: "Helvetica",
+    //textDecorationLine: 'underline', 
   },
+  answerContainer: {
+    flexDirection: 'column',
+    borderBottomWidth: 1,
+    borderBottomColor: "white",
+    paddingBottom: 0,
+    borderBottomEndRadius: 5,
+    borderBottomStartRadius: 5,
+},
+
+
 });
 
 export default QuestionaireAnswers;

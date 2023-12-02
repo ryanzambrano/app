@@ -88,7 +88,44 @@ const TagSelectionScreen = ({ navigation, route }) => {
           .update({
             profile_complete: true,
           })
+          .select("college")
           .eq("user_id", session.user.id);
+          
+          const { data: insertData, error: insertError } = await supabase
+          .from("Group_Chats")
+          .select()
+          .eq("Group_Name", profileData[0].college)
+          .eq("Is_College", true);
+                 
+          
+          if(insertData.length < 1 && insertData === null)
+          {
+            const { data: Collegeinsertdata, error: CollegeinsertError } = await supabase
+          .from("Group_Chats")
+          .insert([
+            {
+              Group_Name: profileData[0].college,
+              Is_College: true,
+              User_ID: [session.user.id], // Assuming User_ID is an array of UUIDs
+              Ammount_Users: 1,
+            },
+          ]);
+          }
+          else
+          {
+            arruuid = insertData[0].User_ID;
+            arruuid.push(session.user.id); // Modifies arruuid in place
+            newammountuser = insertData[0].Ammount_Users + 1;
+            
+            const { data: Collegeupdatedata, error: updateError } = await supabase
+              .from("Group_Chats")
+              .update({ User_ID: arruuid, Ammount_Users: newammountuser })
+              .eq("Group_Name", profileData[0].college)
+              .eq("Is_College", true);
+            
+          }
+
+          
 
         if (error) {
           startShakeAnimation();

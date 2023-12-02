@@ -38,19 +38,19 @@ export const Retake2 = ({ navigation, route }) => {
   const [selectedLivingPreferences, setSelectedLivingPreferences] =
     useState("");
 
-    const livingPreferences = ["Apartment", "Dorm", "House", "No Preferences"];
-    const forFun = ["Going Clubbing", "Movie night in", "Inner circle hang"];
-    const studies = [
-      "Business",
-      "Natural Science",
-      "Social Science",
-      "Medical",
-      "Mathematics",
-      "Engineering",
-      "Art",
-      "Exploratory",
-      "Other",
-    ];
+  const livingPreferences = ["Apartment", "Dorm", "House", "No Preferences"];
+  const forFun = ["Going Clubbing", "Movie night in", "Inner circle hang"];
+  const studies = [
+    "Business",
+    "Natural Science",
+    "Social Science",
+    "Medical",
+    "Mathematics",
+    "Engineering",
+    "Art",
+    "Exploratory",
+    "Other",
+  ];
 
   const openStudiesModal = () => {
     setIsStudiesModalVisible(true);
@@ -183,7 +183,7 @@ export const Retake2 = ({ navigation, route }) => {
           <View style={styles.form}>
             <View style={styles.input}>
               <Text style={styles.inputHeader}>
-              What is your preferred housing situation?
+                What is your preferred housing situation?
               </Text>
 
               <TouchableOpacity
@@ -214,6 +214,7 @@ export const Retake2 = ({ navigation, route }) => {
                     >
                       {livingPreferences.map((livingPreferences) => (
                         <Picker.Item
+                          color="white"
                           key={livingPreferences}
                           label={livingPreferences}
                           value={livingPreferences}
@@ -265,6 +266,7 @@ export const Retake2 = ({ navigation, route }) => {
                     >
                       {forFun.map((Gender) => (
                         <Picker.Item
+                          color="white"
                           key={Gender}
                           label={Gender}
                           value={Gender}
@@ -311,6 +313,7 @@ export const Retake2 = ({ navigation, route }) => {
                     >
                       {studies.map((studies) => (
                         <Picker.Item
+                          color="white"
                           key={studies}
                           label={studies}
                           value={studies}
@@ -436,7 +439,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     marginTop: "130%",
-    backgroundColor: "lightgrey",
+    backgroundColor: "#111111",
     justifyContent: "space-around",
     gap: "50%",
   },

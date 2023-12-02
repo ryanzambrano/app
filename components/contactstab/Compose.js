@@ -212,6 +212,8 @@ const ComposeMessageScreen = ({ route }) => {
     try {
       
       const selectedUserNames = selectedUsers.map((user) => user.name);
+      const nnnn = selectedUserNames.sort();
+      const nameparam = nnnn.join(", ");
       selectedUserNames.push(sessionusername);
       selectedUserNames.sort();
       const usernames = selectedUserNames.join(", ");
@@ -224,7 +226,7 @@ const ComposeMessageScreen = ({ route }) => {
 
       // Insert the new record with User_ID, Group_ID, and Group_Name
       const { data: insertData, error: insertError } = await supabase
-        .from("Group Chats")
+        .from("Group_Chats")
         .insert([
           {
             User_ID: selectedUserIDs, // Join selected user names with commas
@@ -242,6 +244,7 @@ const ComposeMessageScreen = ({ route }) => {
           const fetchedPersons = insertData.map((person) => ({
             ...person,
             images: Imagedata,
+            joinedGroups: nameparam,
           }));
           setPersons(fetchedPersons);
           if (fetchedPersons.length > 0) {
@@ -253,7 +256,7 @@ const ComposeMessageScreen = ({ route }) => {
         if (insertError.code === "23505") {
           const { data: navigationdata, error: navigationError } =
             await supabase
-              .from("Group Chats")
+              .from("Group_Chats")
               .select("*")
               .contains("User_ID", selectedUserIDs)
               .eq("Ammount_Users", selectedUserIDs.length);
@@ -269,11 +272,25 @@ const ComposeMessageScreen = ({ route }) => {
             console.log(navigationError);
             return;
           } else {
-            //console.log(navigationdata);
-            const fetchedPersons = navigationdata.map((person) => ({
-              ...person,
-              images: Imagedata,
-            }));
+            let fetchedPersons;
+            //console.log(navigationdata[0].Group_Name);
+            if(!navigationdata[0].Group_Name){
+              fetchedPersons = navigationdata.map((person) => ({
+                ...person,
+                images: Imagedata,
+                joinedGroups: nameparam,
+              }));
+
+            }
+            else
+            {
+              fetchedPersons = navigationdata.map((person) => ({
+                ...person,
+                images: Imagedata,
+                joinedGroups: navigationdata[0].Group_Name,
+              }));
+            }
+            
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
              navigation.navigate("Message", { user: fetchedPersons[0] });

@@ -22,20 +22,14 @@ import { picURL } from "../auth/supabase";
 import { supabase } from "../auth/supabase.js";
 import ActionSheet from "react-native-action-sheet";
 import ReportUI from "./report.js";
-
+import { promptQuestions } from "../auth/profileUtils.js";
 const MAX_IMAGES = 4;
 
 const scrollY = new Animated.Value(0);
 
-const profileOpacity = scrollY.interpolate({
-  inputRange: [0, 550],
-  outputRange: [1, 0],
-  extrapolate: "clamp",
-});
-
 const profileZIndex = scrollY.interpolate({
   inputRange: [0, 550],
-  outputRange: [1, -1],
+  outputRange: [1, 0],
   extrapolate: "clamp",
 });
 
@@ -53,8 +47,9 @@ const UserCard = ({ navigation, route }) => {
     bookmarked_profiles,
     lastModified,
   } = route.params.user;
-  const [age, setAge] = useState("");
-  const [gender, setGender] = useState("");
+
+  const { age, gender } = route.params.user.profiles;
+
   const [living_preferences, setLivingPreference] = useState("");
   const [persons, setPersons] = useState([]);
   const [photos, setPhotos] = useState([
@@ -62,32 +57,11 @@ const UserCard = ({ navigation, route }) => {
   ]);
   const [isFriendAdded, setIsFriendAdded] = useState(false);
   const [isProfileBlocked, setIsProfileBlocked] = useState(false);
-  const buttonColor = isFriendAdded ? "#14999999" : "#1D1D20";
+  const buttonColor = isFriendAdded ? "#14999999" : "#181d2b";
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
   const [prompts, setPrompts] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isActionSheetVisible, setActionSheetVisible] = useState(false);
-
-  const promptQuestions = {
-    greek_life: "Are you participating in Greek Life?",
-    budget: "My budget restrictions for housing are...",
-    night_out: "A perfect night out for me looks like...",
-    pet_peeves: "My biggest pet peeves are...",
-    favorite_movies: "My favorite movies are...",
-    favorite_artists: "My favorite artists / bands are...",
-    living_considerations: "The dorms halls / apartment complexes I'm considering are...",
-    sharing: "When it comes to sharing my amenities and personal property...",
-    cooking: "When it comes to sharing food and cooking...",
-    burnt_out: "When I'm burnt out, I relax by...",
-    involvement: "The organizations I'm involved in on campus are...",
-    smoking: "My opinion toward smoking in the dorm / apartment are...",
-    other_people: "My thoughts on having guests over are...",
-    temperature: "I like the temperature of the room to be...", 
-    pets: "My thoughts on having pets are...",
-    parties: "My thoughts on throwing parties are...",
-    decorations: "My ideas for decorating the home involve...",
-    conflict: "When it comes to handling conflict, I am...", 
-  };
 
   const handleModalClose = () => {
     setSelectedPhotoIndex(null);
@@ -120,6 +94,42 @@ const UserCard = ({ navigation, route }) => {
       lastModified,
     };
     navigation.navigate("QuestionaireAnswers", { currentUser });
+  };
+
+  useEffect(() => {
+    getProfilePictures();
+  }, [user_id, picURL]);
+
+  const getProfilePictures = async () => {
+    try {
+      let lastModifiedList = [];
+
+      const { data, error } = await supabase
+        .from("images")
+        .select("*")
+        .eq("user_id", user_id);
+
+      if (error) {
+        alert(error.message);
+      }
+
+      if (data) {
+        data.forEach((item) => {
+          lastModifiedList[item.image_index] = item.last_modified;
+        });
+      }
+      let newPhotos = [];
+      for (let i = 1; i < MAX_IMAGES; i++) {
+        const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}-${lastModifiedList[i]}`;
+        const response = await fetch(profilePictureURL);
+        if (response.ok) {
+          newPhotos.push(profilePictureURL);
+        }
+      }
+      setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -158,29 +168,13 @@ const UserCard = ({ navigation, route }) => {
           .map(([prompt, answer]) => ({ prompt, answer }));
 
         setPrompts(answeredPrompts);
-        //console.log(answeredPrompts);
       } else {
         console.log("Error fetching prompts: ", promptsError);
       }
     };
-    const fetchGenderAndAge = async () => {
-      const { data: genderData, error: genderError } = await supabase
-        .from("profile")
-        .select("gender, age, living_preferences")
-        .eq("user_id", user_id);
-      if (genderData) {
-        setGender(genderData[0].gender);
-        setAge(genderData[0].age);
-        setLivingPreference(genderData[0].living_preferences);
-        //console.log(genderData.age);
-      } else {
-        console.log("Error fetching prompts: ");
-      }
-    };
-    fetchGenderAndAge();
+
     fetchBookmarkedProfiles();
     fetchPrompts();
-    //console.log(`${picURL}/${user_id}/${user_id}-0-${lastModified}`);
   }, []);
 
   const handleBlockUser = async (user_id) => {
@@ -211,7 +205,7 @@ const UserCard = ({ navigation, route }) => {
         return;
       }
 
-      const { blocked_profiles } = data[0];;
+      const { blocked_profiles } = data[0];
       if (!blocked_profiles.includes(user_id)) {
         const updatedBlockedProfiles = [...blocked_profiles, user_id];
         const { data: updateData, error: updateError } = await supabase
@@ -236,6 +230,7 @@ const UserCard = ({ navigation, route }) => {
 
   const handleAddFriend = async (user_id) => {
     const userId = session.user.id;
+    console.log(photos);
     try {
       const { data, error } = await supabase
         .from("UGC")
@@ -258,7 +253,6 @@ const UserCard = ({ navigation, route }) => {
             updateError.message
           );
         } else {
-          //console.log("Bookmark added successfully!");
           setIsFriendAdded(true);
         }
       } else {
@@ -289,57 +283,19 @@ const UserCard = ({ navigation, route }) => {
     navigation.goBack();
   };
 
-  useEffect(() => {
-    getProfilePictures();
-  }, [user_id, picURL]);
-
-  const getProfilePictures = async () => {
-    try {
-      let lastModifiedList = [];
-
-      const { data, error } = await supabase
-        .from("images")
-        .select("*")
-        .eq("user_id", user_id);
-
-      if (error) {
-        alert(error.message);
-      }
-
-      if (data) {
-        // alert(`Image data fetched: ${JSON.stringify(data)}`);
-        data.forEach((item) => {         
-          lastModifiedList[item.image_index] = item.last_modified;
-        });
-      }
-      let newPhotos = [];
-      for (let i = 1; i < MAX_IMAGES; i++) {
-        const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}-${lastModifiedList[i]}`;
-        const response = await fetch(profilePictureURL);
-        if (response.ok) {
-          newPhotos.push(profilePictureURL);
-        }
-      }
-      setPhotos((prevPhotos) => [...prevPhotos, ...newPhotos]);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const showActionSheet = () => {
     ActionSheet.showActionSheetWithOptions(
       {
-        options: ['Cancel', 'Block User', 'Report User'],
+        options: ["Cancel", "Block User", "Report User"],
         cancelButtonIndex: 0,
         destructiveButtonIndex: 1,
-        tintColor: 'white', // Set a default text color for all buttons
-        
+        tintColor: "white", // Set a default text color for all buttons
       },
       (buttonIndex) => {
         if (buttonIndex === 1) {
           handleBlockUser(user_id);
         } else if (buttonIndex === 2) {
-          navigation.navigate("ReportUI", {user_id: user_id});
+          navigation.navigate("ReportUI", { user_id: user_id });
         }
       }
     );
@@ -351,7 +307,7 @@ const UserCard = ({ navigation, route }) => {
       setActionSheetVisible(false);
     }
   }, [isActionSheetVisible]);
-  
+
   const handleUserCardPress = async () => {
     {
       //message navigation
@@ -366,11 +322,10 @@ const UserCard = ({ navigation, route }) => {
         return;
       }
       const { data: Imagedata, error: ImageError } = await supabase
-      .from("images")
-      .select("*")
-      .eq("user_id", user_id)
-      .eq("image_index", 0);
-
+        .from("images")
+        .select("*")
+        .eq("user_id", user_id)
+        .eq("image_index", 0);
 
       const sessionusername = data.name;
       const combinedArray = [sessionusername, name];
@@ -381,7 +336,7 @@ const UserCard = ({ navigation, route }) => {
       const Finalarray = combinedIDs.slice().sort();
 
       const { data: insertData, error: insertError } = await supabase
-        .from("Group Chats")
+        .from("Group_Chats")
         .insert([
           {
             User_ID: Finalarray,
@@ -391,10 +346,11 @@ const UserCard = ({ navigation, route }) => {
         .select();
 
       if (insertError) {
-        if (insertError.code === "23505") { // dupe error
+        if (insertError.code === "23505") {
+          // dupe error
           const { data: navigationdata, error: navigationError } =
             await supabase
-              .from("Group Chats")
+              .from("Group_Chats")
               .select("*")
               .contains("User_ID", Finalarray)
               .eq("Ammount_Users", Finalarray.length);
@@ -403,11 +359,12 @@ const UserCard = ({ navigation, route }) => {
             return;
           } else {
             //console.log(navigationdata);
-            const  fetchedPersons = navigationdata.map((person) => ({
+            const fetchedPersons = navigationdata.map((person) => ({
               ...person,
               images: Imagedata,
+              joinedGroups: name,
             }));
-            
+
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
               navigation.navigate("Message", { user: fetchedPersons[0] });
@@ -420,9 +377,10 @@ const UserCard = ({ navigation, route }) => {
         }
         return;
       }
-      const  fetchedPersons = navigationdata.map((person) => ({
+      const fetchedPersons = insertData.map((person) => ({
         ...person,
         images: Imagedata,
+        joinedGroups: name,
       }));
       setPersons(fetchedPersons);
       if (fetchedPersons.length > 0) {
@@ -433,27 +391,31 @@ const UserCard = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
-        <Text style={styles.name}>{name}</Text>
-        <View style={styles.backButton}></View>
-        <TouchableOpacity
-          onPress={() => setActionSheetVisible(true)}
-          style={styles.blockButton}
-        >
-          <AntDesign name="deleteuser" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
-
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.backButton}
+      >
+        <Text style={styles.backButtonText}>←</Text>
+      </TouchableOpacity>
+      <Animated.View
+        style={{
+          zIndex: profileZIndex,
+        }}
+      >
+        <View style={styles.header}>
+          <Text style={styles.name}>{name}</Text>
+          <View style={styles.backButton}></View>
+          <TouchableOpacity
+            onPress={() => setActionSheetVisible(true)}
+            style={styles.blockButton}
+          >
+            <AntDesign name="deleteuser" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
       <Animated.View
         style={{
           ...styles.profileContainer,
-          opacity: profileOpacity,
           zIndex: profileZIndex,
         }}
       >
@@ -513,56 +475,7 @@ const UserCard = ({ navigation, route }) => {
             >
               <Text style={styles.chatButtonText}>Message</Text>
             </TouchableOpacity>
-          </View>         
-                  
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.horizontalInfoScrollView}
-          >
-          {class_year && (
-            <View style={styles.infoContainer}>
-              <Entypo name="graduation-cap" size={22} color="white" />
-              <Text style={styles.bio}>  {class_year}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-          )} 
-          {major && (
-            <View style={styles.infoContainer}>
-              <Entypo name="open-book" size={22} color="white" />
-              <Text style={styles.bio}>  {major}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-            
-          )}
-          {age && (
-            <View style={styles.infoContainer}>
-              <MaterialIcons name="cake" size={22} color="white" />
-              <Text style={styles.bio}>  {age}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-          )}
-          {gender && (
-            <View style={styles.infoContainer}>
-              <Ionicons name="md-person-sharp" size={22} color="white" />
-              <Text style={styles.bio}>  {gender}</Text>
-              <View style={styles.verticalDivider}/>
-            </View>
-          )}
-          {hometown && (
-            <View style={styles.infoContainer} paddingRight={30}>
-              <MaterialIcons name="home-filled" size={26} color="white" />
-              <Text style={styles.bio}>  {hometown}</Text>
-            </View>
-          )}
-        </ScrollView>
-        {bio && (
-          <View style={styles.bioContainer}>
-            <View style={styles.roundedContainer}>
-              <Text style={styles.bio}>{bio}</Text>
-            </View>
           </View>
-        )}
           <TouchableOpacity
             style={styles.questionaireButtonContainer}
             onPress={() => handleQuestionaireButtonPress()}
@@ -572,29 +485,110 @@ const UserCard = ({ navigation, route }) => {
               View Questionaire Responses
             </Text>
           </TouchableOpacity>
-          <ScrollView
-            horizontal
-            style={styles.horizontalScrollView}
-            showsHorizontalScrollIndicator={false}
-            bounces={false}
+
+          <View
+            style={[styles.roundedContainer, { backgroundColor: "#181d2b" }]}
           >
-            {prompts.map((item, index) =>
-              item.answer ? (
-                <View key={index} style={styles.itemContainer}>
-                  <Text style={styles.itemPrompt}>
-                    {promptQuestions[item.prompt]}
-                  </Text>
-                  <Text style={styles.itemAnswer}>{item.answer}</Text>
+            <Text style={styles.bioHeader} paddingBottom={15}>
+              Details
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              paddingBottom={20}
+              paddingTop={4}
+              paddingHorizontal={15}
+            >
+              {class_year && (
+                <View style={styles.infoContainer}>
+                  <Entypo name="graduation-cap" size={22} color="white" />
+                  <Text style={styles.detailsText}> {class_year}</Text>
+                  <View style={styles.verticalDivider} />
                 </View>
-              ) : null
-            )}
-          </ScrollView>
-          <View style={styles.tagsContainer}>
-            {tags.map((tag, index) => (
-              <View key={index} style={styles.tag}>
-                <Text style={styles.tagText}>{tag}</Text>
+              )}
+
+              {age && (
+                <View style={styles.infoContainer}>
+                  <MaterialIcons name="cake" size={22} color="white" />
+                  <Text style={styles.detailsText}>{age}</Text>
+                  <View style={styles.verticalDivider} />
+                </View>
+              )}
+              {gender && (
+                <View style={styles.infoContainer}>
+                  <Ionicons name="md-person-sharp" size={22} color="white" />
+                  <Text style={styles.detailsText}>{gender}</Text>
+                </View>
+              )}
+              {major && (
+                <View style={styles.infoContainer}>
+                  <View style={styles.verticalDivider2} />
+                  <Entypo name="open-book" size={22} color="white" />
+                  <Text style={styles.detailsText}> {major}</Text>
+                </View>
+              )}
+              {!hometown && (
+                <View style={styles.infoContainer} paddingRight={33}></View>
+              )}
+              {hometown && (
+                <View style={styles.infoContainer} paddingRight={35}>
+                  <View style={styles.verticalDivider2} />
+                  <MaterialIcons
+                    name="home-filled"
+                    marginLeft={-2}
+                    size={26}
+                    color="white"
+                  />
+                  <Text style={styles.detailsText}>{hometown}</Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+
+          {bio && (
+            <View style={styles.roundedContainer}>
+              <View style={styles.bio}>
+                <View>
+                  <Text style={styles.bioHeader}>About {name}</Text>
+                  <Text style={styles.bioText}>{bio}</Text>
+                </View>
               </View>
-            ))}
+            </View>
+          )}
+
+          {prompts.some((item) => item.answer) && (
+            <View style={styles.roundedContainer}>
+              {prompts.some((item) => item.answer) && (
+                <Text style={styles.bioHeader}>Additional Info</Text>
+              )}
+              <ScrollView
+                horizontal
+                style={styles.horizontalScrollView}
+                showsHorizontalScrollIndicator={false}
+                bounces={false}
+              >
+                {prompts.map((item, index) =>
+                  item.answer ? (
+                    <View key={index} style={styles.itemContainer}>
+                      <Text style={styles.itemPrompt}>
+                        {promptQuestions[item.prompt]}
+                      </Text>
+                      <Text style={styles.itemAnswer}>{item.answer}</Text>
+                    </View>
+                  ) : null
+                )}
+              </ScrollView>
+            </View>
+          )}
+          <View style={styles.roundedContainer}>
+            <Text style={styles.bioHeader}>Interests</Text>
+            <View style={styles.tagsContainer} marginBottom={25}>
+              {tags.map((tag, index) => (
+                <View key={index} style={styles.tag}>
+                  <Text style={styles.tagText}>{tag}</Text>
+                </View>
+              ))}
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -605,47 +599,53 @@ const UserCard = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    zIndex: 300,
     padding: 16,
     marginHorizontal: 0,
     backgroundColor: "#1D1D20",
   },
+
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 13,
     marginTop: -80,
     paddingTop: 80,
     backgroundColor: "#1D1D20",
-    justifyContent: "space-between",
-    paddingVertical: 10,
-    zIndex: 3,
+    justifyContent: "center",
+    paddingVertical: 15,
   },
 
   backButton: {
+    position: "absolute",
+    left: 0,
+    paddingTop: 45,
     marginRight: 15,
     paddingLeft: 15,
-    paddingRight: 40,
+    zIndex: 10000000,
   },
   blockButton: {
+    position: "absolute",
+    right: 0,
+    paddingTop: 70,
     paddingRight: 10,
   },
   name: {
     fontSize: 20,
-    marginRight: -50,
     fontWeight: "600",
     color: "white",
     textAlign: "center",
   },
   questionaireButtonContainer: {
     flex: 1,
-    marginHorizontal: 10,
+    marginHorizontal: 13,
+    marginTop: 4,
     backgroundColor: "#14999999", //#2B2D2F
-    paddingVertical: 10,
-    borderRadius: 15,
+    paddingVertical: 12,
+    borderRadius: 12,
     //marginBottom: 10,
     borderWidth: 0.4,
     alignItems: "center",
+    marginBottom: 15,
   },
   scrollView: {
     flex: 1,
@@ -658,13 +658,15 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     paddingTop: 550,
-    zIndex: 1,
+    //marginTop: 550,
+    //zIndex: 1,
   },
 
   backButtonText: {
     fontSize: 30,
     color: "#149999",
-    zIndex: 1,
+
+    zIndex: 10000000,
   },
 
   photoContainer: {
@@ -694,8 +696,8 @@ const styles = StyleSheet.create({
     flex: 1,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    paddingTop: 10,
-    marginTop: -8,
+    paddingTop: 12,
+    marginTop: -10,
     //shadow
     shadowColor: "#000",
     shadowOffset: {
@@ -705,6 +707,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.75,
     shadowRadius: 4.84,
     zIndex: 2,
+    paddingBottom: 20,
   },
   fullPhoto: {
     width: "100%",
@@ -715,10 +718,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 0,
+    paddingHorizontal: 3,
   },
   friendButton: {
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 13,
     alignItems: "center",
     marginBottom: 10,
@@ -734,8 +737,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   chatButton: {
-    backgroundColor: "#1D1D20",
-    borderRadius: 10,
+    backgroundColor: "#181d2b",
+    borderRadius: 12,
     marginRight: 10,
     padding: 13,
     alignItems: "center",
@@ -752,51 +755,91 @@ const styles = StyleSheet.create({
   bioContainer: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: "#1D1D20",
+    backgroundColor: "#363659",
     borderRadius: 15,
     marginRight: 10,
     marginLeft: 10,
     marginBottom: 10,
     flexDirection: "row",
     borderWidth: 0.4,
-    //borderColor: "grey",
-  },
-  roundedContainer: {
-    backgroundColor: "#1D1D20",
-    borderRadius: 50,
-    padding: 1,
   },
   bio: {
+    fontSize: 18,
+    fontWeight: "600",
+    paddingBottom: 25,
+    paddingTop: 5,
+  },
+  bioHeader: {
+    alignSelf: "center",
+    fontWeight: "600",
+    paddingBottom: 20,
+    marginTop: 20,
+    marginBottom: 5,
+    fontSize: 20,
+    color: "white",
+  },
+  bioText: {
+    fontSize: 16,
+    marginLeft: 25,
+    marginRight: 25,
+    color: "white",
+  },
+  detailsText: {
     color: "white",
     fontSize: 16,
     textAlign: "justify",
   },
-  ageMajorGradeContainer: {
-    paddingHorizontal: 20,
-    flexDirection: "column",
-    alignItems: "stretch",
+  details: {
+    alignItems: "left",
     justifyContent: "center",
-    backgroundColor: "#1D1D20",
-    borderRadius: 15,
-    marginBottom: 10,
-    paddingVertical: 15,
-    borderWidth: 0.4,
-    marginRight: 10,
-    marginLeft: 10,
-    //borderColor: "grey",
+    gap: 23,
   },
-  divider: {
-    height: 0.3,
-    backgroundColor: "grey",
-    marginVertical: 12,
-    marginHorizontal: -10,
+
+  major: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 0,
+    gap: 10,
+    justifyContent: "left",
+  },
+  icons: {
+    alignContent: "center",
+    alignItems: "center",
+    gap: 17,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingLeft: 10, // Space on the left side of the row
+    paddingRight: 20,
+  },
+  leftColumn: {
+    flexDirection: "column",
+    gap: 5,
+  },
+  rightColumn: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 5,
+  },
+  iconAndText: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  detailsText: {
+    marginLeft: 10,
+    color: "white",
+    fontSize: 16,
   },
   tagsContainer: {
-    backgroundColor: "#111111",
+    backgroundColor: "#181d2b",
     flexDirection: "row",
     flexWrap: "wrap",
-    paddingVertical: 10,
-    marginBottom: 40,
+    paddingBottom: 25,
+    marginTop: -2,
+    marginBottom: 0,
     borderRadius: 15,
     justifyContent: "center",
     // borderWidth: 0.4,
@@ -818,19 +861,16 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "600",
   },
-  horizontalScrollView: {
-    borderBottomEndRadius: 20,
-    borderBottomStartRadius: 20,
-  },
+
   itemContainer: {
     marginHorizontal: 15,
-    backgroundColor: "#1D1D20",
-    borderWidth: 0.5,
+    backgroundColor: "#2c3c4f",
+    //borderWidth: 0.5,
     //borderColor: "lightgrey",
     borderRadius: 50,
     padding: 30,
     width: 300,
-    marginVertical: 15,
+    marginBottom: 25,
     minWidth: 150,
     gap: 10,
   },
@@ -860,8 +900,9 @@ const styles = StyleSheet.create({
   infoContainer: {
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
     flexDirection: "row",
+    backgroundColor: "#181d2b",
   },
 
   verticalDivider: {
@@ -869,12 +910,32 @@ const styles = StyleSheet.create({
     backgroundColor: "grey",
     height: "100%",
     alignSelf: "center",
-    marginLeft: 15,
-    marginRight: -5,
+    marginLeft: 20,
+    marginRight: 10,
   },
-  icon: {
-    width: 30,
-    height: 30,
+  verticalDivider2: {
+    width: 0.3,
+    backgroundColor: "grey",
+    height: "100%",
+    alignSelf: "center",
+    marginLeft: 9,
+    marginRight: 20,
+  },
+  profileDetails: {
+    flex: 1,
+    padding: 16,
+    paddingVertical: 20,
+    paddingTop: 0,
+    gap: 10,
+    marginBottom: -5,
+  },
+
+  roundedContainer: {
+    backgroundColor: "#181d2b",
+    borderRadius: 20,
+    padding: 0,
+    marginBottom: 15,
+    marginHorizontal: 15,
   },
 });
 

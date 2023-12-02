@@ -21,21 +21,31 @@ const FiltersUI = ({ route }) => {
     currentOldestAgePreference,
     currentStudyPreference,
     originalGenderPreference,
-    originalHousingPreference
+    originalHousingPreference,
   } = route.params;
 
-
-  const [housingPreference, setHousingPreference] = useState(currentHousingPreference || "Any");
-  const [genderPreference, setGenderPreference] = useState(currentGenderPreference || "Any");
-  const [youngestAgePreference, setYoungestAgePreference] = useState(currentYoungestAgePreference || "Any");
-  const [oldestAgePreference, setOldestAgePreference] = useState(currentOldestAgePreference || "Any");
-  const [studyPreference, setStudyPreference] = useState(currentStudyPreference || "Any");
+  const [housingPreference, setHousingPreference] = useState(
+    currentHousingPreference || "Any"
+  );
+  const [genderPreference, setGenderPreference] = useState(
+    currentGenderPreference || "Any"
+  );
+  const [youngestAgePreference, setYoungestAgePreference] = useState(
+    currentYoungestAgePreference || "Any"
+  );
+  const [oldestAgePreference, setOldestAgePreference] = useState(
+    currentOldestAgePreference || "Any"
+  );
+  const [studyPreference, setStudyPreference] = useState(
+    currentStudyPreference || "Any"
+  );
   const [isFocus, setIsFocus] = useState(false);
 
   const roomOptions = [
-    { label: "Any", value: "Any" },
+    { label: "Any", value: "No Preferences" },
     { label: "Apartment", value: "Apartment" },
     { label: "Dorm", value: "Dorm" },
+    { label: "House", value: "House" },
   ];
 
   const genders = [
@@ -54,8 +64,8 @@ const FiltersUI = ({ route }) => {
   ];
 
   const studies = [
-    { label: 'Any', value: 'Any' },
-    { label: "Business", value: "Business" }, 
+    { label: "Any", value: "Any" },
+    { label: "Business", value: "Business" },
     { label: "Natural Science", value: "Natural Science" },
     { label: "Mathematics", value: "Mathematics" },
     { label: "Social Science", value: "Social Science" },
@@ -65,13 +75,12 @@ const FiltersUI = ({ route }) => {
   ];
 
   const handleApplyFilters = () => {
-    
     navigation.navigate("Home", {
       housingPreference,
       genderPreference,
       youngestAgePreference,
       oldestAgePreference,
-      studyPreference
+      studyPreference,
     });
   };
 
@@ -87,9 +96,12 @@ const FiltersUI = ({ route }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.swipeIndicator}></View>
       <View style={styles.headerContainer}>
-        <View style={{ width: '33%' }}></View>
+        <View style={{ width: "33%" }}></View>
         <Text style={styles.headerText}>Filters</Text>
-        <TouchableOpacity onPress={resetFilters} style={{ width: '33%', alignItems: 'flex-end' }}>
+        <TouchableOpacity
+          onPress={resetFilters}
+          style={{ width: "33%", alignItems: "flex-end" }}
+        >
           <Text style={styles.clearAllText}>Reset Filters</Text>
         </TouchableOpacity>
       </View>
@@ -100,7 +112,7 @@ const FiltersUI = ({ route }) => {
           data={roomOptions}
           maxHeight={300}
           labelField="label"
-          placeholderStyle={{ backgroundColor: "white"}}
+          placeholderStyle={{ backgroundColor: "white" }}
           valueField="value"
           selectedTextStyle={styles.placeholderText}
           itemTextStyle={styles.placeholderText}
@@ -108,8 +120,7 @@ const FiltersUI = ({ route }) => {
           containerStyle={styles.border}
           autoScroll={false}
           showsVerticalScrollIndicator={false}
-          activeColor="#2D2D30"
-          placeholder="Select Housing Preference"
+          activeColor="#2b3138"
           searchPlaceholder="Search..."
           value={housingPreference}
           onFocus={() => setIsFocus(true)}
@@ -135,7 +146,7 @@ const FiltersUI = ({ route }) => {
           containerStyle={styles.border}
           autoScroll={false}
           showsVerticalScrollIndicator={false}
-          activeColor="#2D2D30"
+          activeColor="#2b3138"
           placeholder="Select Gender Preference"
           searchPlaceholder="Search..."
           value={genderPreference}
@@ -162,7 +173,7 @@ const FiltersUI = ({ route }) => {
           containerStyle={styles.border}
           autoScroll={false}
           showsVerticalScrollIndicator={false}
-          activeColor="#2D2D30"
+          activeColor="#2b3138"
           placeholder="Select Youngest Age Preference"
           searchPlaceholder="Search..."
           value={youngestAgePreference}
@@ -189,7 +200,7 @@ const FiltersUI = ({ route }) => {
           containerStyle={styles.border}
           autoScroll={false}
           showsVerticalScrollIndicator={false}
-          activeColor="#2D2D30"
+          activeColor="#2b3138"
           placeholder="Select Oldest Age Preference"
           searchPlaceholder="Search..."
           value={oldestAgePreference}
@@ -216,7 +227,7 @@ const FiltersUI = ({ route }) => {
           containerStyle={styles.border}
           autoScroll={false}
           showsVerticalScrollIndicator={false}
-          activeColor="#2D2D30"
+          activeColor="#2b3138"
           placeholder="Select Area of Preference"
           searchPlaceholder="Search..."
           value={studyPreference}
@@ -229,10 +240,10 @@ const FiltersUI = ({ route }) => {
         />
       </View>
       <TouchableOpacity onPress={handleApplyFilters}>
-      <View style={styles.applyButtonContainer}>
-        <Text style={styles.applyButtonText}>Apply Filters</Text>
-      </View>
-    </TouchableOpacity>
+        <View style={styles.applyButtonContainer}>
+          <Text style={styles.applyButtonText}>Apply Filters</Text>
+        </View>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -243,31 +254,30 @@ const styles = StyleSheet.create({
     backgroundColor: "#1D1D20",
   },
   headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 15,
     //borderBottomWidth: 0.5,
-    borderColor: 'grey'
+    borderColor: "grey",
   },
   headerText: {
     fontSize: 25,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
     alignSelf: "center",
-    width: '33%',
-    textAlign: 'center'
+    width: "33%",
+    textAlign: "center",
   },
   clearAllText: {
     fontSize: 15,
-    fontWeight: 'bold',
-    color: 'grey' 
+    fontWeight: "bold",
+    color: "grey",
   },
   filterContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginVertical: 10,
     marginHorizontal: 16,
-    
   },
   filterLabel: {
     fontSize: 16,
@@ -278,14 +288,14 @@ const styles = StyleSheet.create({
   dropdown: {
     flex: 1,
     borderColor: "gray",
-    
+
     //borderWidth: 0.5,
     borderRadius: 8,
     color: "white",
     paddingHorizontal: 8,
     borderRadius: 8,
     backgroundColor: "white",
-    backgroundColor: "#2D2D30",
+    backgroundColor: "#2b3138",
   },
   divider: {
     height: 0.5,
@@ -299,7 +309,7 @@ const styles = StyleSheet.create({
   applyButtonContainer: {
     alignSelf: "center",
     backgroundColor: "#149999",
-    borderRadius: 10,  
+    borderRadius: 10,
     marginTop: 20,
   },
   applyButtonText: {
@@ -320,16 +330,16 @@ const styles = StyleSheet.create({
   border: {
     borderColor: "grey",
     borderRadius: 2,
-    backgroundColor: "#1D1D20"
+    backgroundColor: "#1D1D20",
   },
   swipeIndicator: {
-    alignSelf: 'center',
+    alignSelf: "center",
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: 'grey',
+    backgroundColor: "grey",
     marginTop: 25,
-    marginBottom: 5, 
+    marginBottom: 5,
   },
 });
 

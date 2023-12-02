@@ -41,10 +41,27 @@ export const SignUp = ({ navigation }) => {
     setPasswordsMatch(true);
     setIsError(null);
 
-    if (form.password === form.confirmPassword) {
+    // Check if the last 4 characters of email are ".edu"
+    if (form.email.slice(-4) !== ".edu") {
+      startShakeAnimation(shakeAnimationValue);
+      setIsError("Must use the email provided by your college");
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      startShakeAnimation(shakeAnimationValue);
+      setPasswordsMatch(false);
+      return;
+    }
+
+    try {
+      // If all checks pass, proceed with sign-up
       const { data, error } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
+        options: {
+          emailRedirectTo: "https://thecabanaapp.com/congratulations",
+        },
       });
 
       if (error) {
@@ -54,9 +71,10 @@ export const SignUp = ({ navigation }) => {
       } else {
         setIsSignedUp(true);
       }
-    } else {
-      startShakeAnimation(shakeAnimationValue);
-      setPasswordsMatch(false);
+    } catch (error) {
+      // Handle any unexpected errors during sign-up
+      //console.error("Error during sign-up:", error);
+      // You can set an appropriate error message here if needed
     }
   };
 
@@ -91,6 +109,7 @@ export const SignUp = ({ navigation }) => {
                 Check your email for an account verification email, and then
                 sign in!
               </Text>
+              <Text style={styles.sloganText}>(it might be in your spam)</Text>
               <View style={styles.verifyFormAction}>
                 <TouchableOpacity
                   onPress={() => {
@@ -107,8 +126,16 @@ export const SignUp = ({ navigation }) => {
           </>
         ) : (
           <View style={styles.container}>
+            <TouchableOpacity
+              onPress={() => {
+                // handle onPress
+                navigation.goBack();
+              }}
+            >
+              <Text style={styles.backButtonText}>←</Text>
+            </TouchableOpacity>
             <View style={styles.header}>
-              <Image source={logo} style={styles.headerImage} alt="Logo " />
+              {/*<Image source={logo} style={styles.headerImage} alt="Logo " />*/}
               <Text style={styles.titleText}>Create an Account!</Text>
             </View>
 
@@ -216,16 +243,19 @@ const styles = StyleSheet.create({
   header: {
     flex: 0,
     flexDirection: "row",
-    justifyContent: "left",
+    alignItems: "center",
+    justifyContent: "center",
     gap: "10%",
-    marginBottom: "20%",
+    marginTop: "5%",
+    marginBottom: "10%",
     //padding: "0%",
   },
 
   verifyHeader: {
     flex: 0,
     flexDirection: "row",
-    justifyContent: "left",
+    alignItems: "center",
+    //alignSelf: "center",
     gap: "10%",
     marginBottom: "10%",
     //padding: "0%",
@@ -234,7 +264,6 @@ const styles = StyleSheet.create({
   headerImage: {
     width: 40,
     height: 40,
-    //alignSelf: "center",
     marginBottom: 0,
   },
 
@@ -242,10 +271,10 @@ const styles = StyleSheet.create({
     fontFamily: "Verdana-Bold",
     fontSize: 27,
     fontWeight: "700",
-    textAlign: "center",
+
+    //textAlign: "center",
     //AlignSelf: "center",
     color: "#fff",
-    paddingTop: 5,
   },
 
   sloganText: {
@@ -329,6 +358,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 10,
+  },
+
+  backButtonText: {
+    fontSize: 30,
+    color: "#149999",
+    zIndex: 1,
   },
 });
 

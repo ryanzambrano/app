@@ -56,7 +56,7 @@ export const MatchingData = ({ navigation, route }) => {
   };
 
   handleSaveSleepTime = () => {
-    if (!selectedSleepTime) setSelectedSleepTime("8 PM");
+    if (!selectedSleepTime) setSelectedSleepTime("Morning Person");
     closeSleepTimeModal();
   };
 
@@ -150,7 +150,12 @@ export const MatchingData = ({ navigation, route }) => {
                     }
                   >
                     {tidinessLevels.map((level) => (
-                      <Picker.Item key={level} label={level} value={level} />
+                      <Picker.Item
+                        color="white"
+                        key={level}
+                        label={level}
+                        value={level}
+                      />
                     ))}
                   </Picker>
                 </View>
@@ -195,7 +200,12 @@ export const MatchingData = ({ navigation, route }) => {
                     }
                   >
                     {sleepTimes.map((time) => (
-                      <Picker.Item key={time} label={time} value={time} />
+                      <Picker.Item
+                        color="white"
+                        key={time}
+                        label={time}
+                        value={time}
+                      />
                     ))}
                   </Picker>
                 </View>
@@ -238,7 +248,12 @@ export const MatchingData = ({ navigation, route }) => {
                     onValueChange={(itemValue) => setSelectedNoise(itemValue)}
                   >
                     {noisePreferences.map((pref) => (
-                      <Picker.Item key={pref} label={pref} value={pref} />
+                      <Picker.Item
+                        color="white"
+                        key={pref}
+                        label={pref}
+                        value={pref}
+                      />
                     ))}
                   </Picker>
                 </View>
@@ -375,7 +390,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     marginTop: "100%",
-    backgroundColor: "lightgrey",
+    backgroundColor: "#111111",
     justifyContent: "space-around",
     gap: "50%",
   },

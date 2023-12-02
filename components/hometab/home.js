@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import {
   Image,
   TextInput,
@@ -10,6 +10,7 @@ import {
   FlatList,
   SafeAreaView,
   Alert,
+  RefreshControl,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
@@ -19,8 +20,14 @@ import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator } from "react-native";
+import { availableTags } from "../auth/profileUtils.js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { calculateCompatibility } from "../auth/profileUtils.js";
+import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 
 const logo = require("../../assets/logo4.png");
+
 const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
 
@@ -30,7 +37,7 @@ const Home = ({ route }) => {
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [sessionUser, setSessionuser] = useState(session.user);
-  const [sortMethod, setSortMethod] = useState("Most Compatible");
+  const [sortMethod, setSortMethod] = useState("Recommended");
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -39,7 +46,87 @@ const Home = ({ route }) => {
   const [usersBlockingMe, setUsersBlockingMe] = useState([]);
   const [gendaPreference, setGendaPreference] = useState("Any");
   const [housinPreference, setHousinPreference] = useState("Any");
+  const [refreshing, setRefreshing] = useState(false);
   const isFocused = useIsFocused();
+  const [renderLimit, setRenderLimit] = useState(5);
+  const flatListRef = useRef(null);
+  const [expoPushToken, setExpoPushToken] = useState("");
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setRenderLimit(5);
+    fetchUsers().then(() => setRefreshing(false));
+  }, []);
+
+  const onHomePageVisit = async () => {
+    try {
+      await AsyncStorage.setItem("homepageVisited", "true");
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const scrollToTop = () => {
+    flatListRef.current?.scrollToOffset({ animated: true, offset: 0 });
+  };
+  async function registerForPushNotificationsAsync() {
+    let token;
+
+    const storedToken = await AsyncStorage.getItem("expoPushToken");
+    if (storedToken !== null) {
+      //alert(storedToken);
+      return storedToken;
+    }
+
+    if (Platform.OS === "android") {
+      await Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
+    }
+
+    if (Device.isDevice) {
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== "granted") {
+        //alert("Failed to get push token for push notification!");
+        return;
+      }
+      // Learn more about projectId:
+      // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
+      token = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId: "ad275287-fa4a-4f70-8397-8df453abd9a8",
+        })
+      ).data;
+
+      await AsyncStorage.setItem("expoPushToken", token);
+    } else {
+      //   //alert("Must use physical device for Push Notifications");
+    }
+
+    const { data: istoken, error } = await supabase
+      .from("UGC")
+      .select("notification_token")
+      .eq("user_id", session.user.id);
+
+    if (istoken.notification_token === null) {
+      //console.log(token)
+      const { data: tokendata, error } = await supabase
+        .from("UGC")
+        .update({ notification_token: token })
+        .eq("user_id", session.user.id);
+    }
+
+    return token;
+  }
 
   const {
     housingPreference = housinPreference,
@@ -89,68 +176,38 @@ const Home = ({ route }) => {
           onPress: () => setSortMethod("Shared Interests"),
         },
         {
-          text: "Most Compatible",
-          onPress: () => setSortMethod("Most Compatible"),
+          text: "Recommended",
+          onPress: () => setSortMethod("Recommended"),
         },
       ],
       { cancelable: true }
     );
   };
 
-  const calculateCompatibility = (sessionUser, otherUser) => {
-    //console.log(otherUser.profiles.sleep_time);
-    //console.log(sessionUser.profiles.sleep_time);
+  const sortedUsers = useMemo(() => {
+    return users.sort((a, b) => {
+      //console.log(a, b);
+      switch (sortMethod) {
+        case "Alphabetical Order":
+          return a.name.localeCompare(b.name);
 
-    let score = 0;
+        case "Shared Interests":
+          const aTagsCount = a.tags.filter((tag) =>
+            sessionUser.tags.includes(tag)
+          ).length;
+          const bTagsCount = b.tags.filter((tag) =>
+            sessionUser.tags.includes(tag)
+          ).length;
+          return bTagsCount - aTagsCount;
 
-    if (Array.isArray(sessionUser.tags) && Array.isArray(otherUser.tags)) {
-      sessionUser.tags.forEach((tag) => {
-        if (otherUser.tags.includes(tag)) score += 4;
-      });
-    }
-    if (sessionUser.profiles.for_fun === otherUser.profiles.for_fun) score += 5;
-    if (sessionUser.profiles.tidiness === otherUser.profiles.tidiness)
-      score += 5;
-    if (
-      sessionUser.profiles.noise_preference ===
-      otherUser.profiles.noise_preference
-    )
-      score += 5;
-    if (sessionUser.profiles.sleep_time === otherUser.profiles.sleep_time)
-      score += 5;
-    if (
-      sessionUser.profiles.living_preferences ===
-      otherUser.profiles.living_preferences
-    )
-      score += 5;
-    if (sessionUser.profiles.studies === otherUser.profiles.studies) score += 3;
-    
-    if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 2;
-    if (sessionUser.class_year === otherUser.class_year) score += 2;
-    if (sessionUser.profiles.gender === otherUser.profiles.gender) score += 1;
-    return score;
-  };
-
-  const sortedUsers = users.sort((a, b) => {
-    //console.log(a, b);
-    switch (sortMethod) {
-      case "Alphabetical Order":
-        return a.name.localeCompare(b.name);
-      case "Shared Interests":
-        const aTagsCount = a.tags.filter((tag) =>
-          sessionUser.tags.includes(tag)
-        ).length;
-        const bTagsCount = b.tags.filter((tag) =>
-          sessionUser.tags.includes(tag)
-        ).length;
-        return bTagsCount - aTagsCount;
-      case "Most Compatible":
-      default:
-        const aScore = calculateCompatibility(sessionUser, a);
-        const bScore = calculateCompatibility(sessionUser, b);
-        return bScore - aScore;
-    }
-  });
+        case "Most Compatible":
+        default:
+          const aScore = calculateCompatibility(sessionUser, a);
+          const bScore = calculateCompatibility(sessionUser, b);
+          return bScore - aScore;
+      }
+    });
+  }, [users, sortMethod]);
 
   const filteredUsers = sortedUsers.filter((user) => {
     const isSessionUser = user.user_id === session.user.id;
@@ -164,17 +221,21 @@ const Home = ({ route }) => {
       tag.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    // console.log(housingPreference);
     const isHousingMatch =
       housingPreference === "Any" ||
-      user.profiles.living_preferences === housingPreference || user.profiles.living_preferences === "No Preference";
+      user.profiles.living_preferences === housingPreference ||
+      user.profiles.living_preferences === "No Preferences" ||
+      housingPreference === "No Preferences";
+
     //console.log(isHousingMatch);
     const isGenderMatch =
       genderPreference === "Any" || user.profiles.gender === genderPreference;
-  
+
     const isAgeMatch =
-      (youngestAgePreference === "Any" || user.profiles.age >= youngestAgePreference) &&
-      (oldestAgePreference === "Any" || user.profiles.age <= oldestAgePreference);
+      (youngestAgePreference === "Any" ||
+        user.profiles.age >= youngestAgePreference) &&
+      (oldestAgePreference === "Any" ||
+        user.profiles.age <= oldestAgePreference);
     const isStudyMatch =
       studyPreference === "Any" || user.profiles.studies === studyPreference;
 
@@ -193,7 +254,7 @@ const Home = ({ route }) => {
         (isStudyMatch || studyPreference === "Any")
       );
     }
-    
+
     return (
       (nameMatch || tagMatch) &&
       (isHousingMatch || housingPreference === "Any") &&
@@ -204,142 +265,142 @@ const Home = ({ route }) => {
     );
   });
 
-  useEffect(() => {
-    //setIsLoading(true);
-    const fetchUsers = async () => {
-      try {
-        const { data: ugcData, error: ugcError } = await supabase
+  const renderedUsers = filteredUsers.slice(0, renderLimit);
+
+  const fetchUsers = async () => {
+    try {
+      const { data: ugcData, error: ugcError } = await supabase
+        .from("UGC")
+        .select("*")
+        .neq("has_ugc", false)
+        .neq("profile_viewable", false);
+      const { data: profileData, error: profileError } = await supabase
+        .from("profile")
+        .select("*")
+        .neq("profile_complete", false);
+      const { data: imageData, error: imageError } = await supabase
+        .from("images")
+        .select("*")
+        .eq("image_index", 0)
+        .neq("last_modified", null);
+
+      if (ugcError || profileError || imageError) {
+        console.error(ugcError || profileError || imageError);
+      } else {
+        const mergedData = ugcData.map((ugcUser) => {
+          const relatedProfileData = profileData.find(
+            (profileUser) => profileUser.user_id === ugcUser.user_id
+          );
+          const relatedImageData = imageData.find(
+            (img) => img.user_id === ugcUser.user_id
+          );
+          if (
+            ugcUser.has_ugc &&
+            relatedProfileData?.profile_complete &&
+            relatedImageData?.last_modified
+          ) {
+            return {
+              ...ugcUser,
+              profiles: relatedProfileData,
+              lastModified: relatedImageData?.last_modified || null,
+            };
+          } else {
+            return null;
+          }
+        });
+        const filteredData = mergedData.filter((user) => user !== null);
+
+        const userId = session.user.id;
+        const ugcResponse = await supabase
           .from("UGC")
-          .select("*")
-          .neq("has_ugc", false);
-        const { data: profileData, error: profileError } = await supabase
+          .select("name, bio, tags, major, class_year, hometown")
+          .eq("user_id", userId)
+          .single();
+        const profileResponse = await supabase
           .from("profile")
           .select("*")
-          .neq("profile_complete", false);
-        const { data: imageData, error: imageError } = await supabase
-          .from("images")
-          .select("*")
-          .eq("image_index", 0)
-          .neq("last_modified", null);
-      
-          if (ugcError || profileError || imageError) {
-            console.error(ugcError || profileError || imageError);
-          } 
-          else {
-            const mergedData = ugcData.map((ugcUser) => {
-              const relatedProfileData = profileData.find(
-                (profileUser) => profileUser.user_id === ugcUser.user_id
-              );
-              const relatedImageData = imageData.find(
-                (img) => img.user_id === ugcUser.user_id
-              );
-              if (
-                ugcUser.has_ugc &&
-                relatedProfileData?.profile_complete &&
-                relatedImageData?.last_modified
-              ) {
-                return {
-                  ...ugcUser,
-                  profiles: relatedProfileData,
-                  lastModified: relatedImageData?.last_modified || null,
-                };
-              } else {
-                return null;
-            }
-          });
-          const filteredData = mergedData.filter((user) => user !== null);
+          .eq("user_id", userId)
+          .single();
 
-          const userId = session.user.id;
-          const ugcResponse = await supabase
-            .from("UGC")
-            .select("name, bio, tags, major, class_year, hometown")
-            .eq("user_id", userId)
-            .single();
-          const profileResponse = await supabase
-            .from("profile")
-            .select("*")
-            .eq("user_id", userId)
-            .single();
-
-          if (ugcResponse.error || profileResponse.error) {
-            console.error(
-              ugcResponse.error?.message || profileResponse.error?.message
-            );
-          } else {
-            const mergedSessionUser = {
-              ...ugcResponse.data,
-              profiles: profileResponse.data,
-            };
-            setSessionuser(mergedSessionUser);
-            setGendaPreference(mergedSessionUser.profiles.who);
-            setHousinPreference(mergedSessionUser.profiles.living_preferences); 
-          }
-
-          
-          const { data: allBlockedProfilesData, error: allBlockedProfilesError } = 
-            await supabase
-              .from("UGC")
-              .select("user_id, blocked_profiles");
-          if (allBlockedProfilesError) {
-            console.error("Error fetching all blocked profiles:", allBlockedProfilesError.message);
-          } else {
-            const usersWhoBlockedMe = allBlockedProfilesData
-            .filter(user => Array.isArray(user.blocked_profiles) && user.blocked_profiles.includes(session.user.id))
-            .map(user => user.user_id);
-            //console.log(usersWhoBlockedMe);
-          setUsersBlockingMe(usersWhoBlockedMe);
-          }
-
-
-          const { data: bookmarkedData, error: bookmarkedError } =
-            await supabase
-              .from("UGC")
-              .select("bookmarked_profiles")
-              .eq("user_id", userId);
-          if (bookmarkedError) {
-            console.error(
-              "Error fetching bookmarked profiles:",
-              bookmarkedError.message
-            );
-          } else {
-            const { bookmarked_profiles } = bookmarkedData[0];
-            setBookmarkedProfiles(bookmarked_profiles);
-          }
-
-          const { data: blockedData, error: blockedError } = await supabase
-            .from("UGC")
-            .select("blocked_profiles")
-            .eq("user_id", userId);
-          if (blockedError) {
-            console.error(
-              "Error fetching blocked profiles:",
-              blockedError.message
-            );
-          } else {
-            const { blocked_profiles } = blockedData[0];
-            setBlockedProfiles(blocked_profiles);
-          }
-
-          setUsers(filteredData);
-          
+        if (ugcResponse.error || profileResponse.error) {
+          console.error(
+            ugcResponse.error?.message || profileResponse.error?.message
+          );
+        } else {
+          const mergedSessionUser = {
+            ...ugcResponse.data,
+            profiles: profileResponse.data,
+          };
+          setSessionuser(mergedSessionUser);
+          setGendaPreference(mergedSessionUser.profiles.who);
+          setHousinPreference(mergedSessionUser.profiles.living_preferences);
         }
-      } catch (error) {
-        console.error("An unexpected error occurred:", error);
+
+        const { data: allBlockedProfilesData, error: allBlockedProfilesError } =
+          await supabase.from("UGC").select("user_id, blocked_profiles");
+        if (allBlockedProfilesError) {
+          console.error(
+            "Error fetching all blocked profiles:",
+            allBlockedProfilesError.message
+          );
+        } else {
+          const usersWhoBlockedMe = allBlockedProfilesData
+            .filter(
+              (user) =>
+                Array.isArray(user.blocked_profiles) &&
+                user.blocked_profiles.includes(session.user.id)
+            )
+            .map((user) => user.user_id);
+          //console.log(usersWhoBlockedMe);
+          setUsersBlockingMe(usersWhoBlockedMe);
+        }
+
+        const { data: bookmarkedData, error: bookmarkedError } = await supabase
+          .from("UGC")
+          .select("bookmarked_profiles")
+          .eq("user_id", userId);
+        if (bookmarkedError) {
+          console.error(
+            "Error fetching bookmarked profiles:",
+            bookmarkedError.message
+          );
+        } else {
+          const { bookmarked_profiles } = bookmarkedData[0];
+          setBookmarkedProfiles(bookmarked_profiles);
+        }
+
+        const { data: blockedData, error: blockedError } = await supabase
+          .from("UGC")
+          .select("blocked_profiles")
+          .eq("user_id", userId);
+        if (blockedError) {
+          console.error(
+            "Error fetching blocked profiles:",
+            blockedError.message
+          );
+        } else {
+          const { blocked_profiles } = blockedData[0];
+          setBlockedProfiles(blocked_profiles);
+        }
+
+        setUsers(filteredData);
       }
-      setIsLoading(false);
-    };
-
-    fetchUsers();
-    if (isFocused) {
-      fetchUsers();
+    } catch (error) {
+      console.error("An unexpected error occurred:", error);
+      alert("An unexpected error occurred, please try again later.");
     }
+    setIsLoading(false);
+    onHomePageVisit();
+  };
 
+  useEffect(() => {
+    fetchUsers();
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token)
+    );
     if (isBookmarked) {
       fetchUsers();
     }
-
-
-    //setIsLoading(false);
   }, [isFocused]);
 
   const handleUserCardPress = (user) => {
@@ -357,7 +418,7 @@ const Home = ({ route }) => {
 
   const renderUserCard = ({ item }) => {
     if (!item.lastModified) {
-      console.log(item);
+      //console.log(item);
       return null;
     }
     return (
@@ -370,14 +431,22 @@ const Home = ({ route }) => {
             }}
           />
           <View style={styles.userInfo}>
-            <Text style={styles.name}> {item.name} </Text>
-            <Text numberOfLines={1} ellipsizeMode='tail' style={styles.major}> {item.major || "Undecided"}</Text>
-            <View style={styles.tagsContainer}>
-              {item.tags.slice(0, 8).map((tag, index) => (
-                <View key={index} style={styles.tag}>
-                  <Text style={styles.tagText}>{tag}</Text>
-                </View>
-              ))}
+            <View style={styles.vClass}>
+              <Text style={styles.class}>{item.class_year}</Text>
+            </View>
+            <View style={styles.userStuff}>
+              <Text style={styles.name}> {item.name} </Text>
+              <Text numberOfLines={1} ellipsizeMode="tail" style={styles.major}>
+                {" "}
+                {item.major || "Undecided"}
+              </Text>
+              <View style={styles.tagsContainer}>
+                {item.tags.slice(0, 8).map((tag, index) => (
+                  <View key={index} style={styles.tag}>
+                    <Text style={styles.tagText}>{tag}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
           </View>
         </View>
@@ -388,10 +457,13 @@ const Home = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.logoTitleContainer}>
+        <TouchableOpacity
+          style={styles.logoTitleContainer}
+          onPress={() => scrollToTop()}
+        >
           <Image style={styles.logo} source={logo} />
           <Text style={styles.headerText}> Cabana </Text>
-        </View>
+        </TouchableOpacity>
         <View style={styles.buttonContainer}>
           <TouchableOpacity onPress={handleFiltersPress}>
             <Icon name="sliders" size={30} color="#fff" />
@@ -442,29 +514,17 @@ const Home = ({ route }) => {
           renderLoading()
         ) : (
           <FlatList
-            data={filteredUsers}
+            ref={flatListRef}
+            data={renderedUsers}
             extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
             renderItem={renderUserCard}
             keyExtractor={(item) => item.user_id.toString()}
-            // ListHeaderComponent={() => (
-            //   <>
-            //     <View style={styles.sortContainer}>
-            //       <Text style={styles.sortText}>Sort by:</Text>
-            //       <TouchableOpacity onPress={() => showSortMenu()}>
-            //         <Text
-            //           style={{
-            //             color: "#159e9e",
-            //             fontWeight: "bold",
-            //             fontSize: 15,
-            //           }}
-            //         >
-            //           {sortMethod}
-            //         </Text>
-            //       </TouchableOpacity>
-            //     </View>
-            //   </>
-            // )}
             ListEmptyComponent={renderEmptyComponent}
+            onEndReached={() => setRenderLimit((prevLimit) => prevLimit + 5)}
+            onEndReachedThreshold={0.1}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
           />
         )}
       </View>
@@ -535,7 +595,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#252d36",
     borderRadius: 10,
     paddingHorizontal: 15,
     marginTop: 5,
@@ -557,6 +617,12 @@ const styles = StyleSheet.create({
 
   userInfo: {
     flex: 1,
+  },
+
+  userStuff: {
+    flex: 1,
+    marginTop: -19,
+    justifyContent: "center",
   },
 
   userContainer: {
@@ -594,6 +660,7 @@ const styles = StyleSheet.create({
     borderRadius: 60,
     //borderWidth: 0.6,
     borderColor: "grey",
+    marginTop: -10,
   },
 
   major: {
@@ -608,7 +675,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: 600,
-    paddingTop: 10,
+    //paddingTop: 10,
     color: "white",
     zIndex: 1,
     //top: 60,
@@ -677,6 +744,22 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 20,
     color: "grey",
+  },
+  class: {
+    color: "grey",
+    //margin: 10,
+    fontSize: 16,
+    fontWeight: "500",
+    textAlign: "right",
+
+    flex: 1,
+  },
+  vClass: {
+    //flex: 1,
+    flexDirection: "row",
+    //backgroundColor: "blue",
+    marginTop: 7,
+    marginRight: 15,
   },
 });
 

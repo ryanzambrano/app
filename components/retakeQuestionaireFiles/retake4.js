@@ -185,7 +185,12 @@ export const Retake4 = ({ navigation, route }) => {
                     }
                   >
                     {tidinessLevels.map((level) => (
-                      <Picker.Item key={level} label={level} value={level} />
+                      <Picker.Item
+                        color="white"
+                        key={level}
+                        label={level}
+                        value={level}
+                      />
                     ))}
                   </Picker>
                 </View>
@@ -206,7 +211,7 @@ export const Retake4 = ({ navigation, route }) => {
           </View>
           <View style={styles.input}>
             <Text style={styles.inputHeader}>
-            What sleep schedule label fits you best?
+              What sleep schedule label fits you best?
             </Text>
             <TouchableOpacity onPress={() => setSleepTimeModalVisible(true)}>
               <View style={styles.inputControl}>
@@ -228,7 +233,12 @@ export const Retake4 = ({ navigation, route }) => {
                     }
                   >
                     {sleepTimes.map((time) => (
-                      <Picker.Item key={time} label={time} value={time} />
+                      <Picker.Item
+                        color="white"
+                        key={time}
+                        label={time}
+                        value={time}
+                      />
                     ))}
                   </Picker>
                 </View>
@@ -271,7 +281,12 @@ export const Retake4 = ({ navigation, route }) => {
                     onValueChange={(itemValue) => setSelectedNoise(itemValue)}
                   >
                     {noisePreferences.map((pref) => (
-                      <Picker.Item key={pref} label={pref} value={pref} />
+                      <Picker.Item
+                        color="white"
+                        key={pref}
+                        label={pref}
+                        value={pref}
+                      />
                     ))}
                   </Picker>
                 </View>
@@ -408,7 +423,7 @@ const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
     marginTop: "100%",
-    backgroundColor: "lightgrey",
+    backgroundColor: "#111111",
     justifyContent: "space-around",
     gap: "50%",
   },

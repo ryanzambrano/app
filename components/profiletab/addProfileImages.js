@@ -44,7 +44,7 @@ const ImagePickerScreen = ({ navigation, route }) => {
         .eq("user_id", session.user.id);
 
       if (error) {
-        alert(error.message);
+        console.log(error.message);
       }
 
       if (data) {
@@ -247,7 +247,9 @@ const ImagePickerScreen = ({ navigation, route }) => {
           await getProfilePicturs();
         }}
       >
-        <Icon name="times" size={25} color="grey" />
+        <View style={styles.buttonContainer}>
+          <Icon name="times" size={22} color="white" />
+        </View>
       </TouchableOpacity>
     );
   };
@@ -314,7 +316,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 30,
-    color: "#14999999",
+    color: "#149999",
   },
   headerText: {
     fontSize: 25,
@@ -369,7 +371,16 @@ const styles = StyleSheet.create({
   button: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginRight: 15,
+    marginRight: 0,
+    zIndex: 10000,
+  },
+
+  buttonContainer: {
+    backgroundColor: "#149999ff",
+    borderRadius: 20,
+    padding: 5,
+    paddingHorizontal: 7,
+    marginBottom: -28,
   },
 
   Vbutton: {
@@ -382,11 +393,12 @@ const styles = StyleSheet.create({
   profilePictureContainer: {
     width: 350,
     height: 350,
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#252d36",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 20,
     margin: 5,
+    marginBottom: 20,
   },
   image: {
     width: "100%",
@@ -395,7 +407,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     margin: 10,
   },
- 
 });
 
 export default ImagePickerScreen;

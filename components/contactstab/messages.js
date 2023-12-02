@@ -11,6 +11,7 @@ import {
   Platform,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { picURL } from "../auth/supabase.js";
 import { AntDesign } from "@expo/vector-icons";
@@ -22,6 +23,9 @@ import {
 } from "@react-navigation/native";
 import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
+import * as Animatable from "react-native-animatable";
+import { PanGestureHandler, State } from "react-native-gesture-handler";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const MessagingUI = () => {
   const isFocused = useIsFocused();
@@ -34,23 +38,45 @@ const MessagingUI = () => {
   const [messages, setMessages] = useState([]);
   const { session } = route.params;
   const { user } = route.params;
+  const { datamessages } = route.params;
   const { editedJoinedGroups } = route.params;
   const [joinedGroups, setJoinedGroups] = useState("");
   const [persons, setPersons] = useState([]);
   const [senderNames, setSenderNames] = useState({});
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
+  const handleSwipe = (event) => {
+    if (event.nativeEvent.translationX < -50) {
+      // Perform your swipe left action here
+      //console.log('Swiped left!');
+    }
+  };
+
+  //alert(user.profiles.age);
+
   const sendMessage = async () => {
     if (!isButtonDisabled && message.trim() !== "") {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          Message_Content: message,
+          Sent_From: session.user.id,
+          Group_ID_Sent_To: user.Group_ID,
+          Read: [session.user.id],
+        },
+      ]);
+      setMessage("");
+      animateMessage();
       setIsButtonDisabled(true); // Disable the button
 
       const { data, error } = await supabase
-        .from("Group Chat Messages")
+        .from("Group_Chat_Messages")
         .insert([
           {
             Message_Content: message,
             Group_ID_Sent_To: user.Group_ID,
             Sent_From: session.user.id,
+            Read: [session.user.id],
           },
         ])
         .select()
@@ -58,9 +84,6 @@ const MessagingUI = () => {
 
       if (error) {
         console.error(error);
-      } else {
-        setMessages((prevMessages) => [...prevMessages, data]);
-        setMessage("");
       }
 
       if (messages.length > 1) {
@@ -95,13 +118,28 @@ const MessagingUI = () => {
         }, {});
         setSenderNames(fetchedPersons);
 
+        const { data: profileResponse, error: profileError } = await supabase
+          .from("profile")
+          .select("age, gender")
+          .eq("user_id", extractedIds)
+          .single();
+
+        if (profileError) {
+          console.error(profileError.error.message);
+        } else {
+          user.profiles = profileResponse;
+          //alert(user.profiles.gender);
+        }
+
         // Check if user.images[0] exists and has a last_modified property
         if (user.images[0] && user.images[0].last_modified) {
           // Map last_modified to lastModified for each person in data
           const people = data.map((person) => ({
             ...person,
             lastModified: user.images[0].last_modified,
+            profiles: user.profiles,
           }));
+          //alert(user.profiles.age);
           setPersons(people);
         } else {
           const peoples = data.map((person) => person);
@@ -123,10 +161,36 @@ const MessagingUI = () => {
         .single();
 
       const { data: groupchatdata, error } = await supabase
-        .from("Group Chats")
+        .from("Group_Chats")
         .select("*")
         .eq("Group_ID", user.Group_ID)
         .single();
+
+      const { data: recentmessage1, error: recentmessageerror1 } =
+        await supabase
+          .from("Group_Chat_Messages")
+          .select("Read") // Update the "Read" column
+          .eq("Group_ID_Sent_To", user.Group_ID)
+          .order("created_at", { ascending: false })
+          .limit(1); // Get only the most recent message;
+      const readArray = recentmessage1[0]?.Read || [];
+      // Extract the Read array
+      if (!readArray.includes(session.user.id)) {
+        // Append session.user.id to the array
+        readArray.push(session.user.id);
+
+        const { data: recentmessagedata, error: recentmessageerror } =
+          await supabase
+            .from("Group_Chat_Messages")
+            .update({ Read: readArray }) // Update the "Read" column
+            .eq("Group_ID_Sent_To", user.Group_ID)
+            .order("created_at", { ascending: false })
+            .limit(1); // Get only the most recent message;
+
+        if (recentmessageerror) {
+          console.log(recentmessageerror);
+        }
+      }
 
       if (sessionError) {
         console.error(sessionError);
@@ -136,21 +200,16 @@ const MessagingUI = () => {
         (item) => item !== session.user.id
       );
       const { data: UGCdata, error: sessionErrors } = await supabase
-      .from("UGC")
-      .select("name")
-      .in("user_id", extractedIds);
+        .from("UGC")
+        .select("name")
+        .in("user_id", extractedIds);
       let Groupnames;
-      if(!user.Group_Name)
-      {
-        const joinedGroups = UGCdata.map(item => item.name);
+      if (!user.Group_Name) {
+        const joinedGroups = UGCdata.map((item) => item.name);
         Groupnames = joinedGroups.join(", ");
-      }
-      else
-      {
+      } else {
         Groupnames = user.Group_Name;
       }
-    
-
 
       setJoinedGroups(Groupnames);
       return;
@@ -161,10 +220,11 @@ const MessagingUI = () => {
   }
   useEffect(() => {
     if (isFocused) {
-      getJoinedGroups();
+      readMessages();
     }
     if (user.Ammount_Users <= 2) {
       fetchUsers();
+      readMessages();
     }
     if (editedJoinedGroups !== undefined) {
       setJoinedGroups(editedJoinedGroups);
@@ -175,8 +235,8 @@ const MessagingUI = () => {
     // This effect will run whenever isButtonDisabled changes
     if (isButtonDisabled) {
       // If the button is disabled, re-enable it after 1 second
-      const timeout = setTimeout(() => setIsButtonDisabled(false), 1000);
-      
+      const timeout = setTimeout(() => setIsButtonDisabled(false), 250);
+
       // Cleanup the timeout if the component unmounts or the dependency changes
       return () => clearTimeout(timeout);
     }
@@ -184,7 +244,7 @@ const MessagingUI = () => {
 
   const fetchMessages = async () => {
     const { data, error } = await supabase
-      .from("Group Chat Messages")
+      .from("Group_Chat_Messages")
       .select(`*, UGC (name)`)
       .eq("Group_ID_Sent_To", user.Group_ID)
       .order("created_at", { ascending: false })
@@ -199,32 +259,69 @@ const MessagingUI = () => {
       //console.log(data.UGC.name);
     }
   };
+  const readMessages = async () => {
+    const { data: recentmessage1, error: recentmessageerror1 } = await supabase
+      .from("Group_Chat_Messages")
+      .select("Read") // Update the "Read" column
+      .eq("Group_ID_Sent_To", user.Group_ID)
+      .order("created_at", { ascending: false })
+      .limit(1); // Get only the most recent message;
+    const readArray = recentmessage1[0]?.Read || [];
+    // Extract the Read array
+    if (!readArray.includes(session.user.id)) {
+      // Append session.user.id to the array
+      readArray.push(session.user.id);
+
+      const { data: recentmessagedata, error: recentmessageerror } =
+        await supabase
+          .from("Group_Chat_Messages")
+          .update({ Read: readArray }) // Update the "Read" column
+          .eq("Group_ID_Sent_To", user.Group_ID)
+          .order("created_at", { ascending: false })
+          .limit(1); // Get only the most recent message;
+
+      if (recentmessageerror) {
+        console.log(recentmessageerror);
+      }
+    }
+  };
+  animateMessage = () => {
+    this.messageRef.fadeIn(250); // You can adjust the duration (1000ms in this example)
+  };
 
   useEffect(() => {
     fetchMessages();
-
-    const channel = supabase
-      .channel("custom-all-channel")
+    const channel = supabase.channel("messaging");
+    const subscription = channel
       .on(
         "postgres_changes",
         {
-          event: "*",
+          event: "insert",
           schema: "public",
-          table: "Group Chat Messages",
-          filter: {
-            Group_ID_Sent_To: user.Group_ID,
-          },
+          table: "Group_Chat_Messages",
+          filter: `Group_ID_Sent_To=eq.${user.Group_ID}`,
         },
-        (payload) => {
-          fetchMessages();
+        (genericPayload) => {
+          if (genericPayload) {
+            if (
+              genericPayload.new.Sent_From != session.user.id &&
+              genericPayload.new.Group_ID_Sent_To == user.Group_ID
+            ) {
+              const data = genericPayload.new;
+              setMessages((prevMessages) => [...prevMessages, data]);
+              readMessages();
+            }
+          }
+          // Handle generic event
         }
       )
       .subscribe();
 
+    // Clean up the subscription when the component unmounts
     return () => {
-      supabase.removeChannel(channel);
+      subscription.unsubscribe();
     };
-  }, [session.user.id, messages]);
+  }, []);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -357,108 +454,116 @@ const MessagingUI = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : null}
-      keyboardVerticalOffset={Platform.OS === "ios" ? -5 : 0}
-    >
-      <View style={{ flex: 0.01 }}>
-        <ScrollView
-          ref={scrollViewRef}
-          contentContainerStyle={{ flexGrow: 1 }}
-        ></ScrollView>
-      </View>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Contacts")}
-        >
-          <AntDesign name="arrowleft" size={24} color="#159e9e" />
-        </TouchableOpacity>
-        <Text style={styles.contactName} numberOfLines={1}>
-          {joinedGroups}
-        </Text>
-        <TouchableOpacity onPress={navigateToProfile}>
-          {renderProfilePicture()}
-        </TouchableOpacity>
-      </View>
-      <View style={styles.messagesContainer}>
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={({ item, index }) => {
-            const isOwnMessage = item.Sent_From === session.user.id;
-            const isFirstOwnMessage =
-              isOwnMessage &&
-              (index === 0 ||
-                messages[index - 1].Sent_From !== session.user.id);
-            const isOtherMessage = item.Sent_From !== session.user.id;
-            const isFirstOtherMessage =
-              isOtherMessage &&
-              (index === 0 ||
-                messages[index - 1].Sent_From === session.user.id);
-            const shouldDisplaySenderName =
-              user.Ammount_Users >= 3 && isFirstOtherMessage;
+    <PanGestureHandler onGestureEvent={handleSwipe}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : null}
+        keyboardVerticalOffset={Platform.OS === "ios" ? -5 : 0}
+      >
+        <View style={{ flex: 0.01 }}>
+          <ScrollView
+            ref={scrollViewRef}
+            contentContainerStyle={{ flexGrow: 1 }}
+          ></ScrollView>
+        </View>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Contacts")}
+          >
+            <AntDesign name="arrowleft" size={24} color="#159e9e" />
+          </TouchableOpacity>
+          <Text style={styles.contactName} numberOfLines={1}>
+            {user.joinedGroups}
+          </Text>
+          <TouchableOpacity onPress={navigateToProfile}>
+            {renderProfilePicture()}
+          </TouchableOpacity>
+        </View>
+        <View style={styles.messagesContainer}>
+          <FlatList
+            ref={flatListRef}
+            data={messages}
+            renderItem={({ item, index }) => {
+              const isOwnMessage = item.Sent_From === session.user.id;
+              const isFirstOwnMessage =
+                isOwnMessage &&
+                (index === 0 ||
+                  messages[index - 1].Sent_From !== session.user.id);
+              const isOtherMessage = item.Sent_From !== session.user.id;
+              const isFirstOtherMessage =
+                isOtherMessage &&
+                (index === 0 ||
+                  messages[index - 1].Sent_From === session.user.id);
+              const shouldDisplaySenderName =
+                user.Ammount_Users >= 3 && isFirstOtherMessage;
 
-            return (
-              <View>
-                {shouldDisplaySenderName && (
-                  <Text style={styles.senderName}>{item.UGC.name}</Text>
-                )}
-                <View
-                  style={[
-                    styles.messageContainer,
-                    isOwnMessage
-                      ? styles.messageContainerRight
-                      : styles.messageContainerLeft,
-                    // conditionally apply the smaller margin styles
-                    isFirstOwnMessage
-                      ? {}
-                      : styles.messageContainerRightSmallMargin,
-                    isFirstOtherMessage
-                      ? {}
-                      : styles.messageContainerLeftSmallMargin,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.message,
-                      isOwnMessage ? { color: "white" } : { color: "white" },
-                    ]}
-                  >
-                    {item.Message_Content}
-                  </Text>
-                </View>
-              </View>
-            );
-          }}
-          keyExtractor={(_, index) => index.toString()}
-          contentContainerStyle={styles.messagesContent}
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={[styles.input, { height: Math.max(40, inputHeight) }]}
-          value={message}
-          onChangeText={(text) => setMessage(text)}
-          placeholder="Type a message..."
-          placeholderTextColor="#888"
-          autoCorrect={true}
-          multiline
-          onContentSizeChange={(e) =>
-            setInputHeight(e.nativeEvent.contentSize.height)
-          }
-          keyboardAppearance="dark"
-        />
-        <Button
-          title="Send"
-          onPress={sendMessage}
-          color="#159e9e"
-          text="bold"
-          disabled={isButtonDisabled}
-        />
-      </View>
-    </KeyboardAvoidingView>
+              return (
+                <Animatable.View ref={(ref) => (this.messageRef = ref)}>
+                  <View>
+                    {shouldDisplaySenderName && (
+                      <Text style={styles.senderName}>{item.UGC.name}</Text>
+                    )}
+                    <View
+                      style={[
+                        styles.messageContainer,
+                        isOwnMessage
+                          ? styles.messageContainerRight
+                          : styles.messageContainerLeft,
+                        // conditionally apply the smaller margin styles
+                        isFirstOwnMessage
+                          ? {}
+                          : styles.messageContainerRightSmallMargin,
+                        isFirstOtherMessage
+                          ? {}
+                          : styles.messageContainerLeftSmallMargin,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.message,
+                          isOwnMessage
+                            ? { color: "white" }
+                            : { color: "white" },
+                        ]}
+                      >
+                        {item.Message_Content}
+                      </Text>
+                    </View>
+                  </View>
+                </Animatable.View>
+              );
+            }}
+            initialNumToRender={messages.length}
+            keyExtractor={(_, index) => index.toString()}
+            contentContainerStyle={styles.messagesContent}
+          />
+        </View>
+        <View style={styles.footer}>
+  <View style={styles.inputContainer}>
+    <TextInput
+      style={styles.input}
+      value={message}
+      onChangeText={(text) => setMessage(text)}
+      placeholder="Message..."
+      placeholderTextColor="#575D61"
+      autoCorrect={true}
+      multiline
+      onContentSizeChange={(e) =>
+        setInputHeight(e.nativeEvent.contentSize.height)
+      }
+      keyboardAppearance="dark"
+    />
+  </View>
+  <TouchableOpacity onPress={sendMessage} style={styles.button}>
+  <View style={styles.customIcon}>
+          <Icon name="paper-plane" size={30} color="#159e9e" style={styles.sendIcon} />
+        </View>
+      </TouchableOpacity>
+</View>
+ 
+      </KeyboardAvoidingView>
+    </PanGestureHandler>
   );
 };
 
@@ -560,29 +665,41 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     color: "#000",
   },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#2B2D2F",
-    borderRadius: 20,
-    paddingHorizontal: 1,
-    paddingVertical: 5,
-    marginBottom: 20,
-    paddingTop: 0,
-  },
-  input: {
-    flex: 1,
-    height: 40,
-    marginRight: 0,
-    color: "white",
-    borderRadius: 20,
-    paddingHorizontal: 0,
-    paddingVertical: 10,
-    backgroundColor: "#2B2D2F",
-    fontSize: 20,
-    paddingTop: 10,
-    marginLeft: 15,
-  },
+ inputContainer: {
+  flexDirection: "row",
+  backgroundColor: "#252d36",
+  borderRadius: 20,
+  width: '83%', // Set a fixed width for the input container
+},
+
+input: {
+  flex: 1,
+  alignSelf: "center",
+  marginLeft: 10,
+  color: "white",
+  borderRadius: 20,
+  backgroundColor: "#252d36",
+  fontSize: 20,
+  marginTop: 5,
+  paddingVertical: 10,
+},
+footer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  marginBottom: 10,
+},
+customIcon: {
+  marginRight: 5,
+  marginbottom: 20,
+  backgroundColor: "#252d36",
+  borderRadius: 20, // A large value to make it a circle (you can experiment with different values)
+  paddingVertical: 9,
+  paddingHorizontal: 9,
+},
+sendIcon: {
+  marginRight: 1,
+},
 });
 
 export default MessagingUI;

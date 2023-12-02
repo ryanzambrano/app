@@ -18,12 +18,13 @@ import { supabase } from "../auth/supabase";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { picURL } from "../auth/supabase";
 import Retake from "../retakeQuestionaireFiles/retake.js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const EditProfileScreen = ({ navigation, route }) => {
   const { session } = route.params;
   const [editedUser, setEditedUser] = useState(route.params.editedUser);
   //editedUser.tags = route.params.selectedTags;
-  const [bioCharCount, setBioCharCount] = useState(editedUser.bio.length);
+  const [bioCharCount, setBioCharCount] = useState("");
 
   const { updated } = route.params;
   const selectedTags = route.params.selectedTags;
@@ -113,10 +114,9 @@ export const EditProfileScreen = ({ navigation, route }) => {
         setProfilePicture(null);
       }
     } catch (error) {
-      alert("Couldn't fetch profile picture");
+      console.log(error.message);
     }
   };
-  2;
 
   const updateProfile = async () => {
     if (session?.user) {
@@ -133,6 +133,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
         alert("Please enter a valid class year");
         return;
       }
+
       if (editedUser.major.length > 30) {
         alert("Please enter a valid major");
         return;
@@ -145,21 +146,35 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
       if (editedUser.bio.length <= 700) {
         const trimmedBio = editedUser.bio.trimEnd();
+        const name = editedUser.name.trimEnd();
+        const major = editedUser.major.trimEnd();
+        const class_year = editedUser.class_year.trimEnd();
+        const hometown = editedUser.hometown.trimEnd();
         const { data, error } = await supabase
           .from("UGC")
           .update([
             {
-              name: editedUser.name,
+              name: name,
               bio: trimmedBio,
-              major: editedUser.major,
-              class_year: editedUser.class_year,
-              hometown: editedUser.hometown,
+              major: major,
+              class_year: class_year,
+              hometown: hometown,
             },
           ])
           .eq("user_id", session.user.id);
         if (error) {
-          alert(error.message);
+          console.error(error.message);
         } else {
+          const userData = {
+            name,
+            bio: trimmedBio,
+            major,
+            class_year,
+            hometown,
+            tags: editedUser.tags,
+          };
+          await AsyncStorage.setItem("userData", JSON.stringify(userData));
+
           navigation.navigate("Tabs", { updated: true });
         }
       } else {
@@ -348,6 +363,17 @@ export const EditProfileScreen = ({ navigation, route }) => {
             )}
 
             <Text style={styles.more}>More about me:</Text>
+            <Text
+              style={{
+                textAlign: "center",
+                fontSize: 12,
+                fontWeight: 500,
+                color: "darkgrey",
+                paddingBottom: 8,
+              }}
+            >
+              Click any prompt to edit
+            </Text>
           </>
         }
         ListFooterComponent={
@@ -491,7 +517,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#2B2D2F",
     borderRadius: 15,
     justifyContent: "center",
-    paddingBottom: 10,
+    paddingBottom: 18,
     marginBottom: 10,
     paddingHorizontal: 15,
     borderBottomWidth: 1.4,
@@ -500,7 +526,7 @@ const styles = StyleSheet.create({
     margin: 50,
     width: 150,
     height: 150,
-    backgroundColor: "#ccc",
+    backgroundColor: "#2B2D2F",
     justifyContent: "center",
     alignItems: "center",
     alignSelf: "center",
@@ -523,7 +549,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderRadius: 40,
     gap: 10,
-    backgroundColor: "#2B2D2F",
+    backgroundColor: "#252d36",
   },
   promptAdd: {
     padding: 30,
