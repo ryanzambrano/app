@@ -3,6 +3,7 @@
     "name": "Cabana",
     "slug": "hello-world",
     "version": "1.0.4",
+
     "orientation": "portrait",
     "icon": "./assets/cabanaAppLogo.png",
     "userInterfaceStyle": "dark",
