@@ -22,10 +22,8 @@ import { FontAwesome } from "@expo/vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import Home from "../hometab/home";
 
-
 const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
-
 
 const ComposeMessageScreen = ({ route }) => {
   const [selectedUserCount, setSelectedUserCount] = useState(0);
@@ -52,7 +50,6 @@ const ComposeMessageScreen = ({ route }) => {
       <Text style={styles.emptyText}>No users found</Text>
     </View>
   );
-
 
   useEffect(() => {
     fetchUsers();
@@ -86,72 +83,72 @@ const ComposeMessageScreen = ({ route }) => {
 
   const fetchSessionWho = async () => {
     const { data, error } = await supabase
-      .from('profile')  
-      .select('who')  
-      .eq('user_id', session.user.id)  
+      .from("profile")
+      .select("who")
+      .eq("user_id", session.user.id)
       .single();
-  
+
     if (error) {
       console.error(error);
       return;
     }
-  
-    setSessionWho(data.who);  
+
+    setSessionWho(data.who);
   };
-  
 
   const fetchUsers = async () => {
-
     const { data: users, error } = await supabase
-    .from("UGC")
-    .select("*")
-    .neq("user_id", session.user.id);
+      .from("UGC")
+      .select("*")
+      .neq("user_id", session.user.id);
     if (error) {
       console.error(error);
       return;
     }
-    const modifiedUsers = await Promise.all(users.map(async (user) => {
-      const { data: Imagedata, error: ImageError } = await supabase
-      .from("images")
-      .select('last_modified, user_id')
-      .eq("user_id", user.user_id)
-      .eq("image_index", 0)
-      .single();
-      const { data: profileData, error: profileError } = await supabase
-        .from("profile")
-        .select('gender')
-        .eq("user_id", user.user_id)
-        .single();
+    const modifiedUsers = await Promise.all(
+      users.map(async (user) => {
+        const { data: Imagedata, error: ImageError } = await supabase
+          .from("images")
+          .select("last_modified, user_id")
+          .eq("user_id", user.user_id)
+          .eq("image_index", 0)
+          .single();
+        const { data: profileData, error: profileError } = await supabase
+          .from("profile")
+          .select("gender")
+          .eq("user_id", user.user_id)
+          .single();
 
         let gender = profileData ? profileData.gender : null;
 
-      if(ImageError)
-      {
-        return {
-          ...user,
-          image: "data:image/png;base64,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",
-          gender
-        };
-      }
-      if(Imagedata)
-      {
-      return {
-          ...user,
-          image: `${picURL}/${Imagedata.user_id}/${Imagedata.user_id}-0-${ Imagedata.last_modified}`,
-          gender
-        };
-      }
-      
-    }));
-    const usersWithProfilePictures = modifiedUsers.filter(user => {
-      return user.image !== "data:image/png;base64,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";
+        if (ImageError) {
+          return {
+            ...user,
+            image:
+              "data:image/png;base64,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",
+            gender,
+          };
+        }
+        if (Imagedata) {
+          return {
+            ...user,
+            image: `${picURL}/${Imagedata.user_id}/${Imagedata.user_id}-0-${Imagedata.last_modified}`,
+            gender,
+          };
+        }
+      })
+    );
+    const usersWithProfilePictures = modifiedUsers.filter((user) => {
+      return (
+        user.image !==
+        "data:image/png;base64,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"
+      );
     });
 
-    const { data: bookmarkedData, error: bookmarkedError } =
-      await supabase
-        .from("UGC")
-        .select("bookmarked_profiles")
-        .eq("user_id", session.user.id);
+    const { data: bookmarkedData, error: bookmarkedError } = await supabase
+      .from("UGC")
+      .select("bookmarked_profiles")
+      .eq("user_id", session.user.id);
     if (bookmarkedError) {
       console.error(
         "Error fetching bookmarked profiles:",
@@ -162,55 +159,56 @@ const ComposeMessageScreen = ({ route }) => {
       setBookmarkedProfiles(bookmarked_profiles);
     }
 
-    const { data: allBlockedProfilesData, error: allBlockedProfilesError } = 
-      await supabase
-        .from("UGC")
-        .select("user_id, blocked_profiles");
-      if (allBlockedProfilesError) {
-        console.error("Error fetching all blocked profiles:", allBlockedProfilesError.message);
-      } else {
-        const usersWhoBlockedMe = allBlockedProfilesData
-        .filter(user => Array.isArray(user.blocked_profiles) && user.blocked_profiles.includes(session.user.id))
-        .map(user => user.user_id);
-        //(usersWhoBlockedMe);
+    const { data: allBlockedProfilesData, error: allBlockedProfilesError } =
+      await supabase.from("UGC").select("user_id, blocked_profiles");
+    if (allBlockedProfilesError) {
+      console.error(
+        "Error fetching all blocked profiles:",
+        allBlockedProfilesError.message
+      );
+    } else {
+      const usersWhoBlockedMe = allBlockedProfilesData
+        .filter(
+          (user) =>
+            Array.isArray(user.blocked_profiles) &&
+            user.blocked_profiles.includes(session.user.id)
+        )
+        .map((user) => user.user_id);
+      //(usersWhoBlockedMe);
       setUsersBlockingMe(usersWhoBlockedMe);
-      }
+    }
 
-    const { data: blockedData, error: blockedError } = 
-      await supabase
+    const { data: blockedData, error: blockedError } = await supabase
       .from("UGC")
       .select("blocked_profiles")
       .eq("user_id", session.user.id);
-      if (blockedError) {
-        console.error(
-          "Error fetching blocked profiles:",
-          blockedError.message
-        );
-      } else {
-        const { blocked_profiles } = blockedData[0];
-        setBlockedProfiles(blocked_profiles);
-      }
-      setUsers(usersWithProfilePictures);
-      
-      };
+    if (blockedError) {
+      console.error("Error fetching blocked profiles:", blockedError.message);
+    } else {
+      const { blocked_profiles } = blockedData[0];
+      setBlockedProfiles(blocked_profiles);
+    }
+    setUsers(usersWithProfilePictures);
+  };
 
-      const handleUserCardPress = (user) => {
-        if (selectedUsers.includes(user)) {
-          setSelectedUsers(selectedUsers.filter((selectedUser) => selectedUser !== user));
-          setSelectedUserCount(selectedUserCount - 1);
-        } else {
-          if (selectedUserCount < 6) {
-            setSelectedUsers([...selectedUsers, user]);
-            setSelectedUserCount(selectedUserCount + 1);
-          }
-        }
-      
-        // Toggle user label visibility with LayoutAnimation
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-      };
+  const handleUserCardPress = (user) => {
+    if (selectedUsers.includes(user)) {
+      setSelectedUsers(
+        selectedUsers.filter((selectedUser) => selectedUser !== user)
+      );
+      setSelectedUserCount(selectedUserCount - 1);
+    } else {
+      if (selectedUserCount < 6) {
+        setSelectedUsers([...selectedUsers, user]);
+        setSelectedUserCount(selectedUserCount + 1);
+      }
+    }
+
+    // Toggle user label visibility with LayoutAnimation
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  };
   const handleCreateMessage = async () => {
     try {
-      
       const selectedUserNames = selectedUsers.map((user) => user.name);
       const nnnn = selectedUserNames.sort();
       const nameparam = nnnn.join(", ");
@@ -234,23 +232,22 @@ const ComposeMessageScreen = ({ route }) => {
           },
         ])
         .select();
-        if(insertData)
-        {
-          const { data: Imagedata, error: ImageError } = await supabase
-              .from("images")
-              .select("*")
-              .in("user_id", ids)
-              .eq("image_index", 0);
-          const fetchedPersons = insertData.map((person) => ({
-            ...person,
-            images: Imagedata,
-            joinedGroups: nameparam,
-          }));
-          setPersons(fetchedPersons);
-          if (fetchedPersons.length > 0) {
-            navigation.navigate("Message", { user: fetchedPersons[0] });
-           }
+      if (insertData) {
+        const { data: Imagedata, error: ImageError } = await supabase
+          .from("images")
+          .select("*")
+          .in("user_id", ids)
+          .eq("image_index", 0);
+        const fetchedPersons = insertData.map((person) => ({
+          ...person,
+          images: Imagedata,
+          joinedGroups: nameparam,
+        }));
+        setPersons(fetchedPersons);
+        if (fetchedPersons.length > 0) {
+          navigation.replace("Message", { user: fetchedPersons[0] });
         }
+      }
 
       if (insertError) {
         if (insertError.code === "23505") {
@@ -262,10 +259,10 @@ const ComposeMessageScreen = ({ route }) => {
               .eq("Ammount_Users", selectedUserIDs.length);
 
           const { data: Imagedata, error: ImageError } = await supabase
-              .from("images")
-              .select("*")
-              .in("user_id", ids)
-              .eq("image_index", 0);
+            .from("images")
+            .select("*")
+            .in("user_id", ids)
+            .eq("image_index", 0);
 
           //console.log(Imagedata);
           if (navigationError) {
@@ -274,26 +271,23 @@ const ComposeMessageScreen = ({ route }) => {
           } else {
             let fetchedPersons;
             //console.log(navigationdata[0].Group_Name);
-            if(!navigationdata[0].Group_Name){
+            if (!navigationdata[0].Group_Name) {
               fetchedPersons = navigationdata.map((person) => ({
                 ...person,
                 images: Imagedata,
                 joinedGroups: nameparam,
               }));
-
-            }
-            else
-            {
+            } else {
               fetchedPersons = navigationdata.map((person) => ({
                 ...person,
                 images: Imagedata,
                 joinedGroups: navigationdata[0].Group_Name,
               }));
             }
-            
+
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
-             navigation.navigate("Message", { user: fetchedPersons[0] });
+              navigation.replace("Message", { user: fetchedPersons[0] });
             }
 
             return;
@@ -305,7 +299,6 @@ const ComposeMessageScreen = ({ route }) => {
         }
         return;
       }
-
 
       // Log the Group_ID
     } catch (err) {
@@ -336,25 +329,25 @@ const ComposeMessageScreen = ({ route }) => {
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
     if (isBookmarked) {
-        return (
-          bookmarkedProfiles.includes(user.user_id) &&
-          (nameMatch)
-        );
-      }
-    return (
-      (nameMatch)
-    );
+      return bookmarkedProfiles.includes(user.user_id) && nameMatch;
+    }
+    return nameMatch;
   });
 
   const renderUserItem = ({ item }) => (
-    <TouchableOpacity onPress={() => handleUserCardPress(item)}
-     disabled={selectedUserCount >= 6 && !selectedUsers.includes(item)}>
+    <TouchableOpacity
+      onPress={() => {
+        handleUserCardPress(item);
+        setSearchQuery("");
+      }}
+      disabled={selectedUserCount >= 6 && !selectedUsers.includes(item)}
+    >
       <View style={styles.contactItem}>
         <View style={styles.profileContainer}>
           <Image
             style={styles.profilePicture}
             source={{
-              uri:  item.image,
+              uri: item.image,
             }}
           />
         </View>
@@ -388,7 +381,10 @@ const ComposeMessageScreen = ({ route }) => {
             <AntDesign name="arrowleft" size={24} color="#159e9e" />
           </TouchableOpacity>
           <Text style={styles.composeHeader}>{"Compose Message"}</Text>
-          <TouchableOpacity onPress={toggleBookmarkButton} style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={toggleBookmarkButton}
+            style={styles.buttonContainer}
+          >
             <Icon
               name="bookmark"
               size={30}
@@ -432,7 +428,7 @@ const ComposeMessageScreen = ({ route }) => {
         ListEmptyComponent={renderEmptyComponent}
       />
       <View style={styles.createButtonContainer}>
-        <View style={{ flex: 1, justifyContent: 'center' }}>
+        <View style={{ flex: 1, justifyContent: "center" }}>
           <TouchableOpacity
             style={[
               styles.createButton,
@@ -452,19 +448,19 @@ const ComposeMessageScreen = ({ route }) => {
 
 const styles = StyleSheet.create({
   createButtonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center', // Center the items horizontally
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center", // Center the items horizontally
+    alignItems: "center",
     marginLeft: 45,
     marginHorizontal: 16, // Adjust margin as needed
     marginBottom: 16, // Adjust margin as needed
   },
-  
+
   // Style for the counter text
   counterText: {
     fontSize: 13,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
     marginLeft: 10,
   },
   contactItem: {
@@ -499,7 +495,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     paddingHorizontal: 20,
     paddingVertical: 10,
-    
+
     backgroundColor: "#14999999",
     borderRadius: 10,
   },
@@ -525,7 +521,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
-    
   },
   toLabelContainer: {
     flexDirection: "row",
@@ -537,7 +532,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "flex-end",
     color: "#14999999",
-    
   },
   contactInfo: {
     flex: 1,
@@ -571,7 +565,7 @@ const styles = StyleSheet.create({
     marginTop: -5,
     paddingVertical: 10,
     marginBottom: 5,
-    borderBottomColor: 'grey',
+    borderBottomColor: "grey",
     borderBottomWidth: 0.2,
     borderBottomRightRadius: 10,
     borderBottomLeftRadius: 10,
@@ -637,15 +631,15 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === "ios" ? -50 : 0,
     paddingBottom: Platform.OS === "ios" ? -25 : 0,
     marginBottom: 5,
-    borderBottomColor: 'grey',
+    borderBottomColor: "grey",
     borderBottomWidth: 0.2,
     borderBottomRightRadius: 10,
     borderBottomLeftRadius: 10,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 15,
     paddingHorizontal: 15,
   },
@@ -667,13 +661,13 @@ const styles = StyleSheet.create({
     paddingLeft: 1,
   },
   swipeIndicator: {
-    alignSelf: 'center',
+    alignSelf: "center",
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: 'grey',
+    backgroundColor: "grey",
     marginTop: 25,
-    marginBottom: 5, 
+    marginBottom: 5,
   },
   emptyContainer: {
     flex: 1,

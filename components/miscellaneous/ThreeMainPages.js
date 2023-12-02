@@ -85,7 +85,7 @@ const ThreeMainPages = ({ route }) => {
           mode="modal"
           component={ComposeMessageScreen}
           initialParams={{ session }}
-          options={{ presentation: "modal" }}
+          //options={{ presentation: "modal" }}
         />
         <Stack.Screen
           name="Filters"

@@ -12,10 +12,7 @@ import {
   Alert,
   RefreshControl,
 } from "react-native";
-
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AntDesign } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
@@ -63,6 +60,12 @@ const ContactsUI = ({ route }) => {
       .includes(searchQuery.toLowerCase());
     return nameMatch;
   });
+  const loadData = async () => {
+    const storedData = await AsyncStorage.getItem("contactsData");
+    if (storedData !== null) {
+      setUsers(JSON.parse(storedData));
+    }
+  };
 
   const fetchUsers = async () => {
     const { data: users, error } = await supabase
@@ -168,6 +171,7 @@ const ContactsUI = ({ route }) => {
     });
 
     setUsers(filteredUsers);
+    await AsyncStorage.setItem("contactsData", JSON.stringify(filteredUsers));
   };
 
   const formatRecentTime = (timestamp) => {
@@ -216,6 +220,7 @@ const ContactsUI = ({ route }) => {
   };
 
   useEffect(() => {
+    loadData();
     fetchUsers();
     const channel = supabase.channel("room1");
     const subscription = channel
@@ -682,10 +687,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     elevation: 3,
     marginHorizontal: 10,
-    // borderWidth: 0.20,
-    // borderTopWidth: 0.20,
-    //borderBottomWidth: 0.2,
-
     borderColor: "grey",
   },
   searchInput: {

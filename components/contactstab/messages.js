@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  Animated,
 } from "react-native";
 import { picURL } from "../auth/supabase.js";
 import { AntDesign } from "@expo/vector-icons";
@@ -25,7 +26,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
 import * as Animatable from "react-native-animatable";
 import { PanGestureHandler, State } from "react-native-gesture-handler";
-import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const MessagingUI = () => {
   const isFocused = useIsFocused();
@@ -53,6 +54,9 @@ const MessagingUI = () => {
   };
 
   //alert(user.profiles.age);
+  /*animateMessage = () => {
+    this.messageRef.fadeIn(250);
+  };*/
 
   const sendMessage = async () => {
     if (!isButtonDisabled && message.trim() !== "") {
@@ -66,7 +70,7 @@ const MessagingUI = () => {
         },
       ]);
       setMessage("");
-      animateMessage();
+      //animateMessage();
       setIsButtonDisabled(true); // Disable the button
 
       const { data, error } = await supabase
@@ -285,9 +289,6 @@ const MessagingUI = () => {
       }
     }
   };
-  animateMessage = () => {
-    this.messageRef.fadeIn(250); // You can adjust the duration (1000ms in this example)
-  };
 
   useEffect(() => {
     fetchMessages();
@@ -469,7 +470,7 @@ const MessagingUI = () => {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("Contacts")}
+            onPress={() => navigation.goBack()}
           >
             <AntDesign name="arrowleft" size={24} color="#159e9e" />
           </TouchableOpacity>
@@ -499,7 +500,7 @@ const MessagingUI = () => {
                 user.Ammount_Users >= 3 && isFirstOtherMessage;
 
               return (
-                <Animatable.View ref={(ref) => (this.messageRef = ref)}>
+                <Animated.View ref={(ref) => (this.messageRef = ref)}>
                   <View>
                     {shouldDisplaySenderName && (
                       <Text style={styles.senderName}>{item.UGC.name}</Text>
@@ -531,7 +532,7 @@ const MessagingUI = () => {
                       </Text>
                     </View>
                   </View>
-                </Animatable.View>
+                </Animated.View>
               );
             }}
             initialNumToRender={messages.length}
@@ -540,28 +541,32 @@ const MessagingUI = () => {
           />
         </View>
         <View style={styles.footer}>
-  <View style={styles.inputContainer}>
-    <TextInput
-      style={styles.input}
-      value={message}
-      onChangeText={(text) => setMessage(text)}
-      placeholder="Message..."
-      placeholderTextColor="#575D61"
-      autoCorrect={true}
-      multiline
-      onContentSizeChange={(e) =>
-        setInputHeight(e.nativeEvent.contentSize.height)
-      }
-      keyboardAppearance="dark"
-    />
-  </View>
-  <TouchableOpacity onPress={sendMessage} style={styles.button}>
-  <View style={styles.customIcon}>
-          <Icon name="paper-plane" size={30} color="#159e9e" style={styles.sendIcon} />
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              value={message}
+              onChangeText={(text) => setMessage(text)}
+              placeholder="Message..."
+              placeholderTextColor="#575D61"
+              autoCorrect={true}
+              multiline
+              onContentSizeChange={(e) =>
+                setInputHeight(e.nativeEvent.contentSize.height)
+              }
+              keyboardAppearance="dark"
+            />
+          </View>
+          <TouchableOpacity onPress={sendMessage} style={styles.button}>
+            <View style={styles.customIcon}>
+              <Icon
+                name="paper-plane"
+                size={30}
+                color="#159e9e"
+                style={styles.sendIcon}
+              />
+            </View>
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
-</View>
- 
       </KeyboardAvoidingView>
     </PanGestureHandler>
   );
@@ -665,41 +670,41 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     color: "#000",
   },
- inputContainer: {
-  flexDirection: "row",
-  backgroundColor: "#252d36",
-  borderRadius: 20,
-  width: '83%', // Set a fixed width for the input container
-},
+  inputContainer: {
+    flexDirection: "row",
+    backgroundColor: "#252d36",
+    borderRadius: 20,
+    width: "83%", // Set a fixed width for the input container
+  },
 
-input: {
-  flex: 1,
-  alignSelf: "center",
-  marginLeft: 10,
-  color: "white",
-  borderRadius: 20,
-  backgroundColor: "#252d36",
-  fontSize: 20,
-  marginTop: 5,
-  paddingVertical: 10,
-},
-footer: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  marginBottom: 10,
-},
-customIcon: {
-  marginRight: 5,
-  marginbottom: 20,
-  backgroundColor: "#252d36",
-  borderRadius: 20, // A large value to make it a circle (you can experiment with different values)
-  paddingVertical: 9,
-  paddingHorizontal: 9,
-},
-sendIcon: {
-  marginRight: 1,
-},
+  input: {
+    flex: 1,
+    alignSelf: "center",
+    marginLeft: 10,
+    color: "white",
+    borderRadius: 20,
+    backgroundColor: "#252d36",
+    fontSize: 20,
+    marginTop: 5,
+    paddingVertical: 10,
+  },
+  footer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  customIcon: {
+    marginRight: 5,
+    marginbottom: 20,
+    backgroundColor: "#252d36",
+    borderRadius: 20, // A large value to make it a circle (you can experiment with different values)
+    paddingVertical: 9,
+    paddingHorizontal: 9,
+  },
+  sendIcon: {
+    marginRight: 1,
+  },
 });
 
 export default MessagingUI;

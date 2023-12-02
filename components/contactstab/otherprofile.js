@@ -14,6 +14,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { supabase } from "../auth/supabase";
 import { picURL } from "../auth/supabase.js";
+import { useIsFocused } from "@react-navigation/native";
 
 const GroupChatScreen = ({}) => {
   const [persons, setPersons] = useState([]);
@@ -21,11 +22,13 @@ const GroupChatScreen = ({}) => {
   const route = useRoute();
   const { session } = route.params;
   const { user } = route.params;
+  //const [user, setUser] = useState(route.params);
   const navigation = useNavigation();
   const [editedJoinedGroups, setEditedJoinedGroups] = useState(
     user.joinedGroups
   );
   const [userIds, setUserIds] = useState([]);
+  const isFocused = useIsFocused();
 
   const extractedIds = user.User_ID.filter((item) => item !== session.user.id);
 
@@ -84,7 +87,10 @@ const GroupChatScreen = ({}) => {
     // Extract session.user.id values from user.User_ID array
 
     fetchUsers();
-  }, [user.User_ID, session.user.id]);
+    if (isFocused == true) {
+      fetchUsers(); //alert("hi");
+    }
+  }, [user.User_ID, session.user.id, isFocused]);
 
   const handleUserPress = (person) => {
     // Set the selected person in state
