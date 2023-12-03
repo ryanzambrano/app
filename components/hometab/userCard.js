@@ -1,4 +1,4 @@
-import { React, useEffect, useState, useRef } from "react";
+import { React, useEffect, useState, useRef, memo } from "react";
 import {
   Alert,
   View,
@@ -229,8 +229,8 @@ const UserCard = ({ navigation, route }) => {
   };
 
   const handleAddFriend = async (user_id) => {
+    setIsFriendAdded((prevState) => !prevState);
     const userId = session.user.id;
-    console.log(photos);
     try {
       const { data, error } = await supabase
         .from("UGC")
@@ -279,7 +279,6 @@ const UserCard = ({ navigation, route }) => {
   };
 
   const goBack = () => {
-    console.log("Pressed");
     navigation.goBack();
   };
 
@@ -310,27 +309,13 @@ const UserCard = ({ navigation, route }) => {
 
   const handleUserCardPress = async () => {
     {
-      //message navigation
-      const { data, error: sessionError } = await supabase
-        .from("UGC")
-        .select("name")
-        .eq("user_id", session.user.id)
-        .single();
-
-      if (sessionError) {
-        console.error(sessionError);
-        return;
-      }
-      const { data: Imagedata, error: ImageError } = await supabase
-        .from("images")
-        .select("*")
-        .eq("user_id", user_id)
-        .eq("image_index", 0);
-
-      const sessionusername = data.name;
-      const combinedArray = [sessionusername, name];
-      const FinalString = combinedArray.slice().sort();
-      const combinedString = FinalString.join(", ");
+      let Imagedata = [
+        {
+          last_modified: lastModified,
+          user_id: user_id,
+          image_index: 0,
+        },
+      ];
 
       const combinedIDs = [session.user.id, user_id];
       const Finalarray = combinedIDs.slice().sort();
@@ -356,6 +341,7 @@ const UserCard = ({ navigation, route }) => {
               .eq("Ammount_Users", Finalarray.length);
           if (navigationError) {
             console.log(navigationError);
+            alert("Something went wrong, please try again later");
             return;
           } else {
             //console.log(navigationdata);

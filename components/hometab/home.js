@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef, useMemo, memo } from "react";
 import {
   Image,
   TextInput,
@@ -416,7 +416,7 @@ const Home = ({ route }) => {
     );
   };
 
-  const renderUserCard = ({ item }) => {
+  const UserCard = memo(({ item, onPress }) => {
     if (!item.lastModified) {
       //console.log(item);
       return null;
@@ -452,7 +452,7 @@ const Home = ({ route }) => {
         </View>
       </TouchableOpacity>
     );
-  };
+  });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -517,7 +517,10 @@ const Home = ({ route }) => {
             ref={flatListRef}
             data={renderedUsers}
             extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
-            renderItem={renderUserCard}
+            // ... other props
+            renderItem={({ item }) => (
+              <UserCard item={item} onPress={handleUserCardPress} />
+            )}
             keyExtractor={(item) => item.user_id.toString()}
             ListEmptyComponent={renderEmptyComponent}
             onEndReached={() => setRenderLimit((prevLimit) => prevLimit + 5)}
