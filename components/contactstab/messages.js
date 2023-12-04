@@ -24,7 +24,6 @@ import {
 } from "@react-navigation/native";
 import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
-import * as Animatable from "react-native-animatable";
 import { PanGestureHandler, State } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/FontAwesome";
 
@@ -156,72 +155,6 @@ const MessagingUI = () => {
     }
   }
 
-  async function getJoinedGroups() {
-    try {
-      const { data, error: sessionError } = await supabase
-        .from("UGC")
-        .select("name")
-        .eq("user_id", session.user.id)
-        .single();
-
-      const { data: groupchatdata, error } = await supabase
-        .from("Group_Chats")
-        .select("*")
-        .eq("Group_ID", user.Group_ID)
-        .single();
-
-      const { data: recentmessage1, error: recentmessageerror1 } =
-        await supabase
-          .from("Group_Chat_Messages")
-          .select("Read") // Update the "Read" column
-          .eq("Group_ID_Sent_To", user.Group_ID)
-          .order("created_at", { ascending: false })
-          .limit(1); // Get only the most recent message;
-      const readArray = recentmessage1[0]?.Read || [];
-      // Extract the Read array
-      if (!readArray.includes(session.user.id)) {
-        // Append session.user.id to the array
-        readArray.push(session.user.id);
-
-        const { data: recentmessagedata, error: recentmessageerror } =
-          await supabase
-            .from("Group_Chat_Messages")
-            .update({ Read: readArray }) // Update the "Read" column
-            .eq("Group_ID_Sent_To", user.Group_ID)
-            .order("created_at", { ascending: false })
-            .limit(1); // Get only the most recent message;
-
-        if (recentmessageerror) {
-          console.log(recentmessageerror);
-        }
-      }
-
-      if (sessionError) {
-        console.error(sessionError);
-        return null;
-      }
-      const extractedIds = user.User_ID.filter(
-        (item) => item !== session.user.id
-      );
-      const { data: UGCdata, error: sessionErrors } = await supabase
-        .from("UGC")
-        .select("name")
-        .in("user_id", extractedIds);
-      let Groupnames;
-      if (!user.Group_Name) {
-        const joinedGroups = UGCdata.map((item) => item.name);
-        Groupnames = joinedGroups.join(", ");
-      } else {
-        Groupnames = user.Group_Name;
-      }
-
-      setJoinedGroups(Groupnames);
-      return;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  }
   useEffect(() => {
     if (isFocused) {
       readMessages();
@@ -500,7 +433,6 @@ const MessagingUI = () => {
                 user.Ammount_Users >= 3 && isFirstOtherMessage;
 
               return (
-                <Animated.View ref={(ref) => (this.messageRef = ref)}>
                   <View>
                     {shouldDisplaySenderName && (
                       <Text style={styles.senderName}>{item.UGC.name}</Text>
@@ -532,7 +464,6 @@ const MessagingUI = () => {
                       </Text>
                     </View>
                   </View>
-                </Animated.View>
               );
             }}
             initialNumToRender={messages.length}

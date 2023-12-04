@@ -23,10 +23,11 @@ import Icon from "react-native-vector-icons/FontAwesome";
 const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
 const AddPerson = ({ route }) => {
+  const { session, group } = route.params;
+  const [selectedUserCount, setSelectedUserCount] = useState(group.Ammount_Users);
   const [persons, setPersons] = useState([]);
   const navigation = useNavigation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-  const { session, group } = route.params;
   const [users, setUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,6 +43,7 @@ const AddPerson = ({ route }) => {
   };
 
   useEffect(() => {
+    console.log(group.Ammount_Users);
     fetchUsers();
     fetchSessionWho();
   }, []);
@@ -171,30 +173,60 @@ const AddPerson = ({ route }) => {
     setUsers(usersWithProfilePictures);
   };
 
+  const ahandleUserCardPress = (user) => {
+    if (selectedUsers.includes(user)) {
+      setSelectedUsers(
+        selectedUsers.filter((selectedUser) => selectedUser !== user)
+      );
+      setSelectedUserCount(selectedUserCount - 1);
+    } else {
+      if (selectedUserCount < 6) {
+        setSelectedUsers([...selectedUsers, user]);
+        setSelectedUserCount(selectedUserCount + 1);
+      }
+    }
+
+    // Toggle user label visibility with LayoutAnimation
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  };
+
   const handleUserCardPress = (user) => {
     if (selectedUsers.includes(user)) {
       setSelectedUsers(
         selectedUsers.filter((selectedUser) => selectedUser !== user)
       );
+      setSelectedUserCount(selectedUserCount - 1);
     } else {
-      setSelectedUsers([...selectedUsers, user]);
+      if (selectedUserCount < 6) {
+        setSelectedUsers([...selectedUsers, user]);
+        setSelectedUserCount(selectedUserCount + 1);
+      }
     }
 
     // Toggle user label visibility with LayoutAnimation
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   };
   const handleCreateMessage = async () => {
+    const { data: Groupdata, error: GroupError } = await supabase
+      .from("Group_Chats")
+      .select('*')
+      .eq("Group_ID", group.Group_ID);
+
     const selectedUserIDs = selectedUsers.map((user) => user.user_id);
-    const groupids = group.User_ID;
+    const groupids = Groupdata[0].User_ID;
 
     // Combine the arrays using the concat() method
     const combinedArray = selectedUserIDs.concat(groupids);
+
+   
     const finalarray = combinedArray.sort();
+
     const { data: insertData, error: insertError } = await supabase
       .from("Group_Chats")
       .update({ User_ID: finalarray, Ammount_Users: finalarray.length })
-      .contains("User_ID", groupids)
-      .eq("Ammount_Users", groupids.length);
+      .select('*')
+      .eq("Group_ID", group.Group_ID);
+
     if (insertError) {
       console.log(insertError);
     }
@@ -281,7 +313,7 @@ const AddPerson = ({ route }) => {
 
       <View style={styles.toInputContainer}>
         <View style={styles.toLabelContainer}>
-          <Text style={styles.toLabel}>To:</Text>
+          <Text style={styles.toLabel}>Add:</Text>
           <View style={styles.selectedUserContainer}>
             {selectedUsers.map((user) => (
               <View key={user.id} style={styles.selectedUser}>
@@ -308,22 +340,43 @@ const AddPerson = ({ route }) => {
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={renderEmptyComponent}
       />
-
-      <TouchableOpacity
-        style={[
-          styles.createButton,
-          { backgroundColor: isButtonDisabled ? "#999" : "#14999999" }, // Apply grey color if disabled
-        ]}
-        onPress={handleCreateMessage}
-        disabled={isButtonDisabled} // Disable the button based on the state
-      >
-        <Text style={styles.createButtonText}>{createButtonLabel}</Text>
-      </TouchableOpacity>
+      <View style={styles.createButtonContainer}>
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <TouchableOpacity
+            style={[
+              styles.createButton,
+              { backgroundColor: isButtonDisabled ? "#999" : "#14999999" },
+            ]}
+            onPress={handleCreateMessage}
+            disabled={isButtonDisabled}
+          >
+            <Text style={styles.createButtonText}>{createButtonLabel}</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.counterText}>{selectedUserCount}/6</Text>
+      </View>
     </View>
+
   );
 };
 
 const styles = StyleSheet.create({
+  createButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "center", // Center the items horizontally
+    alignItems: "center",
+    marginLeft: 45,
+    marginHorizontal: 16, // Adjust margin as needed
+    marginBottom: 16, // Adjust margin as needed
+  },
+
+  // Style for the counter text
+  counterText: {
+    fontSize: 13,
+    fontWeight: "bold",
+    color: "white",
+    marginLeft: 10,
+  },
   contactItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -356,6 +409,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     paddingHorizontal: 20,
     paddingVertical: 10,
+
     backgroundColor: "#14999999",
     borderRadius: 10,
   },
@@ -372,6 +426,7 @@ const styles = StyleSheet.create({
     flexDirection: "row", // Align the selected users horizontally
     alignItems: "center", // Vertically center the selected users
     marginRight: 10,
+    paddingRight: 20,
   },
   inputContainer: {
     flex: 1,
@@ -388,9 +443,9 @@ const styles = StyleSheet.create({
     height: 30,
   },
   buttonContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
+    flex: 1,
+    alignItems: "flex-end",
+    color: "#14999999",
   },
   contactInfo: {
     flex: 1,
@@ -452,6 +507,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     color: "white",
   },
+  buttonContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
   profileContainer: {
     width: 50,
     height: 50,
@@ -501,8 +561,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "white",
-    //paddingRight: 150,
-    //justifyContent: "center",
+    // adjust or remove paddingRight as needed
   },
   cancelButton: {
     paddingHorizontal: 0,

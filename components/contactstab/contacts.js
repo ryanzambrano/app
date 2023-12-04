@@ -133,8 +133,7 @@ const ContactsUI = ({ route }) => {
 
         // Check if recentMessageData exists, and only include users with recent messages
         if (
-          (!recentMessageData && user.Is_College == false) ||
-          user.Ammount_Users == 1
+          (!recentMessageData && user.Is_College == false || user.Ammount_Users < 2) 
         ) {
           return null;
         }
@@ -243,11 +242,17 @@ const ContactsUI = ({ route }) => {
         { event: "update", schema: "public", table: "Group_Chats" },
         (updatePayload) => {
           if (updatePayload) {
-            const payloadarray = updatePayload.new.User_ID;
+            fetchUsers();
+            /*const payloadarray = updatePayload.new.User_ID;
             if (payloadarray.includes(session.user.id)) {
               // console.log("Group data altered");
               fetchUsers();
             }
+            /*if()
+            {
+              console.log("heard");
+              fetchUsers();
+            }*/
           }
           // Handle delete event
         }

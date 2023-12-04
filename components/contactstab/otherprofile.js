@@ -27,13 +27,21 @@ const GroupChatScreen = ({}) => {
   const [editedJoinedGroups, setEditedJoinedGroups] = useState(
     user.joinedGroups
   );
-  const [userIds, setUserIds] = useState([]);
-  const isFocused = useIsFocused();
 
-  const extractedIds = user.User_ID.filter((item) => item !== session.user.id);
+
 
   const fetchUsers = async () => {
-    const { data: peoples, error } = await supabase
+    const { data: ids, error: iderror } = await supabase
+      .from("Group_Chats")
+      .select("*")
+      .eq("Group_ID", user.Group_ID);
+
+      
+  const extractedIds = ids[0].User_ID.filter((item) => item !== session.user.id);
+
+  user.Ammount_Users = ids[0].Ammount_Users;
+   
+  const { data: peoples, error } = await supabase
       .from("UGC")
       .select("*")
       .in("user_id", extractedIds);
@@ -79,18 +87,42 @@ const GroupChatScreen = ({}) => {
         }
       })
     );
+    const namesString = modifiedUsers.map(user => user.name).join(', ');
+
+    setEditedJoinedGroups(namesString);
 
     setPersons(modifiedUsers);
   };
 
   useEffect(() => {
-    // Extract session.user.id values from user.User_ID array
-
     fetchUsers();
-    if (isFocused == true) {
-      fetchUsers(); //alert("hi");
-    }
-  }, [user.User_ID, session.user.id, isFocused]);
+    const channel = supabase.channel("Group_Chats");
+    const subscription = channel
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "Group_Chats",
+        },
+        (genericPayload) => {
+          if (genericPayload) {
+            fetchUsers();
+            
+          }
+          // Handle generic event
+        }
+      )
+      .subscribe();
+
+    // Clean up the subscription when the component unmounts
+    return () => {
+      subscription.unsubscribe();
+    };
+  
+
+    
+  }, [user.User_ID, session.user.id]);
 
   const handleUserPress = (person) => {
     // Set the selected person in state
@@ -200,7 +232,21 @@ const GroupChatScreen = ({}) => {
         ]
       );
       return;
-    } else {
+    }
+    if(user.Ammount_Users == 6)
+    {
+      Alert.alert(
+        "Max Users",
+        "Their cannot be more than 6 users in a group chat",
+        [
+          {
+            text: "Ok",
+          },
+        ]
+      );
+      return;
+    } 
+    else {
       // Handle the case where the user doesn't meet the condition
       navigation.navigate("AddPerson", { group: user });
       // Optionally, you can show an alert or perform other actions.
