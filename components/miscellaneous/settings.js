@@ -60,6 +60,7 @@ const SettingsScreen = ({ navigation, route }) => {
       items: [
         { name: "Manage Blocked Users" },
         { name: "Allow Your Account Discoverable", type: "switch" },
+        { name: "Beta Test Survey" },
       ],
     },
     {
@@ -84,7 +85,7 @@ const SettingsScreen = ({ navigation, route }) => {
     "User Agreement": "UserAgreement",
     "Privacy Policy": "PrivacyPolicy",
     "Content Policy": "ContentPolicy",
-    FAQ: "FAQ",
+    "Beta Test Survey": "FAQ",
     "Report an Issue": "ReportIssue",
   };
 
