@@ -117,7 +117,7 @@ const Home = ({ route }) => {
       .select("notification_token")
       .eq("user_id", session.user.id);
 
-    if (istoken.notification_token === null) {
+    if (istoken.notification_token == null) {
       //console.log(token)
       const { data: tokendata, error } = await supabase
         .from("UGC")
