@@ -416,7 +416,7 @@ const Home = ({ route }) => {
     );
   };
 
-  const UserCard = memo(({ item, onPress }) => {
+  const renderUserCard = ({ item, onPress }) => {
     if (!item.lastModified) {
       //console.log(item);
       return null;
@@ -452,7 +452,7 @@ const Home = ({ route }) => {
         </View>
       </TouchableOpacity>
     );
-  });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -518,9 +518,7 @@ const Home = ({ route }) => {
             data={renderedUsers}
             extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
             // ... other props
-            renderItem={({ item }) => (
-              <UserCard item={item} onPress={handleUserCardPress} />
-            )}
+            renderItem={renderUserCard}
             keyExtractor={(item) => item.user_id.toString()}
             ListEmptyComponent={renderEmptyComponent}
             onEndReached={() => setRenderLimit((prevLimit) => prevLimit + 5)}
