@@ -105,11 +105,11 @@ export const SignUp = ({ navigation }) => {
                 />
                 <Text style={styles.titleText}>Verify your email!</Text>
               </View>
-              <Text style={styles.sloganText}>
+              <Text style={styles.successText}>
                 Check your email for an account verification email, and then
                 sign in!
               </Text>
-              <Text style={styles.sloganText}>(it might be in your spam)</Text>
+              <Text style={styles.successText}>(0-5 minute wait time.)</Text>
               <View style={styles.verifyFormAction}>
                 <TouchableOpacity
                   onPress={() => {
@@ -283,6 +283,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "500",
     color: "#929292",
+    textAlign: "center",
+    marginBottom: "10%",
+  },
+
+  successText: {
+    //flex: 1,
+    fontFamily: "Verdana",
+    fontSize: 16,
+    fontWeight: "500",
+    color: "lightgreen",
     textAlign: "center",
     marginBottom: "10%",
   },

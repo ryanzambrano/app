@@ -67,7 +67,7 @@ export const Questionaire1 = ({ navigation, route }) => {
 
   handleSaveAge = () => {
     if (!selectedAge) {
-      setSelectedAge(1);
+      setSelectedAge(18);
     }
     closeAgeModal();
   };

@@ -24,6 +24,8 @@ const App = () => {
   const [isReady, setIsReady] = useState(false);
   const [initialState, setInitialState] = useState();
   const logo = require("./assets/logo4.png");
+  const [profileInserted, setProfileInserted] = useState(null);
+  const [ugcInserted, setUgcInserted] = useState(null);
 
   useEffect(() => {
     let unsubscribe;
@@ -81,49 +83,59 @@ const App = () => {
   }, []);
 
   const checkUserProfile = async (session) => {
+    //const { error } = await supabase.auth.signOut();
     if (session?.user) {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("profile")
         .select("profile_complete")
-        .eq("user_id", session.user.id)
-        .single();
+        .eq("user_id", session.user.id);
 
       const { data: ugcData, error: ugcError } = await supabase
         .from("UGC")
         .select("has_ugc")
-        .eq("user_id", session.user.id)
-        .single();
+        .eq("user_id", session.user.id);
+
+      if (error || ugcError) {
+        alert(error.message);
+      }
 
       if (data == null) {
         // User does not have a profile, insert a new profile
-        const { data, error } = await supabase
-          .from("profile")
-          .insert([{ user_id: session.user.id, profile_complete: false }]);
-        //alert("profile data" + data);
+        const { data: profileInsertData, error: profileInsertError } =
+          await supabase
+            .from("profile")
+            .insert([{ user_id: session.user.id, profile_complete: false }]);
+        if (profileInsertError) {
+          alert("Please try again later");
+        } else {
+          setProfileInserted(true);
+        }
       }
       if (ugcData == null) {
-        const { data: ugcData, error: ugcError } = await supabase
+        const { data: ugcInsertData, error: ugcInsertError } = await supabase
           .from("UGC")
           .insert([{ user_id: session.user.id }]);
 
-        if (data == true && ugcData) {
-          setHasProfile(hasProfile);
+        if (ugcInsertError) {
+          alert("Please try again later");
+        } else {
+          setUgcInserted(true);
         }
       }
-      if (error || ugcError) {
-        setIsLoading(false);
 
-        throw new Error("error.message");
-      }
-
-      if (data.profile_complete == true && ugcData.has_ugc == true) {
+      if (
+        (data.profile_complete == true && ugcData.has_ugc == true) ||
+        (ugcInserted == true && profileInserted == true)
+      ) {
         const hasProfile = !!data.profile_complete;
 
         setHasProfile(true);
+        setIsLoading(false);
       } else {
         //console.log("profile invalid");
         setHasProfile(false);
+        setIsLoading(false);
       }
     }
 
