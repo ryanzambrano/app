@@ -90,7 +90,6 @@ const App = () => {
         .from("profile")
         .select("profile_complete")
         .eq("user_id", session.user.id);
-
       const { data: ugcData, error: ugcError } = await supabase
         .from("UGC")
         .select("has_ugc")
@@ -125,7 +124,7 @@ const App = () => {
       }
 
       if (
-        (data.profile_complete == true && ugcData.has_ugc == true) ||
+        (data[0].profile_complete == true && ugcData[0].has_ugc == true) ||
         (ugcInserted == true && profileInserted == true)
       ) {
         const hasProfile = !!data.profile_complete;
