@@ -23,7 +23,7 @@ import { supabase } from "../auth/supabase.js";
 import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { LayoutAnimation } from "react-native";
-
+import collegeLogo from "../../assets/collegeIcon1.png";
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
@@ -134,7 +134,8 @@ const ContactsUI = ({ route }) => {
 
         // Check if recentMessageData exists, and only include users with recent messages
         if (
-          (!recentMessageData && user.Is_College == false || user.Ammount_Users < 2) 
+          (!recentMessageData && user.Is_College == false) ||
+          user.Ammount_Users < 2
         ) {
           return null;
         }
@@ -419,15 +420,8 @@ const ContactsUI = ({ route }) => {
     const renderProfilePicture = () => {
       if (item.Is_College == true) {
         // Single profile picture
-        return (
-          <Image
-            style={styles.profilePicture}
-            source={{
-              uri: "https://png.pngtree.com/png-clipart/20190614/original/pngtree-college-line-black-icon-png-image_3767627.jpg", // Replace with actual URL
-            }}
-          />
-        );
-      } 
+        return <Image style={styles.profilePicture} source={collegeLogo} />;
+      }
       if (item.Ammount_Users > 2 && item.images.length > 1) {
         // Overlay two profile pictures
         return (
@@ -504,9 +498,7 @@ const ContactsUI = ({ route }) => {
             }}
           />
         );
-      }
-      
-      else {
+      } else {
         return (
           <Image
             style={styles.profilePicture}
