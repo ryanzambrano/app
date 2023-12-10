@@ -24,8 +24,6 @@ const App = () => {
   const [isReady, setIsReady] = useState(false);
   const [initialState, setInitialState] = useState();
   const logo = require("./assets/logo4.png");
-  const [profileInserted, setProfileInserted] = useState(null);
-  const [ugcInserted, setUgcInserted] = useState(null);
 
   useEffect(() => {
     let unsubscribe;
@@ -84,57 +82,82 @@ const App = () => {
 
   const checkUserProfile = async (session) => {
     //const { error } = await supabase.auth.signOut();
+    let profileInserted;
+    let ugcInserted;
+
+    setHasProfile(null);
     if (session?.user) {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("profile")
         .select("profile_complete")
-        .eq("user_id", session.user.id);
+        .eq("user_id", session.user.id)
+        .single();
       const { data: ugcData, error: ugcError } = await supabase
         .from("UGC")
         .select("has_ugc")
-        .eq("user_id", session.user.id);
+        .eq("user_id", session.user.id)
+        .single();
 
-      if (error || ugcError) {
-        alert(error.message);
-      }
+      // Handle the specific error
 
-      if (data == null) {
-        // User does not have a profile, insert a new profile
-        const { data: profileInsertData, error: profileInsertError } =
-          await supabase
-            .from("profile")
-            .insert([{ user_id: session.user.id, profile_complete: false }]);
-        if (profileInsertError) {
-          alert("Please try again later");
+      if (data && ugcData) {
+        //alert(data.profile_complete);
+        if (data.profile_complete == true && ugcData.has_ugc == true) {
+          //const hasProfile = !!data.profile_complete;
+          //alert("papii");
+
+          setHasProfile(true);
+          setIsLoading(false);
+
+          //return;
         } else {
-          setProfileInserted(true);
+          setHasProfile(false);
+          setIsLoading(false);
         }
-      }
-      if (ugcData == null) {
-        const { data: ugcInsertData, error: ugcInsertError } = await supabase
-          .from("UGC")
-          .insert([{ user_id: session.user.id }]);
+      } else if (error || ugcError) {
+        // Handle the specific error
+        if (data == null || ugcData == null) {
+          if (data == null) {
+            // User does not have a profile, insert a new profile
+            const { data: profileInsertData, error: profileInsertError } =
+              await supabase
+                .from("profile")
+                .insert([
+                  { user_id: session.user.id, profile_complete: false },
+                ]);
+            if (profileInsertError) {
+              // alert("problem");
+            } else {
+              profileInserted = true;
+              //alert("profile");
+            }
+          }
 
-        if (ugcInsertError) {
-          alert("Please try again later");
-        } else {
-          setUgcInserted(true);
+          if (ugcData == null) {
+            const { data: ugcInsertData, error: ugcInsertError } =
+              await supabase.from("UGC").insert([{ user_id: session.user.id }]);
+
+            if (ugcInsertError) {
+              //alert("problem");
+            } else {
+              ugcInserted = true;
+
+              //alert("ugc");
+            }
+          }
+          if (profileInserted === true || ugcInserted === true) {
+            //alert("success");
+            setHasProfile(false);
+            setIsLoading(false);
+            //return;
+          }
         }
-      }
-
-      if (
-        (data[0].profile_complete == true && ugcData[0].has_ugc == true) ||
-        (ugcInserted == true && profileInserted == true)
-      ) {
-        const hasProfile = !!data.profile_complete;
-
-        setHasProfile(true);
-        setIsLoading(false);
       } else {
-        //console.log("profile invalid");
+        alert("last");
         setHasProfile(false);
         setIsLoading(false);
+        return;
       }
     }
 
