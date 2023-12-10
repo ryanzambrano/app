@@ -92,40 +92,50 @@ const TagSelectionScreen = ({ navigation, route }) => {
           .eq("user_id", session.user.id);
 
           
-          const { data: insertData, error: insertError } = await supabase
+     
+
+          const { data: Groupdata, error: Grouperror } = await supabase
           .from("Group_Chats")
-          .insert([
-            {
-              User_ID: [session.user.id], // Assuming User_ID is an array of UUIDs
-              Ammount_Users: 1,
-              Group_Name: profileData[0].college,
-              Is_College: true
-            },
-          ])
           .select('*')
           .eq("Group_Name", profileData[0].college)
           .eq("Is_College", true);
+
           
                  
-          if(insertData == null)
+          if(Groupdata != null && Groupdata.length > 0)
           {
-            const { data: Groupdata, error: Grouperror } = await supabase
+           
+
+  
+              arruuid = Groupdata[0].User_ID;
+              arruuid.push(session.user.id); // Modifies arruuid in place
+              newammountuser = Groupdata[0].Ammount_Users + 1;
+              
+              const { data: Collegeupdatedata, error: updateError } = await supabase
+                .from("Group_Chats")
+                .update({ User_ID: arruuid, Ammount_Users: newammountuser })
+                .eq("Group_Name", profileData[0].college)
+                .eq("Is_College", true);
+           
+            
+          }
+          else{
+         
+            const { data: insertData, error: insertError } = await supabase
             .from("Group_Chats")
+            .insert([
+              {
+                User_ID: [session.user.id], // Assuming User_ID is an array of UUIDs
+                Ammount_Users: 1,
+                Group_Name: profileData[0].college,
+                Is_College: true
+              },
+            ])
             .select('*')
             .eq("Group_Name", profileData[0].college)
             .eq("Is_College", true);
-
-  
-            arruuid = Groupdata[0].User_ID;
-            arruuid.push(session.user.id); // Modifies arruuid in place
-            newammountuser = Groupdata[0].Ammount_Users + 1;
             
-            const { data: Collegeupdatedata, error: updateError } = await supabase
-              .from("Group_Chats")
-              .update({ User_ID: arruuid, Ammount_Users: newammountuser })
-              .eq("Group_Name", profileData[0].college)
-              .eq("Is_College", true);
-            
+    
           }
 
           

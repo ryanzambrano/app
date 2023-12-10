@@ -24,6 +24,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { LayoutAnimation } from "react-native";
 
+
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
   const navigation = useNavigation();
@@ -416,6 +417,17 @@ const ContactsUI = ({ route }) => {
       );
     };
     const renderProfilePicture = () => {
+      if (item.Is_College == true) {
+        // Single profile picture
+        return (
+          <Image
+            style={styles.profilePicture}
+            source={{
+              uri: "https://png.pngtree.com/png-clipart/20190614/original/pngtree-college-line-black-icon-png-image_3767627.jpg", // Replace with actual URL
+            }}
+          />
+        );
+      } 
       if (item.Ammount_Users > 2 && item.images.length > 1) {
         // Overlay two profile pictures
         return (
@@ -492,7 +504,9 @@ const ContactsUI = ({ route }) => {
             }}
           />
         );
-      } else {
+      }
+      
+      else {
         return (
           <Image
             style={styles.profilePicture}

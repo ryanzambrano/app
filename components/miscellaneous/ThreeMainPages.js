@@ -52,7 +52,6 @@ const ThreeMainPages = ({ route }) => {
           name="Message"
           component={MessagingUI}
           initialParams={{ session }}
-          options={{ gestureEnabled: false }}
         />
         <Stack.Screen
           name="AddProfileImages"

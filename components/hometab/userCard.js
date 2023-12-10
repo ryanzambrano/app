@@ -109,6 +109,7 @@ const UserCard = ({ navigation, route }) => {
         .select("*")
         .eq("user_id", user_id);
 
+
       if (error) {
         alert(error.message);
       }
@@ -118,7 +119,15 @@ const UserCard = ({ navigation, route }) => {
           lastModifiedList[item.image_index] = item.last_modified;
         });
       }
+    
       let newPhotos = [];
+
+      if(data.length < 1)
+      {
+        //newPhotos = lastModifiedList;
+        setPhotos([lastModified]);
+        return;
+      }
       for (let i = 1; i < MAX_IMAGES; i++) {
         const profilePictureURL = `${picURL}/${user_id}/${user_id}-${i}-${lastModifiedList[i]}`;
         const response = await fetch(profilePictureURL);
