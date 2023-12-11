@@ -122,7 +122,7 @@ const PrivacyPolicy = ({ navigation, route }) => {
         <Text style={styles.heading}>10. Contact Us</Text>
         <Text style={styles.text}>
           If you have any questions or suggestions about our Privacy Policy, do
-          not hesitate to contact us at: Cabana [Email] [Address] [Phone]
+          not hesitate to contact us at: {"\n\n"}team@thecabanaapp.com
         </Text>
       </ScrollView>
     </SafeAreaView>

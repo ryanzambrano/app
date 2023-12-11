@@ -114,10 +114,7 @@ const ContentPolicy = ({ navigation, route }) => {
         <Text style={styles.text}>
           If you have any questions or concerns regarding this Content Policy,
           please contact us at:
-          {"\n"}Cabana
-          {"\n"}[Email]
-          {"\n"}[Address]
-          {"\n"}[Phone]
+          {"\n\n"}team@thecabanaapp.com
         </Text>
       </ScrollView>
     </SafeAreaView>
