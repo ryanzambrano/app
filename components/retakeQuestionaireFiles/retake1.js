@@ -90,22 +90,47 @@ export const Retake1 = ({ navigation, route }) => {
     setIsWhoModalVisible(false);
   };
 
-  handleSaveAge = () => {
+  handleSaveAge = async () => {
     if (!selectedAge) {
-      setSelectedAge(1);
+      setSelectedAge(18);
+    }
+    const { data, error } = await supabase
+      .from("profile")
+      .update({
+        age: userData.age,
+      })
+      .eq("user_id", session.user.id);
+
+    if (error) {
+      startShakeAnimation(shakeAnimationValue);
+      setIsError(error.message);
     }
     closeAgeModal();
   };
-  handleSaveGender = () => {
+  handleSaveGender = async () => {
     if (!selectedGender) {
       setSelectedGender("Male");
     }
+    const { data, error } = await supabase
+      .from("profile")
+      .update({
+        gender: userData.gender,
+      })
+      .eq("user_id", session.user.id);
+
     closeGenderModal();
   };
-  handleSaveWho = () => {
+  handleSaveWho = async () => {
     if (!selectedWho) {
       setSelectedWho("Male");
     }
+    const { data, error } = await supabase
+      .from("profile")
+      .update({
+        who: userData.who,
+      })
+      .eq("user_id", session.user.id);
+
     closeWhoModal();
   };
 
@@ -120,21 +145,7 @@ export const Retake1 = ({ navigation, route }) => {
 
     if (session?.user) {
       if (!!userData.age && !!userData.gender && !!userData.who) {
-        const { data, error } = await supabase
-          .from("profile")
-          .update({
-            age: userData.age,
-            who: userData.who,
-            gender: userData.gender,
-          })
-          .eq("user_id", session.user.id);
-
-        if (error) {
-          startShakeAnimation(shakeAnimationValue);
-          setIsError(error.message);
-        } else {
-          navigation.navigate("Retake2");
-        }
+        navigation.navigate("Retake2");
       } else {
         startShakeAnimation(shakeAnimationValue);
         setIsError("Enter all required fields");
