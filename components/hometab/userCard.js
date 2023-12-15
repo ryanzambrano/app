@@ -339,6 +339,8 @@ const UserCard = ({ navigation, route }) => {
         ])
         .select();
 
+
+
       if (insertError) {
         if (insertError.code === "23505") {
           // dupe error
@@ -348,6 +350,18 @@ const UserCard = ({ navigation, route }) => {
               .select("*")
               .contains("User_ID", Finalarray)
               .eq("Ammount_Users", Finalarray.length);
+
+       
+
+              const { data: recentMessageData, error: messageError } = await supabase
+              .from("Group_Chat_Messages")
+              .select(`*, UGC (name)`)
+              .eq("Group_ID_Sent_To", navigationdata[0].Group_ID)
+              .order("created_at", { ascending: false })
+              .limit(150);
+
+  
+              
           if (navigationError) {
             console.log(navigationError);
             alert("Something went wrong, please try again later");
@@ -358,11 +372,14 @@ const UserCard = ({ navigation, route }) => {
               ...person,
               images: Imagedata,
               joinedGroups: name,
+              messages: recentMessageData,
+              recentMessage: recentMessageData[0]
             }));
 
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
-              navigation.navigate("Message", { user: fetchedPersons[0] });
+              //console.log(fetchedPersons[0]);
+              navigation.navigate("Message", { user: fetchedPersons[0]});
             }
 
             return;
@@ -379,6 +396,7 @@ const UserCard = ({ navigation, route }) => {
       }));
       setPersons(fetchedPersons);
       if (fetchedPersons.length > 0) {
+        
         navigation.navigate("Message", { user: fetchedPersons[0] });
       }
     }

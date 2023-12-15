@@ -15,6 +15,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { supabase } from "../auth/supabase";
 import { picURL } from "../auth/supabase.js";
 import { useIsFocused } from "@react-navigation/native";
+import collegeLogo from "../../assets/collegeIcon1.png";
 
 const GroupChatScreen = ({}) => {
   const [persons, setPersons] = useState([]);
@@ -134,6 +135,10 @@ const GroupChatScreen = ({}) => {
     navigation.navigate("userCard", { user: person });
   };
   const renderProfilePicture = (item) => {
+    if (user.Is_College == true) {
+      // Single profile picture
+      return <Image style={styles.layeredImage} source={collegeLogo} />;
+    }
     if (user.Ammount_Users > 2 && user.images.length > 1) {
       // Overlay two profile pictures
       return (

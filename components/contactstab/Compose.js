@@ -13,8 +13,7 @@ import {
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Feather } from "@expo/vector-icons"; // Import Feather icons
+import { SafeAreaView } from "react-native-safe-area-context"; // Import Feather icons
 import { supabase } from "../auth/supabase";
 import { picURL } from "../auth/supabase.js";
 import { AntDesign } from "@expo/vector-icons";
@@ -258,6 +257,13 @@ const ComposeMessageScreen = ({ route }) => {
               .contains("User_ID", selectedUserIDs)
               .eq("Ammount_Users", selectedUserIDs.length);
 
+              const { data: recentMessageData, error: messageError } = await supabase
+              .from("Group_Chat_Messages")
+              .select(`*, UGC (name)`)
+              .eq("Group_ID_Sent_To", navigationdata[0].Group_ID)
+              .order("created_at", { ascending: false })
+              .limit(150);
+
           const { data: Imagedata, error: ImageError } = await supabase
             .from("images")
             .select("*")
@@ -276,6 +282,8 @@ const ComposeMessageScreen = ({ route }) => {
                 ...person,
                 images: Imagedata,
                 joinedGroups: nameparam,
+                recentMessage: recentMessageData[0],
+                messages: recentMessageData
               }));
             } else {
               fetchedPersons = navigationdata.map((person) => ({
@@ -340,7 +348,7 @@ const ComposeMessageScreen = ({ route }) => {
         handleUserCardPress(item);
         setSearchQuery("");
       }}
-      disabled={selectedUserCount >= 6 && !selectedUsers.includes(item)}
+      disabled={selectedUserCount >= 5 && !selectedUsers.includes(item)}
     >
       <View style={styles.contactItem}>
         <View style={styles.profileContainer}>
@@ -440,7 +448,7 @@ const ComposeMessageScreen = ({ route }) => {
             <Text style={styles.createButtonText}>{createButtonLabel}</Text>
           </TouchableOpacity>
         </View>
-        <Text style={styles.counterText}>{selectedUserCount}/6</Text>
+        <Text style={styles.counterText}>{selectedUserCount}/5</Text>
       </View>
     </View>
   );

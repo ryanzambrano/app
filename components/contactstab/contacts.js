@@ -120,11 +120,12 @@ const ContactsUI = ({ route }) => {
         // Fetch the most recent group chat message
         const { data: recentMessageData, error: messageError } = await supabase
           .from("Group_Chat_Messages")
-          .select("*")
+          .select(`*, UGC (name)`)
           .eq("Group_ID_Sent_To", user.Group_ID)
           .order("created_at", { ascending: false })
-          .limit(1)
-          .single();
+          .limit(150);
+
+        
 
         const { data: Imagedata, error: ImageError } = await supabase
           .from("images")
@@ -134,7 +135,7 @@ const ContactsUI = ({ route }) => {
 
         // Check if recentMessageData exists, and only include users with recent messages
         if (
-          (!recentMessageData && user.Is_College == false) ||
+          (user.Is_College == false && recentMessageData.length == 0) ||
           user.Ammount_Users < 2
         ) {
           return null;
@@ -143,7 +144,8 @@ const ContactsUI = ({ route }) => {
         return {
           ...user,
           joinedGroups,
-          recentMessage: recentMessageData,
+          recentMessage: recentMessageData[0],
+          messages: recentMessageData,
           images: ImageError ? null : Imagedata,
         };
       })

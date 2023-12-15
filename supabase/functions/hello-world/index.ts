@@ -13,38 +13,78 @@ Deno.serve(async (_req) => {
     
     const updatedUserdata = UUID.filter((uuid: string) => uuid !== payload.record.Sent_From)
 
-    const senderdata = UUID.filter((uuid: string) => uuid == payload.record.Sent_From)
+    
 
-    const {data: datasender, error: sendererror } = await supabase.from('UGC').select('*').eq('user_id', senderdata[0])
+    const {data: datasender, error: sendererror } = await supabase.from('UGC').select('*').eq('user_id', payload.record.Sent_From)
   
-    const {data: userdata, error: usererror } = await supabase.from('UGC').select('*').eq('user_id', updatedUserdata[0])
-    console.log(userdata[0].notification_token)
-    const notif_token = userdata[0].notification_token
-    console.log(notif_token)
+    const {data: userdata, error: usererror } = await supabase.from('UGC').select('*').in('user_id', updatedUserdata)
+
+
+
+
+    const notif_token = userdata.map(user => user.notification_token).flat();
+    
+
+
+    const numberOfNotifications = notif_token.length
+
 
     const acseestoken = 'o5ttnVzo8Q56jPHyVpmMtRvxMmhYcN0XZljY5ET1'
 
     if (error) {
       throw error
     }
-    const res = await fetch('https://exp.host/--/api/v2/push/send', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${acseestoken}`,
-      },
-      body: JSON.stringify({
-        to: notif_token,
-        title: datasender[0].name,
-        body: payload.record.Message_Content,
-      }),
-    }).then((res) => res.json())
-    console.log(res)
+  
+    const responses = []
 
+    let title
+
+
+
+  // Example: Set different titles based on a condition
+  if (numberOfNotifications > 1) {
+ 
+    if(data[0].Group_Name.length > 0)
+    {
+
+      title = data[0].Group_Name
+    }
+    else
+    {
+
+      title = 'Group'
+    }
+  } else {
+    // Default title if no condition is met
+    title = datasender[0].name
+  }
+
+
+for (let i = 0; i < numberOfNotifications; i++) {
+
+  let res = await fetch('https://exp.host/--/api/v2/push/send', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${acseestoken}`,
+    },
+    body: JSON.stringify({
+      to: notif_token[i],
+      title: title,
+      body: payload.record.Message_Content,
+      sound: 'default',
+    }),
+  }).then((res) => res.json());
+
+
+
+  // Push each response to the array
+  responses.push(res);
+}
     
-    return new Response(JSON.stringify(res), {
-      headers: { 'Content-Type': 'application/json' },
-    })
+return new Response(JSON.stringify(responses), {
+  headers: { 'Content-Type': 'application/json' },
+})
   } catch (err) {
     return new Response(String(err?.message ?? err), { status: 500 })
   }
