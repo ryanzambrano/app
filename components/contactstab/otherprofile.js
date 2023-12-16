@@ -22,7 +22,7 @@ const GroupChatScreen = ({}) => {
   const [selectedPerson, setSelectedPerson] = useState(null);
   const route = useRoute();
   const { session } = route.params;
-  const { user } = route.params;
+  const { user, modifiedUsers } = route.params;
   //const [user, setUser] = useState(route.params);
   const navigation = useNavigation();
   const [editedJoinedGroups, setEditedJoinedGroups] = useState(
@@ -98,7 +98,8 @@ const GroupChatScreen = ({}) => {
   };
 
   useEffect(() => {
-    fetchUsers();
+    setPersons(modifiedUsers);
+    //fetchUsers();
     const channel = supabase.channel("Group_Chats");
     const subscription = channel
       .on(
@@ -137,7 +138,9 @@ const GroupChatScreen = ({}) => {
   const renderProfilePicture = (item) => {
     if (user.Is_College == true) {
       // Single profile picture
-      return <Image style={styles.layeredImage} source={collegeLogo} />;
+      return <Image style={styles.layeredImage}source={{
+        uri: `${user.images}`, // Replace with actual URLs
+      }} />;
     }
     if (user.Ammount_Users > 2 && user.images.length > 1) {
       // Overlay two profile pictures

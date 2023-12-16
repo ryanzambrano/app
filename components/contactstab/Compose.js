@@ -25,7 +25,7 @@ const isBookmarkedColor = "#14999999";
 const notBookmarkedColor = "#fff";
 
 const ComposeMessageScreen = ({ route }) => {
-  const [selectedUserCount, setSelectedUserCount] = useState(0);
+  const [selectedUserCount, setSelectedUserCount] = useState(1);
   const [persons, setPersons] = useState([]);
   const navigation = useNavigation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -261,8 +261,19 @@ const ComposeMessageScreen = ({ route }) => {
               .from("Group_Chat_Messages")
               .select(`*, UGC (name)`)
               .eq("Group_ID_Sent_To", navigationdata[0].Group_ID)
-              .order("created_at", { ascending: false })
+              .order("created_at", {ascending: false})
               .limit(150);
+
+              let chatmessages = recentMessageData;
+
+              if(recentMessageData != undefined)
+              {
+                if(recentMessageData.length < 17)
+                {
+                  chatmessages = [...recentMessageData].reverse();
+                }
+                
+              }
 
           const { data: Imagedata, error: ImageError } = await supabase
             .from("images")
@@ -278,18 +289,23 @@ const ComposeMessageScreen = ({ route }) => {
             let fetchedPersons;
             //console.log(navigationdata[0].Group_Name);
             if (!navigationdata[0].Group_Name) {
+              console.log("Group Name does not exist");
               fetchedPersons = navigationdata.map((person) => ({
                 ...person,
                 images: Imagedata,
                 joinedGroups: nameparam,
-                recentMessage: recentMessageData[0],
-                messages: recentMessageData
+                recentMessage: recentMessageData[recentMessageData.length - 1],
+                messages: chatmessages
               }));
             } else {
+
+              console.log("Group Name exist");
               fetchedPersons = navigationdata.map((person) => ({
                 ...person,
                 images: Imagedata,
                 joinedGroups: navigationdata[0].Group_Name,
+                recentMessage: recentMessageData[recentMessageData.length - 1],
+                messages: chatmessages
               }));
             }
 
@@ -348,7 +364,7 @@ const ComposeMessageScreen = ({ route }) => {
         handleUserCardPress(item);
         setSearchQuery("");
       }}
-      disabled={selectedUserCount >= 5 && !selectedUsers.includes(item)}
+      disabled={selectedUserCount >= 6 && !selectedUsers.includes(item)}
     >
       <View style={styles.contactItem}>
         <View style={styles.profileContainer}>
@@ -448,7 +464,7 @@ const ComposeMessageScreen = ({ route }) => {
             <Text style={styles.createButtonText}>{createButtonLabel}</Text>
           </TouchableOpacity>
         </View>
-        <Text style={styles.counterText}>{selectedUserCount}/5</Text>
+        <Text style={styles.counterText}>{selectedUserCount}/6</Text>
       </View>
     </View>
   );

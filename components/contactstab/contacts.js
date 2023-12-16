@@ -68,6 +68,38 @@ const ContactsUI = ({ route }) => {
     }
   };
 
+  function getInitials(fullName) {
+    const words = fullName.split(' ');
+  
+    // Filter out common words (e.g., "of", "and") and take the first letter of each remaining word
+    const initials = words
+      .filter(word => !['of', 'and', 'the'].includes(word.toLowerCase()))
+      .map(word => word.charAt(0).toLowerCase())
+      .join('');
+  
+    return initials;
+  }
+
+  
+  const fetchLogoFromClearbit = async (domain) => {
+    try {
+      const response = await fetch(`https://logo.clearbit.com/${domain}`);
+      
+      // Check if the response status is OK (200)
+      if (response.ok) {
+        // Return the logo URL
+        return response.url;
+      } else {
+        // Handle errors, e.g., company/school not found or no logo available
+        console.error(`Error fetching logo for ${domain}: ${response.statusText}`);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching logo:', error);
+      return null;
+    }
+  };
+
   const fetchUsers = async () => {
     const { data: users, error } = await supabase
       .from("Group_Chats")
@@ -122,8 +154,25 @@ const ContactsUI = ({ route }) => {
           .from("Group_Chat_Messages")
           .select(`*, UGC (name)`)
           .eq("Group_ID_Sent_To", user.Group_ID)
-          .order("created_at", { ascending: false })
+          .order("created_at", {ascending: false})
           .limit(150);
+
+          let chatmessages = recentMessageData;
+
+          if(recentMessageData != undefined)
+          {
+            if(recentMessageData.length < 17)
+            {
+              chatmessages = [...recentMessageData].reverse();
+            }
+            
+          }
+
+          
+
+          
+
+        //console.log("recentMessageData");
 
         
 
@@ -140,12 +189,30 @@ const ContactsUI = ({ route }) => {
         ) {
           return null;
         }
-
+        if (user.Is_College == true) {
+          const initials = getInitials(user.Group_Name);
+      
+          try {
+            const college_logo = await fetchLogoFromClearbit(`${initials}.edu`);
+            // Assuming you have other variables like joinedGroups, recentMessageData, and ImageError
+            return {
+              ...user,
+              joinedGroups,
+              recentMessage: recentMessageData[0],
+              messages: chatmessages,
+              images: college_logo,
+            };
+            
+          } catch (error) {
+            console.error('Error fetching college logo:', error);
+            // Handle error or return a modified user object as needed
+          }
+        }
         return {
           ...user,
           joinedGroups,
           recentMessage: recentMessageData[0],
-          messages: recentMessageData,
+          messages: chatmessages,
           images: ImageError ? null : Imagedata,
         };
       })
@@ -225,6 +292,7 @@ const ContactsUI = ({ route }) => {
   useEffect(() => {
     loadData();
     fetchUsers();
+
     const channel = supabase.channel("room1");
     const subscription = channel
       .on(
@@ -420,9 +488,9 @@ const ContactsUI = ({ route }) => {
       );
     };
     const renderProfilePicture = () => {
-      if (item.Is_College == true) {
+      if (item.Is_College === true) {
         // Single profile picture
-        return <Image style={styles.profilePicture} source={collegeLogo} />;
+        return <Image style={styles.profilePicture} source={{ uri: item.images }} />;
       }
       if (item.Ammount_Users > 2 && item.images.length > 1) {
         // Overlay two profile pictures

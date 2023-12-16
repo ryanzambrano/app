@@ -357,9 +357,20 @@ const UserCard = ({ navigation, route }) => {
               .from("Group_Chat_Messages")
               .select(`*, UGC (name)`)
               .eq("Group_ID_Sent_To", navigationdata[0].Group_ID)
-              .order("created_at", { ascending: false })
+              .order("created_at", {ascending: false})
               .limit(150);
 
+
+              let chatmessages = recentMessageData;
+
+              if(recentMessageData != undefined)
+              {
+                if(recentMessageData.length < 17)
+                {
+                  chatmessages = [...recentMessageData].reverse();
+                }
+                
+              }
   
               
           if (navigationError) {
@@ -372,13 +383,13 @@ const UserCard = ({ navigation, route }) => {
               ...person,
               images: Imagedata,
               joinedGroups: name,
-              messages: recentMessageData,
-              recentMessage: recentMessageData[0]
+              recentMessage: recentMessageData[0],
+              messages: chatmessages
             }));
 
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
-              //console.log(fetchedPersons[0]);
+    
               navigation.navigate("Message", { user: fetchedPersons[0]});
             }
 
@@ -393,6 +404,8 @@ const UserCard = ({ navigation, route }) => {
         ...person,
         images: Imagedata,
         joinedGroups: name,
+        messages: undefined,
+        recentMessage: undefined,
       }));
       setPersons(fetchedPersons);
       if (fetchedPersons.length > 0) {
