@@ -17,7 +17,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { picURL } from "../auth/supabase.js";
 
 const PrivacyPolicy = ({ navigation, route }) => {
-  const { session } = route.params;
+  // const { session } = route.params;
 
   useEffect(() => {}, []);
 

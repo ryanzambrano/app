@@ -51,6 +51,7 @@ export const colleges = [
   { label: "University of Oregon", value: "UO" },
   { label: "University of Mississippi", value: "Ole Miss" },
   { label: "Florida State University", value: "FSU" },
+  { label: "Florida Atlantic University", value: "FAU" },
 ];
 
 //export default CollegePicker;

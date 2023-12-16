@@ -14,6 +14,7 @@ import {
   Keyboard,
   Animated,
 } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 
 import { supabase } from "./supabase.js";
 import { startShakeAnimation } from "./profileUtils.js";
@@ -26,6 +27,11 @@ export const SignUp = ({ navigation }) => {
   const [passwordsMatch, setPasswordsMatch] = useState(null);
   const [isError, setIsError] = useState("");
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
+  const [isChecked, setIsChecked] = useState(null);
+
+  const toggleCheck = () => {
+    setIsChecked(!isChecked);
+  };
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -42,15 +48,20 @@ export const SignUp = ({ navigation }) => {
     setIsError(null);
 
     // Check if the last 4 characters of email are ".edu"
-    if (form.email.slice(-4) !== ".edu") {
+    /*if (form.email.slice(-4) !== ".edu") {
       startShakeAnimation(shakeAnimationValue);
-      setIsError("Must use the email provided by your college");
       return;
-    }
+    }*/
 
     if (form.password !== form.confirmPassword) {
       startShakeAnimation(shakeAnimationValue);
       setPasswordsMatch(false);
+      return;
+    }
+
+    if (!isChecked) {
+      startShakeAnimation(shakeAnimationValue);
+      setIsChecked(false);
       return;
     }
 
@@ -142,7 +153,7 @@ export const SignUp = ({ navigation }) => {
             <View style={styles.form}>
               <View style={styles.input}>
                 <Text style={styles.inputHeader}>
-                  Enter your College Email Address:
+                  Enter your Email Address:
                 </Text>
                 <TextInput
                   style={styles.inputControl}
@@ -183,9 +194,42 @@ export const SignUp = ({ navigation }) => {
                 />
               </View>
 
+              <View style={styles.termsContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.termsBox,
+                    { backgroundColor: isChecked ? "#14999999" : "grey" },
+                  ]}
+                  onPress={toggleCheck}
+                ></TouchableOpacity>
+                <Text style={styles.formFooter}>Agree to our </Text>
+                <TouchableOpacity
+                  style={styles.termsContainer}
+                  onPress={() => {
+                    // handle link
+                    navigation.navigate("PrivacyPolicy");
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.formFooter,
+                      { textDecorationLine: "underline" },
+                    ]}
+                  >
+                    Privacy Policy
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
               {passwordsMatch == false && (
                 <Animated.Text style={[styles.errorText, shakeAnimationStyle]}>
                   Passwords Do Not Match
+                </Animated.Text>
+              )}
+
+              {isChecked == false && (
+                <Animated.Text style={[styles.errorText, shakeAnimationStyle]}>
+                  You Must Agree to the Privacy Policy to Register
                 </Animated.Text>
               )}
 
@@ -374,6 +418,23 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#149999",
     zIndex: 1,
+  },
+
+  termsContainer: {
+    flexDirection: "row",
+    marginBottom: 10,
+    gap: 5,
+  },
+
+  termsBox: {
+    backgroundColor: "white",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "white",
+    borderRadius: 5,
+    flex: 0,
+    flexDirection: "row",
+    height: "1%",
   },
 });
 
