@@ -401,7 +401,7 @@ const ContactsUI = ({ route }) => {
         const opacityValue = contactOpacities[item.Group_ID];
         Animated.timing(opacityValue, {
           toValue: 0, // Make it fully transparent
-          duration: 150, // Animation duration in milliseconds
+          duration: 75, // Animation duration in milliseconds
           useNativeDriver: false, // Required for opacity animations
         }).start(async () => {
           // After the animation is complete, perform the deletion logic
@@ -437,8 +437,8 @@ const ContactsUI = ({ route }) => {
     const renderRightActions = (progress, dragX) => {
       // console.log("Progress:", progress);
       const trans = dragX.interpolate({
-        inputRange: [-75, 0],
-        outputRange: [0, 75], // Modify this line to change the direction of the expansion
+        inputRange: [-110, 0],
+        outputRange: [0, 110], // Modify this line to change the direction of the expansion
       });
 
       const handleDeleteConfirmation = (item) => {
@@ -470,23 +470,33 @@ const ContactsUI = ({ route }) => {
       };
 
       return (
-        <TouchableOpacity onPress={() => handleDeleteConfirmation(item)}>
-          <Animated.View
-            style={{
-              backgroundColor: "red",
-              justifyContent: "center",
-              alignItems: "center",
-              width: 75,
-              height: "100%",
-              transform: [{ translateX: trans }],
-            }}
-          >
-            {/* Replace 'Delete' text with trashcan icon */}
-            <Icon name="trash" size={24} color="white" />
-          </Animated.View>
-        </TouchableOpacity>
+        <Animated.View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: 110,
+            transform: [{ translateX: trans }],
+            flexDirection: 'row',
+          }}
+        >
+          <TouchableOpacity onPress={() => handleSecondAction(item)}>
+            <View style={{ flex: 1, backgroundColor: '#5b52c7', width: 55,  justifyContent: 'center',
+            alignItems: 'center', }}>
+              <Icon name="bell-slash" size={20} color="white" />
+            </View>
+          </TouchableOpacity>
+      
+          <TouchableOpacity onPress={() => handleDeleteConfirmation(item)}>
+            <View style={{ flex: 1, backgroundColor: '#e60000', width: 55,  justifyContent: 'center',
+            alignItems: 'center',}}>
+              {/* Replace 'Delete' text with trashcan icon */}
+              <Icon name="trash" size={25} color="white" />
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
       );
     };
+
     const renderProfilePicture = () => {
       if (item.Is_College === true) {
         // Single profile picture
