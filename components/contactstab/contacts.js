@@ -585,6 +585,7 @@ const ContactsUI = ({ route }) => {
           renderRightActions={renderRightActions}
           overshootRight={false}
           useNativeDriver={true}
+          friction={2}
         >
           <TouchableOpacity onPress={() => handleUserCardPress(item)}>
             <View style={styles.contactItem}>

@@ -25,6 +25,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { supabase } from "../auth/supabase"; // we have our client here no need to worry about creating
 import Icon from "react-native-vector-icons/FontAwesome";
 import collegeLogo from "../../assets/collegeIcon1.png";
+import { Swipeable } from "react-native-gesture-handler";
 
 const MessagingUI = () => {
   const isFocused = useIsFocused();
@@ -388,6 +389,35 @@ const MessagingUI = () => {
     }
   };
 
+  const formatRecentTime = (timestamp) => {
+    if (!timestamp) return "";
+
+    const date = new Date(timestamp);
+    const currentTime = new Date();
+    const diffInMs = currentTime - date;
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+    if (diffInDays < 1) {
+      // Less than a day ago, display time in AM/PM format
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const ampm = hours >= 12 ? "PM" : "AM";
+      const formattedTime = `${hours % 12 || 12}:${minutes
+        .toString()
+        .padStart(2, "0")} ${ampm}`;
+      return formattedTime;
+    } else {
+      // More than a day ago, display the full date
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const formattedDate = `${month.toString().padStart(2, "0")}/${day
+        .toString()
+        .padStart(2, "0")}/${year}`;
+      return formattedDate;
+    }
+  };
+
 
 
 
@@ -496,7 +526,29 @@ const MessagingUI = () => {
       );
     }
   };
+  const renderRightActions = (progress, dragX, item) => {
+    // console.log("Progress:", progress);
+    const trans = dragX.interpolate({
+      inputRange: [-75, 0],
+      outputRange: [0, 75], // Modify this line to change the direction of the expansion
+    });
+    const time = formatRecentTime(item.created_at);
 
+    return (
+      <Animated.View
+      style={{
+        justifyContent: "center",
+        alignItems: "center",
+        width: 75,
+        height: "100%",
+        transform: [{ translateX: trans }],
+      }}
+    >
+      {/* Replace 'Delete' text with trashcan icon */}
+      <Text style={styles.senderName}>{time}</Text>
+    </Animated.View>
+    );
+  };
   return (
       <KeyboardAvoidingView
         style={styles.container}
@@ -528,26 +580,41 @@ const MessagingUI = () => {
   ref={flatListRef}
   data={messages}
   renderItem={({ item, index }) => {
-    const isOwnMessage = item.Sent_From === session.user.id;
+    let adjustedIndex = 0;
+    let one = 1;
+    if(isInverted == true)
+    {
+      adjustedIndex = messages.length - 1;
+      one = -1;
+    }
+
+    const isOwnMessage = item.Sent_From == session.user.id;
     const isFirstOwnMessage =
       isOwnMessage &&
-      (index === 0 || messages[index - 1].Sent_From !== session.user.id);
+      (index === adjustedIndex || messages[index - one].Sent_From !== session.user.id);
 
     const isOtherMessage = item.Sent_From !== session.user.id;
     const isFirstOtherMessage =
       isOtherMessage &&
-      (index === 0 || messages[index - 1].Sent_From !== item.Sent_From);
+      (index === adjustedIndex  || messages[index - one].Sent_From !== item.Sent_From);
 
     const shouldDisplaySenderName =
       user.Ammount_Users >= 3 && isFirstOtherMessage;
               return (
                   <View>
+                      <Swipeable
+         renderRightActions={(progress, dragX) =>
+            renderRightActions(progress, dragX, item)
+          }
+          overshootRight={false}
+           friction={2}
+          useNativeDriver={true}>
                     {shouldDisplaySenderName && (
                       <Text style={styles.senderName}>{item.UGC.name}</Text>
                     )}
                     <View
                       style={[
-                        styles.messageContainer,
+                        styles.messagesContainer,
                         isOwnMessage
                           ? styles.messageContainerRight
                           : styles.messageContainerLeft,
@@ -571,6 +638,7 @@ const MessagingUI = () => {
                         {item.Message_Content}
                       </Text>
                     </View>
+                    </Swipeable>
                   </View>
               );
             }}
