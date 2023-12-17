@@ -202,7 +202,7 @@ export const SignUp = ({ navigation }) => {
                   ]}
                   onPress={toggleCheck}
                 ></TouchableOpacity>
-                <Text style={styles.formFooter}>Agree to our </Text>
+                <Text style={styles.formFooter}>I Agree to </Text>
                 <TouchableOpacity
                   style={styles.termsContainer}
                   onPress={() => {
@@ -216,7 +216,24 @@ export const SignUp = ({ navigation }) => {
                       { textDecorationLine: "underline" },
                     ]}
                   >
-                    Privacy Policy
+                    Privacy
+                  </Text>
+                </TouchableOpacity>
+                <Text style={styles.formFooter}>and{"  "}</Text>
+                <TouchableOpacity
+                  style={styles.termsContainer}
+                  onPress={() => {
+                    // handle link
+                    navigation.navigate("ContentPolicy");
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.formFooter,
+                      { textDecorationLine: "underline" },
+                    ]}
+                  >
+                    Content Policy
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -229,7 +246,8 @@ export const SignUp = ({ navigation }) => {
 
               {isChecked == false && (
                 <Animated.Text style={[styles.errorText, shakeAnimationStyle]}>
-                  You Must Agree to the Privacy Policy to Register
+                  You Must Agree to the Privacy Policy and Content Policy to
+                  Register
                 </Animated.Text>
               )}
 
@@ -423,7 +441,7 @@ const styles = StyleSheet.create({
   termsContainer: {
     flexDirection: "row",
     marginBottom: 10,
-    gap: 5,
+    //gap: 5,
   },
 
   termsBox: {
@@ -435,6 +453,7 @@ const styles = StyleSheet.create({
     flex: 0,
     flexDirection: "row",
     height: "1%",
+    marginRight: 5,
   },
 });
 
