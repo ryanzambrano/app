@@ -39,6 +39,7 @@ const ContactsUI = ({ route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const groupIds = contacts.map((contact) => contact.Group_ID);
   const [expoPushToken, setExpoPushToken] = useState("");
+  const [ringer, setRinger] = useState(false);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -69,33 +70,34 @@ const ContactsUI = ({ route }) => {
   };
 
   function getInitials(fullName) {
-    const words = fullName.split(' ');
-  
+    const words = fullName.split(" ");
+
     // Filter out common words (e.g., "of", "and") and take the first letter of each remaining word
     const initials = words
-      .filter(word => !['of', 'and', 'the'].includes(word.toLowerCase()))
-      .map(word => word.charAt(0).toLowerCase())
-      .join('');
-  
+      .filter((word) => !["of", "and", "the"].includes(word.toLowerCase()))
+      .map((word) => word.charAt(0).toLowerCase())
+      .join("");
+
     return initials;
   }
 
-  
   const fetchLogoFromClearbit = async (domain) => {
     try {
       const response = await fetch(`https://logo.clearbit.com/${domain}`);
-      
+
       // Check if the response status is OK (200)
       if (response.ok) {
         // Return the logo URL
         return response.url;
       } else {
         // Handle errors, e.g., company/school not found or no logo available
-        console.error(`Error fetching logo for ${domain}: ${response.statusText}`);
+        console.error(
+          `Error fetching logo for ${domain}: ${response.statusText}`
+        );
         return null;
       }
     } catch (error) {
-      console.error('Error fetching logo:', error);
+      console.error("Error fetching logo:", error);
       return null;
     }
   };
@@ -154,27 +156,18 @@ const ContactsUI = ({ route }) => {
           .from("Group_Chat_Messages")
           .select(`*, UGC (name)`)
           .eq("Group_ID_Sent_To", user.Group_ID)
-          .order("created_at", {ascending: false})
+          .order("created_at", { ascending: false })
           .limit(150);
 
-          let chatmessages = recentMessageData;
+        let chatmessages = recentMessageData;
 
-          if(recentMessageData != undefined)
-          {
-            if(recentMessageData.length < 17)
-            {
-              chatmessages = [...recentMessageData].reverse();
-            }
-            
+        if (recentMessageData != undefined) {
+          if (recentMessageData.length < 17) {
+            chatmessages = [...recentMessageData].reverse();
           }
-
-          
-
-          
+        }
 
         //console.log("recentMessageData");
-
-        
 
         const { data: Imagedata, error: ImageError } = await supabase
           .from("images")
@@ -191,7 +184,7 @@ const ContactsUI = ({ route }) => {
         }
         if (user.Is_College == true) {
           const initials = getInitials(user.Group_Name);
-      
+
           try {
             const college_logo = await fetchLogoFromClearbit(`${initials}.edu`);
             // Assuming you have other variables like joinedGroups, recentMessageData, and ImageError
@@ -202,9 +195,8 @@ const ContactsUI = ({ route }) => {
               messages: chatmessages,
               images: college_logo,
             };
-            
           } catch (error) {
-            console.error('Error fetching college logo:', error);
+            console.error("Error fetching college logo:", error);
             // Handle error or return a modified user object as needed
           }
         }
@@ -472,23 +464,37 @@ const ContactsUI = ({ route }) => {
       return (
         <Animated.View
           style={{
-            justifyContent: 'center',
-            alignItems: 'center',
+            justifyContent: "center",
+            alignItems: "center",
             width: 110,
             transform: [{ translateX: trans }],
-            flexDirection: 'row',
+            flexDirection: "row",
           }}
         >
           <TouchableOpacity onPress={() => handleSecondAction(item)}>
-            <View style={{ flex: 1, backgroundColor: '#5b52c7', width: 55,  justifyContent: 'center',
-            alignItems: 'center', }}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "#5b52c7",
+                width: 55,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               <Icon name="bell-slash" size={20} color="white" />
             </View>
           </TouchableOpacity>
-      
+
           <TouchableOpacity onPress={() => handleDeleteConfirmation(item)}>
-            <View style={{ flex: 1, backgroundColor: '#e60000', width: 55,  justifyContent: 'center',
-            alignItems: 'center',}}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "#e60000",
+                width: 55,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               {/* Replace 'Delete' text with trashcan icon */}
               <Icon name="trash" size={25} color="white" />
             </View>
@@ -500,7 +506,9 @@ const ContactsUI = ({ route }) => {
     const renderProfilePicture = () => {
       if (item.Is_College === true) {
         // Single profile picture
-        return <Image style={styles.profilePicture} source={{ uri: item.images }} />;
+        return (
+          <Image style={styles.profilePicture} source={{ uri: item.images }} />
+        );
       }
       if (item.Ammount_Users > 2 && item.images.length > 1) {
         // Overlay two profile pictures
@@ -643,6 +651,10 @@ const ContactsUI = ({ route }) => {
                       >
                         {item.recentMessage.Message_Content}
                       </Text>
+                      {!ringer ? (
+                        <Icon name="bell-slash" size={13} color="#575D61" />
+                      ) : null}
+
                       {item.recentMessage &&
                       !item.recentMessage.Read.includes(session.user.id) ? (
                         <View style={styles.circle} /> // Add this View for the solid circle
@@ -669,12 +681,6 @@ const ContactsUI = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Image
-          style={styles.logo}
-          source={{
-            uri: "https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg",
-          }}
-        />
         <Text style={styles.headerText}>Messages</Text>
         <TouchableOpacity
           onPress={handlePlusIconPress}
