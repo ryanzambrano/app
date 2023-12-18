@@ -221,7 +221,6 @@ const ComposeMessageScreen = ({ route }) => {
       selectedUserIDs.push(session.user.id);
       selectedUserIDs.sort();
 
-
       // Insert the new record with User_ID, Group_ID, and Group_Name
       const { data: insertData, error: insertError } = await supabase
         .from("Group_Chats")
@@ -251,6 +250,7 @@ const ComposeMessageScreen = ({ route }) => {
       }
 
       if (insertError) {
+        alert(insertError.message);
         if (insertError.code === "23505") {
           const { data: navigationdata, error: navigationError } =
             await supabase
@@ -259,23 +259,21 @@ const ComposeMessageScreen = ({ route }) => {
               .contains("User_ID", selectedUserIDs)
               .eq("Ammount_Users", selectedUserIDs.length);
 
-              const { data: recentMessageData, error: messageError } = await supabase
+          const { data: recentMessageData, error: messageError } =
+            await supabase
               .from("Group_Chat_Messages")
               .select(`*, UGC (name)`)
               .eq("Group_ID_Sent_To", navigationdata[0].Group_ID)
-              .order("created_at", {ascending: false})
+              .order("created_at", { ascending: false })
               .limit(150);
 
-              let chatmessages = recentMessageData;
+          let chatmessages = recentMessageData;
 
-              if(recentMessageData != undefined)
-              {
-                if(recentMessageData.length < 17)
-                {
-                  chatmessages = [...recentMessageData].reverse();
-                }
-                
-              }
+          if (recentMessageData != undefined) {
+            if (recentMessageData.length < 17) {
+              chatmessages = [...recentMessageData].reverse();
+            }
+          }
 
           const { data: Imagedata, error: ImageError } = await supabase
             .from("images")
@@ -297,17 +295,16 @@ const ComposeMessageScreen = ({ route }) => {
                 images: Imagedata,
                 joinedGroups: nameparam,
                 recentMessage: recentMessageData[recentMessageData.length - 1],
-                messages: chatmessages
+                messages: chatmessages,
               }));
             } else {
-
               console.log("Group Name exist");
               fetchedPersons = navigationdata.map((person) => ({
                 ...person,
                 images: Imagedata,
                 joinedGroups: navigationdata[0].Group_Name,
                 recentMessage: recentMessageData[recentMessageData.length - 1],
-                messages: chatmessages
+                messages: chatmessages,
               }));
             }
 

@@ -131,7 +131,6 @@ const UserCard = ({ navigation, route }) => {
         .select("*")
         .eq("user_id", user_id);
 
-
       if (error) {
         alert(error.message);
       }
@@ -141,11 +140,10 @@ const UserCard = ({ navigation, route }) => {
           lastModifiedList[item.image_index] = item.last_modified;
         });
       }
-    
+
       let newPhotos = [];
 
-      if(data.length < 1)
-      {
+      if (data.length < 1) {
         //newPhotos = lastModifiedList;
         setPhotos([lastModified]);
         return;
@@ -361,8 +359,6 @@ const UserCard = ({ navigation, route }) => {
         ])
         .select();
 
-
-
       if (insertError) {
         if (insertError.code === "23505") {
           // dupe error
@@ -373,28 +369,22 @@ const UserCard = ({ navigation, route }) => {
               .contains("User_ID", Finalarray)
               .eq("Ammount_Users", Finalarray.length);
 
-       
-
-              const { data: recentMessageData, error: messageError } = await supabase
+          const { data: recentMessageData, error: messageError } =
+            await supabase
               .from("Group_Chat_Messages")
               .select(`*, UGC (name)`)
               .eq("Group_ID_Sent_To", navigationdata[0].Group_ID)
-              .order("created_at", {ascending: false})
+              .order("created_at", { ascending: false })
               .limit(150);
 
+          let chatmessages = recentMessageData;
 
-              let chatmessages = recentMessageData;
+          if (recentMessageData != undefined) {
+            if (recentMessageData.length < 17) {
+              chatmessages = [...recentMessageData].reverse();
+            }
+          }
 
-              if(recentMessageData != undefined)
-              {
-                if(recentMessageData.length < 17)
-                {
-                  chatmessages = [...recentMessageData].reverse();
-                }
-                
-              }
-  
-              
           if (navigationError) {
             console.log(navigationError);
             alert("Something went wrong, please try again later");
@@ -406,13 +396,12 @@ const UserCard = ({ navigation, route }) => {
               images: Imagedata,
               joinedGroups: name,
               recentMessage: recentMessageData[0],
-              messages: chatmessages
+              messages: chatmessages,
             }));
 
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
-    
-              navigation.navigate("Message", { user: fetchedPersons[0]});
+              navigation.navigate("Message", { user: fetchedPersons[0] });
             }
 
             return;
@@ -431,7 +420,6 @@ const UserCard = ({ navigation, route }) => {
       }));
       setPersons(fetchedPersons);
       if (fetchedPersons.length > 0) {
-        
         navigation.navigate("Message", { user: fetchedPersons[0] });
       }
     }
