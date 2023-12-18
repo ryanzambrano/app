@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  KeyboardAvoidingView,
   FlatList,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
@@ -25,7 +26,8 @@ export const EditProfileScreen = ({ navigation, route }) => {
   const [editedUser, setEditedUser] = useState(route.params.editedUser);
   //editedUser.tags = route.params.selectedTags;
   const [bioCharCount, setBioCharCount] = useState("");
-
+  
+  
   const { updated } = route.params;
   const selectedTags = route.params.selectedTags;
   //alert(updated);
@@ -144,12 +146,25 @@ export const EditProfileScreen = ({ navigation, route }) => {
         alert("Please enter a valid hometown");
         return;
       }
+
+      // if (editedUser.instagramHandle.trim() !== "" && !/^[A-Za-z\s]*$/.test(editedUser.instagramHandle)) {
+      //   alert("Please enter a valid handle");
+      //   return;
+      // }
+
+      // if (editedUser.snapchatHandle.trim() !== "" && !/^[A-Za-z\s]*$/.test(editedUser.snapchatHandle)) {
+      //   alert("Please enter a valid handle");
+      //   return;
+      // }
+
       if (editedUser.bio.length <= 700) {
         const trimmedBio = editedUser.bio.trimEnd();
         const name = editedUser.name.trimEnd();
         const major = editedUser.major.trimEnd();
         const class_year = editedUser.class_year.trimEnd();
         const hometown = editedUser.hometown.trimEnd();
+        const instagramHandle = editedUser.instagramHandle.trimEnd();
+        const snapchatHandle = editedUser.snapchatHandle.trimEnd();
         const { data, error } = await supabase
           .from("UGC")
           .update([
@@ -159,6 +174,8 @@ export const EditProfileScreen = ({ navigation, route }) => {
               major: major,
               class_year: class_year,
               hometown: hometown,
+              instagramHandle: instagramHandle,
+              snapchatHandle: snapchatHandle,
             },
           ])
           .eq("user_id", session.user.id);
@@ -171,7 +188,10 @@ export const EditProfileScreen = ({ navigation, route }) => {
             major,
             class_year,
             hometown,
+            instagramHandle,
+            snapchatHandle,
             tags: editedUser.tags,
+           
           };
           await AsyncStorage.setItem("userData", JSON.stringify(userData));
 
@@ -194,6 +214,10 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.contain}>
+      <KeyboardAvoidingView
+        style={{ flex: 1, paddingBottom: 20, }}
+        behavior="padding" // or "height" depending on your needs
+      >
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.bbuttonContainer}
@@ -367,7 +391,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
               </View>
             )}
 
-            <Text style={styles.more}>More about me:</Text>
+            <Text style={styles.more}>More about me</Text>
             <Text
               style={{
                 textAlign: "center",
@@ -401,9 +425,35 @@ export const EditProfileScreen = ({ navigation, route }) => {
                 </Text>
               </TouchableOpacity>
             </View>
+
+            <View style={styles.socialsContainer}>
+              <Text style={styles.more}>Socials</Text>
+              <Text style={styles.label}>Instagram:</Text>
+              <TextInput
+                style={styles.input}
+                value={editedUser.instagramHandle}
+                onChangeText={(instagramHandle) =>
+                  setEditedUser({ ...editedUser, instagramHandle })
+                }
+                placeholder="Instagram Handle"
+                placeholderTextColor="#575D61"
+              />
+        
+              <Text style={styles.label}>Snapchat:</Text>
+              <TextInput
+                style={styles.input}
+                value={editedUser.snapchatHandle}
+                onChangeText={(snapchatHandle) =>
+                  setEditedUser({ ...editedUser, snapchatHandle })
+                }
+                placeholder="Snapchat Handle"
+                placeholderTextColor="#575D61"
+              />
+            </View>
           </>
         }
       />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -442,6 +492,17 @@ const styles = StyleSheet.create({
     borderTopColor: "#2B2D2F",
     borderTopWidth: 1.4,
     marginHorizontal: 10,
+    marginTop: 10,
+    paddingTop: 10,
+    marginBottom: 10,
+    gap: 5,
+  },
+
+  socialsContainer: {
+    flexDirection: "column",
+    borderTopColor: "#2B2D2F",
+    borderTopWidth: 1.4,
+    marginHorizontal: 25,
     marginTop: 10,
     paddingTop: 10,
     marginBottom: 10,

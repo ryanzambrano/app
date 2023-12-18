@@ -22,6 +22,7 @@ import { picURL } from "../auth/supabase";
 import { supabase } from "../auth/supabase.js";
 import ActionSheet from "react-native-action-sheet";
 import ReportUI from "./report.js";
+import { Linking } from 'react-native';
 import { promptQuestions } from "../auth/profileUtils.js";
 const MAX_IMAGES = 4;
 
@@ -32,6 +33,9 @@ const profileZIndex = scrollY.interpolate({
   outputRange: [1, 0],
   extrapolate: "clamp",
 });
+
+const instagramLogo = require('../../assets/instagramLogo.png');
+const snapchatLogo = require('../../assets/snapchatLogo.png');
 
 const UserCard = ({ navigation, route }) => {
   const { session } = route.params;
@@ -46,10 +50,11 @@ const UserCard = ({ navigation, route }) => {
     hometown,
     bookmarked_profiles,
     lastModified,
+    instagramHandle,
+    snapchatHandle,
   } = route.params.user;
 
   const { age, gender } = route.params.user.profiles;
-
   const [living_preferences, setLivingPreference] = useState("");
   const [persons, setPersons] = useState([]);
   const [photos, setPhotos] = useState([
@@ -62,6 +67,23 @@ const UserCard = ({ navigation, route }) => {
   const [prompts, setPrompts] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isActionSheetVisible, setActionSheetVisible] = useState(false);
+
+  const openSocialMediaProfile = (handle, type) => {
+    let url = '';
+    if (type === 'instagram') {
+      url = `https://www.instagram.com/${handle}`;
+    } else if (type === 'snapchat') {
+      url = `https://www.snapchat.com/add/${handle}`;
+    }
+
+    Linking.canOpenURL(url).then(supported => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        console.log("Don't know how to open URI: " + url);
+      }
+    });
+  };
 
   const handleModalClose = () => {
     setSelectedPhotoIndex(null);
@@ -608,7 +630,7 @@ const UserCard = ({ navigation, route }) => {
           )}
           <View style={styles.roundedContainer}>
             <Text style={styles.bioHeader}>Interests</Text>
-            <View style={styles.tagsContainer} marginBottom={25}>
+            <View style={styles.tagsContainer} marginBottom={5}>
               {tags.map((tag, index) => (
                 <View key={index} style={styles.tag}>
                   <Text style={styles.tagText}>{tag}</Text>
@@ -616,6 +638,34 @@ const UserCard = ({ navigation, route }) => {
               ))}
             </View>
           </View>
+          { (instagramHandle || snapchatHandle) && (
+            <View style={styles.roundedContainer}>
+              <Text style={styles.bioHeader} paddingBottom={7}>
+                Socials
+              </Text>
+              <View style={styles.bio}>
+                {instagramHandle && (
+                  <View style={styles.socialMediaRow}>
+                    <Image source={instagramLogo} style={styles.socialMediaIcon} />
+                    <TouchableOpacity onPress={() => openSocialMediaProfile(instagramHandle, 'instagram')}>
+                      <Text style={styles.socialMediaText}> {instagramHandle}</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                {instagramHandle && snapchatHandle && <View style={styles.horizontalDivider} />}
+
+                {snapchatHandle && (
+                  <View style={styles.socialMediaRow}>
+                    <Image source={snapchatLogo} style={styles.socialMediaIcon} />
+                    <TouchableOpacity onPress={() => openSocialMediaProfile(snapchatHandle, 'snapchat')}>
+                      <Text style={styles.socialMediaText}> {snapchatHandle}</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -933,7 +983,7 @@ const styles = StyleSheet.create({
 
   verticalDivider: {
     width: 0.3,
-    backgroundColor: "grey",
+    backgroundColor: "#575D61",
     height: "100%",
     alignSelf: "center",
     marginLeft: 20,
@@ -941,7 +991,7 @@ const styles = StyleSheet.create({
   },
   verticalDivider2: {
     width: 0.3,
-    backgroundColor: "grey",
+    backgroundColor: "#575D61",
     height: "100%",
     alignSelf: "center",
     marginLeft: 9,
@@ -962,6 +1012,29 @@ const styles = StyleSheet.create({
     padding: 0,
     marginBottom: 15,
     marginHorizontal: 15,
+  },
+
+  socialMediaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10, 
+    paddingHorizontal: 25,
+  },
+  socialMediaIcon: {
+    width: 35,
+    height: 35,
+    borderRadius: 17.5, 
+    marginRight: 10, 
+  },
+  socialMediaText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  horizontalDivider: {
+    height: 0.3,
+    backgroundColor: '#575D61',
+    marginVertical: 10, 
+    marginHorizontal: 20, 
   },
 });
 
