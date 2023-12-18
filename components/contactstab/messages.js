@@ -228,6 +228,10 @@ const MessagingUI = () => {
   };
 
   useEffect(() => {
+    if (isFocused && user.messagess == undefined)
+    {
+      setIsInverted(false);
+    }
     if (user.recentMessage != undefined) {
       if (isFocused && !user.recentMessage.Read.includes(session.user.id)) {
         user.recentMessage.Read.push(session.user.id);
@@ -550,10 +554,13 @@ const MessagingUI = () => {
           data={messages}
           renderItem={({ item, index }) => {
             let adjustedIndex = 0;
+            let pfpindex = messages.length - 1;
             let one = 1;
             if (isInverted == true) {
+             // console.log(inverted);
               adjustedIndex = messages.length - 1;
               one = -1;
+              pfpindex = 0;
             }
 
             const isOwnMessage = item.Sent_From == session.user.id;
@@ -569,7 +576,7 @@ const MessagingUI = () => {
                 messages[index - one].Sent_From !== item.Sent_From);
             const isLastOtherMessage =
               isOtherMessage &&
-              (index === messages.length - 1 || // It's the last message in the array
+              (index === pfpindex || // It's the last message in the array
                 messages[index + one].Sent_From !== item.Sent_From);
 
             const shouldDisplaySenderName =

@@ -127,8 +127,6 @@ const ContactsUI = ({ route }) => {
       return;
     }
 
-    const sessionusername = data.name;
-
     const modifiedUsers = await Promise.all(
       users.map(async (user) => {
         const extractedIds = user.User_ID.filter(
@@ -194,6 +192,7 @@ const ContactsUI = ({ route }) => {
               recentMessage: recentMessageData[0],
               messages: chatmessages,
               images: college_logo,
+              ringer: false,
             };
           } catch (error) {
             console.error("Error fetching college logo:", error);
@@ -206,6 +205,7 @@ const ContactsUI = ({ route }) => {
           recentMessage: recentMessageData[0],
           messages: chatmessages,
           images: ImageError ? null : Imagedata,
+          ringer: false,
         };
       })
     );
@@ -378,6 +378,10 @@ const ContactsUI = ({ route }) => {
     navigation.navigate("ComposeMessage");
   };
 
+    
+ 
+  
+
   const renderContact = ({ item }) => {
     const handleDelete = async () => {
       try {
@@ -426,6 +430,24 @@ const ContactsUI = ({ route }) => {
     };
     const opacityValue = contactOpacities[item.Group_ID];
 
+    const handleSilence = async () => {
+      item.Silenced.push(session.user.id);
+      const { data, error } = await supabase
+      .from("Group_Chats")
+      .update({Silenced: item.Silenced})
+      .eq("Group_ID", item.Group_ID);
+    }
+  
+    const handleUnsilence = async () => {
+      item.Silenced = item.Silenced.filter(userId => userId !== session.user.id);
+    const { data, error } = await supabase
+      .from("Group_Chats")
+      .update({Silenced: item.Silenced})
+      .eq("Group_ID", item.Group_ID);
+
+    }
+  
+
     const renderRightActions = (progress, dragX) => {
       // console.log("Progress:", progress);
       const trans = dragX.interpolate({
@@ -437,6 +459,18 @@ const ContactsUI = ({ route }) => {
         if (item.Is_College == true) {
           Alert.alert(
             "School Channel",
+            "You do not have permission to delete this channel",
+            [
+              {
+                text: "Ok",
+              },
+            ]
+          );
+          return;
+        }
+        if (item.Ammount_Users > 2 && item.Host != session.user.id) {
+          Alert.alert(
+            "You are not the host of this channel",
             "You do not have permission to delete this channel",
             [
               {
@@ -459,6 +493,41 @@ const ContactsUI = ({ route }) => {
             },
           ]
         );
+      };
+      const handleSecondAction = (item) => {
+        if(item.Silenced.includes(session.user.id))
+        {
+          Alert.alert(
+            "Unsilence Notifications",
+            "Are you sure you want to unsilence the notifications for this group chat?",
+            [
+              {
+                text: "Yes",
+                onPress: handleUnsilence,
+              },
+              {
+                text: "No",
+              },
+            ]
+          );
+        }
+        else
+        {
+          Alert.alert(
+            "Silence Notifications",
+            "Are you sure you want to silence the notifications for this group chat?",
+            [
+              {
+                text: "Yes",
+                onPress: handleSilence,
+              },
+              {
+                text: "No",
+              },
+            ]
+          );
+        }
+
       };
 
       return (
@@ -651,9 +720,9 @@ const ContactsUI = ({ route }) => {
                       >
                         {item.recentMessage.Message_Content}
                       </Text>
-                      {!ringer ? (
-                        <Icon name="bell-slash" size={13} color="#575D61" />
-                      ) : null}
+                      {item.Silenced.includes(session.user.id) ? (
+  <Icon name="bell-slash" size={13} color="#575D61" />
+) : null}
 
                       {item.recentMessage &&
                       !item.recentMessage.Read.includes(session.user.id) ? (

@@ -221,6 +221,7 @@ const ComposeMessageScreen = ({ route }) => {
       selectedUserIDs.push(session.user.id);
       selectedUserIDs.sort();
 
+
       // Insert the new record with User_ID, Group_ID, and Group_Name
       const { data: insertData, error: insertError } = await supabase
         .from("Group_Chats")
@@ -228,6 +229,7 @@ const ComposeMessageScreen = ({ route }) => {
           {
             User_ID: selectedUserIDs, // Join selected user names with commas
             Ammount_Users: selectedUserIDs.length,
+            Host: session.user.id,
           },
         ])
         .select();
