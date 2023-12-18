@@ -229,24 +229,30 @@ const ContactsUI = ({ route }) => {
     // Filter out null values (users with no recent messages) and sort
     const filteredUsers = modifiedUsers.filter((user) => user !== null);
 
-    filteredUsers.sort((a, b) => {
-      const dateA = a.recentMessage
-        ? new Date(a.recentMessage.created_at)
-        : null;
-      const dateB = b.recentMessage
-        ? new Date(b.recentMessage.created_at)
-        : null;
+filteredUsers.sort((a, b) => {
+  // Check if Is_College is true for either user
+  const isCollegeA = a.Is_College === true;
+  const isCollegeB = b.Is_College === true;
 
-      if (dateA && dateB) {
-        return dateB - dateA;
-      } else if (dateA) {
-        return -1;
-      } else if (dateB) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
+  // If only one user is from college, prioritize it
+  if (isCollegeA !== isCollegeB) {
+    return isCollegeA ? -1 : 1;
+  }
+
+  // If both users are from college or both are not, sort by recentMessage date
+  const dateA = a.recentMessage ? new Date(a.recentMessage.created_at) : null;
+  const dateB = b.recentMessage ? new Date(b.recentMessage.created_at) : null;
+
+  if (dateA && dateB) {
+    return dateB - dateA;
+  } else if (dateA) {
+    return -1;
+  } else if (dateB) {
+    return 1;
+  } else {
+    return 0;
+  }
+});
 
     setUsers(filteredUsers);
     await AsyncStorage.setItem("contactsData", JSON.stringify(filteredUsers));
