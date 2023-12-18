@@ -312,6 +312,53 @@ const MessagingUI = () => {
   };
 
   useEffect(() => {
+    const fetchData = async (genericPayload) => {
+      try {
+        const { data: nameData, error: nameError } = await supabase
+          .from("UGC")
+          .select(`name`)
+          .eq("user_id", genericPayload.Sent_From)
+          .single();
+          
+         // console.log(nameData);
+
+          const { data: ImageData, error: ImageError } = await supabase
+          .from("images")
+          .select(`last_modified`)
+          .eq("user_id", genericPayload.Sent_From)
+          .eq("image_index", 0)
+          .single();
+
+          //console.log(ImageData);
+  
+        const data = {
+          ...genericPayload.new,
+          UGC: {
+            name: nameData ? nameData.name : null,
+            // Add other properties from the 'UGC' table if needed
+          },
+          navigation: {
+            last_modified: ImageData ? ImageData.last_modified : null,
+            // Add other properties from the 'UGC' table if needed
+          },
+
+        };
+        console.log(data);
+  
+        if (isInverted == true) {
+          setMessages((prevMessages) => [data, ...prevMessages]);
+          
+        } else {
+          setMessages((prevMessages) => [...prevMessages, data]);
+          
+        }
+  
+        readMessages();
+      } catch (error) {
+        console.error('Error fetching data:', error.message);
+      }
+    };
+  
     const channel = supabase.channel("messaging");
     const subscription = channel
       .on(
@@ -328,20 +375,13 @@ const MessagingUI = () => {
               genericPayload.new.Sent_From != session.user.id &&
               genericPayload.new.Group_ID_Sent_To == user.Group_ID
             ) {
-              const data = genericPayload.new;
-              if (isInverted == true) {
-                setMessages((prevMessages) => [...prevMessages, data]);
-              } else {
-                setMessages((prevMessages) => [data, ...prevMessages]);
-              }
-              readMessages();
+              fetchData(genericPayload);
             }
           }
-          // Handle generic event
         }
       )
       .subscribe();
-
+  
     // Clean up the subscription when the component unmounts
     return () => {
       subscription.unsubscribe();
@@ -647,7 +687,6 @@ const MessagingUI = () => {
                           uri: item.lastModified,
                         }}
                       />
-                      //alert(hi);
                     )}
                   </View>
                 </Swipeable>

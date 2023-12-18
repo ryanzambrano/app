@@ -116,17 +116,6 @@ const ContactsUI = ({ route }) => {
       return;
     }
 
-    const { data, error: sessionError } = await supabase
-      .from("UGC")
-      .select("name")
-      .eq("user_id", session.user.id)
-      .single();
-
-    if (sessionError) {
-      console.error(sessionError);
-      return;
-    }
-
     const modifiedUsers = await Promise.all(
       users.map(async (user) => {
         const extractedIds = user.User_ID.filter(
@@ -152,16 +141,42 @@ const ContactsUI = ({ route }) => {
         // Fetch the most recent group chat message
         const { data: recentMessageData, error: messageError } = await supabase
           .from("Group_Chat_Messages")
-          .select(`*, UGC (name)`)
+          .select(`*, UGC (*)`)
           .eq("Group_ID_Sent_To", user.Group_ID)
           .order("created_at", { ascending: false })
-          .limit(150);
+          .limit(100);
 
-        let chatmessages = recentMessageData;
+          const finalmessages = await Promise.all(
+            recentMessageData.map(async (message) => {
+              // Fetch additional data for each message from Supabase
+              // Replace the following query with your actual Supabase query
+              const { data, error } = await supabase
+                .from('images')
+                .select('*')
+                .eq('user_id', message.Sent_From)
+                .eq("image_index", 0);
+        
+              if (error) {
+                console.error('Error fetching additional data:', error.message);
+                return null;
+              }
+        
+              // Attach the additional data to the message
+              return {
+                ...message,
+                navigation: data,
+              };
+            })
+          );
+
+        //create structure for messages
+        //querry image data && navigation data
+
+        let chatmessages = finalmessages;
 
         if (recentMessageData != undefined) {
           if (recentMessageData.length < 17) {
-            chatmessages = [...recentMessageData].reverse();
+            chatmessages = [...finalmessages].reverse();
           }
         }
 
@@ -171,7 +186,8 @@ const ContactsUI = ({ route }) => {
           .from("images")
           .select("*")
           .in("user_id", extractedIds)
-          .eq("image_index", 0);
+          .eq("image_index", 0)
+          .limit(2);
 
         // Check if recentMessageData exists, and only include users with recent messages
         if (
