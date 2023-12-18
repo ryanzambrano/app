@@ -459,12 +459,10 @@ const ContactsUI = ({ route }) => {
 
     const handleSilence = async () => {
       const arr = [];
-      if(item.Silenced != null || item.Silenced != undefined) {
+      if (item.Silenced != null || item.Silenced != undefined) {
         item.Silenced.push(session.user.id);
         arr = item.Silenced;
-      }
-      else
-      {
+      } else {
         arr.push(session.user.id);
       }
       item.Silenced.push(session.user.id);
@@ -476,13 +474,13 @@ const ContactsUI = ({ route }) => {
 
     const handleUnsilence = async () => {
       const arr = [];
-      if(item.Silenced != null || item.Silenced != undefined) {
+      if (item.Silenced != null || item.Silenced != undefined) {
         item.Silenced = item.Silenced.filter(
           (userId) => userId !== session.user.id
         );
         arr = item.Silenced;
       }
-     
+
       const { data, error } = await supabase
         .from("Group_Chats")
         .update({ Silenced: arr })
@@ -757,13 +755,17 @@ const ContactsUI = ({ route }) => {
                       >
                         {item.recentMessage.Message_Content}
                       </Text>
-                      {item.Silenced.includes(session.user.id) ? (
-                        <Icon name="bell-slash" size={13} color="#575D61" />
-                      ) : null}
+                      {item.Silenced ? (
+                        <>
+                          {item.Silenced.includes(session.user.id) ? (
+                            <Icon name="bell-slash" size={13} color="#575D61" />
+                          ) : null}
 
-                      {item.recentMessage &&
-                      !item.recentMessage.Read.includes(session.user.id) ? (
-                        <View style={styles.circle} /> // Add this View for the solid circle
+                          {item.recentMessage &&
+                          !item.recentMessage.Read.includes(session.user.id) ? (
+                            <View style={styles.circle} /> // Add this View for the solid circle
+                          ) : null}
+                        </>
                       ) : null}
                     </View>
                   ) : (
