@@ -115,13 +115,13 @@ export const Questionaire2 = ({ navigation, route }) => {
   };
   handleForFun = () => {
     if (!selectedForFun) {
-      setSelectedForFun("Stay in");
+      setSelectedForFun("Going Clubbing");
     }
     closeForFunModal();
   };
   handleStudies = () => {
     if (!selectedStudies) {
-      setSelectedStudies("Science");
+      setSelectedStudies("Business");
     }
     closeStudiesModal();
   };

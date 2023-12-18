@@ -17,6 +17,7 @@ import { startShakeAnimation } from "../auth/profileUtils.js";
 const TagSelectionScreen = ({ navigation, route }) => {
   const { session } = route.params;
   const [selectedTags, setSelectedTags] = useState([]);
+  const [tagCount, setTagCount] = useState(0);
 
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
@@ -91,61 +92,44 @@ const TagSelectionScreen = ({ navigation, route }) => {
           .select("college")
           .eq("user_id", session.user.id);
 
-          
-     
-
-          const { data: Groupdata, error: Grouperror } = await supabase
+        const { data: Groupdata, error: Grouperror } = await supabase
           .from("Group_Chats")
-          .select('*')
+          .select("*")
           .eq("Group_Name", profileData[0].college)
           .eq("Is_College", true);
 
-          
-                 
-          if(Groupdata != null && Groupdata.length > 0)
-          {
-           
+        if (Groupdata != null && Groupdata.length > 0) {
+          arruuid = Groupdata[0].User_ID;
+          arruuid.push(session.user.id); // Modifies arruuid in place
+          newammountuser = Groupdata[0].Ammount_Users + 1;
 
-  
-              arruuid = Groupdata[0].User_ID;
-              arruuid.push(session.user.id); // Modifies arruuid in place
-              newammountuser = Groupdata[0].Ammount_Users + 1;
-              
-              const { data: Collegeupdatedata, error: updateError } = await supabase
-                .from("Group_Chats")
-                .update({ User_ID: arruuid, Ammount_Users: newammountuser })
-                .eq("Group_Name", profileData[0].college)
-                .eq("Is_College", true);
-           
-            
-          }
-          else{
-         
-            const { data: insertData, error: insertError } = await supabase
+          const { data: Collegeupdatedata, error: updateError } = await supabase
+            .from("Group_Chats")
+            .update({ User_ID: arruuid, Ammount_Users: newammountuser })
+            .eq("Group_Name", profileData[0].college)
+            .eq("Is_College", true);
+        } else {
+          const { data: insertData, error: insertError } = await supabase
             .from("Group_Chats")
             .insert([
               {
                 User_ID: [session.user.id], // Assuming User_ID is an array of UUIDs
                 Ammount_Users: 1,
                 Group_Name: profileData[0].college,
-                Is_College: true
+                Is_College: true,
               },
             ])
-            .select('*')
+            .select("*")
             .eq("Group_Name", profileData[0].college)
             .eq("Is_College", true);
-            
-    
-          }
-
-          
+        }
 
         if (error) {
           startShakeAnimation();
           setIsError(error.message);
         } else {
           //refreshSession();
-         navigation.navigate("Congrats");
+          navigation.navigate("Congrats");
           //signOut();
         }
       } else if (userData.tags.length > 15) {
@@ -178,7 +162,7 @@ const TagSelectionScreen = ({ navigation, route }) => {
         >
           {availableTags.map((tag) => renderTag(tag))}
         </ScrollView>
-        <Text style={styles.selectedTagsText}>{selectedTags.join(", ")}</Text>
+        {/*<Text style={styles.selectedTagsText}>{selectedTags.join(", ")}</Text>*/}
 
         {isError && (
           <Animated.Text
@@ -202,6 +186,16 @@ const TagSelectionScreen = ({ navigation, route }) => {
             </View>
           </TouchableOpacity>
         </View>
+        <Text
+          style={[
+            styles.tagCounter,
+            selectedTags.length > 15 || selectedTags.length < 3
+              ? styles.tagCounterOverLimit
+              : null,
+          ]}
+        >
+          {selectedTags.length}/15
+        </Text>
         <StatusBar style="light" />
       </View>
     </SafeAreaView>
@@ -269,6 +263,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     backgroundColor: "#14999999",
     borderColor: "#14999999",
+    marginTop: 10,
   },
   continueText: {
     fontSize: 18,
@@ -282,6 +277,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 10,
+  },
+  tagCounter: {
+    position: "absolute",
+    bottom: 0,
+    right: 30,
+    fontSize: 18,
+    color: "grey",
+  },
+  tagCounterOverLimit: {
+    color: "red",
   },
 });
 

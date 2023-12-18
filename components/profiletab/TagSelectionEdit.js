@@ -139,14 +139,14 @@ const TagSelectionEdit = ({ navigation, route }) => {
           {availableTags.map((tag) => renderTag(tag))}
         </ScrollView>
         <View style={styles.selectedTagsContainer}>
-          <Text
+          {/*<Text
             style={[styles.selectedTagsText, styles.selectedTagsTextUnderline]}
           >
             Selected Tags:
           </Text>
           <Text style={styles.selectedTagsText}>
             {selectedTags.join(",  ")}
-          </Text>
+        </Text>*/}
         </View>
         <Text
           style={[
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     //color: "#fff",
   },
   tag: {
-    backgroundColor: "#1D1D20",
+    backgroundColor: "#2B2D2D",
 
     borderRadius: 20,
 

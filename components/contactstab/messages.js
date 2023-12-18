@@ -318,16 +318,15 @@ const MessagingUI = () => {
         .select(`name`)
         .eq("user_id", genericPayload.new.Sent_From)
         .single();
-        
 
-        const { data: ImageData, error: ImageError } = await supabase
+      const { data: ImageData, error: ImageError } = await supabase
         .from("images")
         .select(`last_modified`)
         .eq("user_id", genericPayload.new.Sent_From)
         .eq("image_index", 0)
         .single();
 
-        //console.log(ImageData);
+      //console.log(ImageData);
 
       const data = {
         ...genericPayload.new,
@@ -339,20 +338,17 @@ const MessagingUI = () => {
           last_modified: ImageData ? ImageData.last_modified : null,
           // Add other properties from the 'UGC' table if needed
         },
-
       };
 
       if (isInverted == true) {
         setMessages((prevMessages) => [data, ...prevMessages]);
-        
       } else {
         setMessages((prevMessages) => [...prevMessages, data]);
-        
       }
 
       readMessages();
     } catch (error) {
-      console.error('Error fetching data:', error.message);
+      console.error("Error fetching data:", error.message);
     }
   };
 
@@ -379,7 +375,7 @@ const MessagingUI = () => {
         }
       )
       .subscribe();
-  
+
     // Clean up the subscription when the component unmounts
     return () => {
       subscription.unsubscribe();
@@ -599,6 +595,8 @@ const MessagingUI = () => {
               one = -1;
               pfpindex = 0;
             }
+
+            console.log(item);
 
             const isOwnMessage = item.Sent_From == session.user.id;
             const isFirstOwnMessage =

@@ -18,11 +18,11 @@ export const QuestionaireAnswers = ({ navigation, route }) => {
   const [answers, setAnswers] = useState([]);
 
   const questionaireQuestions = {
-    living_preferences: "What type of housing do you plan on living in?",
-    for_fun: "Do you prefer to stay in or go out for a fun night?",
+    living_preferences: "What is your preferred housing situation?",
+    for_fun: "A typical weekend looks like?",
     tidiness: "How tidy are you when it comes to your living spaces?",
     noise_preference: "Does noise bother you when relaxing and/or sleeping?",
-    sleep_time: "What time do you rougly go to sleep?",
+    sleep_time: "What sleep schedule label fits you best?",
   };
 
   useEffect(() => {
@@ -52,7 +52,6 @@ export const QuestionaireAnswers = ({ navigation, route }) => {
       <Text style={styles.question}>{item.question}</Text>
       <View style={styles.answerContainer}>
         <Text style={styles.input}>{item.answer}</Text>
-        
       </View>
     </View>
   );
@@ -135,18 +134,16 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 26,
     fontFamily: "Helvetica",
-    //textDecorationLine: 'underline', 
+    //textDecorationLine: 'underline',
   },
   answerContainer: {
-    flexDirection: 'column',
+    flexDirection: "column",
     borderBottomWidth: 1,
     borderBottomColor: "white",
     paddingBottom: 0,
     borderBottomEndRadius: 5,
     borderBottomStartRadius: 5,
-},
-
-
+  },
 });
 
 export default QuestionaireAnswers;

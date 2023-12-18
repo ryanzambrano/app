@@ -146,29 +146,33 @@ const ContactsUI = ({ route }) => {
           .order("created_at", { ascending: false })
           .limit(100);
 
-          const finalmessages = await Promise.all(
-            recentMessageData.map(async (message) => {
-              // Fetch additional data for each message from Supabase
-              // Replace the following query with your actual Supabase query
-              const { data, error } = await supabase
-                .from('images')
-                .select('last_modified')
-                .eq('user_id', message.Sent_From)
-                .eq("image_index", 0)
-                .single();
-        
-              if (error) {
-                console.error('Error fetching additional data:', error.message);
-                return null;
-              }
-        
-              // Attach the additional data to the message
+        const finalmessages = await Promise.all(
+          recentMessageData.map(async (message) => {
+            // Fetch additional data for each message from Supabase
+            // Replace the following query with your actual Supabase query
+            const { data, error } = await supabase
+              .from("images")
+              .select("last_modified")
+              .eq("user_id", message.Sent_From)
+              .eq("image_index", 0)
+              .single();
+
+            if (error) {
+              //console.error(error.message);
+              let fee: foo = "";
               return {
                 ...message,
-                navigation: data,
+                navigation: fee,
               };
-            })
-          );
+            }
+
+            // Attach the additional data to the message
+            return {
+              ...message,
+              navigation: data,
+            };
+          })
+        );
 
         //create structure for messages
         //querry image data && navigation data
@@ -230,30 +234,34 @@ const ContactsUI = ({ route }) => {
     // Filter out null values (users with no recent messages) and sort
     const filteredUsers = modifiedUsers.filter((user) => user !== null);
 
-filteredUsers.sort((a, b) => {
-  // Check if Is_College is true for either user
-  const isCollegeA = a.Is_College === true;
-  const isCollegeB = b.Is_College === true;
+    filteredUsers.sort((a, b) => {
+      // Check if Is_College is true for either user
+      const isCollegeA = a.Is_College === true;
+      const isCollegeB = b.Is_College === true;
 
-  // If only one user is from college, prioritize it
-  if (isCollegeA !== isCollegeB) {
-    return isCollegeA ? -1 : 1;
-  }
+      // If only one user is from college, prioritize it
+      if (isCollegeA !== isCollegeB) {
+        return isCollegeA ? -1 : 1;
+      }
 
-  // If both users are from college or both are not, sort by recentMessage date
-  const dateA = a.recentMessage ? new Date(a.recentMessage.created_at) : null;
-  const dateB = b.recentMessage ? new Date(b.recentMessage.created_at) : null;
+      // If both users are from college or both are not, sort by recentMessage date
+      const dateA = a.recentMessage
+        ? new Date(a.recentMessage.created_at)
+        : null;
+      const dateB = b.recentMessage
+        ? new Date(b.recentMessage.created_at)
+        : null;
 
-  if (dateA && dateB) {
-    return dateB - dateA;
-  } else if (dateA) {
-    return -1;
-  } else if (dateB) {
-    return 1;
-  } else {
-    return 0;
-  }
-});
+      if (dateA && dateB) {
+        return dateB - dateA;
+      } else if (dateA) {
+        return -1;
+      } else if (dateB) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
 
     setUsers(filteredUsers);
     await AsyncStorage.setItem("contactsData", JSON.stringify(filteredUsers));
@@ -401,10 +409,6 @@ filteredUsers.sort((a, b) => {
     navigation.navigate("ComposeMessage");
   };
 
-    
- 
-  
-
   const renderContact = ({ item }) => {
     const handleDelete = async () => {
       try {
@@ -456,20 +460,20 @@ filteredUsers.sort((a, b) => {
     const handleSilence = async () => {
       item.Silenced.push(session.user.id);
       const { data, error } = await supabase
-      .from("Group_Chats")
-      .update({Silenced: item.Silenced})
-      .eq("Group_ID", item.Group_ID);
-    }
-  
-    const handleUnsilence = async () => {
-      item.Silenced = item.Silenced.filter(userId => userId !== session.user.id);
-    const { data, error } = await supabase
-      .from("Group_Chats")
-      .update({Silenced: item.Silenced})
-      .eq("Group_ID", item.Group_ID);
+        .from("Group_Chats")
+        .update({ Silenced: item.Silenced })
+        .eq("Group_ID", item.Group_ID);
+    };
 
-    }
-  
+    const handleUnsilence = async () => {
+      item.Silenced = item.Silenced.filter(
+        (userId) => userId !== session.user.id
+      );
+      const { data, error } = await supabase
+        .from("Group_Chats")
+        .update({ Silenced: item.Silenced })
+        .eq("Group_ID", item.Group_ID);
+    };
 
     const renderRightActions = (progress, dragX) => {
       // console.log("Progress:", progress);
@@ -518,8 +522,7 @@ filteredUsers.sort((a, b) => {
         );
       };
       const handleSecondAction = (item) => {
-        if(item.Silenced.includes(session.user.id))
-        {
+        if (item.Silenced.includes(session.user.id)) {
           Alert.alert(
             "Unsilence Notifications",
             "Are you sure you want to unsilence the notifications for this group chat?",
@@ -533,9 +536,7 @@ filteredUsers.sort((a, b) => {
               },
             ]
           );
-        }
-        else
-        {
+        } else {
           Alert.alert(
             "Silence Notifications",
             "Are you sure you want to silence the notifications for this group chat?",
@@ -550,7 +551,6 @@ filteredUsers.sort((a, b) => {
             ]
           );
         }
-
       };
 
       return (
@@ -744,8 +744,8 @@ filteredUsers.sort((a, b) => {
                         {item.recentMessage.Message_Content}
                       </Text>
                       {item.Silenced.includes(session.user.id) ? (
-  <Icon name="bell-slash" size={13} color="#575D61" />
-) : null}
+                        <Icon name="bell-slash" size={13} color="#575D61" />
+                      ) : null}
 
                       {item.recentMessage &&
                       !item.recentMessage.Read.includes(session.user.id) ? (
