@@ -184,7 +184,12 @@ export const EditProfileScreen = ({ navigation, route }) => {
   };
 
   handleEditPictures = async () => {
+    await AsyncStorage.setItem("userData", JSON.stringify(userData));
     navigation.navigate("AddProfileImages");
+  };
+
+  handleBack = async () => {
+    navigation.goBack();
   };
 
   return (

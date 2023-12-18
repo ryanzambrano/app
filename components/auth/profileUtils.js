@@ -164,7 +164,7 @@ export const calculateCompatibility = (sessionUser, otherUser) => {
     score += 5;
   if (sessionUser.profiles.studies === otherUser.profiles.studies) score += 3;
   if (Math.abs(sessionUser.age - otherUser.age) <= 5) score += 2;
-  if (sessionUser.class_year === otherUser.class_year) score += 2;
+  if (sessionUser.class_year === otherUser.class_year) score += 6;
   if (sessionUser.profiles.gender === otherUser.profiles.gender) score += 1;
 
   const tidinessDiff = Math.abs(

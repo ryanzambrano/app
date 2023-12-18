@@ -228,8 +228,7 @@ const MessagingUI = () => {
   };
 
   useEffect(() => {
-    if (isFocused && user.messagess == undefined)
-    {
+    if (isFocused && user.messages == undefined) {
       setIsInverted(false);
     }
     if (user.recentMessage != undefined) {
@@ -557,7 +556,7 @@ const MessagingUI = () => {
             let pfpindex = messages.length - 1;
             let one = 1;
             if (isInverted == true) {
-             // console.log(inverted);
+              // console.log(inverted);
               adjustedIndex = messages.length - 1;
               one = -1;
               pfpindex = 0;
@@ -585,7 +584,10 @@ const MessagingUI = () => {
             const shouldDisplaySenderPic =
               user.Ammount_Users >= 3 && isLastOtherMessage;
             return (
-              <View>
+              <TouchableOpacity
+                onPress={() => (!isOwnMessage ? navigation.goBack() : null)}
+                activeOpacity={1}
+              >
                 <Swipeable
                   renderRightActions={(progress, dragX) =>
                     renderRightActions(progress, dragX, item)
@@ -649,7 +651,7 @@ const MessagingUI = () => {
                     )}
                   </View>
                 </Swipeable>
-              </View>
+              </TouchableOpacity>
             );
           }}
           inverted={isInverted}
