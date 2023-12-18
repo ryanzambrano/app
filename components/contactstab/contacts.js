@@ -458,20 +458,34 @@ const ContactsUI = ({ route }) => {
     const opacityValue = contactOpacities[item.Group_ID];
 
     const handleSilence = async () => {
+      const arr = [];
+      if(item.Silenced != null || item.Silenced != undefined) {
+        item.Silenced.push(session.user.id);
+        arr = item.Silenced;
+      }
+      else
+      {
+        arr.push(session.user.id);
+      }
       item.Silenced.push(session.user.id);
       const { data, error } = await supabase
         .from("Group_Chats")
-        .update({ Silenced: item.Silenced })
+        .update({ Silenced: arr })
         .eq("Group_ID", item.Group_ID);
     };
 
     const handleUnsilence = async () => {
-      item.Silenced = item.Silenced.filter(
-        (userId) => userId !== session.user.id
-      );
+      const arr = [];
+      if(item.Silenced != null || item.Silenced != undefined) {
+        item.Silenced = item.Silenced.filter(
+          (userId) => userId !== session.user.id
+        );
+        arr = item.Silenced;
+      }
+     
       const { data, error } = await supabase
         .from("Group_Chats")
-        .update({ Silenced: item.Silenced })
+        .update({ Silenced: arr })
         .eq("Group_ID", item.Group_ID);
     };
 
