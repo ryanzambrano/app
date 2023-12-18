@@ -311,54 +311,52 @@ const MessagingUI = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async (genericPayload) => {
-      try {
-        const { data: nameData, error: nameError } = await supabase
-          .from("UGC")
-          .select(`name`)
-          .eq("user_id", genericPayload.Sent_From)
-          .single();
-          
-         // console.log(nameData);
+  const fetchData = async (genericPayload) => {
+    try {
+      const { data: nameData, error: nameError } = await supabase
+        .from("UGC")
+        .select(`name`)
+        .eq("user_id", genericPayload.Sent_From)
+        .single();
+        
 
-          const { data: ImageData, error: ImageError } = await supabase
-          .from("images")
-          .select(`last_modified`)
-          .eq("user_id", genericPayload.Sent_From)
-          .eq("image_index", 0)
-          .single();
+        const { data: ImageData, error: ImageError } = await supabase
+        .from("images")
+        .select(`last_modified`)
+        .eq("user_id", genericPayload.Sent_From)
+        .eq("image_index", 0)
+        .single();
 
-          //console.log(ImageData);
-  
-        const data = {
-          ...genericPayload.new,
-          UGC: {
-            name: nameData ? nameData.name : null,
-            // Add other properties from the 'UGC' table if needed
-          },
-          navigation: {
-            last_modified: ImageData ? ImageData.last_modified : null,
-            // Add other properties from the 'UGC' table if needed
-          },
+        //console.log(ImageData);
 
-        };
-        console.log(data);
-  
-        if (isInverted == true) {
-          setMessages((prevMessages) => [data, ...prevMessages]);
-          
-        } else {
-          setMessages((prevMessages) => [...prevMessages, data]);
-          
-        }
-  
-        readMessages();
-      } catch (error) {
-        console.error('Error fetching data:', error.message);
+      const data = {
+        ...genericPayload.new,
+        UGC: {
+          name: nameData ? nameData.name : null,
+          // Add other properties from the 'UGC' table if needed
+        },
+        navigation: {
+          last_modified: ImageData ? ImageData.last_modified : null,
+          // Add other properties from the 'UGC' table if needed
+        },
+
+      };
+
+      if (isInverted == true) {
+        setMessages((prevMessages) => [data, ...prevMessages]);
+        
+      } else {
+        setMessages((prevMessages) => [...prevMessages, data]);
+        
       }
-    };
-  
+
+      readMessages();
+    } catch (error) {
+      console.error('Error fetching data:', error.message);
+    }
+  };
+
+  useEffect(() => {
     const channel = supabase.channel("messaging");
     const subscription = channel
       .on(
