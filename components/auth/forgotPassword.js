@@ -99,12 +99,12 @@ export const ForgotPassword = ({ navigation }) => {
             <Text style={styles.titleText}>Forgot Password?</Text>
             <Text style={styles.sloganText}>
               Enter the email address that you used to sign up and we'll send
-              you an email
+              you an email.
             </Text>
           </View>
           {emailSent && (
             <Animated.Text style={[styles.formFooter, shakeAnimationStyle]}>
-              Email successfully sent (0-5 minute wait time)
+              Email successfully sent (0-5 minute wait time){"\n\n"}Make sure to check your spam.
             </Animated.Text>
           )}
           {error && (
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     color: "lightgreen",
     textAlign: "center",
     letterSpacing: 0.15,
-    marginBottom: 20,
+    marginBottom: 40,
   },
 
   continue: {

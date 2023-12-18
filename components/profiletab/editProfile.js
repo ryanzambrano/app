@@ -120,30 +120,30 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
   const updateProfile = async () => {
     if (session?.user) {
-      if (editedUser.name.trim() === "") {
-        alert("Must enter a name");
-        return;
-      }
-      if (editedUser.name.length > 30) {
+      if (!/^[A-Za-z\s]+$/.test(editedUser.name) && editedUser.name.trim() !== "") {
         alert("Please enter a valid name");
         return;
       }
+      if (editedUser.name.trim() === "" || editedUser.name.length > 30) {
+        alert("Please enter a valid name");
+        return;
+      }
+
       const classYear = Number(editedUser.class_year);
-      if (isNaN(classYear) || classYear < 2023 || classYear > 2030) {
+      if (isNaN(classYear) || classYear < 2023 || classYear > 2030 || !/^\d{4}$/.test(editedUser.class_year)) {
         alert("Please enter a valid class year");
         return;
       }
 
-      if (editedUser.major.length > 30) {
+      if (editedUser.major.trim() !== "" && !/^[A-Za-z\s]*$/.test(editedUser.major)) {
         alert("Please enter a valid major");
         return;
       }
 
-      if (editedUser.hometown.length > 30) {
+      if (editedUser.hometown.trim() !== "" && !/^[A-Za-z\s]*$/.test(editedUser.hometown)) {
         alert("Please enter a valid hometown");
         return;
       }
-
       if (editedUser.bio.length <= 700) {
         const trimmedBio = editedUser.bio.trimEnd();
         const name = editedUser.name.trimEnd();

@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   formAction: {
-    marginBottom: 20,
+    marginBottom: 5,
   },
 
   continue: {
@@ -261,9 +261,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 20,
+    marginTop: 20,
     backgroundColor: "#14999999",
     borderColor: "#14999999",
-    marginTop: 10,
+   
   },
   continueText: {
     fontSize: 18,

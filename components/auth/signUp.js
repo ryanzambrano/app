@@ -120,7 +120,7 @@ export const SignUp = ({ navigation }) => {
                 Check your email for an account verification email, and then
                 sign in!
               </Text>
-              <Text style={styles.successText}>(0-5 minute wait time.)</Text>
+              <Text style={styles.successText}>(0-5 minute wait time.){"\n"}Make sure to check your spam.</Text>
               <View style={styles.verifyFormAction}>
                 <TouchableOpacity
                   onPress={() => {
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     fontFamily: "Verdana-Bold",
     fontSize: 27,
     fontWeight: "700",
-
+    paddingLeft: 10,
     //textAlign: "center",
     //AlignSelf: "center",
     color: "#fff",
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "lightgreen",
     textAlign: "center",
-    marginBottom: "10%",
+    marginBottom: 30,
   },
 
   input: {
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
   },
 
   continue: {
-    marginTop: 5,
+    //marginTop: 5,
     marginBottom: 20,
 
     flexDirection: "row",
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderWidth: 1,
+    //borderWidth: 1,
     backgroundColor: "#14999999",
     borderColor: "#14999999",
   },

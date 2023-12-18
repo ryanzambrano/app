@@ -37,7 +37,7 @@ export const Questionaire2 = ({ navigation, route }) => {
     useState("");
 
   const livingPreferences = ["Apartment", "Dorm", "House", "No Preferences"];
-  const forFun = ["Going Clubbing", "Movie night in", "Inner circle hang"];
+  const forFun = ["Going clubbing", "Movie night in", "Inner circle hangout"];
   const studies = [
     "Business",
     "Natural Sciences",

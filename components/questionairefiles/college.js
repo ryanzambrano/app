@@ -113,7 +113,7 @@ export const Colleges = ({ navigation, route }) => {
 
         <TextInput
           style={styles.inputControl}
-          placeholder="Enter your college... (You can't change this)"
+          placeholder="Enter your college... (You cannot change this)"
           placeholderTextColor={"grey"}
           onChangeText={(text) => setSearchQuery(text)}
           value={searchQuery}
