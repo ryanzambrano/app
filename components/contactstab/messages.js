@@ -316,14 +316,14 @@ const MessagingUI = () => {
       const { data: nameData, error: nameError } = await supabase
         .from("UGC")
         .select(`name`)
-        .eq("user_id", genericPayload.Sent_From)
+        .eq("user_id", genericPayload.new.Sent_From)
         .single();
         
 
         const { data: ImageData, error: ImageError } = await supabase
         .from("images")
         .select(`last_modified`)
-        .eq("user_id", genericPayload.Sent_From)
+        .eq("user_id", genericPayload.new.Sent_From)
         .eq("image_index", 0)
         .single();
 
@@ -682,7 +682,7 @@ const MessagingUI = () => {
                       <Image
                         style={styles.pfpContainer}
                         source={{
-                          uri: item.lastModified,
+                          uri: `${picURL}/${item.Sent_From}/${item.Sent_From}-0-${item.navigation.last_modified}`,
                         }}
                       />
                     )}

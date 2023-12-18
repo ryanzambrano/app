@@ -152,9 +152,10 @@ const ContactsUI = ({ route }) => {
               // Replace the following query with your actual Supabase query
               const { data, error } = await supabase
                 .from('images')
-                .select('*')
+                .select('last_modified')
                 .eq('user_id', message.Sent_From)
-                .eq("image_index", 0);
+                .eq("image_index", 0)
+                .single();
         
               if (error) {
                 console.error('Error fetching additional data:', error.message);
