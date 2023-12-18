@@ -172,7 +172,7 @@ const MessagingUI = () => {
 
     const extractedIds = ids[0].User_ID.filter(
       (item) => item !== session.user.id
-    );
+    ); /*
 
     user.Ammount_Users = ids[0].Ammount_Users;
 
@@ -224,7 +224,7 @@ const MessagingUI = () => {
       })
     );
 
-    setPersons(modifiedUsers);
+    setPersons(modifiedUsers);*/
   };
 
   useEffect(() => {
@@ -596,8 +596,6 @@ const MessagingUI = () => {
               pfpindex = 0;
             }
 
-            console.log(item);
-
             const isOwnMessage = item.Sent_From == session.user.id;
             const isFirstOwnMessage =
               isOwnMessage &&
@@ -621,7 +619,11 @@ const MessagingUI = () => {
               user.Ammount_Users >= 3 && isLastOtherMessage;
             return (
               <TouchableOpacity
-                onPress={() => (!isOwnMessage ? navigation.goBack() : null)}
+                onPress={() =>
+                  !isOwnMessage
+                    ? navigation.navigate("UserCardClone", { user: item.UGC })
+                    : null
+                }
                 activeOpacity={1}
               >
                 <Swipeable

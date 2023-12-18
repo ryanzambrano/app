@@ -27,6 +27,7 @@ import ContentPolicy from "./contentPolicy";
 import FAQ from "./faq";
 import UserAgreement from "./userAgreement";
 import ReportIssue from "./reportIssue";
+import UserCardClone from "../hometab/userCardClone";
 
 const Stack = createStackNavigator(); // Initialize stack navigator
 
@@ -113,6 +114,11 @@ const ThreeMainPages = ({ route }) => {
         <Stack.Screen
           name="GroupChatScreen"
           component={GroupChatScreen}
+          initialParams={{ session }}
+        />
+        <Stack.Screen
+          name="UserCardClone"
+          component={UserCardClone}
           initialParams={{ session }}
         />
         <Stack.Screen
