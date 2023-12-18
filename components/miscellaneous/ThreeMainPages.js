@@ -26,6 +26,7 @@ import PrivacyPolicy from "./privacyPolicy";
 import ContentPolicy from "./contentPolicy";
 import FAQ from "./faq";
 import UserAgreement from "./userAgreement";
+import ReportIssue from "./reportIssue";
 
 const Stack = createStackNavigator(); // Initialize stack navigator
 
@@ -150,6 +151,12 @@ const ThreeMainPages = ({ route }) => {
         <Stack.Screen
           name="ReportUI"
           component={ReportUI}
+          initialParams={{ session }}
+          options={{ presentation: "modal" }}
+        />
+        <Stack.Screen
+          name="ReportIssue"
+          component={ReportIssue}
           initialParams={{ session }}
           options={{ presentation: "modal" }}
         />

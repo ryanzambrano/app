@@ -105,7 +105,7 @@ const SettingsScreen = ({ navigation, route }) => {
           <AntDesign name="arrowleft" size={24} color="#159e9e" />
         </TouchableOpacity>
       </View>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {sections.map((section, sectionIndex) => (
           <View key={sectionIndex}>
             <View style={styles.titleContainer}>

@@ -37,7 +37,7 @@ const UserAgreement = ({ navigation, route }) => {
         </View>
         <View style={styles.right}></View>
       </View>
-      <ScrollView style={styles.textContainer}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.textContainer}>
         <Text style={styles.heading}>1. Acceptance of Terms</Text>
         <Text style={styles.text}>
           By accessing and using the Cabana app, you agree to be bound by the
@@ -172,18 +172,19 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    fontSize: 11,
+    fontSize: 18,
     color: "lightgrey",
+    lineHeight: 28,
     marginVertical: 2,
   },
   textContainer: {
-    margin: 30,
+    margin: 15,
     //alignItems: "center",
   },
   heading: {
     fontWeight: "bold",
     color: "lightgrey",
-    fontSize: 12,
+    fontSize: 20,
     marginTop: 20,
     marginBottom: 2,
   },

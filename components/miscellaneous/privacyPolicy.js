@@ -37,10 +37,10 @@ const PrivacyPolicy = ({ navigation, route }) => {
         </View>
         <View style={styles.right}></View>
       </View>
-      <ScrollView style={styles.textContainer}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.textContainer}>
         <Text style={styles.heading}>1. Introduction </Text>
         <Text style={styles.text}>
-          Welcome to Cabana, a dedicated platform designed to connect college
+          {"\t"}Welcome to Cabana, a dedicated platform designed to connect college
           students with potential roommates. Your privacy is of utmost
           importance to us. This Privacy Policy document outlines the types of
           information collected by Cabana, and how we use, maintain, protect,
@@ -48,40 +48,40 @@ const PrivacyPolicy = ({ navigation, route }) => {
         </Text>
         <Text style={styles.heading}>2. Consent</Text>
         <Text style={styles.text}>
-          By using our app, you hereby consent to our Privacy Policy and agree
+        {"\t"}By using our app, you hereby consent to our Privacy Policy and agree
           to its terms.
         </Text>
         <Text style={styles.heading}>3. Information We Collect</Text>
         <Text style={styles.text}>
-          Personal Identification Information: We may collect personal
+        {"\t"}Personal Identification Information: We may collect personal
           identification information including, but not limited to, your name,
           email address, phone number, college/university details, and profile
           picture.
         </Text>
         <Text style={styles.text}>
-          Roommate Preferences: Information regarding your roommate preferences,
+        {"\n\t"}Roommate Preferences: Information regarding your roommate preferences,
           living habits, interests, and hobbies to facilitate a compatible
           roommate match.
         </Text>
         <Text style={styles.text}>
-          Location Information: We may collect and process information about
+        {"\n\t"}Location Information: We may collect and process information about
           your geographical location to provide localized services.
         </Text>
         <Text style={styles.text}>
-          Usage Data: Information about how the user accesses and uses the app,
+        {"\n\t"}Usage Data: Information about how the user accesses and uses the app,
           which may include your IP address, browser type, and version, the
           pages of our app that you visit, the time and date of your visit, the
           time spent on those pages, and other diagnostic data.
         </Text>
         <Text style={styles.heading}>4. Cookies and Tracking Technologies</Text>
         <Text style={styles.text}>
-          We use cookies, beacons, tags, and other tracking technologies to
+        {"\t"}We use cookies, beacons, tags, and other tracking technologies to
           collect and store information about your preferences and navigation
           to, from, and on our app.
         </Text>
         <Text style={styles.heading}>5. Use of Your Information</Text>
         <Text style={styles.text}>
-          We may use the collected data for various purposes including: - To
+        {"\t"}We may use the collected data for various purposes including: - To
           provide and maintain our services. - To notify you about changes to
           our services. - To allow you to participate in interactive features of
           our service when you choose to do so. - To provide customer support. -
@@ -93,7 +93,7 @@ const PrivacyPolicy = ({ navigation, route }) => {
           6. Sharing and Disclosure of Information
         </Text>
         <Text style={styles.text}>
-          Third-Party Service Providers: We may share your information with
+          {"\t"}Third-Party Service Providers: We may share your information with
           third-party service providers to provide necessary services on our
           behalf, perform service-related services, or assist us in analyzing
           how our service is used.
@@ -104,24 +104,24 @@ const PrivacyPolicy = ({ navigation, route }) => {
         </Text>
         <Text style={styles.heading}>7. Security of Data We employ</Text>
         <Text style={styles.text}>
-          Commercially acceptable means of protecting your data but remember
+          {"\t"}Commercially acceptable means of protecting your data but remember
           that no method of transmission over the internet or method of
           electronic storage is 100% secure.
         </Text>
         <Text style={styles.heading}>8. Changes to This Privacy Policy</Text>
         <Text style={styles.text}>
-          We may update our Privacy Policy from time to time and will notify you
+          {"\t"}We may update our Privacy Policy from time to time and will notify you
           of any changes by posting the new Privacy Policy on this page.
         </Text>
         <Text style={styles.heading}>9. Your Acceptance of These Terms</Text>
         <Text style={styles.text}>
-          By using Cabana, you signify your acceptance of this policy and terms
+        {"\t"}By using Cabana, you signify your acceptance of this policy and terms
           of service. If you do not agree to this policy, please do not use our
           app.
         </Text>
         <Text style={styles.heading}>10. Contact Us</Text>
         <Text style={styles.text}>
-          If you have any questions or suggestions about our Privacy Policy, do
+        {"\t"}If you have any questions or suggestions about our Privacy Policy, do
           not hesitate to contact us at: {"\n\n"}team@thecabanaapp.com
         </Text>
       </ScrollView>
@@ -178,18 +178,19 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    fontSize: 11,
+    fontSize: 18,
+    lineHeight: 28,
     color: "lightgrey",
     marginVertical: 2,
   },
   textContainer: {
-    margin: 30,
+    margin: 15,
     //alignItems: "center",
   },
   heading: {
     fontWeight: "bold",
     color: "lightgrey",
-    fontSize: 12,
+    fontSize: 20,
     marginTop: 20,
     marginBottom: 2,
   },

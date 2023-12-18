@@ -36,7 +36,7 @@ const AboutUs = ({ navigation, route }) => {
         </View>
         <View style={styles.right}></View>
       </View>
-      <ScrollView style={styles.textContainer}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.textContainer}>
         <Text style={styles.text}>
           {"    "}
           Cabana, established by a team of dedicated college students, emerged
@@ -44,7 +44,9 @@ const AboutUs = ({ navigation, route }) => {
           academic community - the pursuit of an ideal roommate. Our inception
           is deeply rooted in the collective experiences and insights gained
           from navigating the intricacies of campus life, particularly in the
-          realm of shared living arrangements. Our platform is meticulously
+          realm of shared living arrangements. 
+          
+          {"\n\n     "}Our platform is meticulously
           designed to streamline the roommate selection process, employing a
           data-driven approach to ensure optimal compatibility among users. At
           Cabana, we emphasize the criticality of aligning key lifestyle
@@ -54,7 +56,8 @@ const AboutUs = ({ navigation, route }) => {
           user-friendly experience that simplifies the roommate search. We are
           committed to continuously evolving our services, incorporating
           cutting-edge technologies and user feedback to enhance our offerings.
-          Cabana's corporate philosophy is centered around fostering a
+          
+          {"\n\n     "}Cabana's corporate philosophy is centered around fostering a
           supportive and cohesive community among college students. We aim to
           provide a reliable, secure, and intuitive platform that not only
           connects individuals based on compatibility but also contributes to
@@ -79,6 +82,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: 10,
+    
     marginLeft: 15,
     marginRight: 39,
   },
@@ -87,6 +91,7 @@ const styles = StyleSheet.create({
     alignContent: "center",
     textAlign: "center",
     alignItems: "center",
+    paddingBottom: 10,
   },
 
   left: {
@@ -109,9 +114,11 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     color: "lightgrey",
+    lineHeight: 28,
   },
   textContainer: {
-    margin: 15,
+    marginHorizontal: 15,
+    marginBottom: -10,
     //alignItems: "center",
   },
 });
