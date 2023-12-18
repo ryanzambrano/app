@@ -135,6 +135,7 @@ export const Profile = ({ navigation, route }) => {
     } else {
       console.log("Error fetching prompts: ", promptsError);
     }
+    await AsyncStorage.setItem("userData", JSON.stringify(editedUser));
   };
 
   const getProfilePicture = async (navigation) => {

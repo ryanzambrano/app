@@ -120,7 +120,10 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
   const updateProfile = async () => {
     if (session?.user) {
-      if (!/^[A-Za-z\s]+$/.test(editedUser.name) && editedUser.name.trim() !== "") {
+      if (
+        !/^[A-Za-z\s]+$/.test(editedUser.name) &&
+        editedUser.name.trim() !== ""
+      ) {
         alert("Please enter a valid name");
         return;
       }
@@ -130,17 +133,28 @@ export const EditProfileScreen = ({ navigation, route }) => {
       }
 
       const classYear = Number(editedUser.class_year);
-      if (isNaN(classYear) || classYear < 2023 || classYear > 2030 || !/^\d{4}$/.test(editedUser.class_year)) {
+      if (
+        isNaN(classYear) ||
+        classYear < 2023 ||
+        classYear > 2030 ||
+        !/^\d{4}$/.test(editedUser.class_year)
+      ) {
         alert("Please enter a valid class year");
         return;
       }
 
-      if (editedUser.major.trim() !== "" && !/^[A-Za-z\s]*$/.test(editedUser.major)) {
+      if (
+        editedUser.major.trim() !== "" &&
+        !/^[A-Za-z\s]*$/.test(editedUser.major)
+      ) {
         alert("Please enter a valid major");
         return;
       }
 
-      if (editedUser.hometown.trim() !== "" && !/^[A-Za-z\s]*$/.test(editedUser.hometown)) {
+      if (
+        editedUser.hometown.trim() !== "" &&
+        !/^[A-Za-z\s,]*$/.test(editedUser.hometown)
+      ) {
         alert("Please enter a valid hometown");
         return;
       }
@@ -184,7 +198,6 @@ export const EditProfileScreen = ({ navigation, route }) => {
   };
 
   handleEditPictures = async () => {
-    await AsyncStorage.setItem("userData", JSON.stringify(userData));
     navigation.navigate("AddProfileImages");
   };
 
@@ -195,10 +208,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
   return (
     <SafeAreaView style={styles.contain}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.bbuttonContainer}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.bbuttonContainer} onPress={handleBack}>
           <Text style={styles.bbutton}>Cancel</Text>
         </TouchableOpacity>
         <View style={styles.centerContainer}>
