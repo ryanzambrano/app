@@ -461,14 +461,13 @@ const ContactsUI = ({ route }) => {
     const opacityValue = contactOpacities[item.Group_ID];
 
     const handleSilence = async () => {
-      const arr = [];
+      let arr = [];
       if (item.Silenced != null || item.Silenced != undefined) {
         item.Silenced.push(session.user.id);
         arr = item.Silenced;
       } else {
         arr.push(session.user.id);
       }
-      item.Silenced.push(session.user.id);
       const { data, error } = await supabase
         .from("Group_Chats")
         .update({ Silenced: arr })
@@ -476,7 +475,7 @@ const ContactsUI = ({ route }) => {
     };
 
     const handleUnsilence = async () => {
-      const arr = [];
+      let arr = [];
       if (item.Silenced != null || item.Silenced != undefined) {
         item.Silenced = item.Silenced.filter(
           (userId) => userId !== session.user.id
@@ -537,14 +536,14 @@ const ContactsUI = ({ route }) => {
         );
       };
       const handleSecondAction = (item) => {
-        if (item.Silenced.includes(session.user.id)) {
+        if (item.Silenced == null || item.Silenced == undefined || !item.Silenced.includes(session.user.id)) {
           Alert.alert(
-            "Unsilence Notifications",
-            "Are you sure you want to unsilence the notifications for this group chat?",
+            "Silence Notifications",
+            "Are you sure you want to Silence the notifications for this group chat?",
             [
               {
                 text: "Yes",
-                onPress: handleUnsilence,
+                onPress: handleSilence,
               },
               {
                 text: "No",
@@ -553,12 +552,12 @@ const ContactsUI = ({ route }) => {
           );
         } else {
           Alert.alert(
-            "Silence Notifications",
-            "Are you sure you want to silence the notifications for this group chat?",
+            "Unsilence Notifications",
+            "Are you sure you want to unsilence the notifications for this group chat?",
             [
               {
                 text: "Yes",
-                onPress: handleSilence,
+                onPress: handleUnsilence,
               },
               {
                 text: "No",
