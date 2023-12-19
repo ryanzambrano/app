@@ -164,68 +164,6 @@ const MessagingUI = () => {
     }
   }
 
-  /* const fetchGroup = async () => {
-    const { data: ids, error: iderror } = await supabase
-      .from("Group_Chats")
-      .select("*")
-      .eq("Group_ID", user.Group_ID);
-
-    const extractedIds = ids[0].User_ID.filter(
-      (item) => item !== session.user.id
-    );
-
-    user.Ammount_Users = ids[0].Ammount_Users;
-
-    const { data: peoples, error } = await supabase
-      .from("UGC")
-      .select("*")
-      .in("user_id", extractedIds);
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    const modifiedUsers = await Promise.all(
-      peoples.map(async (people) => {
-        const { data: Imagedata, error: ImageError } = await supabase
-          .from("images")
-          .select("last_modified, user_id")
-          .eq("user_id", people.user_id)
-          .eq("image_index", 0)
-          .single();
-
-        const { data: profileResponse, error: profileError } = await supabase
-          .from("profile")
-          .select("age, gender")
-          .eq("user_id", people.user_id)
-          .single();
-
-        if (profileError) {
-          console.error(profileError.error.message);
-        } else {
-          user.profiles = profileResponse;
-        }
-        if (ImageError) {
-          return {
-            ...people,
-            image: stock_photo,
-            lastModified: stock_photo,
-            profiles: user.profiles,
-          };
-        }
-        if (Imagedata) {
-          return {
-            ...people,
-            image: `${picURL}/${Imagedata.user_id}/${Imagedata.user_id}-0-${Imagedata.last_modified}`,
-            lastModified: Imagedata.last_modified,
-            profiles: user.profiles,
-          };
-        }
-      })
-    );
-
-    setPersons(modifiedUsers);
-  };*/
 
   useEffect(() => {
     if (user.recentMessage != undefined) {
@@ -267,6 +205,8 @@ const MessagingUI = () => {
       //console.log(data.UGC.name);
     }
   };*/
+
+  
   const readMessages = async () => {
     const { data: recentmessage1, error: recentmessageerror1 } = await supabase
       .from("Group_Chat_Messages")
@@ -294,14 +234,7 @@ const MessagingUI = () => {
     }
   };
 
-  async function hadnleNewMessage(data) {
-    setMessages((prevMessages) => [data, ...prevMessages]);
-    // Assuming readMessages returns a Promise
-    await readMessages();
-  
-    // After readMessages is complete, update the messages
-    
-  };
+ 
   
 
   useEffect(() => {
@@ -321,8 +254,10 @@ const MessagingUI = () => {
               genericPayload.new.Sent_From != session.user.id &&
               genericPayload.new.Group_ID_Sent_To == user.Group_ID
             ) {
-              data = genericPayload.new;
-              hadnleNewMessage(data);
+              const data = genericPayload.new;
+              setMessages((prevMessages) => [data, ...prevMessages]);
+               // Assuming readMessages returns a Promise
+              readMessages();
             }
           }
           // Handle generic event
