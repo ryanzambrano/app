@@ -51,7 +51,7 @@ const FiltersUI = ({ route }) => {
   ];
 
   const genders = [
-    { label: "Any", value: "Any" },
+    { label: "Any", value: "No Preferences" },
     { label: "Male", value: "Male" },
     { label: "Female", value: "Female" },
     { label: "Other", value: "Other" },

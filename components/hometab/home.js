@@ -236,7 +236,7 @@ const Home = ({ route }) => {
 
     //console.log(isHousingMatch);
     const isGenderMatch =
-      genderPreference === "Any" || user.profiles.gender === genderPreference;
+      genderPreference === "No Preferences" || user.profiles.gender === genderPreference;
 
     const isAgeMatch =
       (youngestAgePreference === "Any" ||
