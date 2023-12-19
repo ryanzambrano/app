@@ -23,6 +23,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
+import { Feather, FontAwesome } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -225,7 +226,7 @@ export const Profile = ({ navigation, route }) => {
                 navigation.navigate("SettingsScreen");
               }}
             >
-              <Icon name="gear" size={30} color="white" />
+              <FontAwesome name="gear" size={30} color="white" ac/>
             </TouchableOpacity>
           </View>
         </View>

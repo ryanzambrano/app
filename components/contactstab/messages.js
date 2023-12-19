@@ -723,7 +723,7 @@ const MessagingUI = () => {
           <View style={styles.customIcon}>
             <Icon
               name="paper-plane"
-              size={30}
+              size={25}
               color="#159e9e"
               style={styles.sendIcon}
             />
