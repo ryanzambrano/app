@@ -10,6 +10,8 @@ Deno.serve(async (_req) => {
    
   
     const UUID = data[0].User_ID
+
+    const silenced = data[0].Silenced
     
     const updatedUserdata = UUID.filter((uuid: string) => uuid !== payload.record.Sent_From)
 
@@ -23,6 +25,7 @@ Deno.serve(async (_req) => {
 
 
     const notif_token = userdata.map(user => user.notification_token).flat();
+    const user_id = userdata.map(user => user.user_id).flat();
     
 
 
@@ -61,25 +64,27 @@ Deno.serve(async (_req) => {
 
 
 for (let i = 0; i < numberOfNotifications; i++) {
-
-  let res = await fetch('https://exp.host/--/api/v2/push/send', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${acseestoken}`,
-    },
-    body: JSON.stringify({
-      to: notif_token[i],
-      title: title,
-      body: payload.record.Message_Content,
-      sound: 'default',
-    }),
-  }).then((res) => res.json());
-
-
-
-  // Push each response to the array
-  responses.push(res);
+  if (!silenced.includes(user_id[i]))
+  {
+    let res = await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${acseestoken}`,
+      },
+      body: JSON.stringify({
+        to: notif_token[i],
+        title: title,
+        body: payload.record.Message_Content,
+        sound: 'default',
+      }),
+    }).then((res) => res.json());
+  
+  
+  
+    // Push each response to the array
+    responses.push(res);
+  }
 }
     
 return new Response(JSON.stringify(responses), {

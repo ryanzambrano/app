@@ -20,7 +20,6 @@ import { picURL } from "../auth/supabase.js";
 import { gestureHandlerRootHOC } from "react-native-gesture-handler"; //install
 import { Swipeable } from "react-native-gesture-handler";
 import { supabase } from "../auth/supabase.js";
-import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { LayoutAnimation } from "react-native";
 import collegeLogo from "../../assets/collegeIcon1.png";
@@ -32,14 +31,10 @@ const ContactsUI = ({ route }) => {
   const [contacts, setContacts] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const isFocused = useIsFocused();
   const fadeAnimation = new Animated.Value(1);
   const [contactOpacities, setContactOpacities] = useState({});
-  const [images, setImages] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const groupIds = contacts.map((contact) => contact.Group_ID);
-  const [expoPushToken, setExpoPushToken] = useState("");
-  const [ringer, setRinger] = useState(false);
   const [sessionname, setsessionname] = useState("");
 
   const onRefresh = React.useCallback(() => {
@@ -233,34 +228,6 @@ const ContactsUI = ({ route }) => {
     await AsyncStorage.setItem("contactsData", JSON.stringify(filteredUsers));
   };
 
-  // const formatRecentTime = (timestamp) => {
-  //   if (!timestamp) return "";
-
-  //   const date = new Date(timestamp);
-  //   const currentTime = new Date();
-  //   const diffInMs = currentTime - date;
-  //   const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
-
-  //   if (diffInDays < 1) {
-  //     // Less than a day ago, display time in AM/PM format
-  //     const hours = date.getHours();
-  //     const minutes = date.getMinutes();
-  //     const ampm = hours >= 12 ? "PM" : "AM";
-  //     const formattedTime = `${hours % 12 || 12}:${minutes
-  //       .toString()
-  //       .padStart(2, "0")} ${ampm}`;
-  //     return formattedTime;
-  //   } else {
-  //     // More than a day ago, display the full date
-  //     const year = date.getFullYear();
-  //     const month = date.getMonth() + 1;
-  //     const day = date.getDate();
-  //     const formattedDate = `${month.toString().padStart(2, "0")}/${day
-  //       .toString()
-  //       .padStart(2, "0")}/${year}`;
-  //     return formattedDate;
-  //   }
-  // };
 
   const formatRecentTime = (timestamp) => {
     if (!timestamp) return "";
@@ -358,18 +325,16 @@ const ContactsUI = ({ route }) => {
         (updatePayload) => {
           if (updatePayload) {
             fetchUsers();
-            /*const payloadarray = updatePayload.new.User_ID;
-            if (payloadarray.includes(session.user.id)) {
-              // console.log("Group data altered");
-              fetchUsers();
-            }
-            /*if()
-            {
-              console.log("heard");
-              fetchUsers();
-            }*/
           }
-          // Handle delete event
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "delete", schema: "public", table: "Group_Chats" },
+        (deletePayload) => {
+          if (deletePayload) {
+            fetchUsers();
+          }
         }
       )
       .on(
