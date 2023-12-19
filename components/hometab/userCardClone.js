@@ -180,7 +180,6 @@ const UserCardClone = ({ navigation, route }) => {
       const { name, tags, bio, major, for_fun, class_year, hometown } = user;
 
       // Use the variables as needed
-      console.log(name, tags, bio, major, for_fun, class_year, hometown);
       //alert(name + ": " + tags + " " + bio + " " + major + " " + class_year);
       //return;
 
@@ -213,7 +212,7 @@ const UserCardClone = ({ navigation, route }) => {
       }
 
       if (data) {
-        setLastModified(data[0].last_modified);
+        //setLastModified(data[0].last_modified);
         //alert(data[0].last_modified);
         data.forEach((item) => {
           lastModifiedList[item.image_index] = item.last_modified;
@@ -421,7 +420,7 @@ const UserCardClone = ({ navigation, route }) => {
     {
       let Imagedata = [
         {
-          last_modified: lastModified,
+          last_modified: lastModified ? lastModified : null,
           user_id: user_id,
           image_index: 0,
         },
@@ -474,11 +473,13 @@ const UserCardClone = ({ navigation, route }) => {
             //console.log(navigationdata);
             const fetchedPersons = navigationdata.map((person) => ({
               ...person,
-              images: Imagedata,
+              images: Imagedata.last_modified ? imagedata : "",
               joinedGroups: usa.name,
               recentMessage: recentMessageData[0],
               messages: chatmessages,
             }));
+
+            //console.log(images + "hello");
 
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {

@@ -34,7 +34,7 @@ const MessagingUI = () => {
   const [messages, setMessages] = useState([]);
   const { session } = route.params;
   const { user } = route.params;
-  const {  sessionname } = route.params;
+  const { sessionname } = route.params;
   const [persons, setPersons] = useState([]);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isInverted, setIsInverted] = useState(false);
@@ -51,7 +51,6 @@ const MessagingUI = () => {
           Sent_From: session.user.id,
           Group_ID_Sent_To: user.Group_ID,
           Read: [session.user.id],
-
         },
         ...prevMessages,
       ]);
@@ -132,19 +131,33 @@ const MessagingUI = () => {
             profiles: user.profiles,
           }));
 
-          //alert(user.profiles.age);
-          setPersons(people);
-        } else if (user.images.length < 1) {
-          // Map last_modified to lastModified for each person in data
-          const people = data.map((person) => ({
-            ...person,
-            lastModified: stock_photo,
-            profiles: user.profiles,
-          }));
+          console.log(user.profiles);
 
           //alert(user.profiles.age);
           setPersons(people);
+        } else if (!user.images.length) {
+          // Map last_modified to lastModified for each person in data
+          const people = data.map((person) => ({
+            ...person,
+            profiles: user.profiles,
+            lastModified: stock_photo,
+          }));
+
+          setPersons(people);
+        } else if (user.images[0].last_modified == null) {
+          // Map last_modified to lastModified for each person in data
+          const people = data.map((person) => ({
+            ...person,
+            profiles: user.profiles,
+            lastModified: stock_photo,
+          }));
+
+          console.log(user.profiles);
+
+          setPersons(people);
         } else {
+          alert(user.images.length);
+
           const peoples = data.map((person) => person);
           // If user.images[0] does not exist or doesn't have last_modified, setPersons with the original data
           setPersons(peoples);
@@ -155,7 +168,7 @@ const MessagingUI = () => {
     }
   }
 
- /* const fetchGroup = async () => {
+  /* const fetchGroup = async () => {
     const { data: ids, error: iderror } = await supabase
       .from("Group_Chats")
       .select("*")
@@ -219,13 +232,11 @@ const MessagingUI = () => {
   };*/
 
   useEffect(() => {
- 
     if (user.recentMessage != undefined) {
       if (isFocused && !user.recentMessage.Read.includes(session.user.id)) {
         user.recentMessage.Read.push(session.user.id);
         readMessages();
       }
-      
     }
     if (isFocused) {
       if (user.messages != undefined) {
@@ -316,7 +327,7 @@ const MessagingUI = () => {
               genericPayload.new.Group_ID_Sent_To == user.Group_ID
             ) {
               const data = genericPayload.new;
-              setMessages((prevMessages) => [data,...prevMessages]);
+              setMessages((prevMessages) => [data, ...prevMessages]);
               readMessages();
             }
           }
@@ -540,7 +551,7 @@ const MessagingUI = () => {
             let pfpindex = messages.length - 1;
             let one = 1;
             if (isInverted == true) {
-             // console.log(inverted);
+              // console.log(inverted);
               adjustedIndex = messages.length - 1;
               one = -1;
               pfpindex = 0;
@@ -564,7 +575,7 @@ const MessagingUI = () => {
 
             const shouldDisplaySenderName =
               user.Ammount_Users >= 3 && isFirstOtherMessage;
-              
+
             return (
               <View>
                 <Swipeable

@@ -246,12 +246,15 @@ const ComposeMessageScreen = ({ route }) => {
         }));
         setPersons(fetchedPersons);
         if (fetchedPersons.length > 0) {
-          navigation.replace("Message", { user: fetchedPersons[0], sessionname});
+          navigation.replace("Message", {
+            user: fetchedPersons[0],
+            sessionname,
+          });
         }
       }
 
       if (insertError) {
-        alert(insertError.message);
+        //alert(insertError.message);
         if (insertError.code === "23505") {
           const { data: navigationdata, error: navigationError } =
             await supabase
@@ -311,14 +314,17 @@ const ComposeMessageScreen = ({ route }) => {
 
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
-              navigation.replace("Message", { user: fetchedPersons[0], sessionname });
+              navigation.replace("Message", {
+                user: fetchedPersons[0],
+                sessionname,
+              });
             }
 
             return;
           }
           // The duplicate key violation occurred, no need to handle the conflicting row
         } else {
-          alert("Failed to insert.");
+          alert("Something went wrong, please try again later");
           // Handle other insert errors
         }
         return;
