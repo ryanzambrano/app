@@ -171,9 +171,15 @@ const Home = ({ route }) => {
   };
 
   const showSortMenu = () => {
-    const options = ['Alphabetical Order', 'Shared Interests', 'Recommended', 'Class Year', 'Cancel'];
+    const options = [
+      "Alphabetical Order",
+      "Shared Interests",
+      "Recommended",
+      "Class Year",
+      "Cancel",
+    ];
     const cancelButtonIndex = options.length - 1;
-  
+
     ActionSheet.showActionSheetWithOptions(
       {
         options,
@@ -187,7 +193,7 @@ const Home = ({ route }) => {
       }
     );
   };
-  
+
   const sortedUsers = useMemo(() => {
     return users.sort((a, b) => {
       //console.log(a, b);
@@ -236,7 +242,8 @@ const Home = ({ route }) => {
 
     //console.log(isHousingMatch);
     const isGenderMatch =
-      genderPreference === "No Preferences" || user.profiles.gender === genderPreference;
+      genderPreference === "No Preferences" ||
+      user.profiles.gender === genderPreference;
 
     const isAgeMatch =
       (youngestAgePreference === "Any" ||
@@ -525,7 +532,6 @@ const Home = ({ route }) => {
             ref={flatListRef}
             data={renderedUsers}
             extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
-            // ... other props
             renderItem={renderUserCard}
             keyExtractor={(item) => item.user_id.toString()}
             ListEmptyComponent={renderEmptyComponent}
