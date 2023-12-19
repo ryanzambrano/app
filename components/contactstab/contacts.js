@@ -783,13 +783,12 @@ const ContactsUI = ({ route }) => {
                           {item.Silenced.includes(session.user.id) ? (
                             <Icon name="bell-slash" size={13} color="#575D61" />
                           ) : null}
-
-                          {item.recentMessage &&
+                        </>
+                      ) : null}
+                      {item.recentMessage &&
                           !item.recentMessage.Read.includes(session.user.id) ? (
                             <View style={styles.circle} /> // Add this View for the solid circle
                           ) : null}
-                        </>
-                      ) : null}
                     </View>
                   ) : (
                     <Text
