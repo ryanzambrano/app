@@ -37,7 +37,7 @@ const MessagingUI = () => {
   const {  sessionname } = route.params;
   const [persons, setPersons] = useState([]);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
-  const [isInverted, setIsInverted] = useState(true);
+  const [isInverted, setIsInverted] = useState(false);
   const [scrollindex, setIndex] = useState(0);
 
   const stock_photo =
@@ -45,28 +45,16 @@ const MessagingUI = () => {
 
   const sendMessage = async () => {
     if (!isButtonDisabled && message.trim() !== "") {
-      if (isInverted == true) {
-        setMessages((prevMessages) => [
-          {
-            Message_Content: message,
-            Sent_From: session.user.id,
-            Group_ID_Sent_To: user.Group_ID,
-            Read: [session.user.id],
+      setMessages((prevMessages) => [
+        {
+          Message_Content: message,
+          Sent_From: session.user.id,
+          Group_ID_Sent_To: user.Group_ID,
+          Read: [session.user.id],
 
-          },
-          ...prevMessages,
-        ]);
-      } else {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            Message_Content: message,
-            Sent_From: session.user.id,
-            Group_ID_Sent_To: user.Group_ID,
-            Read: [session.user.id],
-          },
-        ]);
-      }
+        },
+        ...prevMessages,
+      ]);
 
       setMessage("");
       //animateMessage();
@@ -232,18 +220,12 @@ const MessagingUI = () => {
 
   useEffect(() => {
  
-    if (isFocused && user.messages == undefined)
-    {
-      setIsInverted(false);
-    }
     if (user.recentMessage != undefined) {
       if (isFocused && !user.recentMessage.Read.includes(session.user.id)) {
         user.recentMessage.Read.push(session.user.id);
         readMessages();
       }
-      if (isFocused && user.messages.length < 17) {
-        setIsInverted(false);
-      }
+      
     }
     if (isFocused) {
       if (user.messages != undefined) {
@@ -334,12 +316,7 @@ const MessagingUI = () => {
               genericPayload.new.Group_ID_Sent_To == user.Group_ID
             ) {
               const data = genericPayload.new;
-              if (isInverted == true) {
-                setMessages((prevMessages) => [...prevMessages, data]);
-              } else {
-                setMessages((prevMessages) => [data, ...prevMessages]);
-                
-              }
+              setMessages((prevMessages) => [data,...prevMessages]);
               readMessages();
             }
           }
@@ -645,8 +622,8 @@ const MessagingUI = () => {
               </View>
             );
           }}
-          inverted={isInverted}
-          initialNumToRender={17}
+          inverted={true}
+          initialNumToRender={15}
           initialScrollIndex={0}
           onLayout={() => {
             // Scroll to the bottom after the component layout is calculated

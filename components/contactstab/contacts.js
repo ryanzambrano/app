@@ -154,12 +154,6 @@ const ContactsUI = ({ route }) => {
 
         let chatmessages = recentMessageData;
 
-        if (recentMessageData != undefined) {
-          if (recentMessageData.length < 17) {
-            chatmessages = [...recentMessageData].reverse();
-          }
-        }
-
         //console.log("recentMessageData");
 
         const { data: Imagedata, error: ImageError } = await supabase
