@@ -311,7 +311,7 @@ const MessagingUI = () => {
     }
   };
 
-  const fetchData = async (genericPayload) => {
+  /*const fetchData = async (genericPayload) => {
     try {
       const { data: nameData, error: nameError } = await supabase
         .from("UGC")
@@ -327,6 +327,8 @@ const MessagingUI = () => {
         .single();
 
       //console.log(ImageData);
+
+      let tempImageData = `${picURL}/${genericPayload.new.Sent_From}/${genericPayload.new.Sent_From}-0-${ImageData.last_modified}`;
 
       const data = {
         ...genericPayload.new,
@@ -350,7 +352,7 @@ const MessagingUI = () => {
     } catch (error) {
       console.error("Error fetching data:", error.message);
     }
-  };
+  };*/
 
   useEffect(() => {
     const channel = supabase.channel("messaging");
@@ -682,7 +684,7 @@ const MessagingUI = () => {
                       <Image
                         style={styles.pfpContainer}
                         source={{
-                          uri: `${picURL}/${item.Sent_From}/${item.Sent_From}-0-${item.navigation.last_modified}`,
+                          uri: item.image,
                         }}
                       />
                     )}

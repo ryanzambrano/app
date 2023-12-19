@@ -24,6 +24,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { LayoutAnimation } from "react-native";
 import collegeLogo from "../../assets/collegeIcon1.png";
+import { stock_photo } from "../auth/profileUtils.js";
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
@@ -159,17 +160,19 @@ const ContactsUI = ({ route }) => {
 
             if (error) {
               //console.error(error.message);
+              //alert("hi");
               let fee: foo = "";
               return {
                 ...message,
-                navigation: fee,
+                image: stock_photo,
               };
             }
+            let tempImageData = `${picURL}/${message.Sent_From}/${message.Sent_From}-0-${data.last_modified}`;
 
             // Attach the additional data to the message
             return {
               ...message,
-              navigation: data,
+              image: data ? tempImageData : stock_photo,
             };
           })
         );
@@ -458,16 +461,13 @@ const ContactsUI = ({ route }) => {
     const opacityValue = contactOpacities[item.Group_ID];
 
     const handleSilence = async () => {
-      const arr = [];
-      if(item.Silenced != null || item.Silenced != undefined) {
+      let arr = [];
+      if (item.Silenced != null || item.Silenced != undefined) {
         item.Silenced.push(session.user.id);
         arr = item.Silenced;
-      }
-      else
-      {
+      } else {
         arr.push(session.user.id);
       }
-      item.Silenced.push(session.user.id);
       const { data, error } = await supabase
         .from("Group_Chats")
         .update({ Silenced: arr })
@@ -475,14 +475,14 @@ const ContactsUI = ({ route }) => {
     };
 
     const handleUnsilence = async () => {
-      const arr = [];
-      if(item.Silenced != null || item.Silenced != undefined) {
+      let arr = [];
+      if (item.Silenced != null || item.Silenced != undefined) {
         item.Silenced = item.Silenced.filter(
           (userId) => userId !== session.user.id
         );
         arr = item.Silenced;
       }
-     
+
       const { data, error } = await supabase
         .from("Group_Chats")
         .update({ Silenced: arr })
@@ -536,14 +536,14 @@ const ContactsUI = ({ route }) => {
         );
       };
       const handleSecondAction = (item) => {
-        if (item.Silenced.includes(session.user.id)) {
+        if (item.Silenced == null || item.Silenced == undefined || !item.Silenced.includes(session.user.id)) {
           Alert.alert(
-            "Unsilence Notifications",
-            "Are you sure you want to unsilence the notifications for this group chat?",
+            "Silence Notifications",
+            "Are you sure you want to Silence the notifications for this group chat?",
             [
               {
                 text: "Yes",
-                onPress: handleUnsilence,
+                onPress: handleSilence,
               },
               {
                 text: "No",
@@ -552,12 +552,12 @@ const ContactsUI = ({ route }) => {
           );
         } else {
           Alert.alert(
-            "Silence Notifications",
-            "Are you sure you want to silence the notifications for this group chat?",
+            "Unsilence Notifications",
+            "Are you sure you want to unsilence the notifications for this group chat?",
             [
               {
                 text: "Yes",
-                onPress: handleSilence,
+                onPress: handleUnsilence,
               },
               {
                 text: "No",
@@ -757,13 +757,17 @@ const ContactsUI = ({ route }) => {
                       >
                         {item.recentMessage.Message_Content}
                       </Text>
-                      {item.Silenced.includes(session.user.id) ? (
-                        <Icon name="bell-slash" size={13} color="#575D61" />
-                      ) : null}
+                      {item.Silenced ? (
+                        <>
+                          {item.Silenced.includes(session.user.id) ? (
+                            <Icon name="bell-slash" size={13} color="#575D61" />
+                          ) : null}
 
-                      {item.recentMessage &&
-                      !item.recentMessage.Read.includes(session.user.id) ? (
-                        <View style={styles.circle} /> // Add this View for the solid circle
+                          {item.recentMessage &&
+                          !item.recentMessage.Read.includes(session.user.id) ? (
+                            <View style={styles.circle} /> // Add this View for the solid circle
+                          ) : null}
+                        </>
                       ) : null}
                     </View>
                   ) : (
