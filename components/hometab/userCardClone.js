@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
-import { Linking } from 'react-native';
+import { Linking } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { picURL } from "../auth/supabase";
@@ -34,8 +34,8 @@ const profileZIndex = scrollY.interpolate({
   extrapolate: "clamp",
 });
 
-const instagramLogo = require('../../assets/instagramLogo.png');
-const snapchatLogo = require('../../assets/snapchatLogo.png');
+const instagramLogo = require("../../assets/instagramLogo.png");
+const snapchatLogo = require("../../assets/snapchatLogo.png");
 
 const UserCardClone = ({ navigation, route }) => {
   const { session } = route.params;
@@ -53,6 +53,7 @@ const UserCardClone = ({ navigation, route }) => {
   } = route.params.user;*/
 
   const { user_id, last_modified } = route.params.user;
+
   const stock_photo =
     "data:image/png;base64,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";
 
@@ -71,16 +72,17 @@ const UserCardClone = ({ navigation, route }) => {
   const [loading, setLoading] = useState(true);
   const [usa, setUsa] = useState(null);
   const [picLoading, setPicLoading] = useState(true);
+  const [lastModified, setLastModified] = useState("");
 
   const openSocialMediaProfile = (handle, type) => {
-    let url = '';
-    if (type === 'instagram') {
+    let url = "";
+    if (type === "instagram") {
       url = `https://www.instagram.com/${handle}`;
-    } else if (type === 'snapchat') {
+    } else if (type === "snapchat") {
       url = `https://www.snapchat.com/add/${handle}`;
     }
 
-    Linking.canOpenURL(url).then(supported => {
+    Linking.canOpenURL(url).then((supported) => {
       if (supported) {
         Linking.openURL(url);
       } else {
@@ -117,7 +119,7 @@ const UserCardClone = ({ navigation, route }) => {
       class_year,
       hometown,
       bookmarked_profiles,
-      
+
       lastModified,
     };
     navigation.navigate("QuestionaireAnswers", { currentUser });
@@ -211,6 +213,8 @@ const UserCardClone = ({ navigation, route }) => {
       }
 
       if (data) {
+        setLastModified(data[0].last_modified);
+        //alert(data[0].last_modified);
         data.forEach((item) => {
           lastModifiedList[item.image_index] = item.last_modified;
         });
@@ -463,7 +467,7 @@ const UserCardClone = ({ navigation, route }) => {
           }
 
           if (navigationError) {
-            console.log(navigationError);
+            //console.log(navigationError);
             alert("Something went wrong, please try again later");
             return;
           } else {
@@ -471,7 +475,7 @@ const UserCardClone = ({ navigation, route }) => {
             const fetchedPersons = navigationdata.map((person) => ({
               ...person,
               images: Imagedata,
-              joinedGroups: name,
+              joinedGroups: usa.name,
               recentMessage: recentMessageData[0],
               messages: chatmessages,
             }));
@@ -484,14 +488,14 @@ const UserCardClone = ({ navigation, route }) => {
             return;
           }
         } else {
-          alert("Failed to insert.");
+          alert("Something went wrong, please try again later");
         }
         return;
       }
       const fetchedPersons = insertData.map((person) => ({
         ...person,
         images: Imagedata,
-        joinedGroups: name,
+        joinedGroups: usa.name,
         messages: undefined,
         recentMessage: undefined,
       }));
@@ -741,7 +745,7 @@ const UserCardClone = ({ navigation, route }) => {
                   ))}
                 </View>
               </View>
-              { (usa.instagramHandle || usa.snapchatHandle) && (
+              {(usa.instagramHandle || usa.snapchatHandle) && (
                 <View style={styles.roundedContainer}>
                   <Text style={styles.bioHeader} paddingBottom={7}>
                     Socials
@@ -749,20 +753,48 @@ const UserCardClone = ({ navigation, route }) => {
                   <View style={styles.bio}>
                     {usa.instagramHandle && (
                       <View style={styles.socialMediaRow}>
-                        <Image source={instagramLogo} style={styles.socialMediaIcon} />
-                        <TouchableOpacity onPress={() => openSocialMediaProfile(usa.instagramHandle, 'instagram')}>
-                          <Text style={styles.socialMediaText}> {usa.instagramHandle}</Text>
+                        <Image
+                          source={instagramLogo}
+                          style={styles.socialMediaIcon}
+                        />
+                        <TouchableOpacity
+                          onPress={() =>
+                            openSocialMediaProfile(
+                              usa.instagramHandle,
+                              "instagram"
+                            )
+                          }
+                        >
+                          <Text style={styles.socialMediaText}>
+                            {" "}
+                            {usa.instagramHandle}
+                          </Text>
                         </TouchableOpacity>
                       </View>
                     )}
 
-                    {usa.instagramHandle && usa.snapchatHandle && <View style={styles.horizontalDivider} />}
+                    {usa.instagramHandle && usa.snapchatHandle && (
+                      <View style={styles.horizontalDivider} />
+                    )}
 
                     {usa.snapchatHandle && (
                       <View style={styles.socialMediaRow}>
-                        <Image source={snapchatLogo} style={styles.socialMediaIcon} />
-                        <TouchableOpacity onPress={() => openSocialMediaProfile(usa.snapchatHandle, 'snapchat')}>
-                          <Text style={styles.socialMediaText}> {usa.snapchatHandle}</Text>
+                        <Image
+                          source={snapchatLogo}
+                          style={styles.socialMediaIcon}
+                        />
+                        <TouchableOpacity
+                          onPress={() =>
+                            openSocialMediaProfile(
+                              usa.snapchatHandle,
+                              "snapchat"
+                            )
+                          }
+                        >
+                          <Text style={styles.socialMediaText}>
+                            {" "}
+                            {usa.snapchatHandle}
+                          </Text>
                         </TouchableOpacity>
                       </View>
                     )}
@@ -1120,26 +1152,26 @@ const styles = StyleSheet.create({
   },
 
   socialMediaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10, 
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
     paddingHorizontal: 25,
   },
   socialMediaIcon: {
     width: 35,
     height: 35,
-    borderRadius: 17.5, 
-    marginRight: 10, 
+    borderRadius: 17.5,
+    marginRight: 10,
   },
   socialMediaText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
   },
   horizontalDivider: {
     height: 0.3,
-    backgroundColor: '#575D61',
-    marginVertical: 10, 
-    marginHorizontal: 20, 
+    backgroundColor: "#575D61",
+    marginVertical: 10,
+    marginHorizontal: 20,
   },
 });
 
