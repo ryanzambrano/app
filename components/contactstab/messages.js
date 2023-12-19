@@ -547,34 +547,19 @@ const MessagingUI = () => {
           ref={flatListRef}
           data={messages}
           renderItem={({ item, index }) => {
-            let adjustedIndex = 0;
-            let pfpindex = messages.length - 1;
-            let one = 1;
-            if (isInverted == true) {
-              // console.log(inverted);
-              adjustedIndex = messages.length - 1;
-              one = -1;
-              pfpindex = 0;
-            }
+            const isOwnMessage = item.Sent_From === session.user.id;
+    const isFirstOwnMessage =
+      isOwnMessage &&
+      (index === messages.length-1 || messages[index + 1].Sent_From !== session.user.id);
 
-            const isOwnMessage = item.Sent_From == session.user.id;
-            const isFirstOwnMessage =
-              isOwnMessage &&
-              (index === adjustedIndex ||
-                messages[index - one].Sent_From !== session.user.id);
+    const isOtherMessage = item.Sent_From !== session.user.id;
+    const isFirstOtherMessage =
+      isOtherMessage &&
+      (index === messages.length-1 || messages[index + 1].Sent_From !== item.Sent_From);
 
-            const isOtherMessage = item.Sent_From !== session.user.id;
-            const isFirstOtherMessage =
-              isOtherMessage &&
-              (index === adjustedIndex ||
-                messages[index - one].Sent_From !== item.Sent_From);
-            const isLastOtherMessage =
-              isOtherMessage &&
-              (index === pfpindex || // It's the last message in the array
-                messages[index + one].Sent_From !== item.Sent_From);
+    const shouldDisplaySenderName =
+      user.Ammount_Users >= 3 && isFirstOtherMessage;
 
-            const shouldDisplaySenderName =
-              user.Ammount_Users >= 3 && isFirstOtherMessage;
 
             return (
               <View>
