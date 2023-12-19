@@ -419,13 +419,13 @@ const ContactsUI = ({ route }) => {
     setSelectedUser(user);
 
     //console.log(user.joinedGroups);
-    navigation.navigate("Message", { user, sessionname });
+    navigation.navigate("Message", { user, sessionname});
   };
 
   const handlePlusIconPress = () => {
     // Implement the logic when the plus icon is pressed
     // For example, you can navigate to the compose message screen
-    navigation.navigate("ComposeMessage");
+    navigation.navigate("ComposeMessage", {sessionname});
   };
 
     

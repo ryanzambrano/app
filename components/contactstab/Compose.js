@@ -30,6 +30,7 @@ const ComposeMessageScreen = ({ route }) => {
   const navigation = useNavigation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const { session } = route.params;
+  const { sessionname } = route.params;
   const [users, setUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -245,7 +246,7 @@ const ComposeMessageScreen = ({ route }) => {
         }));
         setPersons(fetchedPersons);
         if (fetchedPersons.length > 0) {
-          navigation.replace("Message", { user: fetchedPersons[0] });
+          navigation.replace("Message", { user: fetchedPersons[0], sessionname});
         }
       }
 
@@ -310,7 +311,7 @@ const ComposeMessageScreen = ({ route }) => {
 
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
-              navigation.replace("Message", { user: fetchedPersons[0] });
+              navigation.replace("Message", { user: fetchedPersons[0], sessionname });
             }
 
             return;
