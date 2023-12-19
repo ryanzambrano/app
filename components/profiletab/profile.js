@@ -505,7 +505,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     //paddingLeft: 25,
-    paddingBottom: 35,
+    paddingBottom: 30,
 
     marginBottom: 0,
     //color: "white",

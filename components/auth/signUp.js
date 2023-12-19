@@ -108,9 +108,7 @@ export const SignUp = ({ navigation }) => {
             <View style={styles.container}>
               <View style={styles.verifyHeader}>
                 <Image
-                  source={{
-                    uri: "https://cdn3.iconfinder.com/data/icons/furniture-volume-1-2/48/12-512.png",
-                  }}
+                  source={logo}
                   style={styles.headerImage}
                   alt="Logo "
                 />

@@ -20,6 +20,8 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { picURL } from "../auth/supabase";
 import Retake from "../retakeQuestionaireFiles/retake.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+const instagramLogo = require("../../assets/instagramLogo.png");
+const snapchatLogo = require("../../assets/snapchatLogo.png");
 
 export const EditProfileScreen = ({ navigation, route }) => {
   const { session } = route.params;
@@ -437,29 +439,41 @@ export const EditProfileScreen = ({ navigation, route }) => {
             </View>
 
             <View style={styles.socialsContainer}>
-              <Text style={styles.more}>Socials</Text>
-              <Text style={styles.label}>Instagram:</Text>
-              <TextInput
-                style={styles.input}
-                value={editedUser.instagramHandle}
-                onChangeText={(instagramHandle) =>
-                  setEditedUser({ ...editedUser, instagramHandle })
-                }
-                placeholder="Instagram Handle"
-                placeholderTextColor="#575D61"
-              />
-        
-              <Text style={styles.label}>Snapchat:</Text>
-              <TextInput
-                style={styles.input}
-                value={editedUser.snapchatHandle}
-                onChangeText={(snapchatHandle) =>
-                  setEditedUser({ ...editedUser, snapchatHandle })
-                }
-                placeholder="Snapchat Handle"
-                placeholderTextColor="#575D61"
-              />
+            <Text style={styles.more}>Socials</Text>
+
+            <View style={styles.socialMediaContainer}>
+              <Image source={instagramLogo} style={styles.socialMediaIcon} />
+              <View style={styles.socialTextContainer}>
+                <Text style={styles.label}>Instagram:</Text>
+                <TextInput
+                  style={styles.input2}
+                  value={editedUser.instagramHandle}
+                  onChangeText={(instagramHandle) =>
+                    setEditedUser({ ...editedUser, instagramHandle })
+                  }
+                  placeholder="Instagram Handle"
+                  placeholderTextColor="#575D61"
+                />
+              </View>
             </View>
+
+            <View style={styles.socialMediaContainer}>
+              <Image source={snapchatLogo} style={styles.socialMediaIcon} />
+              <View style={styles.socialTextContainer}>
+                <Text style={styles.label}>Snapchat:</Text>
+                <TextInput
+                  style={styles.input2}
+                  value={editedUser.snapchatHandle}
+                  onChangeText={(snapchatHandle) =>
+                    setEditedUser({ ...editedUser, snapchatHandle })
+                  }
+                  placeholder="Snapchat Handle"
+                  placeholderTextColor="#575D61"
+                />
+              </View>
+            </View>
+          </View>
+
           </>
         }
       />
@@ -652,6 +666,49 @@ const styles = StyleSheet.create({
     margin: 10,
     marginBottom: 6,
   },
+  socialsContainer: {
+    flexDirection: "column",
+    borderTopColor: "#2B2D2F",
+    borderTopWidth: 1.4,
+    marginHorizontal: 25,
+    marginTop: 10,
+    paddingTop: 10,
+    marginBottom: 10,
+    gap: 5,
+  },
+  socialMediaContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  socialTextContainer: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    marginLeft: 15,
+    marginTop: 12,
+  },
+  socialMediaIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  label: {
+    fontSize: 16,
+    color: "white",
+    fontWeight: "bold",
+  },
+  input2: {
+    flex: 0,
+    fontSize: 16,
+    color: "white",
+    marginBottom: 10,
+    borderBottomColor: "#2B2D2F",
+    borderBottomWidth: 1.8,
+    borderBottomRightRadius: 20,
+    paddingBottom: 5, 
+  },
+  
 });
 
 export default EditProfileScreen;

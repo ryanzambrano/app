@@ -107,13 +107,15 @@ const SettingsScreen = ({ navigation, route }) => {
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         {sections.map((section, sectionIndex) => (
-          <View key={sectionIndex}>
+         <View key={sectionIndex} style={styles.rowContainer}>
+            
             <View style={styles.titleContainer}>
               <Text style={styles.sectionTitle}>{section.title}</Text>
             </View>
             {section.items.map((item, itemIndex) => {
               if (item.type === "switch") {
                 return (
+                  
                   <View key={itemIndex} style={styles.settingRow}>
                     <Text style={styles.text}>
                       {item.name}
@@ -127,6 +129,7 @@ const SettingsScreen = ({ navigation, route }) => {
                       value={isDiscoverable}
                     />
                   </View>
+                 
                 );
               } else {
                 return (
@@ -140,12 +143,15 @@ const SettingsScreen = ({ navigation, route }) => {
                 );
               }
             })}
+            
           </View>
         ))}
 
-        <View style={styles.logoutRow}>
-          <Button title="Logout" color="red" onPress={signOut} />
-        </View>
+<View style={styles.logoutSection}>
+    <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+      <Text style={styles.logoutButtonText}>Logout</Text>
+    </TouchableOpacity>
+  </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -154,13 +160,15 @@ const SettingsScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1D1D20", //#1D1D20
-    padding: 10,
+    backgroundColor: "#111111", //#1D1D20
+    marginBottom: -30,
+    
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: 10,
+    
   },
 
   sectionTitle: {
@@ -189,7 +197,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 15,
     paddingHorizontal: 15,
+    backgroundColor: "#1D1D20",
+    
   },
+
+  rowContainer: {
+    marginHorizontal: 0,
+    borderRadius: 20,
+    backgroundColor: "#1D1D20", // Set background color as per your theme
+    marginBottom: 10, // Add spacing between sections
+  },
+
   logoutRow: {
     paddingVertical: 15,
     paddingHorizontal: 15,
@@ -202,6 +220,33 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingRight: 10,
   },
+  logoutSection: {
+    marginTop: 20, 
+    backgroundColor: "#111111",
+    marginBottom: 20,
+  },
+  logoutRow: {
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    
+    alignItems: 'center', 
+  },
+  logoutButton: {
+    backgroundColor: "red", // Set button color
+    padding: 10,
+    marginBottom: 40,
+    marginHorizontal: 100,
+    borderRadius: 5, // Adjust as per your design
+    alignItems: "center",
+  },
+  
+  logoutButtonText: {
+    color: "white",
+    fontSize: 18, // Set your desired font size
+    fontWeight: "bold",
+    
+  },
+  
 });
 
 export default SettingsScreen;
