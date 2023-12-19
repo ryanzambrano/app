@@ -350,30 +350,29 @@ const MessagingUI = () => {
   const formatRecentTime = (timestamp) => {
     if (!timestamp) return "";
 
-    const messageDate = new Date(timestamp);
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0); // Set to start of current day
+    const date = new Date(timestamp);
+    const currentTime = new Date();
+    const diffInMs = currentTime - date;
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
 
-    const yesterday = new Date(currentDate);
-    yesterday.setDate(yesterday.getDate() - 1); // Set to start of yesterday
-
-    if (messageDate > currentDate) {
-      // Message sent today, show time
-      return messageDate.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: true,
-      });
-    } else if (messageDate > yesterday) {
-      // Message sent yesterday, show "Yesterday"
-      return "Yesterday";
+    if (diffInDays < 1) {
+      // Less than a day ago, display time in AM/PM format
+      const hours = date.getHours();
+      const minutes = date.getMinutes();
+      const ampm = hours >= 12 ? "PM" : "AM";
+      const formattedTime = `${hours % 12 || 12}:${minutes
+        .toString()
+        .padStart(2, "0")} ${ampm}`;
+      return formattedTime;
     } else {
-      // Message sent earlier than yesterday, show date
-      return messageDate.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "numeric",
-        day: "numeric",
-      });
+      // More than a day ago, display the full date
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const formattedDate = `${month.toString().padStart(2, "0")}/${day
+        .toString()
+        .padStart(2, "0")}/${year}`;
+      return formattedDate;
     }
   };
 
