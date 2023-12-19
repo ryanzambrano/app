@@ -36,7 +36,7 @@ export const Questionaire1 = ({ navigation, route }) => {
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedWho, setSelectedWho] = useState("");
 
-  const gender = ["Male", "Female", "Other"];
+  const gender = ["Male", "Female", "Other", "No Preferences"];
   const race = [
     "White",
     "Black / African American",

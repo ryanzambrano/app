@@ -38,7 +38,7 @@ export const Retake1 = ({ navigation, route }) => {
   const [selectedWho, setSelectedWho] = useState("");
   const [fetched, setFetched] = useState(false);
 
-  const gender = ["Male", "Female", "Other"];
+  const gender = ["Male", "Female", "Other", "No Preferences"];
   const race = [
     "White",
     "Black / African American",
