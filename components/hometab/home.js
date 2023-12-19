@@ -288,10 +288,31 @@ const Home = ({ route }) => {
         .select("*")
         .neq("has_ugc", false)
         .neq("profile_viewable", false);
-      const { data: profileData, error: profileError } = await supabase
+      
+      const sessionUserId = session.user.id;
+      const { data: sessionProfileData, error: sessionProfileError } = await supabase
         .from("profile")
-        .select("*")
-        .neq("profile_complete", false);
+        .select("college")
+        .eq("user_id", sessionUserId)
+        .single();
+
+      if (sessionProfileError || !sessionProfileData) {
+        console.error(sessionProfileError || "Session user's profile not found");
+        return;
+      }
+
+      const sessionUserCollege = sessionProfileData.college;
+
+      const { data: profileData, error: profileError } = await supabase
+      .from("profile")
+      .select("*")
+      .eq("college", sessionUserCollege)
+      .neq("profile_complete", false);
+
+      if (profileError) {
+        console.error(profileError);
+        return;
+      }
       const { data: imageData, error: imageError } = await supabase
         .from("images")
         .select("*")
