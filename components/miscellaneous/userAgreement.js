@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "lightgrey",
     fontSize: 20,
-    marginTop: 20,
+    marginTop: 5,
     marginBottom: 2,
   },
 });

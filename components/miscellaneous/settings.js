@@ -165,18 +165,18 @@ const styles = StyleSheet.create({
 
   sectionTitle: {
     color: "grey",
-    fontSize: 15,
+    fontSize: 20,
     marginLeft: 15,
     paddingVertical: 10,
-    fontWeight: "bold",
+    fontWeight: "500",
     //borderBottomWidth: 1,
-    borderBottomColor: "grey",
+    //borderBottomColor: "grey",
   },
 
   titleContainer: {
     paddingVertical: 10,
     borderBottomColor: "grey",
-    borderBottomWidth: 0.3,
+    //borderBottomWidth: 0.3,
     backgroundColor: "#111111",
   },
 
@@ -200,6 +200,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 10,
     paddingVertical: 10,
+    paddingRight: 10,
   },
 });
 

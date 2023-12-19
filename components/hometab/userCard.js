@@ -704,7 +704,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 13,
     marginTop: 4,
     backgroundColor: "#14999999", //#2B2D2F
-    paddingVertical: 12,
+    paddingVertical: 13,
     borderRadius: 12,
     //marginBottom: 10,
     borderWidth: 0.4,
