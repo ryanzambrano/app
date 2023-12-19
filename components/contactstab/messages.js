@@ -335,9 +335,9 @@ const MessagingUI = () => {
             ) {
               const data = genericPayload.new;
               if (isInverted == true) {
-                setMessages((prevMessages) => [data, ...prevMessages]);
-              } else {
                 setMessages((prevMessages) => [...prevMessages, data]);
+              } else {
+                setMessages((prevMessages) => [data, ...prevMessages]);
                 
               }
               readMessages();
