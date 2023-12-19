@@ -51,8 +51,6 @@ const ContactsUI = ({ route }) => {
     setSearchQuery(text);
   };
 
- 
-
   const renderEmptyComponent = () => (
     <View style={styles.emptyContainer}>
       <Text style={styles.emptyText}>No messages</Text>
@@ -67,9 +65,14 @@ const ContactsUI = ({ route }) => {
   });
   const loadData = async () => {
     const storedData = await AsyncStorage.getItem("contactsData");
+    const seshName = await AsyncStorage.getItem("sessionName");
     if (storedData !== null) {
       setUsers(JSON.parse(storedData));
     }
+    if (seshName !== null) {
+      setsessionname(seshName);
+    }
+    //alert(sessionname);
   };
 
   function getInitials(fullName) {
@@ -118,9 +121,6 @@ const ContactsUI = ({ route }) => {
       console.error(error);
       return;
     }
-
-   
-
 
     const modifiedUsers = await Promise.all(
       users.map(async (user) => {
@@ -270,26 +270,33 @@ const ContactsUI = ({ route }) => {
 
   const formatRecentTime = (timestamp) => {
     if (!timestamp) return "";
-  
+
     const messageDate = new Date(timestamp);
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0); // Set to start of current day
-  
+
     const yesterday = new Date(currentDate);
     yesterday.setDate(yesterday.getDate() - 1); // Set to start of yesterday
-  
+
     if (messageDate > currentDate) {
       // Message sent today, show time
-      return messageDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+      return messageDate.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      });
     } else if (messageDate > yesterday) {
       // Message sent yesterday, show "Yesterday"
       return "Yesterday";
     } else {
       // Message sent earlier than yesterday, show date
-      return messageDate.toLocaleDateString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric' });
+      return messageDate.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+      });
     }
   };
-  
 
   const checkchat = async (payload) => {
     // console.log(payload.new.Group_ID_Sent_To);
@@ -315,15 +322,15 @@ const ContactsUI = ({ route }) => {
         .eq("user_id", session.user.id)
         .single();
 
-  
       if (sessionError) {
         // Handle error if needed
         console.error("Error fetching data:", sessionError);
         return;
       }
-  
+
       // Use the state updater function to ensure correct state updates
       setsessionname(data.name);
+      await AsyncStorage.setItem("sessionName", data.name);
     } catch (error) {
       // Handle exceptions if needed
       console.error("An error occurred:", error);
@@ -331,7 +338,7 @@ const ContactsUI = ({ route }) => {
   };
 
   useEffect(() => {
-    fetchName(); 
+    fetchName();
     loadData();
     fetchUsers();
 
@@ -419,18 +426,14 @@ const ContactsUI = ({ route }) => {
     setSelectedUser(user);
 
     //console.log(user.joinedGroups);
-    navigation.navigate("Message", { user, sessionname});
+    navigation.navigate("Message", { user, sessionname });
   };
 
   const handlePlusIconPress = () => {
     // Implement the logic when the plus icon is pressed
     // For example, you can navigate to the compose message screen
-    navigation.navigate("ComposeMessage", {sessionname});
+    navigation.navigate("ComposeMessage", { sessionname });
   };
-
-    
- 
-  
 
   const renderContact = ({ item }) => {
     const handleDelete = async () => {
@@ -508,7 +511,6 @@ const ContactsUI = ({ route }) => {
         .update({ Silenced: arr })
         .eq("Group_ID", item.Group_ID);
     };
-  
 
     const renderRightActions = (progress, dragX) => {
       // console.log("Progress:", progress);
@@ -557,7 +559,11 @@ const ContactsUI = ({ route }) => {
         );
       };
       const handleSecondAction = (item) => {
-        if (item.Silenced == null || item.Silenced == undefined || !item.Silenced.includes(session.user.id)) {
+        if (
+          item.Silenced == null ||
+          item.Silenced == undefined ||
+          !item.Silenced.includes(session.user.id)
+        ) {
           Alert.alert(
             "Silence Notifications",
             "Are you sure you want to Silence the notifications for this group chat?",
@@ -777,7 +783,7 @@ const ContactsUI = ({ route }) => {
                         }}
                       >
                         {item.recentMessage.Message_Content}
-                        </Text>
+                      </Text>
                       {item.Silenced ? (
                         <>
                           {item.Silenced.includes(session.user.id) ? (
@@ -786,9 +792,9 @@ const ContactsUI = ({ route }) => {
                         </>
                       ) : null}
                       {item.recentMessage &&
-                          !item.recentMessage.Read.includes(session.user.id) ? (
-                            <View style={styles.circle} /> // Add this View for the solid circle
-                          ) : null}
+                      !item.recentMessage.Read.includes(session.user.id) ? (
+                        <View style={styles.circle} /> // Add this View for the solid circle
+                      ) : null}
                     </View>
                   ) : (
                     <Text
