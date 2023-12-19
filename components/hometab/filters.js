@@ -9,6 +9,8 @@ import {
 import { Dropdown } from "react-native-element-dropdown";
 import { useNavigation } from "@react-navigation/native";
 import { supabase } from "../auth/supabase";
+import { RangeSlider } from '@react-native-assets/slider';
+
 
 const FiltersUI = ({ route }) => {
   const { session } = route.params;
@@ -57,11 +59,17 @@ const FiltersUI = ({ route }) => {
 
   const ages = [
     { label: "Any", value: "Any" },
-    ...Array.from({ length: 83 }, (_, index) => ({
+    ...Array.from({ length: 9 }, (_, index) => ({
       label: (18 + index).toString(),
       value: (18 + index).toString(),
     })),
   ];
+
+  const [ageRange, setAgeRange] = useState([
+    parseInt(currentYoungestAgePreference) || 18, 
+    parseInt(currentOldestAgePreference) || 26
+  ]);
+  
 
   const studies = [
     { label: "Any", value: "Any" },
@@ -78,8 +86,8 @@ const FiltersUI = ({ route }) => {
     navigation.navigate("Home", {
       housingPreference,
       genderPreference,
-      youngestAgePreference,
-      oldestAgePreference,
+      youngestAgePreference: ageRange[0],
+      oldestAgePreference: ageRange[1],
       studyPreference,
     });
   };
@@ -87,8 +95,7 @@ const FiltersUI = ({ route }) => {
   const resetFilters = () => {
     setHousingPreference(originalHousingPreference);
     setGenderPreference(originalGenderPreference);
-    setYoungestAgePreference("Any");
-    setOldestAgePreference("Any");
+    setAgeRange([18, 26]);
     setStudyPreference("Any");
   };
 
@@ -160,60 +167,6 @@ const FiltersUI = ({ route }) => {
       </View>
       <View style={styles.divider}></View>
       <View style={styles.filterContainer}>
-        <Text style={styles.filterLabel}>Youngest Age:</Text>
-        <Dropdown
-          style={styles.dropdown}
-          data={ages}
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          selectedTextStyle={styles.placeholderText}
-          itemTextStyle={styles.placeholderText}
-          itemContainerStyle={styles.listContainer}
-          containerStyle={styles.border}
-          autoScroll={false}
-          showsVerticalScrollIndicator={false}
-          activeColor="#2b3138"
-          placeholder="Select Youngest Age Preference"
-          searchPlaceholder="Search..."
-          value={youngestAgePreference}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={(item) => {
-            setYoungestAgePreference(item.value);
-            setIsFocus(false);
-          }}
-        />
-      </View>
-      <View style={styles.divider}></View>
-      <View style={styles.filterContainer}>
-        <Text style={styles.filterLabel}>Oldest Age:</Text>
-        <Dropdown
-          style={styles.dropdown}
-          data={ages}
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          selectedTextStyle={styles.placeholderText}
-          itemTextStyle={styles.placeholderText}
-          itemContainerStyle={styles.listContainer}
-          containerStyle={styles.border}
-          autoScroll={false}
-          showsVerticalScrollIndicator={false}
-          activeColor="#2b3138"
-          placeholder="Select Oldest Age Preference"
-          searchPlaceholder="Search..."
-          value={oldestAgePreference}
-          onFocus={() => setIsFocus(true)}
-          onBlur={() => setIsFocus(false)}
-          onChange={(item) => {
-            setOldestAgePreference(item.value);
-            setIsFocus(false);
-          }}
-        />
-      </View>
-      <View style={styles.divider}></View>
-      <View style={styles.filterContainer}>
         <Text style={styles.filterLabel}>Area of Study:</Text>
         <Dropdown
           style={styles.dropdown}
@@ -239,6 +192,26 @@ const FiltersUI = ({ route }) => {
           }}
         />
       </View>
+      <View style={styles.divider}></View>
+      <View style={styles.filterContainer}>
+        <Text style={styles.filterLabel}>Age Range:</Text>
+        <View style={{flex: 1, paddingLeft: 10, paddingRight: 20, alignItems: 'stretch', justifyContent: 'center'}}>
+        <RangeSlider
+          range={ageRange}
+          minimumValue={18}
+          maximumValue={26}
+          minimumRange={0}
+          step={1}
+          outboundColor='#2b3138'
+          inboundColor='darkcyan'
+          thumbTintColor='white'
+          trackHeight={4}
+          thumbSize={15}
+          onValueChange={(newRange) => setAgeRange(newRange)}
+        />
+      </View>
+      <Text style={{color: "white", fontSize: 16, fontWeight: "400",}}>{`${ageRange[0]} - ${ageRange[1]}`}</Text>
+    </View> 
       <TouchableOpacity onPress={handleApplyFilters}>
         <View style={styles.applyButtonContainer}>
           <Text style={styles.applyButtonText}>Apply Filters</Text>

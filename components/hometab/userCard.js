@@ -398,10 +398,10 @@ const UserCard = ({ navigation, route }) => {
               recentMessage: recentMessageData[0],
               messages: chatmessages,
             }));
-
+            
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
-              navigation.navigate("Message", { user: fetchedPersons[0] });
+                            navigation.navigate("Message", { user: fetchedPersons[0] });
             }
 
             return;
@@ -420,7 +420,7 @@ const UserCard = ({ navigation, route }) => {
       }));
       setPersons(fetchedPersons);
       if (fetchedPersons.length > 0) {
-        navigation.navigate("Message", { user: fetchedPersons[0] });
+                navigation.navigate("Message", { user: fetchedPersons[0] });
       }
     }
   };
