@@ -167,7 +167,7 @@ const MessagingUI = () => {
     }
   }
 
-  const fetchGroup = async () => {
+ /* const fetchGroup = async () => {
     const { data: ids, error: iderror } = await supabase
       .from("Group_Chats")
       .select("*")
@@ -228,7 +228,7 @@ const MessagingUI = () => {
     );
 
     setPersons(modifiedUsers);
-  };
+  };*/
 
   useEffect(() => {
  
@@ -256,9 +256,9 @@ const MessagingUI = () => {
     if (user.Ammount_Users <= 2) {
       fetchUsers();
     }
-    if (user.Ammount_Users > 2) {
+    /*if (user.Ammount_Users > 2) {
       fetchGroup();
-    }
+    }*/
   }, [user.User_ID, session.user.id, isFocused]);
 
   useEffect(() => {
