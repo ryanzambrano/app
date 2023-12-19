@@ -34,6 +34,7 @@ const MessagingUI = () => {
   const [messages, setMessages] = useState([]);
   const { session } = route.params;
   const { user } = route.params;
+  const {  sessionname } = route.params;
   const [persons, setPersons] = useState([]);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isInverted, setIsInverted] = useState(true);
@@ -51,6 +52,7 @@ const MessagingUI = () => {
             Sent_From: session.user.id,
             Group_ID_Sent_To: user.Group_ID,
             Read: [session.user.id],
+
           },
           ...prevMessages,
         ]);
@@ -78,6 +80,7 @@ const MessagingUI = () => {
             Group_ID_Sent_To: user.Group_ID,
             Sent_From: session.user.id,
             Read: [session.user.id],
+            sender_name: sessionname,
           },
         ])
         .select()
@@ -172,7 +175,7 @@ const MessagingUI = () => {
 
     const extractedIds = ids[0].User_ID.filter(
       (item) => item !== session.user.id
-    ); /*
+    );
 
     user.Ammount_Users = ids[0].Ammount_Users;
 
@@ -224,11 +227,13 @@ const MessagingUI = () => {
       })
     );
 
-    setPersons(modifiedUsers);*/
+    setPersons(modifiedUsers);
   };
 
   useEffect(() => {
-    if (isFocused && user.messages == undefined) {
+ 
+    if (isFocused && user.messages == undefined)
+    {
       setIsInverted(false);
     }
     if (user.recentMessage != undefined) {
@@ -311,49 +316,6 @@ const MessagingUI = () => {
     }
   };
 
-  /*const fetchData = async (genericPayload) => {
-    try {
-      const { data: nameData, error: nameError } = await supabase
-        .from("UGC")
-        .select(`name`)
-        .eq("user_id", genericPayload.new.Sent_From)
-        .single();
-
-      const { data: ImageData, error: ImageError } = await supabase
-        .from("images")
-        .select(`last_modified`)
-        .eq("user_id", genericPayload.new.Sent_From)
-        .eq("image_index", 0)
-        .single();
-
-      //console.log(ImageData);
-
-      let tempImageData = `${picURL}/${genericPayload.new.Sent_From}/${genericPayload.new.Sent_From}-0-${ImageData.last_modified}`;
-
-      const data = {
-        ...genericPayload.new,
-        UGC: {
-          name: nameData ? nameData.name : null,
-          // Add other properties from the 'UGC' table if needed
-        },
-        navigation: {
-          last_modified: ImageData ? ImageData.last_modified : null,
-          // Add other properties from the 'UGC' table if needed
-        },
-      };
-
-      if (isInverted == true) {
-        setMessages((prevMessages) => [data, ...prevMessages]);
-      } else {
-        setMessages((prevMessages) => [...prevMessages, data]);
-      }
-
-      readMessages();
-    } catch (error) {
-      console.error("Error fetching data:", error.message);
-    }
-  };*/
-
   useEffect(() => {
     const channel = supabase.channel("messaging");
     const subscription = channel
@@ -371,9 +333,16 @@ const MessagingUI = () => {
               genericPayload.new.Sent_From != session.user.id &&
               genericPayload.new.Group_ID_Sent_To == user.Group_ID
             ) {
-              fetchData(genericPayload);
+              const data = genericPayload.new;
+              if (isInverted == true) {
+                setMessages((prevMessages) => [...prevMessages, data]);
+              } else {
+                setMessages((prevMessages) => [data, ...prevMessages]);
+              }
+              readMessages();
             }
           }
+          // Handle generic event
         }
       )
       .subscribe();
@@ -592,7 +561,7 @@ const MessagingUI = () => {
             let pfpindex = messages.length - 1;
             let one = 1;
             if (isInverted == true) {
-              // console.log(inverted);
+             // console.log(inverted);
               adjustedIndex = messages.length - 1;
               one = -1;
               pfpindex = 0;
@@ -616,18 +585,9 @@ const MessagingUI = () => {
 
             const shouldDisplaySenderName =
               user.Ammount_Users >= 3 && isFirstOtherMessage;
-
-            const shouldDisplaySenderPic =
-              user.Ammount_Users >= 3 && isLastOtherMessage;
+              
             return (
-              <TouchableOpacity
-                onPress={() =>
-                  !isOwnMessage
-                    ? navigation.navigate("UserCardClone", { user: item.UGC })
-                    : null
-                }
-                activeOpacity={1}
-              >
+              <View>
                 <Swipeable
                   renderRightActions={(progress, dragX) =>
                     renderRightActions(progress, dragX, item)
@@ -637,7 +597,7 @@ const MessagingUI = () => {
                   useNativeDriver={true}
                 >
                   {shouldDisplaySenderName && (
-                    <Text style={styles.senderName}>{item.UGC.name}</Text>
+                    <Text style={styles.senderName}>{item.sender_name}</Text>
                   )}
 
                   <View
@@ -679,18 +639,9 @@ const MessagingUI = () => {
                         {item.Message_Content}
                       </Text>
                     </View>
-                    {shouldDisplaySenderPic && (
-                      // <Text style={styles.senderName}>{item.UGC.name}</Text>
-                      <Image
-                        style={styles.pfpContainer}
-                        source={{
-                          uri: item.image,
-                        }}
-                      />
-                    )}
                   </View>
                 </Swipeable>
-              </TouchableOpacity>
+              </View>
             );
           }}
           inverted={isInverted}
@@ -723,7 +674,7 @@ const MessagingUI = () => {
           <View style={styles.customIcon}>
             <Icon
               name="paper-plane"
-              size={25}
+              size={30}
               color="#159e9e"
               style={styles.sendIcon}
             />

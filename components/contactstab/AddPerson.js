@@ -43,7 +43,6 @@ const AddPerson = ({ route }) => {
   };
 
   useEffect(() => {
-    console.log(group.Ammount_Users);
     fetchUsers();
     fetchSessionWho();
   }, []);
@@ -173,22 +172,7 @@ const AddPerson = ({ route }) => {
     setUsers(usersWithProfilePictures);
   };
 
-  const ahandleUserCardPress = (user) => {
-    if (selectedUsers.includes(user)) {
-      setSelectedUsers(
-        selectedUsers.filter((selectedUser) => selectedUser !== user)
-      );
-      setSelectedUserCount(selectedUserCount - 1);
-    } else {
-      if (selectedUserCount < 6) {
-        setSelectedUsers([...selectedUsers, user]);
-        setSelectedUserCount(selectedUserCount + 1);
-      }
-    }
 
-    // Toggle user label visibility with LayoutAnimation
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-  };
 
   const handleUserCardPress = (user) => {
     if (selectedUsers.includes(user)) {

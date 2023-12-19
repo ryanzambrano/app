@@ -24,7 +24,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { LayoutAnimation } from "react-native";
 import collegeLogo from "../../assets/collegeIcon1.png";
-import { stock_photo } from "../auth/profileUtils.js";
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
@@ -41,6 +40,7 @@ const ContactsUI = ({ route }) => {
   const groupIds = contacts.map((contact) => contact.Group_ID);
   const [expoPushToken, setExpoPushToken] = useState("");
   const [ringer, setRinger] = useState(false);
+  const [sessionname, setsessionname] = useState("");
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -50,6 +50,8 @@ const ContactsUI = ({ route }) => {
   const handleSearch = (text) => {
     setSearchQuery(text);
   };
+
+ 
 
   const renderEmptyComponent = () => (
     <View style={styles.emptyContainer}>
@@ -117,6 +119,9 @@ const ContactsUI = ({ route }) => {
       return;
     }
 
+   
+
+
     const modifiedUsers = await Promise.all(
       users.map(async (user) => {
         const extractedIds = user.User_ID.filter(
@@ -142,49 +147,16 @@ const ContactsUI = ({ route }) => {
         // Fetch the most recent group chat message
         const { data: recentMessageData, error: messageError } = await supabase
           .from("Group_Chat_Messages")
-          .select(`*, UGC (*)`)
+          .select(`*`)
           .eq("Group_ID_Sent_To", user.Group_ID)
           .order("created_at", { ascending: false })
           .limit(100);
 
-        const finalmessages = await Promise.all(
-          recentMessageData.map(async (message) => {
-            // Fetch additional data for each message from Supabase
-            // Replace the following query with your actual Supabase query
-            const { data, error } = await supabase
-              .from("images")
-              .select("last_modified")
-              .eq("user_id", message.Sent_From)
-              .eq("image_index", 0)
-              .single();
-
-            if (error) {
-              //console.error(error.message);
-              //alert("hi");
-              let fee: foo = "";
-              return {
-                ...message,
-                image: stock_photo,
-              };
-            }
-            let tempImageData = `${picURL}/${message.Sent_From}/${message.Sent_From}-0-${data.last_modified}`;
-
-            // Attach the additional data to the message
-            return {
-              ...message,
-              image: data ? tempImageData : stock_photo,
-            };
-          })
-        );
-
-        //create structure for messages
-        //querry image data && navigation data
-
-        let chatmessages = finalmessages;
+        let chatmessages = recentMessageData;
 
         if (recentMessageData != undefined) {
           if (recentMessageData.length < 17) {
-            chatmessages = [...finalmessages].reverse();
+            chatmessages = [...recentMessageData].reverse();
           }
         }
 
@@ -194,8 +166,7 @@ const ContactsUI = ({ route }) => {
           .from("images")
           .select("*")
           .in("user_id", extractedIds)
-          .eq("image_index", 0)
-          .limit(2);
+          .eq("image_index", 0);
 
         // Check if recentMessageData exists, and only include users with recent messages
         if (
@@ -216,7 +187,6 @@ const ContactsUI = ({ route }) => {
               recentMessage: recentMessageData[0],
               messages: chatmessages,
               images: college_logo,
-              ringer: false,
             };
           } catch (error) {
             console.error("Error fetching college logo:", error);
@@ -229,7 +199,6 @@ const ContactsUI = ({ route }) => {
           recentMessage: recentMessageData[0],
           messages: chatmessages,
           images: ImageError ? null : Imagedata,
-          ringer: false,
         };
       })
     );
@@ -338,7 +307,31 @@ const ContactsUI = ({ route }) => {
     }
   };
 
+  const fetchName = async () => {
+    try {
+      const { data, error: sessionError } = await supabase
+        .from("UGC")
+        .select("name")
+        .eq("user_id", session.user.id)
+        .single();
+
+  
+      if (sessionError) {
+        // Handle error if needed
+        console.error("Error fetching data:", sessionError);
+        return;
+      }
+  
+      // Use the state updater function to ensure correct state updates
+      setsessionname(data.name);
+    } catch (error) {
+      // Handle exceptions if needed
+      console.error("An error occurred:", error);
+    }
+  };
+
   useEffect(() => {
+    fetchName(); 
     loadData();
     fetchUsers();
 
@@ -426,7 +419,7 @@ const ContactsUI = ({ route }) => {
     setSelectedUser(user);
 
     //console.log(user.joinedGroups);
-    navigation.navigate("Message", { user });
+    navigation.navigate("Message", { user, sessionname });
   };
 
   const handlePlusIconPress = () => {
@@ -434,6 +427,10 @@ const ContactsUI = ({ route }) => {
     // For example, you can navigate to the compose message screen
     navigation.navigate("ComposeMessage");
   };
+
+    
+ 
+  
 
   const renderContact = ({ item }) => {
     const handleDelete = async () => {
@@ -511,6 +508,7 @@ const ContactsUI = ({ route }) => {
         .update({ Silenced: arr })
         .eq("Group_ID", item.Group_ID);
     };
+  
 
     const renderRightActions = (progress, dragX) => {
       // console.log("Progress:", progress);
@@ -779,7 +777,7 @@ const ContactsUI = ({ route }) => {
                         }}
                       >
                         {item.recentMessage.Message_Content}
-                      </Text>
+                        </Text>
                       {item.Silenced ? (
                         <>
                           {item.Silenced.includes(session.user.id) ? (

@@ -372,10 +372,10 @@ const UserCard = ({ navigation, route }) => {
           const { data: recentMessageData, error: messageError } =
             await supabase
               .from("Group_Chat_Messages")
-              .select(`*, UGC (name)`)
+              .select(`*`)
               .eq("Group_ID_Sent_To", navigationdata[0].Group_ID)
               .order("created_at", { ascending: false })
-              .limit(150);
+              .limit(100);
 
           let chatmessages = recentMessageData;
 
