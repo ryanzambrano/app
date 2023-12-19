@@ -548,18 +548,19 @@ const MessagingUI = () => {
           data={messages}
           renderItem={({ item, index }) => {
             const isOwnMessage = item.Sent_From === session.user.id;
-    const isFirstOwnMessage =
-      isOwnMessage &&
-      (index === messages.length-1 || messages[index + 1].Sent_From !== session.user.id);
+            const isFirstOwnMessage =
+              isOwnMessage &&
+              (index === messages.length - 1 ||
+                messages[index + 1].Sent_From !== session.user.id);
 
-    const isOtherMessage = item.Sent_From !== session.user.id;
-    const isFirstOtherMessage =
-      isOtherMessage &&
-      (index === messages.length-1 || messages[index + 1].Sent_From !== item.Sent_From);
+            const isOtherMessage = item.Sent_From !== session.user.id;
+            const isFirstOtherMessage =
+              isOtherMessage &&
+              (index === messages.length - 1 ||
+                messages[index + 1].Sent_From !== item.Sent_From);
 
-    const shouldDisplaySenderName =
-      user.Ammount_Users >= 3 && isFirstOtherMessage;
-
+            const shouldDisplaySenderName =
+              user.Ammount_Users >= 3 && isFirstOtherMessage;
 
             return (
               <View>
