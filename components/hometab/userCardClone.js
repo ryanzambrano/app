@@ -107,20 +107,19 @@ const UserCardClone = ({ navigation, route }) => {
 
   const handleQuestionaireButtonPress = () => {
     const currentUser = {
-      name,
-      tags,
-      bio,
-      major,
-      user_id,
-      age,
-      gender,
-      living_preferences,
-      for_fun,
-      class_year,
-      hometown,
-      bookmarked_profiles,
-
-      lastModified,
+      name: usa.name,
+      tags: usa.tags,
+      bio: usa.bio,
+      major: usa.major,
+      user_id: usa.user_id,
+      age: usa.age,
+      gender: usa.gender,
+      living_preferences: usa.living_preferences,
+      for_fun: usa.for_fun,
+      class_year: usa.class_year,
+      hometown: usa.hometown,
+      bookmarked_profiles: usa.bookmarked_profiles,
+      lastModified: usa.lastModified,
     };
     navigation.navigate("QuestionaireAnswers", { currentUser });
   };

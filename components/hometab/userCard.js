@@ -22,7 +22,7 @@ import { picURL } from "../auth/supabase";
 import { supabase } from "../auth/supabase.js";
 import ActionSheet from "react-native-action-sheet";
 import ReportUI from "./report.js";
-import { Linking } from 'react-native';
+import { Linking } from "react-native";
 import { promptQuestions } from "../auth/profileUtils.js";
 const MAX_IMAGES = 4;
 
@@ -34,8 +34,8 @@ const profileZIndex = scrollY.interpolate({
   extrapolate: "clamp",
 });
 
-const instagramLogo = require('../../assets/instagramLogo.png');
-const snapchatLogo = require('../../assets/snapchatLogo.png');
+const instagramLogo = require("../../assets/instagramLogo.png");
+const snapchatLogo = require("../../assets/snapchatLogo.png");
 
 const UserCard = ({ navigation, route }) => {
   const { session } = route.params;
@@ -69,14 +69,14 @@ const UserCard = ({ navigation, route }) => {
   const [isActionSheetVisible, setActionSheetVisible] = useState(false);
 
   const openSocialMediaProfile = (handle, type) => {
-    let url = '';
-    if (type === 'instagram') {
+    let url = "";
+    if (type === "instagram") {
       url = `https://www.instagram.com/${handle}`;
-    } else if (type === 'snapchat') {
+    } else if (type === "snapchat") {
       url = `https://www.snapchat.com/add/${handle}`;
     }
 
-    Linking.canOpenURL(url).then(supported => {
+    Linking.canOpenURL(url).then((supported) => {
       if (supported) {
         Linking.openURL(url);
       } else {
@@ -398,10 +398,10 @@ const UserCard = ({ navigation, route }) => {
               recentMessage: recentMessageData[0],
               messages: chatmessages,
             }));
-            
+
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
-                            navigation.navigate("Message", { user: fetchedPersons[0] });
+              navigation.navigate("Message", { user: fetchedPersons[0] });
             }
 
             return;
@@ -420,7 +420,7 @@ const UserCard = ({ navigation, route }) => {
       }));
       setPersons(fetchedPersons);
       if (fetchedPersons.length > 0) {
-                navigation.navigate("Message", { user: fetchedPersons[0] });
+        navigation.navigate("Message", { user: fetchedPersons[0] });
       }
     }
   };
@@ -626,7 +626,7 @@ const UserCard = ({ navigation, route }) => {
               ))}
             </View>
           </View>
-          { (instagramHandle || snapchatHandle) && (
+          {(instagramHandle || snapchatHandle) && (
             <View style={styles.roundedContainer}>
               <Text style={styles.bioHeader} paddingBottom={7}>
                 Socials
@@ -634,20 +634,42 @@ const UserCard = ({ navigation, route }) => {
               <View style={styles.bio}>
                 {instagramHandle && (
                   <View style={styles.socialMediaRow}>
-                    <Image source={instagramLogo} style={styles.socialMediaIcon} />
-                    <TouchableOpacity onPress={() => openSocialMediaProfile(instagramHandle, 'instagram')}>
-                      <Text style={styles.socialMediaText}> {instagramHandle}</Text>
+                    <Image
+                      source={instagramLogo}
+                      style={styles.socialMediaIcon}
+                    />
+                    <TouchableOpacity
+                      onPress={() =>
+                        openSocialMediaProfile(instagramHandle, "instagram")
+                      }
+                    >
+                      <Text style={styles.socialMediaText}>
+                        {" "}
+                        {instagramHandle}
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 )}
 
-                {instagramHandle && snapchatHandle && <View style={styles.horizontalDivider} />}
+                {instagramHandle && snapchatHandle && (
+                  <View style={styles.horizontalDivider} />
+                )}
 
                 {snapchatHandle && (
                   <View style={styles.socialMediaRow}>
-                    <Image source={snapchatLogo} style={styles.socialMediaIcon} />
-                    <TouchableOpacity onPress={() => openSocialMediaProfile(snapchatHandle, 'snapchat')}>
-                      <Text style={styles.socialMediaText}> {snapchatHandle}</Text>
+                    <Image
+                      source={snapchatLogo}
+                      style={styles.socialMediaIcon}
+                    />
+                    <TouchableOpacity
+                      onPress={() =>
+                        openSocialMediaProfile(snapchatHandle, "snapchat")
+                      }
+                    >
+                      <Text style={styles.socialMediaText}>
+                        {" "}
+                        {snapchatHandle}
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 )}
@@ -1003,26 +1025,26 @@ const styles = StyleSheet.create({
   },
 
   socialMediaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10, 
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
     paddingHorizontal: 25,
   },
   socialMediaIcon: {
     width: 35,
     height: 35,
-    borderRadius: 17.5, 
-    marginRight: 10, 
+    borderRadius: 17.5,
+    marginRight: 10,
   },
   socialMediaText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
   },
   horizontalDivider: {
     height: 0.3,
-    backgroundColor: '#575D61',
-    marginVertical: 10, 
-    marginHorizontal: 20, 
+    backgroundColor: "#575D61",
+    marginVertical: 10,
+    marginHorizontal: 20,
   },
 });
 
