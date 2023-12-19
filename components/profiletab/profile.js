@@ -15,7 +15,7 @@ import { useIsFocused } from "@react-navigation/native";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { fetchUsername } from "../auth/profileUtils.js";
 import { supabase } from "../auth/supabase.js";
-import { Linking } from 'react-native';
+import { Linking } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { picURL } from "../auth/supabase.js";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -26,8 +26,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const instagramLogo = require('../../assets/instagramLogo.png');
-const snapchatLogo = require('../../assets/snapchatLogo.png');
+const instagramLogo = require("../../assets/instagramLogo.png");
+const snapchatLogo = require("../../assets/snapchatLogo.png");
 
 export const Profile = ({ navigation, route }) => {
   const { updated, session } = route.params;
@@ -95,14 +95,14 @@ export const Profile = ({ navigation, route }) => {
   };
 
   const openSocialMediaProfile = (handle, type) => {
-    let url = '';
-    if (type === 'instagram') {
+    let url = "";
+    if (type === "instagram") {
       url = `https://www.instagram.com/${handle}`;
-    } else if (type === 'snapchat') {
+    } else if (type === "snapchat") {
       url = `https://www.snapchat.com/add/${handle}`;
     }
 
-    Linking.canOpenURL(url).then(supported => {
+    Linking.canOpenURL(url).then((supported) => {
       if (supported) {
         Linking.openURL(url);
       } else {
@@ -129,7 +129,9 @@ export const Profile = ({ navigation, route }) => {
   const fetchProfile = async () => {
     const { data, error } = await supabase
       .from("UGC")
-      .select("name, bio, tags, major, class_year, hometown, instagramHandle, snapchatHandle")
+      .select(
+        "name, bio, tags, major, class_year, hometown, instagramHandle, snapchatHandle"
+      )
       .eq("user_id", session.user.id)
       .single();
 
@@ -380,36 +382,63 @@ export const Profile = ({ navigation, route }) => {
                 </View>
               )}
             </View>
-            { (editedUser.instagramHandle || editedUser.snapchatHandle) && (
-            <View style={styles.roundedContainer}>
-              <Text style={styles.bioHeader} paddingBottom={15}>
-                Socials
-              </Text>
-              <View style={styles.bio}>
-                {editedUser.instagramHandle && (
-                  <View style={styles.socialMediaRow}>
-                    <Image source={instagramLogo} style={styles.socialMediaIcon} />
-                    <TouchableOpacity onPress={() => openSocialMediaProfile(editedUser.instagramHandle, 'instagram')}>
-                      <Text style={styles.socialMediaText}> {editedUser.instagramHandle}</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
+            {(editedUser.instagramHandle || editedUser.snapchatHandle) && (
+              <View style={styles.roundedContainer}>
+                <Text style={styles.bioHeader} paddingBottom={15}>
+                  Socials
+                </Text>
+                <View style={styles.bio}>
+                  {editedUser.instagramHandle && (
+                    <View style={styles.socialMediaRow}>
+                      <Image
+                        source={instagramLogo}
+                        style={styles.socialMediaIcon}
+                      />
+                      <TouchableOpacity
+                        onPress={() =>
+                          openSocialMediaProfile(
+                            editedUser.instagramHandle,
+                            "instagram"
+                          )
+                        }
+                      >
+                        <Text style={styles.socialMediaText}>
+                          {" "}
+                          {editedUser.instagramHandle}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
 
-                {editedUser.instagramHandle && editedUser.snapchatHandle && <View style={styles.horizontalDivider} />}
+                  {editedUser.instagramHandle && editedUser.snapchatHandle && (
+                    <View style={styles.horizontalDivider} />
+                  )}
 
-                {editedUser.snapchatHandle && (
-                  <View style={styles.socialMediaRow}>
-                    <Image source={snapchatLogo} style={styles.socialMediaIcon} />
-                    <TouchableOpacity onPress={() => openSocialMediaProfile(editedUser.snapchatHandle, 'snapchat')}>
-                      <Text style={styles.socialMediaText}> {editedUser.snapchatHandle}</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
+                  {editedUser.snapchatHandle && (
+                    <View style={styles.socialMediaRow}>
+                      <Image
+                        source={snapchatLogo}
+                        style={styles.socialMediaIcon}
+                      />
+                      <TouchableOpacity
+                        onPress={() =>
+                          openSocialMediaProfile(
+                            editedUser.snapchatHandle,
+                            "snapchat"
+                          )
+                        }
+                      >
+                        <Text style={styles.socialMediaText}>
+                          {" "}
+                          {editedUser.snapchatHandle}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
               </View>
-            </View>
-          )}
+            )}
           </View>
-          
         </ScrollView>
       </View>
       <StatusBar style="light" />
@@ -819,26 +848,26 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
   },
   socialMediaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10, 
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
     paddingHorizontal: 25,
   },
   socialMediaIcon: {
     width: 35,
     height: 35,
-    borderRadius: 17.5, 
-    marginRight: 10, 
+    borderRadius: 17.5,
+    marginRight: 10,
   },
   socialMediaText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
   },
   horizontalDivider: {
     height: 0.3,
-    backgroundColor: '#575D61',
-    marginVertical: 10, 
-    marginHorizontal: 20, 
+    backgroundColor: "#575D61",
+    marginVertical: 10,
+    marginHorizontal: 20,
   },
 });
 

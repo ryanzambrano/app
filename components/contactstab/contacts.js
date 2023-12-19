@@ -24,6 +24,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { LayoutAnimation } from "react-native";
 import collegeLogo from "../../assets/collegeIcon1.png";
+import { stock_photo } from "../auth/profileUtils.js";
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
@@ -159,17 +160,19 @@ const ContactsUI = ({ route }) => {
 
             if (error) {
               //console.error(error.message);
+              //alert("hi");
               let fee: foo = "";
               return {
                 ...message,
-                navigation: fee,
+                image: stock_photo,
               };
             }
+            let tempImageData = `${picURL}/${message.Sent_From}/${message.Sent_From}-0-${data.last_modified}`;
 
             // Attach the additional data to the message
             return {
               ...message,
-              navigation: data,
+              image: data ? tempImageData : stock_photo,
             };
           })
         );
