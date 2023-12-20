@@ -100,7 +100,7 @@ const GroupChatScreen = ({}) => {
           table: "Group_Chats",
         },
         (genericPayload) => {
-          if (genericPayload.new.Group_ID == user.Group_ID) {
+          if (genericPayload.new.Group_ID == user.Group_ID && user.Is_College != true) {
             fetchGroup();
           }
           // Handle generic event
