@@ -53,34 +53,6 @@ export const Colleges = ({ navigation, route }) => {
           setIsError(error.message);
         } else {
           //console.log(selectedCollege);
-          const { data: insertData, error: insertError } = await supabase
-            .from("Group_Chats")
-            .select()
-            .eq("Group_Name", selectedCollege)
-            .eq("Is_College", true);
-
-          if (insertData.length < 1) {
-            const { data: Collegeinsertdata, error: CollegeinsertError } =
-              await supabase.from("Group_Chats").insert([
-                {
-                  Group_Name: selectedCollege,
-                  Is_College: true,
-                  User_ID: [session.user.id], // Assuming User_ID is an array of UUIDs
-                  Ammount_Users: 1,
-                },
-              ]);
-          } else {
-            arruuid = insertData[0].User_ID;
-            arruuid.push(session.user.id); // Modifies arruuid in place
-            newammountuser = insertData[0].Ammount_Users + 1;
-
-            const { data: Collegeupdatedata, error: updateError } =
-              await supabase
-                .from("Group_Chats")
-                .update({ User_ID: arruuid, Ammount_Users: newammountuser })
-                .eq("Group_Name", selectedCollege)
-                .eq("Is_College", true);
-          }
           navigation.navigate("Questionaire1");
         }
       } else setIsError("please select a College");
