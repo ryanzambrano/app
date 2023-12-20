@@ -374,6 +374,26 @@ const ContactsUI = ({ route }) => {
       )
       .on(
         "postgres_changes",
+        { event: "delete", schema: "public", table: "Group_Chats" },
+        (DelPayload) => {
+          if (DelPayload) {
+            fetchUsers();
+            /*const payloadarray = updatePayload.new.User_ID;
+            if (payloadarray.includes(session.user.id)) {
+              // console.log("Group data altered");
+              fetchUsers();
+            }
+            /*if()
+            {
+              console.log("heard");
+              fetchUsers();
+            }*/
+          }
+          // Handle delete event
+        }
+      )
+      .on(
+        "postgres_changes",
         { event: "insert", schema: "public", table: "Group_Chat_Messages" },
         (genericPayload) => {
           if (genericPayload) {
