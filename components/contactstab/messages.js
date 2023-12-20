@@ -86,8 +86,7 @@ const MessagingUI = () => {
         });
     
         setMessage("");
-        
-        flatListRef.current.scrollToIndex({ animated: true, index: 0 });
+      
      
         try {
           const { data, error } = await supabase
