@@ -40,6 +40,8 @@ const MessagingUI = () => {
   const [isInverted, setIsInverted] = useState(false);
   const [scrollindex, setIndex] = useState(0);
 
+  
+
  function getCurrentDateTime() {
     const now = new Date();
   
@@ -84,6 +86,8 @@ const MessagingUI = () => {
         });
     
         setMessage("");
+        
+        flatListRef.current.scrollToIndex({ animated: true, index: 0 });
      
         try {
           const { data, error } = await supabase
@@ -641,7 +645,7 @@ const MessagingUI = () => {
           initialNumToRender={15}
           initialScrollIndex={0}
           onLayout={() => {
-            // Scroll to the bottom after the component layout is calculated
+            flatListRef.current.scrollToIndex({ animated: true, index: 0 });
           }}
           keyExtractor={(_, index) => index.toString()}
           contentContainerStyle={styles.messagesContent}
