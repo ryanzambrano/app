@@ -94,14 +94,45 @@ const ComposeMessageScreen = ({ route }) => {
   };
 
   const fetchUsers = async () => {
+    const { data: sessionProfile, error: sessionProfileError } = await supabase
+      .from("profile")
+      .select("college")
+      .eq("user_id", session.user.id)
+      .single();
+
+    if (sessionProfileError) {
+      console.error("Error fetching session user's profile:", sessionProfileError.message);
+      return;
+    }
+
+    const sessionUserCollege = sessionProfile.college;
+
+    const { data: collegeProfiles, error: collegeProfilesError } = await supabase
+      .from("profile")
+      .select("user_id")
+      .eq("college", sessionUserCollege)
+      .neq("profile_complete", false);
+
+    if (collegeProfilesError) {
+      console.error("Error fetching profiles:", collegeProfilesError.message);
+      return;
+    }
+
+    const userIds = collegeProfiles.map(profile => profile.user_id);
+
     const { data: users, error } = await supabase
       .from("UGC")
       .select("*")
+      .in("user_id", userIds)
+      .neq("has_ugc", false)
+      .neq("profile_viewable", false)
       .neq("user_id", session.user.id);
+
     if (error) {
       console.error(error);
       return;
     }
+
     const modifiedUsers = await Promise.all(
       users.map(async (user) => {
         const { data: Imagedata, error: ImageError } = await supabase
