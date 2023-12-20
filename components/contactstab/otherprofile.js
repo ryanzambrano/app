@@ -100,8 +100,8 @@ const GroupChatScreen = ({}) => {
           table: "Group_Chats",
         },
         (genericPayload) => {
-          if (genericPayload) {
-            fetchUsers();
+          if (genericPayload.new.Group_ID == user.Group_ID) {
+            fetchGroup();
           }
           // Handle generic event
         }
