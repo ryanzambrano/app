@@ -60,7 +60,7 @@ const SettingsScreen = ({ navigation, route }) => {
       items: [
         { name: "Manage Blocked Users" },
         { name: "Allow Your Account Discoverable", type: "switch" },
-        { name: "Beta Test Survey" },
+        
       ],
     },
     {
