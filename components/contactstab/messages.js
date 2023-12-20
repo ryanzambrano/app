@@ -645,7 +645,7 @@ const MessagingUI = () => {
           initialNumToRender={15}
           initialScrollIndex={0}
           onLayout={() => {
-            flatListRef.current.scrollToIndex({ animated: true, index: 0 });
+        
           }}
           keyExtractor={(_, index) => index.toString()}
           contentContainerStyle={styles.messagesContent}
