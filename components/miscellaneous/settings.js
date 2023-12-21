@@ -27,6 +27,38 @@ const SettingsScreen = ({ navigation, route }) => {
     // Here you can add logic to update this setting in your backend or local storage
   };
 
+  const deleteUser = async () => {
+    try {
+      const { data: profileData, error: profileError } = await supabase
+        .from("profile")
+        .delete()
+        .eq("user_id", session.user.id);
+      const { data: promptsData, error: promptsError } = await supabase
+        .from("prompts")
+        .delete()
+        .eq("user_id", session.user.id);
+      const { error: groupChatsError } = await supabase
+        .from("Group_Chat_Messages")
+        .delete()
+        .eq("Sent_From", session.user.id);
+
+      const { error: groupsError } = await supabase
+        .from("Group_Chats")
+        .delete()
+        .contains("User_Id", [session.user.id])
+        .eq("Is_College", false);
+      const { data: ugcData, error: ugcError } = await supabase
+        .from("UGC")
+        .delete()
+        .eq("user_id", session.user.id);
+    } finally {
+      const { data: betaData, error: betaError } = await supabase
+        .from("beta")
+        .insert({ imp1: session.user.id });
+      const { error } = await supabase.auth.signOut();
+    }
+  };
+
   const handleBackPress = () => {
     navigation.navigate("Tabs");
   };
@@ -60,7 +92,6 @@ const SettingsScreen = ({ navigation, route }) => {
       items: [
         { name: "Manage Blocked Users" },
         { name: "Allow Your Account Discoverable", type: "switch" },
-        
       ],
     },
     {
@@ -107,15 +138,13 @@ const SettingsScreen = ({ navigation, route }) => {
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         {sections.map((section, sectionIndex) => (
-         <View key={sectionIndex} style={styles.rowContainer}>
-            
+          <View key={sectionIndex} style={styles.rowContainer}>
             <View style={styles.titleContainer}>
               <Text style={styles.sectionTitle}>{section.title}</Text>
             </View>
             {section.items.map((item, itemIndex) => {
               if (item.type === "switch") {
                 return (
-                  
                   <View key={itemIndex} style={styles.settingRow}>
                     <Text style={styles.text}>
                       {item.name}
@@ -129,7 +158,6 @@ const SettingsScreen = ({ navigation, route }) => {
                       value={isDiscoverable}
                     />
                   </View>
-                 
                 );
               } else {
                 return (
@@ -143,15 +171,20 @@ const SettingsScreen = ({ navigation, route }) => {
                 );
               }
             })}
-            
           </View>
         ))}
 
-<View style={styles.logoutSection}>
-    <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
-      <Text style={styles.logoutButtonText}>Logout</Text>
-    </TouchableOpacity>
-  </View>
+        <View style={styles.logoutSection}>
+          <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+            <Text style={styles.logoutButtonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.logoutSection}>
+          <TouchableOpacity style={styles.logoutButton} onPress={deleteUser}>
+            <Text style={styles.logoutButtonText}>Delete Profile</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -162,13 +195,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#111111", //#1D1D20
     marginBottom: -30,
-    
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: 10,
-    
   },
 
   sectionTitle: {
@@ -198,7 +229,6 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 15,
     backgroundColor: "#1D1D20",
-    
   },
 
   rowContainer: {
@@ -221,15 +251,15 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   logoutSection: {
-    marginTop: 20, 
+    marginTop: 20,
     backgroundColor: "#111111",
     marginBottom: 20,
   },
   logoutRow: {
     paddingVertical: 20,
     paddingHorizontal: 15,
-    
-    alignItems: 'center', 
+
+    alignItems: "center",
   },
   logoutButton: {
     backgroundColor: "red", // Set button color
@@ -239,14 +269,12 @@ const styles = StyleSheet.create({
     borderRadius: 5, // Adjust as per your design
     alignItems: "center",
   },
-  
+
   logoutButtonText: {
     color: "white",
     fontSize: 18, // Set your desired font size
     fontWeight: "bold",
-    
   },
-  
 });
 
 export default SettingsScreen;
