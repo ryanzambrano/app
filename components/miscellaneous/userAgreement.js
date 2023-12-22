@@ -17,7 +17,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { picURL } from "../auth/supabase.js";
 
 const UserAgreement = ({ navigation, route }) => {
-  const { session } = route.params;
+  //const { session } = route.params;
 
   useEffect(() => {}, []);
 
@@ -37,7 +37,10 @@ const UserAgreement = ({ navigation, route }) => {
         </View>
         <View style={styles.right}></View>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.textContainer}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.textContainer}
+      >
         <Text style={styles.heading}>1. Acceptance of Terms</Text>
         <Text style={styles.text}>
           By accessing and using the Cabana app, you agree to be bound by the

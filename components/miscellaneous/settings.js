@@ -180,9 +180,18 @@ const SettingsScreen = ({ navigation, route }) => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.logoutSection}>
-          <TouchableOpacity style={styles.logoutButton} onPress={deleteUser}>
-            <Text style={styles.logoutButtonText}>Delete Profile</Text>
+        <View>
+          <TouchableOpacity style={styles.settingRow} onPress={deleteUser}>
+            <Text
+              style={{
+                color: "red",
+                fontSize: 21,
+                marginBottom: 15,
+                fontWeight: "800",
+              }}
+            >
+              Delete Profile
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -264,7 +273,7 @@ const styles = StyleSheet.create({
   logoutButton: {
     backgroundColor: "red", // Set button color
     padding: 10,
-    marginBottom: 40,
+    marginBottom: 25,
     marginHorizontal: 100,
     borderRadius: 5, // Adjust as per your design
     alignItems: "center",

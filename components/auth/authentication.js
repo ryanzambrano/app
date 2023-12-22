@@ -4,7 +4,7 @@ import SignIn from "./signIn.js";
 import SignUp from "./signUp.js";
 import ForgotPassword from "./forgotPassword.js";
 import PrivacyPolicy from "../miscellaneous/privacyPolicy.js";
-import ContentPolicy from "../miscellaneous/contentPolicy.js";
+import UserAgreement from "../miscellaneous/userAgreement.js";
 
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -22,8 +22,8 @@ const Authentication = ({ navigation }) => {
         //initialParams={session}
       />
       <Stack.Screen
-        name="ContentPolicy"
-        component={ContentPolicy}
+        name="UserAgreement"
+        component={UserAgreement}
         //initialParams={session}
       />
     </Stack.Navigator>

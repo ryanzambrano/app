@@ -107,18 +107,16 @@ export const SignUp = ({ navigation }) => {
           <>
             <View style={styles.container}>
               <View style={styles.verifyHeader}>
-                <Image
-                  source={logo}
-                  style={styles.headerImage}
-                  alt="Logo "
-                />
+                <Image source={logo} style={styles.headerImage} alt="Logo " />
                 <Text style={styles.titleText}>Verify your email!</Text>
               </View>
               <Text style={styles.successText}>
                 Check your email for an account verification email, and then
                 sign in!
               </Text>
-              <Text style={styles.successText}>(0-5 minute wait time.){"\n"}Make sure to check your spam.</Text>
+              <Text style={styles.successText}>
+                (0-5 minute wait time.){"\n"}Make sure to check your spam.
+              </Text>
               <View style={styles.verifyFormAction}>
                 <TouchableOpacity
                   onPress={() => {
@@ -222,7 +220,7 @@ export const SignUp = ({ navigation }) => {
                   style={styles.termsContainer}
                   onPress={() => {
                     // handle link
-                    navigation.navigate("ContentPolicy");
+                    navigation.navigate("UserAgreement");
                   }}
                 >
                   <Text
@@ -231,7 +229,7 @@ export const SignUp = ({ navigation }) => {
                       { textDecorationLine: "underline" },
                     ]}
                   >
-                    Content Policy
+                    User Agreement
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -244,7 +242,7 @@ export const SignUp = ({ navigation }) => {
 
               {isChecked == false && (
                 <Animated.Text style={[styles.errorText, shakeAnimationStyle]}>
-                  You Must Agree to the Privacy Policy and Content Policy to
+                  You Must Agree to the Privacy Policy and User Agreement to
                   Register
                 </Animated.Text>
               )}
