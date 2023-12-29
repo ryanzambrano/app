@@ -24,6 +24,8 @@ import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { LayoutAnimation } from "react-native";
 import collegeLogo from "../../assets/collegeIcon1.png";
+import { colleges } from "../auth/collegesList.js";
+
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
@@ -75,38 +77,7 @@ const ContactsUI = ({ route }) => {
     //alert(sessionname);
   };
 
-  function getInitials(fullName) {
-    const words = fullName.split(" ");
 
-    // Filter out common words (e.g., "of", "and") and take the first letter of each remaining word
-    const initials = words
-      .filter((word) => !["of", "and", "the"].includes(word.toLowerCase()))
-      .map((word) => word.charAt(0).toLowerCase())
-      .join("");
-
-    return initials;
-  }
-
-  const fetchLogoFromClearbit = async (domain) => {
-    try {
-      const response = await fetch(`https://logo.clearbit.com/${domain}`);
-
-      // Check if the response status is OK (200)
-      if (response.ok) {
-        // Return the logo URL
-        return response.url;
-      } else {
-        // Handle errors, e.g., company/school not found or no logo available
-        console.error(
-          `Error fetching logo for ${domain}: ${response.statusText}`
-        );
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching logo:", error);
-      return null;
-    }
-  };
 
   const fetchUsers = async () => {
     const { data: users, error } = await supabase
@@ -170,10 +141,11 @@ const ContactsUI = ({ route }) => {
           return null;
         }
         if (user.Is_College == true) {
-          const initials = getInitials(user.Group_Name);
+          
 
           try {
-            const college_logo = await fetchLogoFromClearbit(`${initials}.edu`);
+            const selcetedcollege = colleges.find(college => college.label === user.Group_Name);
+            const college_logo = selcetedcollege.url;
             // Assuming you have other variables like joinedGroups, recentMessageData, and ImageError
             return {
               ...user,
@@ -654,7 +626,7 @@ const ContactsUI = ({ route }) => {
       if (item.Is_College === true) {
         // Single profile picture
         return (
-          <Image style={styles.profilePicture} source={{ uri: item.images }} />
+          <Image style={styles.profilePicture} source={item.images} />
         );
       }
       if (item.Ammount_Users > 2 && item.images.length > 1) {
