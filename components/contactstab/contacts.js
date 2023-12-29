@@ -24,8 +24,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { LayoutAnimation } from "react-native";
 import collegeLogo from "../../assets/collegeIcon1.png";
-import { colleges } from "../auth/collegesList.js";
-
+import { collegesHashTable } from "../auth/collegesList.js";
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
@@ -77,8 +76,6 @@ const ContactsUI = ({ route }) => {
     //alert(sessionname);
   };
 
-
-
   const fetchUsers = async () => {
     const { data: users, error } = await supabase
       .from("Group_Chats")
@@ -92,6 +89,12 @@ const ContactsUI = ({ route }) => {
       console.error(error);
       return;
     }
+
+    const findCollegeValue = (label) => {
+      return collegesHashTable[label]
+        ? collegesHashTable[label].url
+        : "Not Found";
+    };
 
     const modifiedUsers = await Promise.all(
       users.map(async (user) => {
@@ -141,12 +144,8 @@ const ContactsUI = ({ route }) => {
           return null;
         }
         if (user.Is_College == true) {
-          
-
           try {
-            const selcetedcollege = colleges.find(college => college.label === user.Group_Name);
-            const college_logo = selcetedcollege.url;
-            // Assuming you have other variables like joinedGroups, recentMessageData, and ImageError
+            const college_logo = findCollegeValue(user.Group_Name);
             return {
               ...user,
               joinedGroups,
@@ -625,9 +624,7 @@ const ContactsUI = ({ route }) => {
     const renderProfilePicture = () => {
       if (item.Is_College === true) {
         // Single profile picture
-        return (
-          <Image style={styles.profilePicture} source={item.images} />
-        );
+        return <Image style={styles.profilePicture} source={item.images} />;
       }
       if (item.Ammount_Users > 2 && item.images.length > 1) {
         // Overlay two profile pictures
