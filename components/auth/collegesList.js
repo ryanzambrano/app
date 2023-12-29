@@ -2,7 +2,11 @@ import React, { memo, useState } from "react";
 import { Text, View } from "react-native";
 
 export const colleges = [
-  { label: "University of Central Florida", value: "UCF" },
+  {
+    label: "University of Central Florida",
+    value: "UCF",
+    url: require("../../assets/college_logos/ucf.png"),
+  },
   { label: "Texas A&M University", value: "TAMU" },
   { label: "Ohio State University", value: "OSU" },
   { label: "Florida International University", value: "FIU" },
@@ -51,6 +55,20 @@ export const colleges = [
   { label: "University of Oregon", value: "UO" },
   { label: "University of Mississippi", value: "Ole Miss" },
   { label: "Florida State University", value: "FSU" },
+  { label: "Florida Atlantic University", value: "FAU" },
+  {
+    label: "University of Miami",
+    value: "UM",
+  },
+  {
+    label: "University of Tampa",
+    value: "UT",
+  },
 ];
+
+export const collegesHashTable = colleges.reduce((hash, college) => {
+  hash[college.label] = college;
+  return hash;
+}, {});
 
 //export default CollegePicker;

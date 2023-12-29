@@ -37,9 +37,14 @@ export const Username = ({ navigation, route }) => {
           return; // Stop the function execution
         }
 
+        if (userData.username.length < 3) {
+          setIsError("Too short of a username");
+          return; // Stop the function execution
+        }
+
         // Check if the name contains non-alphabetic characters
         if (!/^[a-z0-9_.]+$/i.test(userData.username)) {
-          setIsError("Invalid characters");
+          setIsError("Invalid username");
           return; // Stop the function execution
         }
 

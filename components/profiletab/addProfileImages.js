@@ -276,7 +276,9 @@ const ImagePickerScreen = ({ navigation, route }) => {
             >
               {image0 ? (
                 <Image source={{ uri: image0 }} style={styles.image} />
-              ) : null}
+              ) : (
+                <Icon name={"plus"} size={40} color={"grey"} />
+              )}
             </TouchableOpacity>
             {renderItem(2)}
             <TouchableOpacity
@@ -285,7 +287,9 @@ const ImagePickerScreen = ({ navigation, route }) => {
             >
               {image2 ? (
                 <Image source={{ uri: image2 }} style={styles.image} />
-              ) : null}
+              ) : (
+                <Icon name={"plus"} size={40} color={"grey"} />
+              )}
             </TouchableOpacity>
 
             {renderItem(1)}
@@ -295,7 +299,9 @@ const ImagePickerScreen = ({ navigation, route }) => {
             >
               {image1 ? (
                 <Image source={{ uri: image1 }} style={styles.image} />
-              ) : null}
+              ) : (
+                <Icon name={"plus"} size={40} color={"grey"} />
+              )}
             </TouchableOpacity>
           </View>
         </View>

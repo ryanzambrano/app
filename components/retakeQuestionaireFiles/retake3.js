@@ -83,28 +83,25 @@ export const Retake3 = ({ navigation, route }) => {
       if (!userData.gradYear) {
         startShakeAnimation(shakeAnimationValue);
         return setIsError("All fields are required");
-      }
-
-      try {
-        const { error: ugcError } = await supabase
-          .from("UGC")
-          .update({ class_year: userData.gradYear })
-          .eq("user_id", session.user.id);
-
-        if (ugcError) throw ugcError;
-
+      } else {
         navigation.navigate("Retake4");
-      } catch (error) {
-        startShakeAnimation(shakeAnimationValue);
-        setIsError(error.message);
       }
     }
   };
 
-  handleGradYear = () => {
+  handleGradYear = async () => {
     if (!selectedGradYear) {
       setSelectedGradYear(2023);
     }
+    const { error: ugcError } = await supabase
+      .from("UGC")
+      .update({ class_year: userData.gradYear })
+      .eq("user_id", session.user.id);
+
+    if (ugcError) {
+      setIsError(ugcError);
+    }
+
     closeGradYearModal();
   };
   const shakeAnimationStyle = {

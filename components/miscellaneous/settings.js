@@ -27,6 +27,38 @@ const SettingsScreen = ({ navigation, route }) => {
     // Here you can add logic to update this setting in your backend or local storage
   };
 
+  const deleteUser = async () => {
+    try {
+      const { data: profileData, error: profileError } = await supabase
+        .from("profile")
+        .delete()
+        .eq("user_id", session.user.id);
+      const { data: promptsData, error: promptsError } = await supabase
+        .from("prompts")
+        .delete()
+        .eq("user_id", session.user.id);
+      const { error: groupChatsError } = await supabase
+        .from("Group_Chat_Messages")
+        .delete()
+        .eq("Sent_From", session.user.id);
+
+      const { error: groupsError } = await supabase
+        .from("Group_Chats")
+        .delete()
+        .contains("User_Id", [session.user.id])
+        .eq("Is_College", false);
+      const { data: ugcData, error: ugcError } = await supabase
+        .from("UGC")
+        .delete()
+        .eq("user_id", session.user.id);
+    } finally {
+      const { data: betaData, error: betaError } = await supabase
+        .from("beta")
+        .insert({ imp1: session.user.id });
+      const { error } = await supabase.auth.signOut();
+    }
+  };
+
   const handleBackPress = () => {
     navigation.navigate("Tabs");
   };
@@ -84,7 +116,7 @@ const SettingsScreen = ({ navigation, route }) => {
     "User Agreement": "UserAgreement",
     "Privacy Policy": "PrivacyPolicy",
     "Content Policy": "ContentPolicy",
-    FAQ: "FAQ",
+    "Beta Test Survey": "FAQ",
     "Report an Issue": "ReportIssue",
   };
 
@@ -104,9 +136,9 @@ const SettingsScreen = ({ navigation, route }) => {
           <AntDesign name="arrowleft" size={24} color="#159e9e" />
         </TouchableOpacity>
       </View>
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {sections.map((section, sectionIndex) => (
-          <View key={sectionIndex}>
+          <View key={sectionIndex} style={styles.rowContainer}>
             <View style={styles.titleContainer}>
               <Text style={styles.sectionTitle}>{section.title}</Text>
             </View>
@@ -142,8 +174,25 @@ const SettingsScreen = ({ navigation, route }) => {
           </View>
         ))}
 
-        <View style={styles.logoutRow}>
-          <Button title="Logout" color="red" onPress={signOut} />
+        <View style={styles.logoutSection}>
+          <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+            <Text style={styles.logoutButtonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View>
+          <TouchableOpacity style={styles.settingRow} onPress={deleteUser}>
+            <Text
+              style={{
+                color: "red",
+                fontSize: 21,
+                marginBottom: 15,
+                fontWeight: "800",
+              }}
+            >
+              Delete Profile
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -153,8 +202,8 @@ const SettingsScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1D1D20", //#1D1D20
-    padding: 10,
+    backgroundColor: "#111111", //#1D1D20
+    marginBottom: -30,
   },
   header: {
     flexDirection: "row",
@@ -164,18 +213,18 @@ const styles = StyleSheet.create({
 
   sectionTitle: {
     color: "grey",
-    fontSize: 15,
+    fontSize: 20,
     marginLeft: 15,
     paddingVertical: 10,
-    fontWeight: "bold",
+    fontWeight: "500",
     //borderBottomWidth: 1,
-    borderBottomColor: "grey",
+    //borderBottomColor: "grey",
   },
 
   titleContainer: {
     paddingVertical: 10,
     borderBottomColor: "grey",
-    borderBottomWidth: 0.3,
+    //borderBottomWidth: 0.3,
     backgroundColor: "#111111",
   },
 
@@ -188,7 +237,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 15,
     paddingHorizontal: 15,
+    backgroundColor: "#1D1D20",
   },
+
+  rowContainer: {
+    marginHorizontal: 0,
+    borderRadius: 20,
+    backgroundColor: "#1D1D20", // Set background color as per your theme
+    marginBottom: 10, // Add spacing between sections
+  },
+
   logoutRow: {
     paddingVertical: 15,
     paddingHorizontal: 15,
@@ -199,6 +257,32 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginLeft: 10,
     paddingVertical: 10,
+    paddingRight: 10,
+  },
+  logoutSection: {
+    marginTop: 20,
+    backgroundColor: "#111111",
+    marginBottom: 20,
+  },
+  logoutRow: {
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+
+    alignItems: "center",
+  },
+  logoutButton: {
+    backgroundColor: "red", // Set button color
+    padding: 10,
+    marginBottom: 10,
+    marginHorizontal: 100,
+    borderRadius: 5, // Adjust as per your design
+    alignItems: "center",
+  },
+
+  logoutButtonText: {
+    color: "white",
+    fontSize: 18, // Set your desired font size
+    fontWeight: "bold",
   },
 });
 

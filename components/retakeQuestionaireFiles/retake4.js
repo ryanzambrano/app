@@ -53,18 +53,51 @@ export const Retake4 = ({ navigation, route }) => {
   const closeNoiseModal = () => setNoiseModalVisible(false);
 
   // Handle save choices
-  handleSaveTidiness = () => {
+  handleSaveTidiness = async () => {
     if (!selectedTidiness) setSelectedTidiness("Very tidy");
+    const { data, error } = await supabase
+      .from("profile")
+      .update({
+        tidiness: userData.tidiness,
+      })
+      .eq("user_id", session.user.id);
+
+    if (error) {
+      startShakeAnimation(shakeAnimationValue);
+      setIsError(error.message);
+    }
     closeTidinessModal();
   };
 
-  handleSaveSleepTime = () => {
-    if (!selectedSleepTime) setSelectedSleepTime("8 PM");
+  handleSaveSleepTime = async () => {
+    if (!selectedSleepTime) setSelectedSleepTime("Morning Person");
+    const { data, error } = await supabase
+      .from("profile")
+      .update({
+        sleep_time: userData.sleepTime,
+      })
+      .eq("user_id", session.user.id);
+
+    if (error) {
+      startShakeAnimation(shakeAnimationValue);
+      setIsError(error.message);
+    }
     closeSleepTimeModal();
   };
 
-  handleSaveNoise = () => {
+  handleSaveNoise = async () => {
     if (!selectedNoise) setSelectedNoise("Yes");
+    const { data, error } = await supabase
+      .from("profile")
+      .update({
+        noise_preference: userData.noisePreference,
+      })
+      .eq("user_id", session.user.id);
+
+    if (error) {
+      startShakeAnimation(shakeAnimationValue);
+      setIsError(error.message);
+    }
     closeNoiseModal();
   };
 

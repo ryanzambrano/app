@@ -19,7 +19,6 @@ const TagSelectionEdit = ({ navigation, route }) => {
   const { session } = route.params;
   const [tagCount, setTagCount] = useState(0);
 
-
   const [selectedTags, setSelectedTags] = useState(
     route.params.editedUser.tags
   );
@@ -27,7 +26,7 @@ const TagSelectionEdit = ({ navigation, route }) => {
   useEffect(() => {
     setTagCount(selectedTags.length);
   }, [selectedTags]);
-  
+
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
   const [isError, setIsError] = useState("");
 
@@ -140,18 +139,23 @@ const TagSelectionEdit = ({ navigation, route }) => {
           {availableTags.map((tag) => renderTag(tag))}
         </ScrollView>
         <View style={styles.selectedTagsContainer}>
-          <Text style={[styles.selectedTagsText, styles.selectedTagsTextUnderline]}>
+          {/*<Text
+            style={[styles.selectedTagsText, styles.selectedTagsTextUnderline]}
+          >
             Selected Tags:
           </Text>
           <Text style={styles.selectedTagsText}>
             {selectedTags.join(",  ")}
-          </Text>
+        </Text>*/}
         </View>
-        <Text style={[styles.tagCounter, tagCount > 15 || tagCount < 3 ? styles.tagCounterOverLimit : null]}>
+        <Text
+          style={[
+            styles.tagCounter,
+            tagCount > 15 || tagCount < 3 ? styles.tagCounterOverLimit : null,
+          ]}
+        >
           {tagCount}/15
         </Text>
-
-        
 
         <StatusBar style="light" />
       </View>
@@ -166,7 +170,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#111111", // 111111
     justifyContent: "center",
     paddingHorizontal: 20,
-    
   },
   title: {
     fontSize: 24,
@@ -174,7 +177,6 @@ const styles = StyleSheet.create({
     color: "white",
     marginBottom: 20,
     marginTop: 10,
-    
   },
   tagContainer: {
     flexDirection: "row",
@@ -184,7 +186,7 @@ const styles = StyleSheet.create({
     //color: "#fff",
   },
   tag: {
-    backgroundColor: "#1D1D20",
+    backgroundColor: "#2B2D2D",
 
     borderRadius: 20,
 
@@ -276,33 +278,32 @@ const styles = StyleSheet.create({
     // Add other styling as needed
   },
   tagCounter: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     right: 30,
     fontSize: 18,
-    color: 'grey',
+    color: "grey",
   },
   tagCounterOverLimit: {
-    color: 'red',
+    color: "red",
   },
   selectedTagsContainer: {
-    flexDirection: 'column',
-    flexWrap: 'wrap',
-    alignItems: 'center',
+    flexDirection: "column",
+    flexWrap: "wrap",
+    alignItems: "center",
     marginTop: 15,
     marginBottom: 30,
-    justifyContent: 'center',
-    
+    justifyContent: "center",
   },
   selectedTagsText: {
     fontSize: 18,
-    fontWeight: '500',
-    color: 'white',
-    textAlign: 'center',
+    fontWeight: "500",
+    color: "white",
+    textAlign: "center",
   },
   selectedTagsTextUnderline: {
-    textDecorationLine: 'underline',
-    fontWeight: 'bold',
+    textDecorationLine: "underline",
+    fontWeight: "bold",
 
     marginBottom: 10,
   },

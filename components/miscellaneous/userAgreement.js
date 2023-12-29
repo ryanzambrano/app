@@ -17,7 +17,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { picURL } from "../auth/supabase.js";
 
 const UserAgreement = ({ navigation, route }) => {
-  const { session } = route.params;
+  //const { session } = route.params;
 
   useEffect(() => {}, []);
 
@@ -37,7 +37,10 @@ const UserAgreement = ({ navigation, route }) => {
         </View>
         <View style={styles.right}></View>
       </View>
-      <ScrollView style={styles.textContainer}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.textContainer}
+      >
         <Text style={styles.heading}>1. Acceptance of Terms</Text>
         <Text style={styles.text}>
           By accessing and using the Cabana app, you agree to be bound by the
@@ -116,10 +119,7 @@ const UserAgreement = ({ navigation, route }) => {
         <Text style={styles.text}>
           If you have any questions or concerns regarding this User Agreement,
           please contact us at:
-          {"\n"}Cabana
-          {"\n"}[Email]
-          {"\n"}[Address]
-          {"\n"}[Phone]
+          {"\n\n"}team@thecabanaapp.com
         </Text>
       </ScrollView>
     </SafeAreaView>
@@ -175,19 +175,20 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    fontSize: 11,
+    fontSize: 18,
     color: "lightgrey",
+    lineHeight: 28,
     marginVertical: 2,
   },
   textContainer: {
-    margin: 30,
+    margin: 15,
     //alignItems: "center",
   },
   heading: {
     fontWeight: "bold",
     color: "lightgrey",
-    fontSize: 12,
-    marginTop: 20,
+    fontSize: 20,
+    marginTop: 5,
     marginBottom: 2,
   },
 });
