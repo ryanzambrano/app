@@ -22,6 +22,32 @@ Deno.serve(async (_req) => {
 
         console.log("Deleted User: ");
         console.log(payload.PersonReported);
+        
+        const { data: profileData, error: profileError } = await supabase
+        .from("profile")
+        .delete()
+        .eq("user_id", payload.PersonReported);
+      const { data: promptsData, error: promptsError } = await supabase
+        .from("prompts")
+        .delete()
+        .eq("user_id", payload.PersonReported);
+      const { error: groupChatsError } = await supabase
+        .from("Group_Chat_Messages")
+        .delete()
+        .eq("Sent_From", payload.PersonReported);
+
+      const { error: groupsError } = await supabase
+        .from("Group_Chats")
+        .delete()
+        .contains("User_Id", [payload.PersonReported])
+        .eq("Is_College", false);
+      const { data: ugcData, error: ugcError } = await supabase
+        .from("UGC")
+        .delete()
+        .eq("user_id", payload.PersonReported);
+        const { data, error } = await supabase.auth.admin.deleteUser(
+            payload.PersonReported
+          )
        
         
        }
