@@ -17,27 +17,27 @@ Deno.serve(async (_req) => {
         const { data: profileData, error: profileError } = await supabase
         .from("profile")
         .delete()
-        .eq("user_id", payload.user_id);
+        .eq("user_id", payload.PersonReported);
       const { data: promptsData, error: promptsError } = await supabase
         .from("prompts")
         .delete()
-        .eq("user_id", payload.user_id);
+        .eq("user_id", payload.PersonReported);
       const { error: groupChatsError } = await supabase
         .from("Group_Chat_Messages")
         .delete()
-        .eq("Sent_From", payload.user_id);
+        .eq("Sent_From", payload.PersonReported);
 
       const { error: groupsError } = await supabase
         .from("Group_Chats")
         .delete()
-        .contains("User_Id", [payload.user_id])
+        .contains("User_Id", [payload.PersonReported])
         .eq("Is_College", false);
       const { data: ugcData, error: ugcError } = await supabase
         .from("UGC")
         .delete()
-        .eq("user_id", payload.user_id);
+        .eq("user_id", payload.PersonReported);
         const { data, error } = await supabase.auth.admin.deleteUser(
-            payload.user_id
+            payload.PersonReported
           )
        }
 
