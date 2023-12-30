@@ -476,6 +476,7 @@ const UserCardClone = ({ navigation, route }) => {
               joinedGroups: usa.name,
               recentMessage: recentMessageData[0],
               messages: chatmessages,
+              Myname: "singlechat",
             }));
 
             //console.log(images + "hello");

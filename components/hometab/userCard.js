@@ -418,7 +418,7 @@ const UserCard = ({ navigation, route }) => {
         joinedGroups: name,
         messages: undefined,
         recentMessage: undefined,
-        MyName: "singlechat",
+        Myname: "singlechat",
       }));
       setPersons(fetchedPersons);
       if (fetchedPersons.length > 0) {

@@ -263,11 +263,14 @@ const ComposeMessageScreen = ({ route }) => {
           },
         ])
         .select();
-        const { data: YourName, error } = await supabase
+        const { data: YourNam, error } = await supabase
         .from("UGC")
         .select("name")
         .eq("user_id", session.user.id)
         .single();
+
+
+        const Yourname = YourNam.name;
   
       if (insertData) {
         const { data: Imagedata, error: ImageError } = await supabase
@@ -279,7 +282,7 @@ const ComposeMessageScreen = ({ route }) => {
           ...person,
           images: Imagedata,
           joinedGroups: nameparam,
-          MyName: YourName
+          Myname: Yourname
         }));
         setPersons(fetchedPersons);
         if (fetchedPersons.length > 0) {
@@ -336,7 +339,7 @@ const ComposeMessageScreen = ({ route }) => {
                 joinedGroups: nameparam,
                 recentMessage: recentMessageData[recentMessageData.length - 1],
                 messages: chatmessages,
-                MyName: YourName
+                Myname: Yourname
               }));
             } else {
               console.log("Group Name exist");
@@ -346,7 +349,7 @@ const ComposeMessageScreen = ({ route }) => {
                 joinedGroups: navigationdata[0].Group_Name,
                 recentMessage: recentMessageData[recentMessageData.length - 1],
                 messages: chatmessages,
-                MyName: YourName
+                Myname: Yourname
               }));
             }
 

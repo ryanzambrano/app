@@ -212,35 +212,6 @@ const ContactsUI = ({ route }) => {
     await AsyncStorage.setItem("contactsData", JSON.stringify(filteredUsers));
   };
 
-  // const formatRecentTime = (timestamp) => {
-  //   if (!timestamp) return "";
-
-  //   const date = new Date(timestamp);
-  //   const currentTime = new Date();
-  //   const diffInMs = currentTime - date;
-  //   const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
-
-  //   if (diffInDays < 1) {
-  //     // Less than a day ago, display time in AM/PM format
-  //     const hours = date.getHours();
-  //     const minutes = date.getMinutes();
-  //     const ampm = hours >= 12 ? "PM" : "AM";
-  //     const formattedTime = `${hours % 12 || 12}:${minutes
-  //       .toString()
-  //       .padStart(2, "0")} ${ampm}`;
-  //     return formattedTime;
-  //   } else {
-  //     // More than a day ago, display the full date
-  //     const year = date.getFullYear();
-  //     const month = date.getMonth() + 1;
-  //     const day = date.getDate();
-  //     const formattedDate = `${month.toString().padStart(2, "0")}/${day
-  //       .toString()
-  //       .padStart(2, "0")}/${year}`;
-  //     return formattedDate;
-  //   }
-  // };
-
   const formatRecentTime = (timestamp) => {
     if (!timestamp) return "";
 
@@ -287,31 +258,8 @@ const ContactsUI = ({ route }) => {
     }
   };
 
-  const fetchName = async () => {
-    try {
-      /*const { data, error: sessionError } = await supabase
-        .from("UGC")
-        .select("name")
-        .eq("user_id", session.user.id)
-        .single();*/
-
-      /*if (sessionError) {
-        // Handle error if needed
-        console.error("Error fetching data:", sessionError);
-        return;
-      }*/
-
-      // Use the state updater function to ensure correct state updates
-      //setsessionname(data.name);
-      //wait AsyncStorage.setItem("sessionName", data.name);
-    } catch (error) {
-      // Handle exceptions if needed
-      console.error("An error occurred:", error);
-    }
-  };
-
+  
   useEffect(() => {
-    fetchName();
     loadData();
     fetchUsers();
 
