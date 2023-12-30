@@ -92,8 +92,6 @@ const SettingsScreen = ({ navigation, route }) => {
       items: [
         { name: "Manage Blocked Users" },
         { name: "Allow Your Account Discoverable", type: "switch" },
-        { name: "Logout", type: "button", action: signOut },
-        { name: "Delete Profile", type: "button", action: deleteUser },
       ],
     },
     {
@@ -109,6 +107,13 @@ const SettingsScreen = ({ navigation, route }) => {
       title: "Reach Out",
       items: [{ name: "Report an Issue" }],
     },
+    {
+    title: "Manage Your Account", // New section for Logout and Delete Profile
+    items: [
+      { name: "Logout", type: "button", action: signOut },
+      { name: "Delete Profile", type: "button", action: deleteUser },
+    ],
+  },
   ];
 
   const screenMap = {
@@ -139,7 +144,7 @@ const SettingsScreen = ({ navigation, route }) => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} styles={{ paddingBottom: 100}}>
         {sections.map((section, sectionIndex) => (
           <View key={sectionIndex} style={styles.rowContainer}>
             <View style={styles.titleContainer}>
@@ -196,6 +201,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1D1D20", //#1D1D20
     marginBottom: -30,
+    
   },
   header: {
     flexDirection: "row",
@@ -203,9 +209,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     paddingBottom: 20,
-    marginBottom: -20,
-    
-   
+    marginBottom: 0,
+    borderBottomColor:'#2B2D2F',
+    borderBottomWidth: 1,
   },
 
   headerTitle: {
@@ -232,6 +238,7 @@ const styles = StyleSheet.create({
 
   titleContainer: {
     paddingTop: 20,
+    marginTop: 5,
     paddingBottom: 10,
     borderBottomColor: "#2B2D2F",
     //borderBottomWidth: 0.3,
