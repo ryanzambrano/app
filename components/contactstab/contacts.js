@@ -90,11 +90,6 @@ const ContactsUI = ({ route }) => {
       return;
     }
 
-    const findCollegeValue = (label) => {
-      return collegesHashTable[label]
-        ? collegesHashTable[label].url
-        : "Not Found";
-    };
 
     const modifiedUsers = await Promise.all(
       users.map(async (user) => {
@@ -145,13 +140,12 @@ const ContactsUI = ({ route }) => {
         }
         if (user.Is_College == true) {
           try {
-            const college_logo = findCollegeValue(user.Group_Name);
             return {
               ...user,
               joinedGroups,
               recentMessage: recentMessageData[0],
               messages: chatmessages,
-              images: college_logo,
+              images: collegeLogo,
             };
           } catch (error) {
             console.error("Error fetching college logo:", error);
