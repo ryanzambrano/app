@@ -159,7 +159,9 @@ const Home = ({ route }) => {
 
   const renderEmptyComponent = () => (
     <View style={styles.emptyContainer}>
-      <Text style={styles.emptyText}>No One Here Yet!</Text>
+      <Text style={styles.emptyText}>
+        No one yet - Be the first at your school.
+      </Text>
     </View>
   );
 
@@ -288,26 +290,29 @@ const Home = ({ route }) => {
         .select("*")
         .neq("has_ugc", false)
         .neq("profile_viewable", false);
-      
+
       const sessionUserId = session.user.id;
-      const { data: sessionProfileData, error: sessionProfileError } = await supabase
-        .from("profile")
-        .select("college")
-        .eq("user_id", sessionUserId)
-        .single();
+      const { data: sessionProfileData, error: sessionProfileError } =
+        await supabase
+          .from("profile")
+          .select("college")
+          .eq("user_id", sessionUserId)
+          .single();
 
       if (sessionProfileError || !sessionProfileData) {
-        console.error(sessionProfileError || "Session user's profile not found");
+        console.error(
+          sessionProfileError || "Session user's profile not found"
+        );
         return;
       }
 
       const sessionUserCollege = sessionProfileData.college;
 
       const { data: profileData, error: profileError } = await supabase
-      .from("profile")
-      .select("*")
-      .eq("college", sessionUserCollege)
-      .neq("profile_complete", false);
+        .from("profile")
+        .select("*")
+        .eq("college", sessionUserCollege)
+        .neq("profile_complete", false);
 
       if (profileError) {
         console.error(profileError);
@@ -777,10 +782,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 140,
+    marginHorizontal: 20,
   },
   emptyText: {
     fontSize: 20,
     color: "grey",
+    textAlign: "center",
   },
   class: {
     color: "grey",
