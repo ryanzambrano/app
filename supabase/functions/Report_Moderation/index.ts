@@ -10,16 +10,37 @@ Deno.serve(async (_req) => {
         );
 
        const { data, error } = await supabase.from('Reports').select('*').eq('reported_user_id', payload.PersonReported).eq('isUserReport', true);
-       console.log(data);
+  
        const unique_ids = [...new Set(data.map(item => item.sender_user_id))];
        if(unique_ids.length >= 2)
        {
-        console.log("User Deleted");
+        const { data: profileData, error: profileError } = await supabase
+        .from("profile")
+        .delete()
+        .eq("user_id", payload.user_id);
+      const { data: promptsData, error: promptsError } = await supabase
+        .from("prompts")
+        .delete()
+        .eq("user_id", payload.user_id);
+      const { error: groupChatsError } = await supabase
+        .from("Group_Chat_Messages")
+        .delete()
+        .eq("Sent_From", payload.user_id);
+
+      const { error: groupsError } = await supabase
+        .from("Group_Chats")
+        .delete()
+        .contains("User_Id", [payload.user_id])
+        .eq("Is_College", false);
+      const { data: ugcData, error: ugcError } = await supabase
+        .from("UGC")
+        .delete()
+        .eq("user_id", payload.user_id);
+        const { data, error } = await supabase.auth.admin.deleteUser(
+            payload.user_id
+          )
        }
 
-       console.log('Unique sender_user_id values:', unique_ids.length);
-        //if the length of that array is 2 or higher
-        //log
 
 
         return new Response(JSON.stringify(_req), {
