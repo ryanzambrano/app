@@ -34,7 +34,6 @@ const MessagingUI = () => {
   const [messages, setMessages] = useState([]);
   const { session } = route.params;
   const { user } = route.params;
-  const { sessionname } = route.params;
   const [persons, setPersons] = useState([]);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isInverted, setIsInverted] = useState(false);
@@ -95,7 +94,7 @@ const MessagingUI = () => {
                   Group_ID_Sent_To: user.Group_ID,
                   Sent_From: session.user.id,
                   Read: [session.user.id],
-                  sender_name: sessionname,
+                  sender_name: user.Myname,
                 },
               ])
               .select()
@@ -204,7 +203,7 @@ const MessagingUI = () => {
       .select("*")
       .eq("Group_ID", user.Group_ID);
 
-    const extractedIds = ids[0].User_ID.filter(
+    const extractedIds = ids[0].User_ID.filter(d96a5540-14f4-434b-9357-629c5f6cc92a
       (item) => item !== session.user.id
     );
 

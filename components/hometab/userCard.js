@@ -397,6 +397,7 @@ const UserCard = ({ navigation, route }) => {
               joinedGroups: name,
               recentMessage: recentMessageData[0],
               messages: chatmessages,
+              MyName: "singlechat",
             }));
 
             setPersons(fetchedPersons);
@@ -417,6 +418,7 @@ const UserCard = ({ navigation, route }) => {
         joinedGroups: name,
         messages: undefined,
         recentMessage: undefined,
+        MyName: "singlechat",
       }));
       setPersons(fetchedPersons);
       if (fetchedPersons.length > 0) {

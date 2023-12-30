@@ -27,7 +27,6 @@ const ComposeMessageScreen = ({ route }) => {
   const navigation = useNavigation();
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const { session } = route.params;
-  const { sessionname } = route.params;
   const [users, setUsers] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,7 +49,6 @@ const ComposeMessageScreen = ({ route }) => {
 
   useEffect(() => {
     fetchUsers();
-    fetchSessionUsername();
     fetchSessionWho();
   }, []);
 
@@ -265,6 +263,12 @@ const ComposeMessageScreen = ({ route }) => {
           },
         ])
         .select();
+        const { data: YourName, error } = await supabase
+        .from("UGC")
+        .select("name")
+        .eq("user_id", session.user.id)
+        .single();
+  
       if (insertData) {
         const { data: Imagedata, error: ImageError } = await supabase
           .from("images")
@@ -275,12 +279,12 @@ const ComposeMessageScreen = ({ route }) => {
           ...person,
           images: Imagedata,
           joinedGroups: nameparam,
+          MyName: YourName
         }));
         setPersons(fetchedPersons);
         if (fetchedPersons.length > 0) {
           navigation.replace("Message", {
             user: fetchedPersons[0],
-            sessionname,
           });
         }
       }
@@ -332,6 +336,7 @@ const ComposeMessageScreen = ({ route }) => {
                 joinedGroups: nameparam,
                 recentMessage: recentMessageData[recentMessageData.length - 1],
                 messages: chatmessages,
+                MyName: YourName
               }));
             } else {
               console.log("Group Name exist");
@@ -341,14 +346,14 @@ const ComposeMessageScreen = ({ route }) => {
                 joinedGroups: navigationdata[0].Group_Name,
                 recentMessage: recentMessageData[recentMessageData.length - 1],
                 messages: chatmessages,
+                MyName: YourName
               }));
             }
 
             setPersons(fetchedPersons);
             if (fetchedPersons.length > 0) {
               navigation.replace("Message", {
-                user: fetchedPersons[0],
-                sessionname,
+                user: fetchedPersons[0]
               });
             }
 

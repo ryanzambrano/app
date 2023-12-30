@@ -24,7 +24,6 @@ import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { LayoutAnimation } from "react-native";
 import collegeLogo from "../../assets/collegeIcon1.png";
-import { collegesHashTable } from "../auth/collegesList.js";
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
@@ -41,7 +40,7 @@ const ContactsUI = ({ route }) => {
   const groupIds = contacts.map((contact) => contact.Group_ID);
   const [expoPushToken, setExpoPushToken] = useState("");
   const [ringer, setRinger] = useState(false);
-  const [sessionname, setsessionname] = useState("");
+  //const [sessionname, setsessionname] = useState("");
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -66,14 +65,14 @@ const ContactsUI = ({ route }) => {
   });
   const loadData = async () => {
     const storedData = await AsyncStorage.getItem("contactsData");
-    const seshName = await AsyncStorage.getItem("sessionName");
+    //onst seshName = await AsyncStorage.getItem("sessionName");
     if (storedData !== null) {
       setUsers(JSON.parse(storedData));
     }
-    if (seshName !== null) {
-      setsessionname(seshName);
+    /*if (seshName !== null) {
+      //setsessionname(seshName);
     }
-    //alert(sessionname);
+    //alert(sessionname);*/
   };
 
   const fetchUsers = async () => {
@@ -96,13 +95,26 @@ const ContactsUI = ({ route }) => {
         const extractedIds = user.User_ID.filter(
           (item) => item !== session.user.id
         );
-        const { data, error: sessionError } = await supabase
+        const { data: ids, error: sessionError } = await supabase
           .from("UGC")
-          .select("name")
-          .in("user_id", extractedIds);
+          .select("name, user_id")
+          .in("user_id", user.User_ID);
+
+          const ownName = ids.find(item => item.user_id === session.user.id)?.name || null;
+
+
+          const arrnames = ids
+          .filter(item => item.user_id !== session.user.id)
+          .map(item => item.name);
+         
+
+
+
+          
+
         let joinedGroups;
         if (!user.Group_Name) {
-          const groupNames = data.map((item) => item.name);
+          const groupNames = arrnames;
 
           joinedGroups = groupNames.join(", ");
         } else {
@@ -146,6 +158,7 @@ const ContactsUI = ({ route }) => {
               recentMessage: recentMessageData[0],
               messages: chatmessages,
               images: collegeLogo,
+              Myname: ownName,
             };
           } catch (error) {
             console.error("Error fetching college logo:", error);
@@ -158,6 +171,7 @@ const ContactsUI = ({ route }) => {
           recentMessage: recentMessageData[0],
           messages: chatmessages,
           images: ImageError ? null : Imagedata,
+          Myname: ownName,
         };
       })
     );
@@ -275,21 +289,21 @@ const ContactsUI = ({ route }) => {
 
   const fetchName = async () => {
     try {
-      const { data, error: sessionError } = await supabase
+      /*const { data, error: sessionError } = await supabase
         .from("UGC")
         .select("name")
         .eq("user_id", session.user.id)
-        .single();
+        .single();*/
 
-      if (sessionError) {
+      /*if (sessionError) {
         // Handle error if needed
         console.error("Error fetching data:", sessionError);
         return;
-      }
+      }*/
 
       // Use the state updater function to ensure correct state updates
-      setsessionname(data.name);
-      await AsyncStorage.setItem("sessionName", data.name);
+      //setsessionname(data.name);
+      //wait AsyncStorage.setItem("sessionName", data.name);
     } catch (error) {
       // Handle exceptions if needed
       console.error("An error occurred:", error);
@@ -405,13 +419,13 @@ const ContactsUI = ({ route }) => {
     setSelectedUser(user);
 
     //console.log(user.joinedGroups);
-    navigation.navigate("Message", { user, sessionname });
+    navigation.navigate("Message", { user});
   };
 
   const handlePlusIconPress = () => {
     // Implement the logic when the plus icon is pressed
     // For example, you can navigate to the compose message screen
-    navigation.navigate("ComposeMessage", { sessionname });
+    navigation.navigate("ComposeMessage");
   };
 
   const renderContact = ({ item }) => {
