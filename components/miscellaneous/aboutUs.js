@@ -81,8 +81,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 10,
-    
+    paddingTop: 10,
     marginLeft: 15,
     marginRight: 39,
   },
@@ -112,13 +111,17 @@ const styles = StyleSheet.create({
     color: "white",
   },
   text: {
-    fontSize: 18,
+    fontSize: 16,
     color: "lightgrey",
     lineHeight: 28,
+    marginHorizontal: 15,
+    paddingBottom: 60,
   },
   textContainer: {
-    marginHorizontal: 15,
-    marginBottom: -10,
+    borderTopColor:'#2B2D2F',
+    borderTopWidth: 1,
+    paddingTop: 10,
+    marginBottom: -50,
     //alignItems: "center",
   },
 });

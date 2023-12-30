@@ -92,6 +92,8 @@ const SettingsScreen = ({ navigation, route }) => {
       items: [
         { name: "Manage Blocked Users" },
         { name: "Allow Your Account Discoverable", type: "switch" },
+        { name: "Logout", type: "button", action: signOut },
+        { name: "Delete Profile", type: "button", action: deleteUser },
       ],
     },
     {
@@ -135,6 +137,7 @@ const SettingsScreen = ({ navigation, route }) => {
         >
           <AntDesign name="arrowleft" size={24} color="#159e9e" />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>Settings</Text>
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         {sections.map((section, sectionIndex) => (
@@ -159,6 +162,16 @@ const SettingsScreen = ({ navigation, route }) => {
                     />
                   </View>
                 );
+              } else if (item.type === "button") {
+                return (
+                  <TouchableOpacity
+                    key={itemIndex}
+                    style={styles.settingRow}
+                    onPress={item.action}
+                  >
+                    <Text style={styles.text2}>{item.name}</Text>
+                  </TouchableOpacity>
+                );
               } else {
                 return (
                   <TouchableOpacity
@@ -173,27 +186,6 @@ const SettingsScreen = ({ navigation, route }) => {
             })}
           </View>
         ))}
-
-        <View style={styles.logoutSection}>
-          <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
-            <Text style={styles.logoutButtonText}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View>
-          <TouchableOpacity style={styles.settingRow} onPress={deleteUser}>
-            <Text
-              style={{
-                color: "red",
-                fontSize: 21,
-                marginBottom: 15,
-                fontWeight: "800",
-              }}
-            >
-              Delete Profile
-            </Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -202,41 +194,61 @@ const SettingsScreen = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#111111", //#1D1D20
+    backgroundColor: "#1D1D20", //#1D1D20
     marginBottom: -30,
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "center", // Center the title
+    alignItems: "center",
     paddingVertical: 10,
+    paddingBottom: 20,
+    marginBottom: -20,
+    
+   
   },
 
-  sectionTitle: {
-    color: "grey",
+  headerTitle: {
+    color: "#fff",
     fontSize: 20,
-    marginLeft: 15,
-    paddingVertical: 10,
-    fontWeight: "500",
-    //borderBottomWidth: 1,
-    //borderBottomColor: "grey",
-  },
-
-  titleContainer: {
-    paddingVertical: 10,
-    borderBottomColor: "grey",
-    //borderBottomWidth: 0.3,
-    backgroundColor: "#111111",
+    fontWeight: "600",
+    
   },
 
   button: {
-    marginLeft: 15,
+    position: 'absolute', // Position the back button absolutely
+    left: 15,
+    top: 10,
   },
+
+  sectionTitle: {
+    color: "lightgrey",
+    fontSize: 18,
+    marginLeft: 15,
+    paddingTop: 10,
+    fontWeight: "500",
+    
+  },
+
+  titleContainer: {
+    paddingTop: 20,
+    paddingBottom: 10,
+    borderBottomColor: "#2B2D2F",
+    //borderBottomWidth: 0.3,
+    backgroundColor: "#1D1D20",
+    borderBottomWidth: 1.3,
+  },
+
+ 
   settingRow: {
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    paddingVertical: 15,
-    paddingHorizontal: 15,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderBottomColor: "#2B2D2F",
+    borderBottomWidth: 1,
+    borderBottomLeftRadius: 20,
     backgroundColor: "#1D1D20",
   },
 
@@ -244,7 +256,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 0,
     borderRadius: 20,
     backgroundColor: "#1D1D20", // Set background color as per your theme
-    marginBottom: 10, // Add spacing between sections
+    marginBottom: 0, // Add spacing between sections
   },
 
   logoutRow: {
@@ -254,35 +266,43 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 16,
+    marginLeft: 10,
+    paddingVertical: 10,
+    paddingRight: 10,
+  },
+  text2: {
+    color: "red",
+    fontWeight: '400',
+    fontSize: 16,
     marginLeft: 10,
     paddingVertical: 10,
     paddingRight: 10,
   },
   logoutSection: {
     marginTop: 20,
-    backgroundColor: "#111111",
-    marginBottom: 20,
+    backgroundColor: "#141B1F",
+    marginBottom: 0,
   },
   logoutRow: {
-    paddingVertical: 20,
+    paddingVertical: 15,
     paddingHorizontal: 15,
 
     alignItems: "center",
   },
   logoutButton: {
-    backgroundColor: "red", // Set button color
+   // backgroundColor: "red", // Set button color
     padding: 10,
-    marginBottom: 10,
-    marginHorizontal: 100,
+    marginBottom: 0,
+    marginHorizontal: 5,
     borderRadius: 5, // Adjust as per your design
-    alignItems: "center",
+    alignItems: "left",
   },
 
   logoutButtonText: {
-    color: "white",
-    fontSize: 18, // Set your desired font size
-    fontWeight: "bold",
+    color: "orange",
+    fontSize: 17, // Set your desired font size
+    fontWeight: "400",
   },
 });
 

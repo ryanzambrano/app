@@ -173,22 +173,27 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "white",
   },
-
   text: {
-    fontSize: 18,
+    fontSize: 16,
     color: "lightgrey",
     lineHeight: 28,
-    marginVertical: 2,
+    marginHorizontal: 15,
+    paddingBottom: 30,
+    marginBottom: 20,
   },
   textContainer: {
-    margin: 15,
+    borderTopColor:'#2B2D2F',
+    borderTopWidth: 1,
+    paddingTop: 10,
+    marginBottom: -40,
     //alignItems: "center",
   },
   heading: {
     fontWeight: "bold",
     color: "lightgrey",
-    fontSize: 20,
+    fontSize: 18,
     marginTop: 5,
+    paddingLeft: 15,
     marginBottom: 2,
   },
 });

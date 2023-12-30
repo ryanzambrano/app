@@ -169,11 +169,11 @@ const styles = StyleSheet.create({
   },
 
   titleText: {
-    fontFamily: "Verdana-Bold",
+    //fontFamily: "Verdana-Bold",
     fontSize: 27,
-    fontWeight: "700",
+    fontWeight: "600",
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 10,
     color: "#fff",
   },
 

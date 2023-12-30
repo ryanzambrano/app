@@ -159,20 +159,25 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    fontSize: 18,
+    fontSize: 16,
     color: "lightgrey",
-    marginVertical: 2,
     lineHeight: 28,
+    marginHorizontal: 15,
+    paddingBottom: 30,
   },
   textContainer: {
-    margin: 15,
+    borderTopColor:'#2B2D2F',
+    borderTopWidth: 1,
+    paddingTop: 10,
+    marginBottom: -20,
     //alignItems: "center",
   },
   heading: {
     fontWeight: "bold",
     color: "lightgrey",
-    fontSize: 20,
+    fontSize: 18,
     marginTop: 5,
+    paddingLeft: 15,
     marginBottom: 2,
   },
 });

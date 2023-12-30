@@ -326,9 +326,9 @@ const styles = StyleSheet.create({
   },
 
   titleText: {
-    fontFamily: "Verdana-Bold",
-    fontSize: 27,
-    fontWeight: "700",
+    // fontFamily: "Verdana-Bold",
+    fontSize: 28,
+    fontWeight: "600",
     paddingLeft: 10,
     //textAlign: "center",
     //AlignSelf: "center",
