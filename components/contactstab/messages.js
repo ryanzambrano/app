@@ -99,21 +99,26 @@ const MessagingUI = () => {
       }
       const currentmessage = message; // Store the message in a variable
       setMessage('');
-      setMessages((prevMessages) => {
-        const newMessages = [
-          {
-            Message_Content: currentmessage,
-            Sent_From: session.user.id,
-            Group_ID_Sent_To: user.Group_ID,
-            Read: [session.user.id],
-            created_at: getCurrentDateTime()
-          },
-          ...prevMessages,
-        ];
-  
-        return newMessages;
-      }); // Clear the input
-      sendMessage(currentmessage); // Pass the stored message to sendMessage
+      if(currentmessage.trim() !== "")
+      {
+        setMessages((prevMessages) => {
+          const newMessages = [
+            {
+              Message_Content: currentmessage,
+              Sent_From: session.user.id,
+              Group_ID_Sent_To: user.Group_ID,
+              Read: [session.user.id],
+              created_at: getCurrentDateTime()
+            },
+            ...prevMessages,
+          ];
+    
+          return newMessages;
+        });
+        sendMessage(currentmessage);
+      }
+       // Clear the input
+      // Pass the stored message to sendMessage
     };
   
   const extractedIds = user.User_ID.filter((item) => item !== session.user.id);
