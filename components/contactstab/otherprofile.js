@@ -127,9 +127,7 @@ const GroupChatScreen = ({}) => {
       return (
         <Image
           style={styles.layeredImage}
-          source={{
-            uri: `${user.images}`, // Replace with actual URLs
-          }}
+          source={collegeLogo}
         />
       );
     }
