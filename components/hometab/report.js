@@ -44,6 +44,35 @@ const ReportUI = ({ route }) => {
       if (error) {
         console.error('Error inserting report:', error);
       } else {
+        try {
+          const payload = {
+            PersonReported: user_id,
+            Report_Sender: session.user.id,
+            // Add any other fields as needed
+          };
+      
+          // Make an HTTP POST request to trigger the edge function
+          const response = await fetch('https://jaupbyhwvfulpvkfxmgm.supabase.co/functions/v1/Report_Moderation', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              // Add any additional headers as needed
+            },
+            // You can include an empty JSON object as the body
+            body: JSON.stringify(payload),
+          });
+      
+          if (response.ok) {
+            //console.log('Edge function triggered successfully.');
+            // Handle success if needed
+          } else {
+            console.error('Error triggering edge function:', response.statusText);
+            // Handle error if needed
+          }
+        } catch (error) {
+          console.error('Error triggering edge function:', error.message);
+          // Handle error if needed
+        }
         navigation.goBack();
       }
     } catch (error) {
