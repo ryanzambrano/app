@@ -29,6 +29,10 @@ const SettingsScreen = ({ navigation, route }) => {
 
   const deleteUser = async () => {
     try {
+      const { data: imageData, error: imageError } = await supabase
+        .from("images")
+        .delete()
+        .eq("user_id", session.user.id);
       const { data: profileData, error: profileError } = await supabase
         .from("profile")
         .delete()
@@ -41,7 +45,6 @@ const SettingsScreen = ({ navigation, route }) => {
         .from("Group_Chat_Messages")
         .delete()
         .eq("Sent_From", session.user.id);
-
       const { error: groupsError } = await supabase
         .from("Group_Chats")
         .delete()
@@ -108,12 +111,12 @@ const SettingsScreen = ({ navigation, route }) => {
       items: [{ name: "Report an Issue" }],
     },
     {
-    title: "Manage Your Account", // New section for Logout and Delete Profile
-    items: [
-      { name: "Logout", type: "button", action: signOut },
-      { name: "Delete Profile", type: "button", action: deleteUser },
-    ],
-  },
+      title: "Manage Your Account", // New section for Logout and Delete Profile
+      items: [
+        { name: "Logout", type: "button", action: signOut },
+        { name: "Delete Profile", type: "button", action: deleteUser },
+      ],
+    },
   ];
 
   const screenMap = {
@@ -144,7 +147,10 @@ const SettingsScreen = ({ navigation, route }) => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Settings</Text>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false} styles={{ paddingBottom: 100}}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        styles={{ paddingBottom: 100 }}
+      >
         {sections.map((section, sectionIndex) => (
           <View key={sectionIndex} style={styles.rowContainer}>
             <View style={styles.titleContainer}>
@@ -201,7 +207,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1D1D20", //#1D1D20
     marginBottom: -30,
-    
   },
   header: {
     flexDirection: "row",
@@ -210,7 +215,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingBottom: 20,
     marginBottom: 0,
-    borderBottomColor:'#2B2D2F',
+    borderBottomColor: "#2B2D2F",
     borderBottomWidth: 1,
   },
 
@@ -218,11 +223,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 20,
     fontWeight: "600",
-    
   },
 
   button: {
-    position: 'absolute', // Position the back button absolutely
+    position: "absolute", // Position the back button absolutely
     left: 15,
     top: 10,
   },
@@ -233,7 +237,6 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     paddingTop: 10,
     fontWeight: "500",
-    
   },
 
   titleContainer: {
@@ -246,7 +249,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1.3,
   },
 
- 
   settingRow: {
     flexDirection: "row",
     justifyContent: "flex-start",
@@ -280,7 +282,7 @@ const styles = StyleSheet.create({
   },
   text2: {
     color: "red",
-    fontWeight: '400',
+    fontWeight: "400",
     fontSize: 16,
     marginLeft: 10,
     paddingVertical: 10,
@@ -298,7 +300,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoutButton: {
-   // backgroundColor: "red", // Set button color
+    // backgroundColor: "red", // Set button color
     padding: 10,
     marginBottom: 0,
     marginHorizontal: 5,
