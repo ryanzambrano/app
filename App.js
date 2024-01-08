@@ -81,7 +81,8 @@ const App = () => {
   }, []);
 
   const checkUserProfile = async (session) => {
-    //const { error } = await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+
     let profileInserted;
     let ugcInserted;
 
