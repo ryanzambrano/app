@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js';
+import { decode as base64Decode } from 'https://deno.land/std@0.166.0/encoding/base64.ts';
 
 Deno.serve(async (_req) => {
   
@@ -29,34 +30,34 @@ const paymentLinks = {
     // ... other durations for tier 1
   },
   2: {
-    1: "https://stripe-link-tier2-1month",
-    3: "https://stripe-link-tier2-3months",
-    6: "https://stripe-link-tier2-6months",
-    12: "https://stripe-link-tier2-12months",
+    1: "https://buy.stripe.com/8wM01h5sxfjK5JSfZ4",
+    3: "https://buy.stripe.com/6oEdS74ot9Zqdck7sz",
+    6: "https://buy.stripe.com/bIY29pbQVc7ydck9AI",
+    12: "https://buy.stripe.com/8wM01haMR3B23BKbIR",
 
     // ... other durations for tier 1
   },
   3: {
-    1: "https://stripe-link-tier3-1month",
-    3: "https://stripe-link-tier3-3months",
-    6: "https://stripe-link-tier3-6months",
-    12: "https://stripe-link-tier3-12months",
+    1: "https://buy.stripe.com/6oEdS7g7b2wYb4c4gq",
+    3: "https://buy.stripe.com/bIYeWbaMR0oQ4FO14f",
+    6: "https://buy.stripe.com/4gweWb8EJ2wYc8geV6",
+    12: "https://buy.stripe.com/4gw8xN4ot8Vmego7sF",
 
     // ... other durations for tier 1
   },
   4: {
-    1: "https://stripe-link-tier4-1month",
-    3: "https://stripe-link-tier4-3months",
-    6: "https://stripe-link-tier4-6months",
-    12: "https://stripe-link-tier4-12months",
+    1: "https://buy.stripe.com/6oE7tJ5sxgnOa08aES",
+    3: "https://buy.stripe.com/3csbJZ5sx6Ne3BKaET",
+    6: "https://buy.stripe.com/14k5lBg7b6Nea0814k",
+    12: "https://buy.stripe.com/9AQeWb08d7Ri1tC6oF",
 
     // ... other durations for tier 1
   },
   5: {
-    1: "https://stripe-link-tier5-1month",
-    3: "https://stripe-link-tier5-3months",
-    6: "https://stripe-link-tier5-6months",
-    12: "https://stripe-link-tier5-12months",
+    1: "https://buy.stripe.com/eVa4hx5sx7Rib4cdR8",
+    3: "https://buy.stripe.com/eVa5lB08d9Zq6NW14n",
+    6: "https://buy.stripe.com/dR64hxaMR3B2a088wQ",
+    12: "https://buy.stripe.com/8wM5lBcUZb3ufks8wR",
 
     // ... other durations for tier 1
   },
@@ -69,7 +70,7 @@ const paymentLinks = {
 
        
 
-        console.log(payload);
+        //console.log(payload);
         
         const clientReferenceId = crypto.randomUUID();
 
@@ -98,12 +99,33 @@ const paymentLinks = {
 
             //alert(formattedFilename + " " + formattedEndDate);
             //alert(adImage);
+            
+            
+            // In your edge function
+            console.log(payload.image.substring(0, 30));
+            
+            const base64String = payload.image;
+
+// Check and remove any data URI scheme prefix
+const base64Data = base64String.split(';base64,').pop();
+
+// Decode the base64 string
+const binaryData = base64Decode(base64Data);
+
+// Convert the binary data to a Uint8Array (which is a type of ArrayBuffer)
+const arrayBuffer = new Uint8Array(binaryData);
+
+
+// Convert binary data to a buffer
+//const buffer = new Deno.Buffer(binaryData);
+
+            console.log("worked")
         
-              /*const { data: imageData, error: uploadError } = await supabase.storage
+              const { data: imageData, error: uploadError } = await supabase.storage
                 .from("advertisements")
-                .upload(formattedFilename, adImage, {
+                .upload(formattedFilename, arrayBuffer, {
                   contentType: "image/jpeg",
-                });*/
+                });
       
           const { data, error } = await supabase.from("advertisements").insert({
                 person: clientReferenceId,
@@ -112,6 +134,7 @@ const paymentLinks = {
                 url: adUrl,
                 end_date: formattedEndDate,
                 college: payload.college,
+                ad_link: payload.ad_link
           });
       
           if (error) {
