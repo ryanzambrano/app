@@ -25,7 +25,7 @@ const paymentLinks = {
     1: "https://buy.stripe.com/5kAaFVdZ3b3u0py28a",
     3: "https://buy.stripe.com/00g7tJ8EJ0oQ3BKdQT",
     6: "https://buy.stripe.com/3cs15l5sxc7ygow6os",
-    12: `https://buy.stripe.com/eVa3dtaMR3B2gow3ch`,
+    12: "https://buy.stripe.com/6oEdS7f374F6fksbJ4",
 
     // ... other durations for tier 1
   },
@@ -119,7 +119,7 @@ const arrayBuffer = new Uint8Array(binaryData);
 // Convert binary data to a buffer
 //const buffer = new Deno.Buffer(binaryData);
 
-            console.log("worked")
+            //console.log("worked")
         
               const { data: imageData, error: uploadError } = await supabase.storage
                 .from("advertisements")
@@ -134,7 +134,9 @@ const arrayBuffer = new Uint8Array(binaryData);
                 url: adUrl,
                 end_date: formattedEndDate,
                 college: payload.college,
-                ad_link: payload.ad_link
+                ad_link: payload.ad_link,
+                ad_header: payload.ad_header,
+                ad_content: payload.ad_content
           });
       
           if (error) {
