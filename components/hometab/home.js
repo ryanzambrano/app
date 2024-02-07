@@ -52,6 +52,8 @@ const Home = ({ route }) => {
   const [renderLimit, setRenderLimit] = useState(5);
   const flatListRef = useRef(null);
   const [expoPushToken, setExpoPushToken] = useState("");
+  const [ads, setAds] = useState([]);
+  const [combinedDataSource, setCombinedDataSource] = useState([]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -164,6 +166,25 @@ const Home = ({ route }) => {
       </Text>
     </View>
   );
+
+  const prepareDataSource = (users, ads) => {
+    // Assuming ads is an array of ad data and users is an array of user data
+    let combinedData = [];
+    let adIndex = 0;
+    //console.log("Before adding ads", combinedData);
+    users.forEach((user, index) => {
+      combinedData.push(user);
+      // Insert an ad after every 4th user, cycling through ads if there are fewer ads than slots
+      if ((index + 1) % 4 === 0 && ads[adIndex]) {
+        //console.log("Adding ad", ads[adIndex]);
+        combinedData.push({ ...ads[adIndex], isAd: true }); // Mark the ad data for easy identification
+        adIndex = (adIndex + 1) % ads.length; // Cycle through ads
+      }
+    });
+    //console.log("After adding ads", combinedData);
+
+    setCombinedDataSource(combinedData);
+  };
 
   const truncateString = (str, maxLength) => {
     if (str.length > maxLength) {
@@ -282,7 +303,15 @@ const Home = ({ route }) => {
   });
 
   const renderedUsers = filteredUsers.slice(0, renderLimit);
+  const fetchAds = async () => {
+    const { data: collegeData, error: ugcError } = await supabase
+      .from("advertisements")
+      .select("*");
 
+    setAds(collegeData);
+
+    //alert(collegeData);
+  };
   const fetchUsers = async () => {
     try {
       const { data: ugcData, error: ugcError } = await supabase
@@ -433,8 +462,19 @@ const Home = ({ route }) => {
     onHomePageVisit();
   };
 
+  const fetchData = async () => {
+    // Fetch users and ads (not shown here)
+    await fetchUsers(); // Assuming this sets a state for users
+    await fetchAds(); // This should set a state for ads, as corrected above
+
+    // Once both are fetched, prepare the combined data for rendering
+    prepareDataSource(renderedUsers, ads); // Assuming users and ads are your state
+    //setCombinedDataSource(combinedData); // Assuming this is your state setter for the data source
+  };
+
   useEffect(() => {
-    fetchUsers();
+    fetchData();
+
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
     );
@@ -448,6 +488,18 @@ const Home = ({ route }) => {
     navigation.navigate("userCard", { user });
   };
 
+  const getDataSourceWithAds = (users) => {
+    const itemsWithAds = [];
+    users.forEach((user, index) => {
+      itemsWithAds.push(user);
+      // Insert an ad after every 4th user (i.e., at index 3, 7, 11, etc.)
+      if ((index + 1) % 4 === 0) {
+        itemsWithAds.push({ isAd: true });
+      }
+    });
+    return itemsWithAds;
+  };
+
   const renderLoading = () => {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -455,44 +507,79 @@ const Home = ({ route }) => {
       </View>
     );
   };
-
-  const renderUserCard = ({ item, onPress }) => {
-    if (!item.lastModified) {
-      //console.log(item);
-      return null;
-    }
-    const truncatedName = truncateString(item.name, 25);
+  const renderAdComponent = ({ item, onPress }) => {
+    //const truncatedName = truncateString(item.name, 25);
+    //alert("adComponent");
+    console.log(item);
     return (
-      <TouchableOpacity onPress={() => handleUserCardPress(item)}>
+      <TouchableOpacity>
         <View style={styles.card}>
           <Image
             style={styles.profileImage}
             source={{
-              uri: `${picURL}/${item.user_id}/${item.user_id}-0-${item.lastModified}`,
+              uri: `${item.url}`,
             }}
           />
           <View style={styles.userInfo}>
             <View style={styles.vClass}>
-              <Text style={styles.class}>{item.class_year}</Text>
+              <Text style={styles.class}>hi</Text>
             </View>
             <View style={styles.userStuff}>
-              <Text style={styles.name}>{truncatedName}</Text>
-              <Text numberOfLines={1} ellipsizeMode="tail" style={styles.major}>
-                {" "}
-                {item.major || "Undecided"}
-              </Text>
-              <View style={styles.tagsContainer}>
-                {item.tags.slice(0, 8).map((tag, index) => (
-                  <View key={index} style={styles.tag}>
-                    <Text style={styles.tagText}>{tag}</Text>
-                  </View>
-                ))}
-              </View>
+              <Text style={styles.name}>hello</Text>
             </View>
           </View>
         </View>
       </TouchableOpacity>
     );
+  };
+
+  const renderItem = ({ item, index, onPress }) => {
+    if (!item.lastModified) {
+      //console.log(item);
+      return null;
+    }
+    if ((index + 1) % 4 === 0 && ads[index]) {
+      //console.log("checking ad", ads[index]);
+      return renderAdComponent({ item: ads[index] });
+      // Cycle through ads
+    } else {
+      const truncatedName = truncateString(item.name, 25);
+      return (
+        <TouchableOpacity onPress={() => handleUserCardPress(item)}>
+          <View style={styles.card}>
+            <Image
+              style={styles.profileImage}
+              source={{
+                uri: `${picURL}/${item.user_id}/${item.user_id}-0-${item.lastModified}`,
+              }}
+            />
+            <View style={styles.userInfo}>
+              <View style={styles.vClass}>
+                <Text style={styles.class}>{item.class_year}</Text>
+              </View>
+              <View style={styles.userStuff}>
+                <Text style={styles.name}>{truncatedName}</Text>
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={styles.major}
+                >
+                  {" "}
+                  {item.major || "Undecided"}
+                </Text>
+                <View style={styles.tagsContainer}>
+                  {item.tags.slice(0, 8).map((tag, index) => (
+                    <View key={index} style={styles.tag}>
+                      <Text style={styles.tagText}>{tag}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    }
   };
 
   return (
@@ -558,8 +645,10 @@ const Home = ({ route }) => {
             ref={flatListRef}
             data={renderedUsers}
             extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
-            renderItem={renderUserCard}
-            keyExtractor={(item) => item.user_id.toString()}
+            renderItem={renderItem}
+            keyExtractor={(item, index) =>
+              item.isAd ? `ad-${index}` : item.user_id.toString()
+            }
             ListEmptyComponent={renderEmptyComponent}
             onEndReached={() => setRenderLimit((prevLimit) => prevLimit + 5)}
             onEndReachedThreshold={0.1}

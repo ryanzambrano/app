@@ -18,7 +18,9 @@ Deno.serve(async (_req) => {
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
       )
-const values = [0, 1, 3, 6, 12];
+
+    const requiredFields = ['tier', 'duration', 'college', 'image', 'ad_link', 'ad_header', 'ad_content'];
+    const values = [0, 1, 3, 6, 12];
 
 const paymentLinks = {
   1: {
@@ -68,10 +70,20 @@ const paymentLinks = {
 
         const payload = await _req.json();
 
-       
-
-        //console.log(payload);
+        for (const field of requiredFields) {
+          console.log(payload[field]);
+          console.log("loop entered");
+          if (!payload[field]) {
+            console.log("loop hit");
+            return new Response(JSON.stringify({ error: `Missing required field: ${field}` }), {
+              status: 400,
+              headers: corsHeaders
+            });
+          }
+        }
         
+        console.log("after loop");
+
         const clientReferenceId = crypto.randomUUID();
 
 
@@ -140,7 +152,7 @@ const arrayBuffer = new Uint8Array(binaryData);
           });
       
           if (error) {
-                console.log(error);
+                console.error(error);
           } else {
                 // Convert the amount to cents and send it to the backend
           }
