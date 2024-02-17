@@ -53,7 +53,6 @@ const Home = ({ route }) => {
   const flatListRef = useRef(null);
   const [expoPushToken, setExpoPushToken] = useState("");
   const [ads, setAds] = useState([]);
-  const [combinedDataSource, setCombinedDataSource] = useState([]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -150,6 +149,7 @@ const Home = ({ route }) => {
       originalHousingPreference: sessionUser.profiles.living_preferences,
     });
   };
+  const [imageStyle, setImageStyle] = useState({});
 
   const toggleBookmarkButton = () => {
     setIsBookmarked((prevIsBookmarked) => !prevIsBookmarked);
@@ -166,25 +166,6 @@ const Home = ({ route }) => {
       </Text>
     </View>
   );
-
-  const prepareDataSource = (users, ads) => {
-    // Assuming ads is an array of ad data and users is an array of user data
-    let combinedData = [];
-    let adIndex = 0;
-    //console.log("Before adding ads", combinedData);
-    users.forEach((user, index) => {
-      combinedData.push(user);
-      // Insert an ad after every 4th user, cycling through ads if there are fewer ads than slots
-      if ((index + 1) % 4 === 0 && ads[adIndex]) {
-        //console.log("Adding ad", ads[adIndex]);
-        combinedData.push({ ...ads[adIndex], isAd: true }); // Mark the ad data for easy identification
-        adIndex = (adIndex + 1) % ads.length; // Cycle through ads
-      }
-    });
-    //console.log("After adding ads", combinedData);
-
-    setCombinedDataSource(combinedData);
-  };
 
   const truncateString = (str, maxLength) => {
     if (str.length > maxLength) {
@@ -316,28 +297,17 @@ const Home = ({ route }) => {
 
     const randomnessFactor = 1; // Adjust this to increase or decrease randomness
 
-    // Sort and randomize ads based on tier with randomness
     const randomizedAds = collegeData
       .map((ad) => ({
         ...ad,
-        // Assign weight: higher tier increases the probability to be higher up, but with randomness
         weight: ad.tier + Math.random() * randomnessFactor,
       }))
       .sort((a, b) => b.weight - a.weight) // Sort ads by weight in descending order
       .map(({ weight, ...ad }) => ad); // Optionally remove the weight property from the result
 
     setAds(randomizedAds);
-
-    //alert(collegeData);
   };
 
-  function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]]; // Swap elements
-    }
-    return array;
-  }
   const fetchUsers = async () => {
     try {
       const { data: ugcData, error: ugcError } = await supabase
@@ -446,7 +416,7 @@ const Home = ({ route }) => {
                 user.blocked_profiles.includes(session.user.id)
             )
             .map((user) => user.user_id);
-          //console.log(usersWhoBlockedMe);
+
           setUsersBlockingMe(usersWhoBlockedMe);
         }
 
@@ -489,14 +459,12 @@ const Home = ({ route }) => {
   };
 
   const fetchData = async () => {
-    // Fetch users and ads (not shown here)
     await fetchUsers(); // Assuming this sets a state for users
     await fetchAds(); // This should set a state for ads, as corrected above
   };
 
   useEffect(() => {
     fetchData();
-
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
     );
@@ -517,11 +485,12 @@ const Home = ({ route }) => {
       </View>
     );
   };
+
   const renderAdComponent = ({ item, onPress }) => {
     if (!item.url) {
       return null;
     }
-    //const truncatedName = truncateString(item.name, 25);
+
     return (
       <TouchableOpacity>
         <View style={styles.card}>
@@ -538,7 +507,7 @@ const Home = ({ route }) => {
             <View style={styles.adStuff}>
               <Text style={styles.adHeader}>The Hawkin{item.tier}</Text>
               <Text style={styles.adContent}>
-                Only a few steps away from campus. Sign a lease now!
+                Only a few steps away from campus. Sign a lease now! if you
               </Text>
             </View>
           </View>
@@ -667,9 +636,7 @@ const Home = ({ route }) => {
             data={renderedUsers}
             extraData={{ searchQuery, isBookmarked, bookmarkedProfiles }}
             renderItem={renderItem}
-            keyExtractor={(item, index) =>
-              item.isAd ? `ad-${index}` : item.user_id.toString()
-            }
+            keyExtractor={(item, index) => item.user_id.toString()}
             ListEmptyComponent={renderEmptyComponent}
             onEndReached={() => setRenderLimit((prevLimit) => prevLimit + 5)}
             onEndReachedThreshold={0.1}
@@ -697,7 +664,6 @@ const styles = StyleSheet.create({
   titleContainer: {
     alignItems: "right",
     textAlign: "right",
-    //marginRight: -20,
   },
 
   logoContainer: {
@@ -753,9 +719,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     elevation: 3,
     marginHorizontal: 10,
-    // borderWidth: 0.20,
-    // borderTopWidth: 0.20,
-    //borderBottomWidth: 0.2,
     borderColor: "grey",
   },
 
@@ -778,7 +741,7 @@ const styles = StyleSheet.create({
 
   adStuff: {
     flex: 1,
-    //smarginTop: -19,
+    marginTop: 19,
     justifyContent: "flex-start",
     alignSelf: "flex-start",
   },
@@ -787,7 +750,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     padding: 16,
-    //marginBottom: 30,
     backgroundColor: "#1D1D20",
     borderRadius: 8,
   },
@@ -802,12 +764,10 @@ const styles = StyleSheet.create({
     position: "relative",
     marginHorizontal: 7,
     paddingLeft: 10,
-    // paddingVertical: 10,
     height: 185,
     marginTop: 6,
     marginBottom: 2,
     borderWidth: 0.2,
-    //borderColor: "grey",
   },
 
   profileImage: {
@@ -816,17 +776,17 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginRight: 18,
     borderRadius: 60,
-    //borderWidth: 0.6,
     borderColor: "grey",
     marginTop: -10,
   },
 
   adImage: {
-    width: 110,
-    height: 110,
+    width: 130, // Take up all available width in the card
+    height: 130,
+    maxHeight: 150,
     borderRadius: 10,
     marginRight: 18,
-    //borderWidth: 0.6,
+    //xaspectRatio: 1,
     borderColor: "grey",
     marginTop: -10,
   },
@@ -854,19 +814,14 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     paddingRight: 20,
     color: "grey",
-    //textAlign: "justify",
   },
 
   name: {
     fontSize: 18,
     fontWeight: 600,
     paddingLeft: 3,
-    //paddingTop: 10,
     color: "white",
     zIndex: 1,
-    //top: 60,
-    //marginTop: 30,
-    //textAlign: "justify",
   },
 
   bio: {
@@ -883,8 +838,6 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     maxHeight: 90,
     paddingRight: 5,
-    //position: "absolute",
-    //padding: 20,
     overflow: "hidden",
     marginBottom: 10,
     justifyContent: "left",
@@ -919,7 +872,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "lightgrey",
     fontWeight: "500",
-    // textDecorationLine: "underline",
   },
   emptyContainer: {
     flex: 1,
@@ -935,7 +887,6 @@ const styles = StyleSheet.create({
   },
   class: {
     color: "grey",
-    //margin: 10,
     fontSize: 16,
     fontWeight: "500",
     textAlign: "right",
@@ -943,9 +894,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   vClass: {
-    //flex: 1,
     flexDirection: "row",
-    //backgroundColor: "blue",
     marginTop: 7,
     marginRight: 15,
   },
