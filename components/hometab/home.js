@@ -304,14 +304,40 @@ const Home = ({ route }) => {
 
   const renderedUsers = filteredUsers.slice(0, renderLimit);
   const fetchAds = async () => {
-    const { data: collegeData, error: ugcError } = await supabase
+    const { data: collegeData, error: adError } = await supabase
       .from("advertisements")
-      .select("*");
+      .select("*")
+      .order("tier", { ascending: false });
 
-    setAds(collegeData);
+    if (adError) {
+      alert(error.message);
+      return;
+    }
+
+    const randomnessFactor = 1; // Adjust this to increase or decrease randomness
+
+    // Sort and randomize ads based on tier with randomness
+    const randomizedAds = collegeData
+      .map((ad) => ({
+        ...ad,
+        // Assign weight: higher tier increases the probability to be higher up, but with randomness
+        weight: ad.tier + Math.random() * randomnessFactor,
+      }))
+      .sort((a, b) => b.weight - a.weight) // Sort ads by weight in descending order
+      .map(({ weight, ...ad }) => ad); // Optionally remove the weight property from the result
+
+    setAds(randomizedAds);
 
     //alert(collegeData);
   };
+
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+    }
+    return array;
+  }
   const fetchUsers = async () => {
     try {
       const { data: ugcData, error: ugcError } = await supabase
@@ -466,10 +492,6 @@ const Home = ({ route }) => {
     // Fetch users and ads (not shown here)
     await fetchUsers(); // Assuming this sets a state for users
     await fetchAds(); // This should set a state for ads, as corrected above
-
-    // Once both are fetched, prepare the combined data for rendering
-    prepareDataSource(renderedUsers, ads); // Assuming users and ads are your state
-    //setCombinedDataSource(combinedData); // Assuming this is your state setter for the data source
   };
 
   useEffect(() => {
@@ -488,18 +510,6 @@ const Home = ({ route }) => {
     navigation.navigate("userCard", { user });
   };
 
-  const getDataSourceWithAds = (users) => {
-    const itemsWithAds = [];
-    users.forEach((user, index) => {
-      itemsWithAds.push(user);
-      // Insert an ad after every 4th user (i.e., at index 3, 7, 11, etc.)
-      if ((index + 1) % 4 === 0) {
-        itemsWithAds.push({ isAd: true });
-      }
-    });
-    return itemsWithAds;
-  };
-
   const renderLoading = () => {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -508,24 +518,65 @@ const Home = ({ route }) => {
     );
   };
   const renderAdComponent = ({ item, onPress }) => {
+    if (!item.url) {
+      return null;
+    }
     //const truncatedName = truncateString(item.name, 25);
-    //alert("adComponent");
-    console.log(item);
     return (
       <TouchableOpacity>
         <View style={styles.card}>
           <Image
-            style={styles.profileImage}
+            style={styles.adImage}
             source={{
               uri: `${item.url}`,
             }}
           />
           <View style={styles.userInfo}>
             <View style={styles.vClass}>
-              <Text style={styles.class}>hi</Text>
+              <Text style={styles.class}>Ad</Text>
+            </View>
+            <View style={styles.adStuff}>
+              <Text style={styles.adHeader}>The Hawkin{item.tier}</Text>
+              <Text style={styles.adContent}>
+                Only a few steps away from campus. Sign a lease now!
+              </Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderUserItem = (item, index) => {
+    if (!item.lastModified) return null;
+
+    const truncatedName = truncateString(item.name, 25);
+    return (
+      <TouchableOpacity onPress={() => handleUserCardPress(item)}>
+        <View style={styles.card}>
+          <Image
+            style={styles.profileImage}
+            source={{
+              uri: `${picURL}/${item.user_id}/${item.user_id}-0-${item.lastModified}`,
+            }}
+          />
+          <View style={styles.userInfo}>
+            <View style={styles.vClass}>
+              <Text style={styles.class}>{item.class_year}</Text>
             </View>
             <View style={styles.userStuff}>
-              <Text style={styles.name}>hello</Text>
+              <Text style={styles.name}>{truncatedName}</Text>
+              <Text numberOfLines={1} ellipsizeMode="tail" style={styles.major}>
+                {" "}
+                {item.major || "Undecided"}
+              </Text>
+              <View style={styles.tagsContainer}>
+                {item.tags.slice(0, 8).map((tag, index) => (
+                  <View key={index} style={styles.tag}>
+                    <Text style={styles.tagText}>{tag}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
           </View>
         </View>
@@ -538,47 +589,17 @@ const Home = ({ route }) => {
       //console.log(item);
       return null;
     }
-    if ((index + 1) % 4 === 0 && ads[index]) {
-      //console.log("checking ad", ads[index]);
-      return renderAdComponent({ item: ads[index] });
-      // Cycle through ads
-    } else {
-      const truncatedName = truncateString(item.name, 25);
+    // Determine if it's time to render an ad
+    if ((index + 1) % 4 === 0 && ads[Math.floor((index + 1) / 4) - 1]) {
+      const adIndex = Math.floor((index + 1) / 4) - 1;
       return (
-        <TouchableOpacity onPress={() => handleUserCardPress(item)}>
-          <View style={styles.card}>
-            <Image
-              style={styles.profileImage}
-              source={{
-                uri: `${picURL}/${item.user_id}/${item.user_id}-0-${item.lastModified}`,
-              }}
-            />
-            <View style={styles.userInfo}>
-              <View style={styles.vClass}>
-                <Text style={styles.class}>{item.class_year}</Text>
-              </View>
-              <View style={styles.userStuff}>
-                <Text style={styles.name}>{truncatedName}</Text>
-                <Text
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={styles.major}
-                >
-                  {" "}
-                  {item.major || "Undecided"}
-                </Text>
-                <View style={styles.tagsContainer}>
-                  {item.tags.slice(0, 8).map((tag, index) => (
-                    <View key={index} style={styles.tag}>
-                      <Text style={styles.tagText}>{tag}</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            </View>
-          </View>
-        </TouchableOpacity>
+        <View>
+          {renderAdComponent({ item: ads[adIndex] })}
+          {renderUserItem(item, index)}
+        </View>
       );
+    } else {
+      return renderUserItem(item, index);
     }
   };
 
@@ -755,6 +776,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
+  adStuff: {
+    flex: 1,
+    //smarginTop: -19,
+    justifyContent: "flex-start",
+    alignSelf: "flex-start",
+  },
+
   userContainer: {
     flex: 1,
     alignItems: "center",
@@ -791,6 +819,33 @@ const styles = StyleSheet.create({
     //borderWidth: 0.6,
     borderColor: "grey",
     marginTop: -10,
+  },
+
+  adImage: {
+    width: 110,
+    height: 110,
+    borderRadius: 10,
+    marginRight: 18,
+    //borderWidth: 0.6,
+    borderColor: "grey",
+    marginTop: -10,
+  },
+
+  adHeader: {
+    fontSize: 23,
+    fontWeight: 500,
+    color: "white",
+    marginRight: 10,
+    textAlign: "center",
+  },
+
+  adContent: {
+    fontSize: 17,
+    color: "grey",
+    fontWeight: 500,
+    marginTop: 3,
+    marginRight: 10,
+    textAlign: "center",
   },
 
   major: {
