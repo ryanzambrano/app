@@ -288,6 +288,7 @@ const Home = ({ route }) => {
     const { data: collegeData, error: adError } = await supabase
       .from("advertisements")
       .select("*")
+      .eq("payment", true)
       .order("tier", { ascending: false });
 
     if (adError) {
@@ -639,7 +640,7 @@ const Home = ({ route }) => {
             keyExtractor={(item, index) => item.user_id.toString()}
             ListEmptyComponent={renderEmptyComponent}
             onEndReached={() => setRenderLimit((prevLimit) => prevLimit + 5)}
-            onEndReachedThreshold={0.1}
+            onEndReachedThreshold={0.2}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
