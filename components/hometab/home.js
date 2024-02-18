@@ -285,10 +285,13 @@ const Home = ({ route }) => {
 
   const renderedUsers = filteredUsers.slice(0, renderLimit);
   const fetchAds = async () => {
+    const currentDate = new Date();
+
     const { data: collegeData, error: adError } = await supabase
       .from("advertisements")
       .select("*")
       .eq("payment", true)
+      .gte("end_date", currentDate.toISOString().substring(0, 10))
       .order("tier", { ascending: false });
 
     if (adError) {
