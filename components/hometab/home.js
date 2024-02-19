@@ -54,7 +54,7 @@ const Home = ({ route }) => {
   const flatListRef = useRef(null);
   const [expoPushToken, setExpoPushToken] = useState("");
   const [ads, setAds] = useState([]);
-
+  const [sessionUserCollege, setSessionUserCollege] = useState("");
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setRenderLimit(5);
@@ -292,6 +292,7 @@ const Home = ({ route }) => {
       .from("advertisements")
       .select("*")
       .eq("payment", true)
+      .eq("college", sessionUserCollege)
       .gte("end_date", currentDate.toISOString().substring(0, 10))
       .order("tier", { ascending: false });
 
@@ -336,12 +337,12 @@ const Home = ({ route }) => {
         return;
       }
 
-      const sessionUserCollege = sessionProfileData.college;
+      setSessionUserCollege(sessionProfileData.college);
 
       const { data: profileData, error: profileError } = await supabase
         .from("profile")
         .select("*")
-        .eq("college", sessionUserCollege)
+        .eq("college", sessionProfileData.college)
         .neq("profile_complete", false);
 
       if (profileError) {
@@ -459,13 +460,17 @@ const Home = ({ route }) => {
       console.error("An unexpected error occurred:", error);
       alert("An unexpected error occurred, please try again later.");
     }
-    setIsLoading(false);
+
     onHomePageVisit();
   };
 
   const fetchData = async () => {
-    await fetchUsers(); // Assuming this sets a state for users
-    await fetchAds(); // This should set a state for ads, as corrected above
+    try {
+      await fetchUsers(); // Assuming this sets a state for users
+      await fetchAds(); // This should set a state for ads, as corrected above
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
