@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   Alert,
   RefreshControl,
+  Linking,
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
@@ -482,6 +483,31 @@ const Home = ({ route }) => {
     navigation.navigate("userCard", { user });
   };
 
+  const handleAdPress = async (item) => {
+    const url = item.ad_link;
+
+    if (url) {
+      // Open the URL in the default browser
+      Linking.openURL(url).catch((err) =>
+        console.error("An error occurred", err)
+      );
+    } else {
+      //console.warn("No URL provided for the ad item");
+    }
+
+    const { data: clickData, error: clickError } = await supabase.rpc(
+      "increment",
+      { x: 1, row_id: item.id }
+    );
+
+    if (clickError) {
+      alert(clickError.message);
+    }
+
+    if (clickData) {
+      alert("good");
+    }
+  };
   const renderLoading = () => {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -496,7 +522,7 @@ const Home = ({ route }) => {
     }
 
     return (
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() => handleAdPress(item)}>
         <View style={styles.card}>
           <Image
             style={styles.adImage}
@@ -509,10 +535,8 @@ const Home = ({ route }) => {
               <Text style={styles.class}>Ad</Text>
             </View>
             <View style={styles.adStuff}>
-              <Text style={styles.adHeader}>The Hawkin{item.tier}</Text>
-              <Text style={styles.adContent}>
-                Only a few steps away from campus. Sign a lease now! if you
-              </Text>
+              <Text style={styles.adHeader}>{item.ad_header}</Text>
+              <Text style={styles.adContent}>{item.ad_content}</Text>
             </View>
           </View>
         </View>
@@ -745,9 +769,9 @@ const styles = StyleSheet.create({
 
   adStuff: {
     flex: 1,
-    marginTop: 19,
+    //marginTop: 10,
     justifyContent: "flex-start",
-    alignSelf: "flex-start",
+    alignSelf: "center",
   },
 
   userContainer: {
