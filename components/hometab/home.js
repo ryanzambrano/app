@@ -54,7 +54,6 @@ const Home = ({ route }) => {
   const flatListRef = useRef(null);
   const [expoPushToken, setExpoPushToken] = useState("");
   const [ads, setAds] = useState([]);
-  const [sessionUserCollege, setSessionUserCollege] = useState("");
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setRenderLimit(5);
@@ -285,14 +284,30 @@ const Home = ({ route }) => {
   });
 
   const renderedUsers = filteredUsers.slice(0, renderLimit);
-  const fetchAds = async () => {
+
+  const fetchCollege = async () => {
+    const { data: collegeData, error: collegeError } = await supabase
+      .from("profile")
+      .select("college")
+      .eq("user_id", session.user.id)
+      .single();
+
+    if (collegeError || !collegeData) {
+      console.error(sessionProfileError || "Session user's profile not found");
+      return;
+    } else {
+      return collegeData.college;
+    }
+  };
+
+  const fetchAds = async (college) => {
     const currentDate = new Date();
 
     const { data: collegeData, error: adError } = await supabase
       .from("advertisements")
       .select("*")
       .eq("payment", true)
-      .eq("college", sessionUserCollege)
+      .eq("college", college)
       .gte("end_date", currentDate.toISOString().substring(0, 10))
       .order("tier", { ascending: false });
 
@@ -300,9 +315,7 @@ const Home = ({ route }) => {
       alert(error.message);
       return;
     }
-
     const randomnessFactor = 1; // Adjust this to increase or decrease randomness
-
     const randomizedAds = collegeData
       .map((ad) => ({
         ...ad,
@@ -314,46 +327,29 @@ const Home = ({ route }) => {
     setAds(randomizedAds);
   };
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (college) => {
     try {
-      const { data: ugcData, error: ugcError } = await supabase
-        .from("UGC")
-        .select("*")
-        .neq("has_ugc", false)
-        .neq("profile_viewable", false);
-
-      const sessionUserId = session.user.id;
-      const { data: sessionProfileData, error: sessionProfileError } =
-        await supabase
+      const [ugcResponse, profileResponse, imageResponse] = await Promise.all([
+        supabase
+          .from("UGC")
+          .select("*")
+          .neq("has_ugc", false)
+          .neq("profile_viewable", false),
+        supabase
           .from("profile")
-          .select("college")
-          .eq("user_id", sessionUserId)
-          .single();
+          .select("*")
+          .eq("college", college)
+          .neq("profile_complete", false),
+        supabase
+          .from("images")
+          .select("*")
+          .eq("image_index", 0)
+          .neq("last_modified", null),
+      ]);
 
-      if (sessionProfileError || !sessionProfileData) {
-        console.error(
-          sessionProfileError || "Session user's profile not found"
-        );
-        return;
-      }
-
-      setSessionUserCollege(sessionProfileData.college);
-
-      const { data: profileData, error: profileError } = await supabase
-        .from("profile")
-        .select("*")
-        .eq("college", sessionProfileData.college)
-        .neq("profile_complete", false);
-
-      if (profileError) {
-        console.error(profileError);
-        return;
-      }
-      const { data: imageData, error: imageError } = await supabase
-        .from("images")
-        .select("*")
-        .eq("image_index", 0)
-        .neq("last_modified", null);
+      const { data: ugcData, error: ugcError } = ugcResponse;
+      const { data: profileData, error: profileError } = profileResponse;
+      const { data: imageData, error: imageError } = imageResponse;
 
       if (ugcError || profileError || imageError) {
         console.error(ugcError || profileError || imageError);
@@ -381,16 +377,15 @@ const Home = ({ route }) => {
         });
         const filteredData = mergedData.filter((user) => user !== null);
 
-        const userId = session.user.id;
         const ugcResponse = await supabase
           .from("UGC")
           .select("name, bio, tags, major, class_year, hometown")
-          .eq("user_id", userId)
+          .eq("user_id", session.user.id)
           .single();
         const profileResponse = await supabase
           .from("profile")
           .select("*")
-          .eq("user_id", userId)
+          .eq("user_id", session.user.id)
           .single();
 
         if (ugcResponse.error || profileResponse.error) {
@@ -429,7 +424,7 @@ const Home = ({ route }) => {
         const { data: bookmarkedData, error: bookmarkedError } = await supabase
           .from("UGC")
           .select("bookmarked_profiles")
-          .eq("user_id", userId);
+          .eq("user_id", session.user.id);
         if (bookmarkedError) {
           console.error(
             "Error fetching bookmarked profiles:",
@@ -443,7 +438,7 @@ const Home = ({ route }) => {
         const { data: blockedData, error: blockedError } = await supabase
           .from("UGC")
           .select("blocked_profiles")
-          .eq("user_id", userId);
+          .eq("user_id", session.user.id);
         if (blockedError) {
           console.error(
             "Error fetching blocked profiles:",
@@ -460,14 +455,17 @@ const Home = ({ route }) => {
       console.error("An unexpected error occurred:", error);
       alert("An unexpected error occurred, please try again later.");
     }
-
     onHomePageVisit();
   };
 
   const fetchData = async () => {
     try {
-      await fetchUsers(); // Assuming this sets a state for users
-      await fetchAds(); // This should set a state for ads, as corrected above
+      const college = await fetchCollege();
+      //alert("check" + college.collegeData);
+      await Promise.all([
+        fetchUsers(college), // These are now executed in parallel
+        fetchAds(college),
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -493,24 +491,16 @@ const Home = ({ route }) => {
 
     if (url) {
       // Open the URL in the default browser
-      Linking.openURL(url).catch((err) =>
-        console.error("An error occurred", err)
-      );
+      Linking.openURL(url).catch((err) => console.log("An error occurred:"));
     } else {
       //console.warn("No URL provided for the ad item");
     }
-
     const { data: clickData, error: clickError } = await supabase.rpc(
       "increment",
       { x: 1, row_id: item.id }
     );
 
     if (clickError) {
-      alert(clickError.message);
-    }
-
-    if (clickData) {
-      alert("good");
     }
   };
   const renderLoading = () => {
@@ -591,12 +581,15 @@ const Home = ({ route }) => {
       //console.log(item);
       return null;
     }
+
+    const adPosition = Math.floor((index + 1) / 4) - 1; // Calculate ad position
+    const shouldRenderAd = (index + 1) % 4 === 0 && ads[adPosition]; // Check both timing and availability
+
     // Determine if it's time to render an ad
-    if ((index + 1) % 4 === 0 && ads[Math.floor((index + 1) / 4) - 1]) {
-      const adIndex = Math.floor((index + 1) / 4) - 1;
+    if (shouldRenderAd) {
       return (
         <View>
-          {renderAdComponent({ item: ads[adIndex] })}
+          {renderAdComponent({ item: ads[adPosition] })}
           {renderUserItem(item, index)}
         </View>
       );
@@ -676,6 +669,7 @@ const Home = ({ route }) => {
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
+            windowSize={5}
           />
         )}
       </View>
