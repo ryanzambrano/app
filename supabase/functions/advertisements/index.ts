@@ -148,7 +148,8 @@ const arrayBuffer = new Uint8Array(binaryData);
                 college: payload.college,
                 ad_link: payload.ad_link,
                 ad_header: payload.ad_header,
-                ad_content: payload.ad_content
+                ad_content: payload.ad_content,
+                ad_email: payload.ad_email,
           });
       
           if (error) {
