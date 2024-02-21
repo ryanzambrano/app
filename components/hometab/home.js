@@ -57,7 +57,7 @@ const Home = ({ route }) => {
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setRenderLimit(5);
-    fetchUsers().then(() => setRefreshing(false));
+    fetchData().then(() => setRefreshing(false));
   }, []);
 
   const onHomePageVisit = async () => {
