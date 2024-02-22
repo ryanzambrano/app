@@ -300,6 +300,25 @@ const Home = ({ route }) => {
     }
   };
 
+  const adImpressions = async () => {
+    for (const item of ads) {
+      const { data: impData, error: impError } = await supabase.rpc(
+        "incrementimpressions",
+        { x: 1, row_id: item.id }
+      );
+
+      // Handle potential errors from incrementImpressions calls
+      if (impError) {
+        console.error(
+          "Error incrementing impressions for ad ID:",
+          item.id,
+          impError.message
+        );
+        // Optionally, break or continue based on your error handling strategy
+      }
+    }
+  };
+
   const fetchAds = async (college) => {
     const currentDate = new Date();
 
@@ -468,6 +487,7 @@ const Home = ({ route }) => {
       ]);
     } finally {
       setIsLoading(false);
+      adImpressions();
     }
   };
 
