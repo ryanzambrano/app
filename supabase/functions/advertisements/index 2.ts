@@ -24,46 +24,29 @@ Deno.serve(async (_req) => {
 
 const paymentLinks = {
   1: {
-    1: "https://buy.stripe.com/5kAaFVdZ3b3u0py28a",
-    3: "https://buy.stripe.com/00g7tJ8EJ0oQ3BKdQT",
-    6: "https://buy.stripe.com/3cs15l5sxc7ygow6os",
-    12: "https://buy.stripe.com/6oEdS7f374F6fksbJ4",
+    1: "https://buy.stripe.com/aEUg0fg7befG6NW5kH",
+    3: "https://buy.stripe.com/fZe8xN8EJ2wY4FO6oM",
+    6: "https://buy.stripe.com/dR67tJ9IN5Jab4c8wV",
+    12: "https://buy.stripe.com/4gwaFV4ot8Vm5JS28y",
 
     // ... other durations for tier 1
   },
   2: {
-    1: "https://buy.stripe.com/8wM01h5sxfjK5JSfZ4",
-    3: "https://buy.stripe.com/6oEdS74ot9Zqdck7sz",
-    6: "https://buy.stripe.com/bIY29pbQVc7ydck9AI",
-    12: "https://buy.stripe.com/8wM01haMR3B23BKbIR",
+    1: "https://buy.stripe.com/00gcO34ot7Ri6NW00r",
+    3: "https://buy.stripe.com/fZe3dt2gl3B2dck28A",
+    6: "https://buy.stripe.com/8wMbJZ1ch7Ri6NW28B",
+    12: "https://buy.stripe.com/6oE3dtf379Zq0py4gK",
 
     // ... other durations for tier 1
   },
   3: {
-    1: "https://buy.stripe.com/6oEdS7g7b2wYb4c4gq",
-    3: "https://buy.stripe.com/bIYeWbaMR0oQ4FO14f",
-    6: "https://buy.stripe.com/4gweWb8EJ2wYc8geV6",
-    12: "https://buy.stripe.com/4gw8xN4ot8Vmego7sF",
+    1: "https://buy.stripe.com/5kA29pf373B27S0fZt",
+    3: "https://buy.stripe.com/28o8xN9INfjK8W4dRm",
+    6: "https://buy.stripe.com/9AQaFV5sx3B24FOfZv",
+    12: "https://buy.stripe.com/5kA6pF4otefG8W46oW",
 
     // ... other durations for tier 1
   },
-  4: {
-    1: "https://buy.stripe.com/6oE7tJ5sxgnOa08aES",
-    3: "https://buy.stripe.com/3csbJZ5sx6Ne3BKaET",
-    6: "https://buy.stripe.com/14k5lBg7b6Nea0814k",
-    12: "https://buy.stripe.com/9AQeWb08d7Ri1tC6oF",
-
-    // ... other durations for tier 1
-  },
-  5: {
-    1: "https://buy.stripe.com/eVa4hx5sx7Rib4cdR8",
-    3: "https://buy.stripe.com/eVa5lB08d9Zq6NW14n",
-    6: "https://buy.stripe.com/dR64hxaMR3B2a088wQ",
-    12: "https://buy.stripe.com/8wM5lBcUZb3ufks8wR",
-
-    // ... other durations for tier 1
-  },
-  // ... other tiers
 };
 
         
@@ -148,7 +131,8 @@ const arrayBuffer = new Uint8Array(binaryData);
                 college: payload.college,
                 ad_link: payload.ad_link,
                 ad_header: payload.ad_header,
-                ad_content: payload.ad_content
+                ad_content: payload.ad_content,
+                ad_email: payload.ad_email,
           });
       
           if (error) {

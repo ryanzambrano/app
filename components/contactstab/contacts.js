@@ -40,6 +40,7 @@ const ContactsUI = ({ route }) => {
   const groupIds = contacts.map((contact) => contact.Group_ID);
   const [expoPushToken, setExpoPushToken] = useState("");
   const [ringer, setRinger] = useState(false);
+  const [blockedUsers, setBlockedUsers] = useState([]);
   //const [sessionname, setsessionname] = useState("");
 
   const onRefresh = React.useCallback(() => {
@@ -76,19 +77,35 @@ const ContactsUI = ({ route }) => {
   };
 
   const fetchUsers = async () => {
-    const { data: users, error } = await supabase
-      .from("Group_Chats")
-      .select("*")
-      .contains("User_ID", [session.user.id]);
-    if (users) {
-      setContacts(users);
+    const { data: blocked, error: blockerror } = await supabase
+      .from("UGC")
+      .select("blocked_profiles")
+      .eq("user_id", session.user.id)
+      .single();
+
+    if (blocked) {
+      //console.log(blocked.blocked_profiles);
     }
 
-    if (error) {
-      console.error(error);
+    if (blockerror) {
+      console.log(blockerror);
       return;
     }
 
+    const { data: contacts, error } = await supabase
+      .from("Group_Chats")
+      .select("*")
+      .contains("User_ID", [session.user.id]);
+    const users = contacts.filter((contact) => {
+      return (
+        contact.Is_College == true ||
+        !contact.User_ID.some((id) => blocked.blocked_profiles.includes(id))
+      );
+    });
+
+    if (users) {
+      setContacts(users);
+    }
 
     const modifiedUsers = await Promise.all(
       users.map(async (user) => {
@@ -100,17 +117,12 @@ const ContactsUI = ({ route }) => {
           .select("name, user_id")
           .in("user_id", user.User_ID);
 
-          const ownName = ids.find(item => item.user_id === session.user.id)?.name || null;
+        const ownName =
+          ids.find((item) => item.user_id === session.user.id)?.name || null;
 
-
-          const arrnames = ids
-          .filter(item => item.user_id !== session.user.id)
-          .map(item => item.name);
-         
-
-
-
-          
+        const arrnames = ids
+          .filter((item) => item.user_id !== session.user.id)
+          .map((item) => item.name);
 
         let joinedGroups;
         if (!user.Group_Name) {
@@ -258,7 +270,6 @@ const ContactsUI = ({ route }) => {
     }
   };
 
-  
   useEffect(() => {
     loadData();
     fetchUsers();
@@ -367,7 +378,7 @@ const ContactsUI = ({ route }) => {
     setSelectedUser(user);
 
     //console.log(user.joinedGroups);
-    navigation.navigate("Message", { user});
+    navigation.navigate("Message", { user });
   };
 
   const handlePlusIconPress = () => {
