@@ -2,9 +2,7 @@
   "expo": {
     "name": "Cabana",
     "slug": "hello-world",
-
-    "version": "1.2.4",
-
+    "version": "1.2.5",
     "orientation": "portrait",
     "icon": "./assets/cabanaAppLogo.png",
     "userInterfaceStyle": "dark",
@@ -34,8 +32,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "ad275287-fa4a-4f70-8397-8df453abd9a8"
+        "projectId": "1c5b90df-1ed5-43e2-b7d6-d8e61972679c"
       }
-    }
+    },
+    "owner": "mattbrwnn"
   }
 }
