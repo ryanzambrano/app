@@ -39,7 +39,7 @@ export const Name = ({ navigation, route }) => {
 
         // Check if the name contains non-alphabetic characters
         if (!/^[a-z\s]+$/i.test(userData.name)) {
-          setIsError("Invalid characters");
+          setIsError("Enter a valid name");
           return; // Stop the function execution
         }
 

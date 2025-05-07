@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  KeyboardAvoidingView,
   FlatList,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
@@ -19,13 +20,16 @@ import Icon from "react-native-vector-icons/FontAwesome";
 import { picURL } from "../auth/supabase";
 import Retake from "../retakeQuestionaireFiles/retake.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+const instagramLogo = require("../../assets/instagramLogo.png");
+const snapchatLogo = require("../../assets/snapchatLogo.png");
 
 export const EditProfileScreen = ({ navigation, route }) => {
   const { session } = route.params;
   const [editedUser, setEditedUser] = useState(route.params.editedUser);
   //editedUser.tags = route.params.selectedTags;
   const [bioCharCount, setBioCharCount] = useState("");
-
+  
+  
   const { updated } = route.params;
   const selectedTags = route.params.selectedTags;
   //alert(updated);
@@ -120,29 +124,54 @@ export const EditProfileScreen = ({ navigation, route }) => {
 
   const updateProfile = async () => {
     if (session?.user) {
-      if (editedUser.name.trim() === "") {
-        alert("Must enter a name");
-        return;
-      }
-      if (editedUser.name.length > 30) {
+      if (
+        !/^[A-Za-z\s]+$/.test(editedUser.name) &&
+        editedUser.name.trim() !== ""
+      ) {
         alert("Please enter a valid name");
         return;
       }
+      if (editedUser.name.trim() === "" || editedUser.name.length > 30) {
+        alert("Please enter a valid name");
+        return;
+      }
+
       const classYear = Number(editedUser.class_year);
-      if (isNaN(classYear) || classYear < 2023 || classYear > 2030) {
+      if (
+        isNaN(classYear) ||
+        classYear < 2023 ||
+        classYear > 2030 ||
+        !/^\d{4}$/.test(editedUser.class_year)
+      ) {
         alert("Please enter a valid class year");
         return;
       }
 
-      if (editedUser.major.length > 30) {
+      if (
+        editedUser.major.trim() !== "" &&
+        !/^[A-Za-z\s]*$/.test(editedUser.major)
+      ) {
         alert("Please enter a valid major");
         return;
       }
 
-      if (editedUser.hometown.length > 30) {
+      if (
+        editedUser.hometown.trim() !== "" &&
+        !/^[A-Za-z\s,]*$/.test(editedUser.hometown)
+      ) {
         alert("Please enter a valid hometown");
         return;
       }
+
+      // if (editedUser.instagramHandle.trim() !== "" && !/^[A-Za-z\s]*$/.test(editedUser.instagramHandle)) {
+      //   alert("Please enter a valid handle");
+      //   return;
+      // }
+
+      // if (editedUser.snapchatHandle.trim() !== "" && !/^[A-Za-z\s]*$/.test(editedUser.snapchatHandle)) {
+      //   alert("Please enter a valid handle");
+      //   return;
+      // }
 
       if (editedUser.bio.length <= 700) {
         const trimmedBio = editedUser.bio.trimEnd();
@@ -150,6 +179,8 @@ export const EditProfileScreen = ({ navigation, route }) => {
         const major = editedUser.major.trimEnd();
         const class_year = editedUser.class_year.trimEnd();
         const hometown = editedUser.hometown.trimEnd();
+        const instagramHandle = editedUser.instagramHandle.trimEnd();
+        const snapchatHandle = editedUser.snapchatHandle.trimEnd();
         const { data, error } = await supabase
           .from("UGC")
           .update([
@@ -159,6 +190,8 @@ export const EditProfileScreen = ({ navigation, route }) => {
               major: major,
               class_year: class_year,
               hometown: hometown,
+              instagramHandle: instagramHandle,
+              snapchatHandle: snapchatHandle,
             },
           ])
           .eq("user_id", session.user.id);
@@ -171,7 +204,10 @@ export const EditProfileScreen = ({ navigation, route }) => {
             major,
             class_year,
             hometown,
+            instagramHandle,
+            snapchatHandle,
             tags: editedUser.tags,
+           
           };
           await AsyncStorage.setItem("userData", JSON.stringify(userData));
 
@@ -187,13 +223,18 @@ export const EditProfileScreen = ({ navigation, route }) => {
     navigation.navigate("AddProfileImages");
   };
 
+  handleBack = async () => {
+    navigation.goBack();
+  };
+
   return (
     <SafeAreaView style={styles.contain}>
+      <KeyboardAvoidingView
+        style={{ flex: 1, paddingBottom: 20, }}
+        behavior="padding" // or "height" depending on your needs
+      >
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.bbuttonContainer}
-          onPress={() => navigation.goBack()}
-        >
+        <TouchableOpacity style={styles.bbuttonContainer} onPress={handleBack}>
           <Text style={styles.bbutton}>Cancel</Text>
         </TouchableOpacity>
         <View style={styles.centerContainer}>
@@ -362,7 +403,7 @@ export const EditProfileScreen = ({ navigation, route }) => {
               </View>
             )}
 
-            <Text style={styles.more}>More about me:</Text>
+            <Text style={styles.more}>More about me</Text>
             <Text
               style={{
                 textAlign: "center",
@@ -396,9 +437,47 @@ export const EditProfileScreen = ({ navigation, route }) => {
                 </Text>
               </TouchableOpacity>
             </View>
+
+            <View style={styles.socialsContainer}>
+            <Text style={styles.more}>Socials</Text>
+
+            <View style={styles.socialMediaContainer}>
+              <Image source={instagramLogo} style={styles.socialMediaIcon} />
+              <View style={styles.socialTextContainer}>
+                <Text style={styles.label}>Instagram:</Text>
+                <TextInput
+                  style={styles.input2}
+                  value={editedUser.instagramHandle}
+                  onChangeText={(instagramHandle) =>
+                    setEditedUser({ ...editedUser, instagramHandle })
+                  }
+                  placeholder="Instagram Handle"
+                  placeholderTextColor="#575D61"
+                />
+              </View>
+            </View>
+
+            <View style={styles.socialMediaContainer}>
+              <Image source={snapchatLogo} style={styles.socialMediaIcon} />
+              <View style={styles.socialTextContainer}>
+                <Text style={styles.label}>Snapchat:</Text>
+                <TextInput
+                  style={styles.input2}
+                  value={editedUser.snapchatHandle}
+                  onChangeText={(snapchatHandle) =>
+                    setEditedUser({ ...editedUser, snapchatHandle })
+                  }
+                  placeholder="Snapchat Handle"
+                  placeholderTextColor="#575D61"
+                />
+              </View>
+            </View>
+          </View>
+
           </>
         }
       />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -437,6 +516,17 @@ const styles = StyleSheet.create({
     borderTopColor: "#2B2D2F",
     borderTopWidth: 1.4,
     marginHorizontal: 10,
+    marginTop: 10,
+    paddingTop: 10,
+    marginBottom: 10,
+    gap: 5,
+  },
+
+  socialsContainer: {
+    flexDirection: "column",
+    borderTopColor: "#2B2D2F",
+    borderTopWidth: 1.4,
+    marginHorizontal: 25,
     marginTop: 10,
     paddingTop: 10,
     marginBottom: 10,
@@ -576,6 +666,49 @@ const styles = StyleSheet.create({
     margin: 10,
     marginBottom: 6,
   },
+  socialsContainer: {
+    flexDirection: "column",
+    borderTopColor: "#2B2D2F",
+    borderTopWidth: 1.4,
+    marginHorizontal: 25,
+    marginTop: 10,
+    paddingTop: 10,
+    marginBottom: 10,
+    gap: 5,
+  },
+  socialMediaContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  socialTextContainer: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+    marginLeft: 15,
+    marginTop: 12,
+  },
+  socialMediaIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  label: {
+    fontSize: 16,
+    color: "white",
+    fontWeight: "bold",
+  },
+  input2: {
+    flex: 0,
+    fontSize: 16,
+    color: "white",
+    marginBottom: 10,
+    borderBottomColor: "#2B2D2F",
+    borderBottomWidth: 1.8,
+    borderBottomRightRadius: 20,
+    paddingBottom: 5, 
+  },
+  
 });
 
 export default EditProfileScreen;

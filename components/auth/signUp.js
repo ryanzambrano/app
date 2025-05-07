@@ -14,6 +14,7 @@ import {
   Keyboard,
   Animated,
 } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 
 import { supabase } from "./supabase.js";
 import { startShakeAnimation } from "./profileUtils.js";
@@ -26,6 +27,11 @@ export const SignUp = ({ navigation }) => {
   const [passwordsMatch, setPasswordsMatch] = useState(null);
   const [isError, setIsError] = useState("");
   const shakeAnimationValue = useRef(new Animated.Value(0)).current;
+  const [isChecked, setIsChecked] = useState(null);
+
+  const toggleCheck = () => {
+    setIsChecked(!isChecked);
+  };
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -42,15 +48,20 @@ export const SignUp = ({ navigation }) => {
     setIsError(null);
 
     // Check if the last 4 characters of email are ".edu"
-    if (form.email.slice(-4) !== ".edu") {
+    /*if (form.email.slice(-4) !== ".edu") {
       startShakeAnimation(shakeAnimationValue);
-      setIsError("Must use the email provided by your college");
       return;
-    }
+    }*/
 
     if (form.password !== form.confirmPassword) {
       startShakeAnimation(shakeAnimationValue);
       setPasswordsMatch(false);
+      return;
+    }
+
+    if (!isChecked) {
+      startShakeAnimation(shakeAnimationValue);
+      setIsChecked(false);
       return;
     }
 
@@ -96,20 +107,16 @@ export const SignUp = ({ navigation }) => {
           <>
             <View style={styles.container}>
               <View style={styles.verifyHeader}>
-                <Image
-                  source={{
-                    uri: "https://cdn3.iconfinder.com/data/icons/furniture-volume-1-2/48/12-512.png",
-                  }}
-                  style={styles.headerImage}
-                  alt="Logo "
-                />
+                <Image source={logo} style={styles.headerImage} alt="Logo " />
                 <Text style={styles.titleText}>Verify your email!</Text>
               </View>
-              <Text style={styles.sloganText}>
+              <Text style={styles.successText}>
                 Check your email for an account verification email, and then
                 sign in!
               </Text>
-              <Text style={styles.sloganText}>(it might be in your spam)</Text>
+              <Text style={styles.successText}>
+                (0-5 minute wait time.){"\n"}Make sure to check your spam.
+              </Text>
               <View style={styles.verifyFormAction}>
                 <TouchableOpacity
                   onPress={() => {
@@ -142,7 +149,7 @@ export const SignUp = ({ navigation }) => {
             <View style={styles.form}>
               <View style={styles.input}>
                 <Text style={styles.inputHeader}>
-                  Enter your College Email Address:
+                  Enter your Email Address:
                 </Text>
                 <TextInput
                   style={styles.inputControl}
@@ -183,9 +190,60 @@ export const SignUp = ({ navigation }) => {
                 />
               </View>
 
+              <View style={styles.termsContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.termsBox,
+                    { backgroundColor: isChecked ? "#14999999" : "grey" },
+                  ]}
+                  onPress={toggleCheck}
+                ></TouchableOpacity>
+                <Text style={styles.formFooter}>I Agree to </Text>
+                <TouchableOpacity
+                  style={styles.termsContainer}
+                  onPress={() => {
+                    // handle link
+                    navigation.navigate("PrivacyPolicy");
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.formFooter,
+                      { textDecorationLine: "underline" },
+                    ]}
+                  >
+                    Privacy
+                  </Text>
+                </TouchableOpacity>
+                <Text style={styles.formFooter}>and{"  "}</Text>
+                <TouchableOpacity
+                  style={styles.termsContainer}
+                  onPress={() => {
+                    // handle link
+                    navigation.navigate("UserAgreement");
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.formFooter,
+                      { textDecorationLine: "underline" },
+                    ]}
+                  >
+                    User Agreement
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
               {passwordsMatch == false && (
                 <Animated.Text style={[styles.errorText, shakeAnimationStyle]}>
                   Passwords Do Not Match
+                </Animated.Text>
+              )}
+
+              {isChecked == false && (
+                <Animated.Text style={[styles.errorText, shakeAnimationStyle]}>
+                  You Must Agree to the Privacy Policy and User Agreement to
+                  Register
                 </Animated.Text>
               )}
 
@@ -268,10 +326,10 @@ const styles = StyleSheet.create({
   },
 
   titleText: {
-    fontFamily: "Verdana-Bold",
-    fontSize: 27,
-    fontWeight: "700",
-
+    // fontFamily: "Verdana-Bold",
+    fontSize: 28,
+    fontWeight: "600",
+    paddingLeft: 10,
     //textAlign: "center",
     //AlignSelf: "center",
     color: "#fff",
@@ -285,6 +343,16 @@ const styles = StyleSheet.create({
     color: "#929292",
     textAlign: "center",
     marginBottom: "10%",
+  },
+
+  successText: {
+    //flex: 1,
+    fontFamily: "Verdana",
+    fontSize: 16,
+    fontWeight: "500",
+    color: "lightgreen",
+    textAlign: "center",
+    marginBottom: 30,
   },
 
   input: {
@@ -331,7 +399,7 @@ const styles = StyleSheet.create({
   },
 
   continue: {
-    marginTop: 5,
+    //marginTop: 5,
     marginBottom: 20,
 
     flexDirection: "row",
@@ -340,7 +408,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderWidth: 1,
+    //borderWidth: 1,
     backgroundColor: "#14999999",
     borderColor: "#14999999",
   },
@@ -364,6 +432,24 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: "#149999",
     zIndex: 1,
+  },
+
+  termsContainer: {
+    flexDirection: "row",
+    marginBottom: 10,
+    //gap: 5,
+  },
+
+  termsBox: {
+    backgroundColor: "white",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "white",
+    borderRadius: 5,
+    flex: 0,
+    flexDirection: "row",
+    height: "1%",
+    marginRight: 5,
   },
 });
 

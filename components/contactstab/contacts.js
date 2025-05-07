@@ -12,10 +12,7 @@ import {
   Alert,
   RefreshControl,
 } from "react-native";
-
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AntDesign } from "@expo/vector-icons";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
@@ -26,6 +23,7 @@ import { supabase } from "../auth/supabase.js";
 import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { LayoutAnimation } from "react-native";
+import collegeLogo from "../../assets/collegeIcon1.png";
 
 const ContactsUI = ({ route }) => {
   const { session } = route.params;
@@ -41,6 +39,8 @@ const ContactsUI = ({ route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const groupIds = contacts.map((contact) => contact.Group_ID);
   const [expoPushToken, setExpoPushToken] = useState("");
+  const [ringer, setRinger] = useState(false);
+  //const [sessionname, setsessionname] = useState("");
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -63,6 +63,17 @@ const ContactsUI = ({ route }) => {
       .includes(searchQuery.toLowerCase());
     return nameMatch;
   });
+  const loadData = async () => {
+    const storedData = await AsyncStorage.getItem("contactsData");
+    //onst seshName = await AsyncStorage.getItem("sessionName");
+    if (storedData !== null) {
+      setUsers(JSON.parse(storedData));
+    }
+    /*if (seshName !== null) {
+      //setsessionname(seshName);
+    }
+    //alert(sessionname);*/
+  };
 
   const fetchUsers = async () => {
     const { data: users, error } = await supabase
@@ -78,31 +89,32 @@ const ContactsUI = ({ route }) => {
       return;
     }
 
-    const { data, error: sessionError } = await supabase
-      .from("UGC")
-      .select("name")
-      .eq("user_id", session.user.id)
-      .single();
-
-    if (sessionError) {
-      console.error(sessionError);
-      return;
-    }
-
-    const sessionusername = data.name;
 
     const modifiedUsers = await Promise.all(
       users.map(async (user) => {
         const extractedIds = user.User_ID.filter(
           (item) => item !== session.user.id
         );
-        const { data, error: sessionError } = await supabase
+        const { data: ids, error: sessionError } = await supabase
           .from("UGC")
-          .select("name")
-          .in("user_id", extractedIds);
+          .select("name, user_id")
+          .in("user_id", user.User_ID);
+
+          const ownName = ids.find(item => item.user_id === session.user.id)?.name || null;
+
+
+          const arrnames = ids
+          .filter(item => item.user_id !== session.user.id)
+          .map(item => item.name);
+         
+
+
+
+          
+
         let joinedGroups;
         if (!user.Group_Name) {
-          const groupNames = data.map((item) => item.name);
+          const groupNames = arrnames;
 
           joinedGroups = groupNames.join(", ");
         } else {
@@ -116,11 +128,14 @@ const ContactsUI = ({ route }) => {
         // Fetch the most recent group chat message
         const { data: recentMessageData, error: messageError } = await supabase
           .from("Group_Chat_Messages")
-          .select("*")
+          .select(`*`)
           .eq("Group_ID_Sent_To", user.Group_ID)
           .order("created_at", { ascending: false })
-          .limit(1)
-          .single();
+          .limit(100);
+
+        let chatmessages = recentMessageData;
+
+        //console.log("recentMessageData");
 
         const { data: Imagedata, error: ImageError } = await supabase
           .from("images")
@@ -130,17 +145,33 @@ const ContactsUI = ({ route }) => {
 
         // Check if recentMessageData exists, and only include users with recent messages
         if (
-          (!recentMessageData && user.Is_College == false) ||
-          user.Ammount_Users == 1
+          (user.Is_College == false && recentMessageData.length == 0) ||
+          user.Ammount_Users < 2
         ) {
           return null;
         }
-
+        if (user.Is_College == true) {
+          try {
+            return {
+              ...user,
+              joinedGroups,
+              recentMessage: recentMessageData[0],
+              messages: chatmessages,
+              images: collegeLogo,
+              Myname: ownName,
+            };
+          } catch (error) {
+            console.error("Error fetching college logo:", error);
+            // Handle error or return a modified user object as needed
+          }
+        }
         return {
           ...user,
           joinedGroups,
-          recentMessage: recentMessageData,
+          recentMessage: recentMessageData[0],
+          messages: chatmessages,
           images: ImageError ? null : Imagedata,
+          Myname: ownName,
         };
       })
     );
@@ -149,6 +180,16 @@ const ContactsUI = ({ route }) => {
     const filteredUsers = modifiedUsers.filter((user) => user !== null);
 
     filteredUsers.sort((a, b) => {
+      // Check if Is_College is true for either user
+      const isCollegeA = a.Is_College === true;
+      const isCollegeB = b.Is_College === true;
+
+      // If only one user is from college, prioritize it
+      if (isCollegeA !== isCollegeB) {
+        return isCollegeA ? -1 : 1;
+      }
+
+      // If both users are from college or both are not, sort by recentMessage date
       const dateA = a.recentMessage
         ? new Date(a.recentMessage.created_at)
         : null;
@@ -168,34 +209,36 @@ const ContactsUI = ({ route }) => {
     });
 
     setUsers(filteredUsers);
+    await AsyncStorage.setItem("contactsData", JSON.stringify(filteredUsers));
   };
 
   const formatRecentTime = (timestamp) => {
     if (!timestamp) return "";
 
-    const date = new Date(timestamp);
-    const currentTime = new Date();
-    const diffInMs = currentTime - date;
-    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+    const messageDate = new Date(timestamp);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0); // Set to start of current day
 
-    if (diffInDays < 1) {
-      // Less than a day ago, display time in AM/PM format
-      const hours = date.getHours();
-      const minutes = date.getMinutes();
-      const ampm = hours >= 12 ? "PM" : "AM";
-      const formattedTime = `${hours % 12 || 12}:${minutes
-        .toString()
-        .padStart(2, "0")} ${ampm}`;
-      return formattedTime;
+    const yesterday = new Date(currentDate);
+    yesterday.setDate(yesterday.getDate() - 1); // Set to start of yesterday
+
+    if (messageDate > currentDate) {
+      // Message sent today, show time
+      return messageDate.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true,
+      });
+    } else if (messageDate > yesterday) {
+      // Message sent yesterday, show "Yesterday"
+      return "Yesterday";
     } else {
-      // More than a day ago, display the full date
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1;
-      const day = date.getDate();
-      const formattedDate = `${month.toString().padStart(2, "0")}/${day
-        .toString()
-        .padStart(2, "0")}/${year}`;
-      return formattedDate;
+      // Message sent earlier than yesterday, show date
+      return messageDate.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+      });
     }
   };
 
@@ -215,8 +258,11 @@ const ContactsUI = ({ route }) => {
     }
   };
 
+  
   useEffect(() => {
+    loadData();
     fetchUsers();
+
     const channel = supabase.channel("room1");
     const subscription = channel
       .on(
@@ -238,11 +284,37 @@ const ContactsUI = ({ route }) => {
         { event: "update", schema: "public", table: "Group_Chats" },
         (updatePayload) => {
           if (updatePayload) {
-            const payloadarray = updatePayload.new.User_ID;
+            fetchUsers();
+            /*const payloadarray = updatePayload.new.User_ID;
             if (payloadarray.includes(session.user.id)) {
               // console.log("Group data altered");
               fetchUsers();
             }
+            /*if()
+            {
+              console.log("heard");
+              fetchUsers();
+            }*/
+          }
+          // Handle delete event
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "delete", schema: "public", table: "Group_Chats" },
+        (DelPayload) => {
+          if (DelPayload) {
+            fetchUsers();
+            /*const payloadarray = updatePayload.new.User_ID;
+            if (payloadarray.includes(session.user.id)) {
+              // console.log("Group data altered");
+              fetchUsers();
+            }
+            /*if()
+            {
+              console.log("heard");
+              fetchUsers();
+            }*/
           }
           // Handle delete event
         }
@@ -295,7 +367,7 @@ const ContactsUI = ({ route }) => {
     setSelectedUser(user);
 
     //console.log(user.joinedGroups);
-    navigation.navigate("Message", { user });
+    navigation.navigate("Message", { user});
   };
 
   const handlePlusIconPress = () => {
@@ -319,7 +391,7 @@ const ContactsUI = ({ route }) => {
         const opacityValue = contactOpacities[item.Group_ID];
         Animated.timing(opacityValue, {
           toValue: 0, // Make it fully transparent
-          duration: 150, // Animation duration in milliseconds
+          duration: 75, // Animation duration in milliseconds
           useNativeDriver: false, // Required for opacity animations
         }).start(async () => {
           // After the animation is complete, perform the deletion logic
@@ -352,17 +424,58 @@ const ContactsUI = ({ route }) => {
     };
     const opacityValue = contactOpacities[item.Group_ID];
 
+    const handleSilence = async () => {
+      let arr = [];
+      if (item.Silenced != null || item.Silenced != undefined) {
+        item.Silenced.push(session.user.id);
+        arr = item.Silenced;
+      } else {
+        arr.push(session.user.id);
+      }
+      const { data, error } = await supabase
+        .from("Group_Chats")
+        .update({ Silenced: arr })
+        .eq("Group_ID", item.Group_ID);
+    };
+
+    const handleUnsilence = async () => {
+      let arr = [];
+      if (item.Silenced != null || item.Silenced != undefined) {
+        item.Silenced = item.Silenced.filter(
+          (userId) => userId !== session.user.id
+        );
+        arr = item.Silenced;
+      }
+
+      const { data, error } = await supabase
+        .from("Group_Chats")
+        .update({ Silenced: arr })
+        .eq("Group_ID", item.Group_ID);
+    };
+
     const renderRightActions = (progress, dragX) => {
       // console.log("Progress:", progress);
       const trans = dragX.interpolate({
-        inputRange: [-75, 0],
-        outputRange: [0, 75], // Modify this line to change the direction of the expansion
+        inputRange: [-110, 0],
+        outputRange: [0, 110], // Modify this line to change the direction of the expansion
       });
 
       const handleDeleteConfirmation = (item) => {
         if (item.Is_College == true) {
           Alert.alert(
             "School Channel",
+            "You do not have permission to delete this channel",
+            [
+              {
+                text: "Ok",
+              },
+            ]
+          );
+          return;
+        }
+        if (item.Ammount_Users > 2 && item.Host != session.user.id) {
+          Alert.alert(
+            "You are not the host of this channel",
             "You do not have permission to delete this channel",
             [
               {
@@ -386,26 +499,89 @@ const ContactsUI = ({ route }) => {
           ]
         );
       };
+      const handleSecondAction = (item) => {
+        if (
+          item.Silenced == null ||
+          item.Silenced == undefined ||
+          !item.Silenced.includes(session.user.id)
+        ) {
+          Alert.alert(
+            "Silence Notifications",
+            "Are you sure you want to Silence the notifications for this group chat?",
+            [
+              {
+                text: "Yes",
+                onPress: handleSilence,
+              },
+              {
+                text: "No",
+              },
+            ]
+          );
+        } else {
+          Alert.alert(
+            "Unsilence Notifications",
+            "Are you sure you want to unsilence the notifications for this group chat?",
+            [
+              {
+                text: "Yes",
+                onPress: handleUnsilence,
+              },
+              {
+                text: "No",
+              },
+            ]
+          );
+        }
+      };
 
       return (
-        <TouchableOpacity onPress={() => handleDeleteConfirmation(item)}>
-          <Animated.View
-            style={{
-              backgroundColor: "red",
-              justifyContent: "center",
-              alignItems: "center",
-              width: 75,
-              height: "100%",
-              transform: [{ translateX: trans }],
-            }}
-          >
-            {/* Replace 'Delete' text with trashcan icon */}
-            <Icon name="trash" size={24} color="white" />
-          </Animated.View>
-        </TouchableOpacity>
+        <Animated.View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            width: 110,
+            transform: [{ translateX: trans }],
+            flexDirection: "row",
+          }}
+        >
+          <TouchableOpacity onPress={() => handleSecondAction(item)}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "#5b52c7",
+                width: 55,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Icon name="bell-slash" size={20} color="white" />
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => handleDeleteConfirmation(item)}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "#e60000",
+                width: 55,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {/* Replace 'Delete' text with trashcan icon */}
+              <Icon name="trash" size={25} color="white" />
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
       );
     };
+
     const renderProfilePicture = () => {
+      if (item.Is_College === true) {
+        // Single profile picture
+        return <Image style={styles.profilePicture} source={item.images} />;
+      }
       if (item.Ammount_Users > 2 && item.images.length > 1) {
         // Overlay two profile pictures
         return (
@@ -499,6 +675,7 @@ const ContactsUI = ({ route }) => {
           renderRightActions={renderRightActions}
           overshootRight={false}
           useNativeDriver={true}
+          friction={2}
         >
           <TouchableOpacity onPress={() => handleUserCardPress(item)}>
             <View style={styles.contactItem}>
@@ -546,6 +723,13 @@ const ContactsUI = ({ route }) => {
                       >
                         {item.recentMessage.Message_Content}
                       </Text>
+                      {item.Silenced ? (
+                        <>
+                          {item.Silenced.includes(session.user.id) ? (
+                            <Icon name="bell-slash" size={13} color="#575D61" />
+                          ) : null}
+                        </>
+                      ) : null}
                       {item.recentMessage &&
                       !item.recentMessage.Read.includes(session.user.id) ? (
                         <View style={styles.circle} /> // Add this View for the solid circle
@@ -572,12 +756,6 @@ const ContactsUI = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Image
-          style={styles.logo}
-          source={{
-            uri: "https://static.vecteezy.com/system/resources/previews/002/927/317/large_2x/tourist-hammock-for-recreation-portable-hammock-isolated-on-a-white-background-illustration-in-doodle-style-hammock-for-outdoor-recreation-free-vector.jpg",
-          }}
-        />
         <Text style={styles.headerText}>Messages</Text>
         <TouchableOpacity
           onPress={handlePlusIconPress}
@@ -682,10 +860,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     elevation: 3,
     marginHorizontal: 10,
-    // borderWidth: 0.20,
-    // borderTopWidth: 0.20,
-    //borderBottomWidth: 0.2,
-
     borderColor: "grey",
   },
   searchInput: {

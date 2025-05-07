@@ -26,6 +26,8 @@ import PrivacyPolicy from "./privacyPolicy";
 import ContentPolicy from "./contentPolicy";
 import FAQ from "./faq";
 import UserAgreement from "./userAgreement";
+import ReportIssue from "./reportIssue";
+import UserCardClone from "../hometab/userCardClone";
 
 const Stack = createStackNavigator(); // Initialize stack navigator
 
@@ -52,7 +54,6 @@ const ThreeMainPages = ({ route }) => {
           name="Message"
           component={MessagingUI}
           initialParams={{ session }}
-          options={{ gestureEnabled: false }}
         />
         <Stack.Screen
           name="AddProfileImages"
@@ -85,7 +86,7 @@ const ThreeMainPages = ({ route }) => {
           mode="modal"
           component={ComposeMessageScreen}
           initialParams={{ session }}
-          options={{ presentation: "modal" }}
+          //options={{ presentation: "modal" }}
         />
         <Stack.Screen
           name="Filters"
@@ -113,6 +114,11 @@ const ThreeMainPages = ({ route }) => {
         <Stack.Screen
           name="GroupChatScreen"
           component={GroupChatScreen}
+          initialParams={{ session }}
+        />
+        <Stack.Screen
+          name="UserCardClone"
+          component={UserCardClone}
           initialParams={{ session }}
         />
         <Stack.Screen
@@ -151,6 +157,12 @@ const ThreeMainPages = ({ route }) => {
         <Stack.Screen
           name="ReportUI"
           component={ReportUI}
+          initialParams={{ session }}
+          options={{ presentation: "modal" }}
+        />
+        <Stack.Screen
+          name="ReportIssue"
+          component={ReportIssue}
           initialParams={{ session }}
           options={{ presentation: "modal" }}
         />

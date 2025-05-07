@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef, useMemo, memo } from "react";
 import {
   Image,
   TextInput,
@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
+import ActionSheet from "react-native-action-sheet";
 import { supabase } from "../auth/supabase.js"; // we have our client here!!! no need to worry about creating it again
 import { picURL } from "../auth/supabase.js"; // This is the base url of the photos bucket that is in our Supabase project. It makes referencing user pictures easier
 import { useNavigation } from "@react-navigation/native";
@@ -117,7 +118,7 @@ const Home = ({ route }) => {
       .select("notification_token")
       .eq("user_id", session.user.id);
 
-    if (istoken.notification_token === null) {
+    if (istoken.notification_token == null) {
       //console.log(token)
       const { data: tokendata, error } = await supabase
         .from("UGC")
@@ -158,29 +159,40 @@ const Home = ({ route }) => {
 
   const renderEmptyComponent = () => (
     <View style={styles.emptyContainer}>
-      <Text style={styles.emptyText}>No users found</Text>
+      <Text style={styles.emptyText}>
+        No one yet - Be the first at your school.
+      </Text>
     </View>
   );
 
+  const truncateString = (str, maxLength) => {
+    if (str.length > maxLength) {
+      return str.substring(0, maxLength - 3) + "...";
+    }
+    return str;
+  };
+
   const showSortMenu = () => {
-    Alert.alert(
-      "Sort Options",
-      "Choose a sorting method:",
-      [
-        {
-          text: "Alphabetical Order",
-          onPress: () => setSortMethod("Alphabetical Order"),
-        },
-        {
-          text: "Shared Interests",
-          onPress: () => setSortMethod("Shared Interests"),
-        },
-        {
-          text: "Recommended",
-          onPress: () => setSortMethod("Recommended"),
-        },
-      ],
-      { cancelable: true }
+    const options = [
+      "Alphabetical Order",
+      "Shared Interests",
+      "Recommended",
+      "Class Year",
+      "Cancel",
+    ];
+    const cancelButtonIndex = options.length - 1;
+
+    ActionSheet.showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+      },
+      (buttonIndex) => {
+        if (buttonIndex !== cancelButtonIndex) {
+          const selectedSortMethod = options[buttonIndex];
+          setSortMethod(selectedSortMethod);
+        }
+      }
     );
   };
 
@@ -190,6 +202,9 @@ const Home = ({ route }) => {
       switch (sortMethod) {
         case "Alphabetical Order":
           return a.name.localeCompare(b.name);
+
+        case "Class Year":
+          return a.class_year - b.class_year;
 
         case "Shared Interests":
           const aTagsCount = a.tags.filter((tag) =>
@@ -229,7 +244,8 @@ const Home = ({ route }) => {
 
     //console.log(isHousingMatch);
     const isGenderMatch =
-      genderPreference === "Any" || user.profiles.gender === genderPreference;
+      genderPreference === "No Preferences" ||
+      user.profiles.gender === genderPreference;
 
     const isAgeMatch =
       (youngestAgePreference === "Any" ||
@@ -274,10 +290,34 @@ const Home = ({ route }) => {
         .select("*")
         .neq("has_ugc", false)
         .neq("profile_viewable", false);
+
+      const sessionUserId = session.user.id;
+      const { data: sessionProfileData, error: sessionProfileError } =
+        await supabase
+          .from("profile")
+          .select("college")
+          .eq("user_id", sessionUserId)
+          .single();
+
+      if (sessionProfileError || !sessionProfileData) {
+        console.error(
+          sessionProfileError || "Session user's profile not found"
+        );
+        return;
+      }
+
+      const sessionUserCollege = sessionProfileData.college;
+
       const { data: profileData, error: profileError } = await supabase
         .from("profile")
         .select("*")
+        .eq("college", sessionUserCollege)
         .neq("profile_complete", false);
+
+      if (profileError) {
+        console.error(profileError);
+        return;
+      }
       const { data: imageData, error: imageError } = await supabase
         .from("images")
         .select("*")
@@ -416,11 +456,12 @@ const Home = ({ route }) => {
     );
   };
 
-  const renderUserCard = ({ item }) => {
+  const renderUserCard = ({ item, onPress }) => {
     if (!item.lastModified) {
       //console.log(item);
       return null;
     }
+    const truncatedName = truncateString(item.name, 25);
     return (
       <TouchableOpacity onPress={() => handleUserCardPress(item)}>
         <View style={styles.card}>
@@ -435,7 +476,7 @@ const Home = ({ route }) => {
               <Text style={styles.class}>{item.class_year}</Text>
             </View>
             <View style={styles.userStuff}>
-              <Text style={styles.name}> {item.name} </Text>
+              <Text style={styles.name}>{truncatedName}</Text>
               <Text numberOfLines={1} ellipsizeMode="tail" style={styles.major}>
                 {" "}
                 {item.major || "Undecided"}
@@ -675,6 +716,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: 600,
+    paddingLeft: 3,
     //paddingTop: 10,
     color: "white",
     zIndex: 1,
@@ -740,10 +782,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 140,
+    marginHorizontal: 20,
   },
   emptyText: {
     fontSize: 20,
     color: "grey",
+    textAlign: "center",
   },
   class: {
     color: "grey",

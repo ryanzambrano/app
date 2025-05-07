@@ -17,7 +17,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { picURL } from "../auth/supabase.js";
 
 const UserAgreement = ({ navigation, route }) => {
-  const { session } = route.params;
+  //const { session } = route.params;
 
   useEffect(() => {}, []);
 
@@ -37,7 +37,10 @@ const UserAgreement = ({ navigation, route }) => {
         </View>
         <View style={styles.right}></View>
       </View>
-      <ScrollView style={styles.textContainer}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.textContainer}
+      >
         <Text style={styles.heading}>1. Acceptance of Terms</Text>
         <Text style={styles.text}>
           By accessing and using the Cabana app, you agree to be bound by the
@@ -116,10 +119,7 @@ const UserAgreement = ({ navigation, route }) => {
         <Text style={styles.text}>
           If you have any questions or concerns regarding this User Agreement,
           please contact us at:
-          {"\n"}Cabana
-          {"\n"}[Email]
-          {"\n"}[Address]
-          {"\n"}[Phone]
+          {"\n\n"}team@thecabanaapp.com
         </Text>
       </ScrollView>
     </SafeAreaView>
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 10,
+    paddingTop: 10,
     marginLeft: 15,
     marginRight: 39,
   },
@@ -173,21 +173,27 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "white",
   },
-
   text: {
-    fontSize: 11,
+    fontSize: 16,
     color: "lightgrey",
-    marginVertical: 2,
+    lineHeight: 28,
+    marginHorizontal: 15,
+    paddingBottom: 30,
+    marginBottom: 20,
   },
   textContainer: {
-    margin: 30,
+    borderTopColor:'#2B2D2F',
+    borderTopWidth: 1,
+    paddingTop: 10,
+    marginBottom: -40,
     //alignItems: "center",
   },
   heading: {
     fontWeight: "bold",
     color: "lightgrey",
-    fontSize: 12,
-    marginTop: 20,
+    fontSize: 18,
+    marginTop: 5,
+    paddingLeft: 15,
     marginBottom: 2,
   },
 });

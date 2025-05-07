@@ -17,7 +17,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { picURL } from "../auth/supabase.js";
 
 const ContentPolicy = ({ navigation, route }) => {
-  const { session } = route.params;
+  //const { session } = route.params;
 
   useEffect(() => {}, []);
 
@@ -38,10 +38,10 @@ const ContentPolicy = ({ navigation, route }) => {
         <View style={styles.right}></View>
       </View>
 
-      <ScrollView style={styles.textContainer}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.textContainer}>
         <Text style={styles.heading}>1. Introduction </Text>
         <Text style={styles.text}>
-          Cabana is a platform aimed at connecting college students with
+        {"\t"}Cabana is a platform aimed at connecting college students with
           potential roommates. We strive to maintain a respectful, safe, and
           inclusive environment for all users. This Content Policy outlines the
           guidelines and standards for content shared within the Cabana app.
@@ -49,54 +49,54 @@ const ContentPolicy = ({ navigation, route }) => {
 
         <Text style={styles.heading}>2. User Responsibilities</Text>
         <Text style={styles.text}>
-          Accuracy: Users are responsible for providing accurate information
+        {"\t"}Accuracy: Users are responsible for providing accurate information
           regarding their identity, college/university affiliation, and roommate
           preferences.
         </Text>
         <Text style={styles.text}>
-          Respect: Users should respect the opinions and preferences of other
+        {"\n\t"}Respect: Users should respect the opinions and preferences of other
           users, and refrain from engaging in hateful, discriminatory, or
           harassing behavior.
         </Text>
         <Text style={styles.text}>
-          Age Requirement: Users must be at least 18 years old to use Cabana.
+        {"\n\t"}Age Requirement: Users must be at least 18 years old to use Cabana.
         </Text>
 
         {/* ... Previous sections ... */}
 
         <Text style={styles.heading}>3. Prohibited Content</Text>
         <Text style={styles.text}>
-          False Information: Sharing false or misleading information is strictly
+        {"\t"}False Information: Sharing false or misleading information is strictly
           prohibited.
         </Text>
         <Text style={styles.text}>
-          Hateful Content: Any form of discrimination or hate towards
+        {"\n\t"}Hateful Content: Any form of discrimination or hate towards
           individuals or groups based on attributes such as race, ethnicity,
           religion, gender, or sexual orientation is not allowed.
         </Text>
         <Text style={styles.text}>
-          Harassment: Engaging in harassment, threats, or bullying towards other
+        {"\n\t"}Harassment: Engaging in harassment, threats, or bullying towards other
           users is strictly prohibited.
         </Text>
         <Text style={styles.text}>
-          Illegal Content: Sharing or promoting illegal content, including drugs
+        {"\n\t"}Illegal Content: Sharing or promoting illegal content, including drugs
           or violence, is not allowed.
         </Text>
 
         <Text style={styles.heading}>4. Reporting Violations</Text>
         <Text style={styles.text}>
-          Users are encouraged to report any violations of this Content Policy
+        {"\t"}Users are encouraged to report any violations of this Content Policy
           through the reporting features provided within the app, or by
           contacting us directly at [Email].
         </Text>
 
         <Text style={styles.heading}>5. Enforcement</Text>
         <Text style={styles.text}>
-          Review: We reserve the right to review any reported content for
+        {"\t"}Review: We reserve the right to review any reported content for
           violations of this Content Policy.
         </Text>
         <Text style={styles.text}>
-          Actions: We may take various actions against violations, including
+        {"\n\t"}Actions: We may take various actions against violations, including
           warning the offending user, removing the content, suspending the user
           account, or reporting to law enforcement as necessary.
         </Text>
@@ -105,19 +105,16 @@ const ContentPolicy = ({ navigation, route }) => {
           6. Modifications to This Content Policy
         </Text>
         <Text style={styles.text}>
-          Cabana reserves the right to modify this Content Policy at any time.
+        {"\t"}Cabana reserves the right to modify this Content Policy at any time.
           Any changes will be posted on this page and, where appropriate,
           notified to you by email or through the app.
         </Text>
 
         <Text style={styles.heading}>7. Contact Us</Text>
         <Text style={styles.text}>
-          If you have any questions or concerns regarding this Content Policy,
+        {"\t"}If you have any questions or concerns regarding this Content Policy,
           please contact us at:
-          {"\n"}Cabana
-          {"\n"}[Email]
-          {"\n"}[Address]
-          {"\n"}[Phone]
+          {"\n\n"}team@thecabanaapp.com
         </Text>
       </ScrollView>
     </SafeAreaView>
@@ -162,19 +159,25 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    fontSize: 11,
+    fontSize: 16,
     color: "lightgrey",
-    marginVertical: 2,
+    lineHeight: 28,
+    marginHorizontal: 15,
+    paddingBottom: 30,
   },
   textContainer: {
-    margin: 30,
+    borderTopColor:'#2B2D2F',
+    borderTopWidth: 1,
+    paddingTop: 10,
+    marginBottom: -20,
     //alignItems: "center",
   },
   heading: {
     fontWeight: "bold",
     color: "lightgrey",
-    fontSize: 12,
-    marginTop: 20,
+    fontSize: 18,
+    marginTop: 5,
+    paddingLeft: 15,
     marginBottom: 2,
   },
 });

@@ -160,6 +160,8 @@ const BlockedList = ({ navigation, route }) => {
         data={blockedUsers}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
+        borderTopColor={'#2B2D2F'}
+    borderTopWidth={1}
         ListEmptyComponent={renderEmptyComponent}
       />
     </SafeAreaView>
@@ -177,6 +179,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingVertical: 10,
     marginLeft: 15,
+    
     marginRight: 39,
   },
 

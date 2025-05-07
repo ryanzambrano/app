@@ -39,7 +39,7 @@ export const Retake2 = ({ navigation, route }) => {
     useState("");
 
   const livingPreferences = ["Apartment", "Dorm", "House", "No Preferences"];
-  const forFun = ["Going Clubbing", "Movie night in", "Inner circle hang"];
+  const forFun = ["Going clubbing", "Movie night in", "Inner circle hangout"];
   const studies = [
     "Business",
     "Natural Science",
@@ -109,21 +109,7 @@ export const Retake2 = ({ navigation, route }) => {
         !!userData.forFun &&
         !!userData.studies
       ) {
-        const { data, error } = await supabase
-          .from("profile")
-          .update({
-            living_preferences: userData.livingPreferences,
-            for_fun: userData.forFun,
-            studies: userData.studies,
-          })
-          .eq("user_id", session.user.id);
-
-        if (error) {
-          startShakeAnimation(shakeAnimationValue);
-          setIsError(error.message);
-        } else {
-          navigation.navigate("Retake3");
-        }
+        navigation.navigate("Retake3");
       } else {
         startShakeAnimation(shakeAnimationValue);
         setIsError("All fields are required");
@@ -131,21 +117,54 @@ export const Retake2 = ({ navigation, route }) => {
     }
   };
 
-  handleLivingPreferences = () => {
+  handleLivingPreferences = async () => {
     if (!selectedLivingPreferences) {
       setSelectedLivingPreferences("Apartment");
     }
+    const { data, error } = await supabase
+      .from("profile")
+      .update({
+        living_preferences: userData.livingPreferences,
+      })
+      .eq("user_id", session.user.id);
+
+    if (error) {
+      startShakeAnimation(shakeAnimationValue);
+      setIsError(error.message);
+    }
     closeLivingPreferencesModal();
   };
-  handleForFun = () => {
+  handleForFun = async () => {
     if (!selectedForFun) {
-      setSelectedForFun("Stay in");
+      setSelectedForFun("Going Clubbing");
+    }
+    const { data, error } = await supabase
+      .from("profile")
+      .update({
+        for_fun: userData.forFun,
+      })
+      .eq("user_id", session.user.id);
+
+    if (error) {
+      startShakeAnimation(shakeAnimationValue);
+      setIsError(error.message);
     }
     closeForFunModal();
   };
-  handleStudies = () => {
+  handleStudies = async () => {
     if (!selectedStudies) {
-      setSelectedStudies("Science");
+      setSelectedStudies("Business");
+    }
+    const { data, error } = await supabase
+      .from("profile")
+      .update({
+        studies: userData.studies,
+      })
+      .eq("user_id", session.user.id);
+
+    if (error) {
+      startShakeAnimation(shakeAnimationValue);
+      setIsError(error.message);
     }
     closeStudiesModal();
   };

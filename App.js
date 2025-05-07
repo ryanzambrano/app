@@ -81,6 +81,12 @@ const App = () => {
   }, []);
 
   const checkUserProfile = async (session) => {
+    //const { error } = await supabase.auth.signOut();
+
+    let profileInserted;
+    let ugcInserted;
+
+    setHasProfile(null);
     if (session?.user) {
       setIsLoading(true);
       const { data, error } = await supabase
@@ -88,42 +94,71 @@ const App = () => {
         .select("profile_complete")
         .eq("user_id", session.user.id)
         .single();
-
       const { data: ugcData, error: ugcError } = await supabase
         .from("UGC")
         .select("has_ugc")
         .eq("user_id", session.user.id)
         .single();
 
-      if (data == null) {
-        // User does not have a profile, insert a new profile
-        const { data, error } = await supabase
-          .from("profile")
-          .insert([{ user_id: session.user.id, profile_complete: false }]);
-        //alert("profile data" + data);
-      }
-      if (ugcData == null) {
-        const { data: ugcData, error: ugcError } = await supabase
-          .from("UGC")
-          .insert([{ user_id: session.user.id }]);
+      // Handle the specific error
 
-        if (data == true && ugcData) {
-          setHasProfile(hasProfile);
+      if (data && ugcData) {
+        //alert(data.profile_complete);
+        if (data.profile_complete == true && ugcData.has_ugc == true) {
+          //const hasProfile = !!data.profile_complete;
+          //alert("papii");
+
+          setHasProfile(true);
+          setIsLoading(false);
+
+          //return;
+        } else {
+          setHasProfile(false);
+          setIsLoading(false);
         }
-      }
-      if (error || ugcError) {
-        setIsLoading(false);
+      } else if (error || ugcError) {
+        // Handle the specific error
+        if (data == null || ugcData == null) {
+          if (data == null) {
+            // User does not have a profile, insert a new profile
+            const { data: profileInsertData, error: profileInsertError } =
+              await supabase
+                .from("profile")
+                .insert([
+                  { user_id: session.user.id, profile_complete: false },
+                ]);
+            if (profileInsertError) {
+              // alert("problem");
+            } else {
+              profileInserted = true;
+              //alert("profile");
+            }
+          }
 
-        throw new Error("error.message");
-      }
+          if (ugcData == null) {
+            const { data: ugcInsertData, error: ugcInsertError } =
+              await supabase.from("UGC").insert([{ user_id: session.user.id }]);
 
-      if (data.profile_complete == true && ugcData.has_ugc == true) {
-        const hasProfile = !!data.profile_complete;
+            if (ugcInsertError) {
+              //alert("problem");
+            } else {
+              ugcInserted = true;
 
-        setHasProfile(true);
+              //alert("ugc");
+            }
+          }
+          if (profileInserted === true || ugcInserted === true) {
+            //alert("success");
+            setHasProfile(false);
+            setIsLoading(false);
+            //return;
+          }
+        }
       } else {
-        //console.log("profile invalid");
+        alert("last");
         setHasProfile(false);
+        setIsLoading(false);
+        return;
       }
     }
 

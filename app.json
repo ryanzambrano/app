@@ -2,7 +2,8 @@
   "expo": {
     "name": "Cabana",
     "slug": "hello-world",
-    "version": "1.0.4",
+
+    "version": "1.1.8",
 
     "orientation": "portrait",
     "icon": "./assets/cabanaAppLogo.png",
@@ -16,8 +17,11 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.ryanzambrano15.helloworld"
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ryanzambrano15.helloworld",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "This app requires access to your photo library to let you choose and upload images for your profile and posts."
+      }
     },
     "android": {
       "adaptiveIcon": {

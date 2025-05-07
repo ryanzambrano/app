@@ -13,6 +13,7 @@ import {
   Animated,
   TouchableWithoutFeedback,
   Keyboard,
+  Alert,
 } from "react-native";
 
 import { supabase } from "./supabase.js";
@@ -29,13 +30,32 @@ export const ForgotPassword = ({ navigation }) => {
     Keyboard.dismiss();
   };
 
+  /*const showSuccess = () => {
+    Alert.alert(
+      "Email sent",
+      "Choose a sorting method:",
+      [
+        {
+          text: "Alphabetical Order",
+        },
+        {
+          text: "Shared Interests",
+        },
+        {
+          text: "Recommended",
+        },
+      ],
+      { cancelable: true }
+    );
+  };*/
+
   async function forgotPassword(email) {
     setLoading(true);
     setError(null);
 
     try {
       await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: "http://thecabanaapp.com/forgot-password",
+        redirectTo: "https://thecabanaapp.com/forgot-password",
       });
     } catch (error) {
       console.error("Error sending password reset email:", error);
@@ -79,9 +99,19 @@ export const ForgotPassword = ({ navigation }) => {
             <Text style={styles.titleText}>Forgot Password?</Text>
             <Text style={styles.sloganText}>
               Enter the email address that you used to sign up and we'll send
-              you an email
+              you an email.
             </Text>
           </View>
+          {emailSent && (
+            <Animated.Text style={[styles.formFooter, shakeAnimationStyle]}>
+              Email successfully sent (0-5 minute wait time){"\n\n"}Make sure to check your spam.
+            </Animated.Text>
+          )}
+          {error && (
+            <Animated.Text style={[styles.errorText, shakeAnimationStyle]}>
+              {error}
+            </Animated.Text>
+          )}
 
           <View style={styles.form}>
             <View style={styles.input}>
@@ -111,16 +141,6 @@ export const ForgotPassword = ({ navigation }) => {
                 </View>
               </TouchableOpacity>
             </View>
-            {emailSent && (
-              <Animated.Text style={[styles.formFooter, shakeAnimationStyle]}>
-                Email successfully sent
-              </Animated.Text>
-            )}
-            {error && (
-              <Animated.Text style={[styles.errorText, shakeAnimationStyle]}>
-                {error}
-              </Animated.Text>
-            )}
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -149,11 +169,11 @@ const styles = StyleSheet.create({
   },
 
   titleText: {
-    fontFamily: "Verdana-Bold",
+    //fontFamily: "Verdana-Bold",
     fontSize: 27,
-    fontWeight: "700",
+    fontWeight: "600",
     textAlign: "center",
-    marginBottom: 12,
+    marginBottom: 10,
     color: "#fff",
   },
 
@@ -200,9 +220,10 @@ const styles = StyleSheet.create({
   formFooter: {
     fontSize: 17,
     fontWeight: "600",
-    color: "#fff",
+    color: "lightgreen",
     textAlign: "center",
     letterSpacing: 0.15,
+    marginBottom: 40,
   },
 
   continue: {
@@ -236,6 +257,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
     fontWeight: "600",
+    marginBottom: 20,
   },
 });
 

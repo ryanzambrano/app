@@ -91,7 +91,7 @@ export const SignIn = ({ navigation }) => {
                 autoCapitalize="none"
                 autoCorrect={true}
                 keyboardType="email-address"
-                //placeholder="deeznuts@bruh.com"
+                placeholder="Enter your email address"
                 placeholderTextColor="#6b7280"
                 value={form.email}
                 onChangeText={(email) => setForm({ ...form, email })}
@@ -104,7 +104,7 @@ export const SignIn = ({ navigation }) => {
                 style={styles.inputControl}
                 styles={styles.inputControl}
                 autoCorrect={true}
-                //placeholder="*********"
+                placeholder="*********"
                 placeholderTextColor="#6b7280"
                 value={form.password}
                 onChangeText={(password) => setForm({ ...form, password })}
@@ -181,9 +181,9 @@ const styles = StyleSheet.create({
   },
 
   titleText: {
-    fontFamily: "Verdana-Bold",
+    //fontFamily: "Verdana",
     fontSize: 27,
-    fontWeight: "700",
+    fontWeight: "600",
     textAlign: "center",
     marginBottom: 12,
     color: "#fff",
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     //fontFamily: "Verdana",
     fontSize: 17,
     fontWeight: "500",
-    color: "#929292",
+    color: "lightgrey",
     textAlign: "center",
   },
 

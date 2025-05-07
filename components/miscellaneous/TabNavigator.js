@@ -6,9 +6,11 @@ import View from "react-native";
 import ContactsUI from "../contactstab/contacts"; // Imports for use in Tab Navigator
 import Home from "../hometab/home";
 import Profile from "../profiletab/profile";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Foundation } from "@expo/vector-icons";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
+import { FontAwesome5, Feather } from "@expo/vector-icons";
+import { Octicons } from "@expo/vector-icons";
 
 const Tab = createBottomTabNavigator(); // Initializes bottom tab navigator
 
@@ -30,25 +32,25 @@ const TabNavigator = ({ route }) => {
         tabBarIcon: ({ focused, color, size }) => {
           if (route.name === "Contacts") {
             return (
-              <MaterialIcons
-                name="chat-bubble-outline"
-                size={24}
+              <MaterialCommunityIcons
+                name="message-reply-outline"
+                size={27}
                 color={focused ? "white" : "grey"}
               />
             );
           } else if (route.name === "Home") {
             return (
-              <Foundation
+              <AntDesign
                 name="home"
-                size={24}
+                size={27}
                 color={focused ? "white" : "grey"}
               />
             );
           } else if (route.name === "Profile") {
             return (
-              <FontAwesome5
+              <Feather
                 name="user"
-                size={24}
+                size={27}
                 color={focused ? "white" : "grey"}
               />
             );

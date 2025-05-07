@@ -2,16 +2,19 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
+  Keyboard,
   SafeAreaView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   Alert,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { supabase } from "../auth/supabase";
 
-const ReportUI = ({ route }) => {
+
+const ReportIssue = ({ route }) => {
   const { session } = route.params;
   const { user_id } = route.params;
   const navigation = useNavigation();
@@ -34,45 +37,15 @@ const ReportUI = ({ route }) => {
     try {
       const { data, error } = await supabase.from('Reports').insert([
         {
-          reported_user_id: user_id,
           sender_user_id: session.user.id,
           description: trimmedReport,
-          isUserReport: true,
+          isUserReport: false,
         },
       ]);
 
       if (error) {
         console.error('Error inserting report:', error);
       } else {
-        try {
-          const payload = {
-            PersonReported: user_id,
-            Report_Sender: session.user.id,
-            // Add any other fields as needed
-          };
-      
-          // Make an HTTP POST request to trigger the edge function
-          const response = await fetch('https://jaupbyhwvfulpvkfxmgm.supabase.co/functions/v1/Report_Moderation', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              // Add any additional headers as needed
-            },
-            // You can include an empty JSON object as the body
-            body: JSON.stringify(payload),
-          });
-      
-          if (response.ok) {
-            //console.log('Edge function triggered successfully.');
-            // Handle success if needed
-          } else {
-            console.error('Error triggering edge function:', response.statusText);
-            // Handle error if needed
-          }
-        } catch (error) {
-          console.error('Error triggering edge function:', error.message);
-          // Handle error if needed
-        }
         navigation.goBack();
       }
     } catch (error) {
@@ -81,17 +54,19 @@ const ReportUI = ({ route }) => {
   };
 
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
     <SafeAreaView style={styles.container}>
       <View style={styles.swipeIndicator}></View>
       <View style={styles.headerContainer}>
         <View style={{ width: '33%' }}></View>
-        <Text style={styles.headerText}>Report User</Text>
+        <Text style={styles.headerText}>Report Issue</Text>
       </View>
       <View style={styles.descriptionContainer}>
         <Text style={styles.descriptionLabel}>
-          Why are you reporting this user?
+          Did you encounter a problem? If so, describe the issue below so we can fix it immediately.
         </Text>
-        <Text style={styles.smallerText}>Your report is anonymous, unless someone is in immediate danger. If so, call the local emergency services - don't wait.</Text>
+        <Text style={styles.smallerText}>Reports about abuse or specific users shouldn't be submitted here. If you want to report a user, navigate to their profile
+        and press the "Report" button in the top right corner to submit a report.</Text>
         <View style={styles.inputContainer}>
         <TextInput
             style={styles.input}
@@ -102,6 +77,7 @@ const ReportUI = ({ route }) => {
             multiline
             placeholder="Describe the issue..."
             placeholderTextColor="#575D61"
+            onSubmitEditing={() => Keyboard.dismiss()}
           />
           <Text
             style={{
@@ -126,6 +102,7 @@ const ReportUI = ({ route }) => {
         <Text style={styles.submitButtonText}>Submit</Text>
       </TouchableOpacity>
     </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -220,4 +197,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ReportUI;
+export default ReportIssue;
